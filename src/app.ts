@@ -71,62 +71,11 @@ class App {
          */
         this.express.use('/api/user', UserRouter);
 
-
-
     }
-
-
 }
-
 
 export default new App().express;
 
 
 
 
-/*
-import express from "express";
-import compression from "compression";  // compresses requests
-import session from "express-session";
-import bodyParser from "body-parser";
-import * as path from 'path';
-
-import {A_SECRET} from '../config/secrets';
-
-console.log(A_SECRET);
-// Create Express server
-const app = express();
-
-// Express configuration
-app.set("port", process.env.PORT || 3000);
-app.use(compression());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
-app.use((req, res, next) => {
-  res.locals.user = req.user;
-  next();
-});
-app.use((req, res, next) => {
-    // After successful login, redirect back to the intended page
-    if (!req.user &&
-        req.path !== "/login" &&
-        req.path !== "/signup" &&
-        !req.path.match(/^\/auth/) &&
-        !req.path.match(/\./)) {
-        req.session.returnTo = req.path;
-    } else if (req.user &&
-        req.path == "/account") {
-        req.session.returnTo = req.path;
-    }
-    next();
-});
-
-app.use(
-  express.static(path.join(__dirname, "public"), { maxAge: 31557600000 })
-);
-
-export default app;
-
-
-*/
