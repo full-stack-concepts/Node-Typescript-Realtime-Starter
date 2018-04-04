@@ -37,6 +37,32 @@ export const PATH_TO_PROD_PRIVATE_KEY = process.env["PATH_TO_PROD_PRIVATE_KEY"];
 export const PATH_TO_PROD_CERTIFICATE = process.env["PATH_TO_PROD_CERTIFICATE"];
 
 /***
+ * Google Auth
+ */
+export const ENABLE_GOOGLE_AUTHENTICATION:boolean = Boolean(process.env["ENABLE_GOOGLE_AUTHENTICATION"]);
+export const GOOGLE_AUTH_ID = process.env["GOOGLE_AUTH_ID"];
+export const GOOGLE_AUTH_SECRET = process.env["GOOGLE_AUTH_SECRET"];
+export const GOOGLE_CALLBACK_URL = process.env["GOOGLE_CALLBACK_URL"];
+
+if(ENABLE_GOOGLE_AUTHENTICATION) {	
+
+	if(GOOGLE_AUTH_ID && typeof(GOOGLE_AUTH_ID)!='string') {
+		console.error("User Authentication: Google Auth has been enabled but no Auth ID was provided");
+		process.exit(1);
+	}
+
+	if(GOOGLE_AUTH_SECRET && typeof(GOOGLE_AUTH_SECRET)!='string') {
+		console.error("User Authentication: Google Auth has been enabled but no Secret was provided");
+		process.exit(1);
+	}
+
+	if(GOOGLE_CALLBACK_URL && typeof(GOOGLE_CALLBACK_URL)!='string') {
+		console.error("User Authentication: Google Auth has been enabled but no callback url was provided");
+		process.exit(1);
+	}
+}
+
+/***
  * Checks before bootstrapping application
  */
 if(!EXPRESS_SERVER_MODE) {

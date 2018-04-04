@@ -5,9 +5,14 @@ import cookieParser from "cookie-parser";
 import compression from "compression";
 import helmet from "helmet";
 import logger from "morgan";
+import passport from "passport";
 
-// import * as UserRouter from './routers/user.router';
+// import passport for authentication support
+require("./shared/auth-strategies/passport");
 
+/***
+ * Router Controllers
+ */
 import UserRouter from './routers/user.router';
 
 import { shouldCompress } from './util/middleware.util';
@@ -21,11 +26,14 @@ class App {
 
         // create router app with express
         this.express  = express();
-
+        this.initPassPort();
         this.middleware();
         this.routes();    
     }   
 
+    private initPassPort():void {
+        this.express.use(passport.initialize());
+    }
 
     private middleware():void {       
 

@@ -26,7 +26,7 @@ export function allowMethods(req:Request, res:Response, next:NextFunction) {
 };  
 
 // remove http and https string from http headers origin
-export function strip(str:string) :void | boolean | string {    
+export function strip(str:string) {    
     if(!str) return;
     str.replace("http://", "").trim();
     str.replace("https://", "").trim();
@@ -67,12 +67,12 @@ function populate(a:Array<string>):Array<string> {
 export function allowOrigin(req:Request, res:Response, next:NextFunction) {       	
 
 	let allowedOrigins:any[] = [],
-		env:string = ENVIRONMENT.toString();
+		env:string = ENVIRONMENT;
 
 	if(env === 'dev') allowedOrigins = __populate(allowedOrigins);
 	if(env === 'prod') allowedOrigins = populate(allowedOrigins);
 
-	let origin:string = req.headers.origin || req.headers.host;  
+	let origin = req.headers.origin || req.headers.host;  
 	origin = strip(origin);
 
 	 // do we recweive an url through postmen chrome dev toolk then continue

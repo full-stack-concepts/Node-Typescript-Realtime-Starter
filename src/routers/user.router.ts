@@ -20,7 +20,7 @@ class UserRouter {
 	    this.router = express.Router();  
 
 	    this.middleware();
-        this.api_routes();    
+        this.setRoutes();    
 	}
 
 	private middleware():void {
@@ -34,11 +34,40 @@ class UserRouter {
 
 	}
 
-	private api_routes():void {
+	private setRoutes():void {
 
+		/*****
+         * Client Routes
+         */       
+     
+        // google authorization url
+        this.router.get( 
+        	'/auth/google',  
+        	(req, res, next) => {	
+				if (req.query.return) {
+    				req.session.oauth2return = req.query.return;
+    			}
+    			next();
+    		},
+
+    		// Start OAuth 2 flow using Passport.js
+  			passport.authenticate('google', { scope: ['email', 'profile'] }),
+
+		);
+
+		/***
+		 * OAuth 2 callback url. Use this url to configure your OAuth client 
+		 * in the Google Developers console
+		 */
+		this.router.get( 
+			'/auth/google/callback', 
+			passport.authenticate('google'),   
+			
+  			(req, res, next) => {            
+                res.json({verified:true});               
+  			}
+		);    
 	}
-
-
 }
 
 // Create Public Router and Export it 
