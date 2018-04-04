@@ -6,3 +6,9 @@ The current verion is not ready yet. Community contributions and recommendations
 # Pre-reqs
 To build and run this app locally you will need a few things:
 - Install [Node.js](https://nodejs.org/en/)
+
+# Messages: this repo is 'under construction'
+- to add: stripe billing support
+- to add: sendgrid email support
+- to add: webtoken support
+etc.
