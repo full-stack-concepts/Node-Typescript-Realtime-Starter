@@ -44,6 +44,4 @@ class UserRouter {
 // Create Public Router and Export it 
 const userRouter = new UserRouter();
 const router = userRouter.router;
-
-console.log("==> export user router ", userRouter)
 export default router;

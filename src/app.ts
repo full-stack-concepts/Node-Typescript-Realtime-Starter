@@ -10,8 +10,6 @@ import logger from "morgan";
 
 import UserRouter from './routers/user.router';
 
-console.log(UserRouter)
-
 import { shouldCompress } from './util/middleware.util';
 
 class App {

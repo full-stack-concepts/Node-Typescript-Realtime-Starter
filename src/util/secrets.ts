@@ -3,8 +3,7 @@ import fs from "fs";
 
 if (fs.existsSync(".env")) {   
     dotenv.config({ path: ".env" });
-} 
-
+}
 
 export const ENVIRONMENT = process.env.NODE_ENV;
 const prod = ENVIRONMENT === "production"; // Anything else is treated as 'dev'
@@ -38,7 +37,7 @@ export const PATH_TO_PROD_PRIVATE_KEY = process.env["PATH_TO_PROD_PRIVATE_KEY"];
 export const PATH_TO_PROD_CERTIFICATE = process.env["PATH_TO_PROD_CERTIFICATE"];
 
 /***
- * Checkes before bootstrapping application
+ * Checks before bootstrapping application
  */
 if(!EXPRESS_SERVER_MODE) {
 	console.error("Express Server mode is either http or https. Please pick your mode!");
@@ -54,34 +53,34 @@ if(EXPRESS_SERVER_MODE==='https') {
 
 		if(!PATH_TO_DEV_PRIVATE_KEY || !PATH_TO_DEV_CERTIFICATE ) {
 			console.error("SSL configuration: Either Private key or certificate file is missing");
-    		process.exit(1);
+			process.exit(1);
 		}
 
 		if(PATH_TO_DEV_PRIVATE_KEY && typeof(PATH_TO_DEV_PRIVATE_KEY)!='string') {
 			console.error("SSL configuration: Private key has invalid format");
-    		process.exit(1);
+			process.exit(1);
 		}
 
 		if(PATH_TO_DEV_CERTIFICATE && typeof(PATH_TO_DEV_CERTIFICATE)!='string') {
 			console.error("SSL configuration: Private key has invalid format");
-    		process.exit(1);
+			process.exit(1);
 		}
 
 	} else {
 
 		if(!PATH_TO_PROD_PRIVATE_KEY || !PATH_TO_PROD_CERTIFICATE ) {
 			console.error("SSL configuration: Either Private key or certificate file is missing");
-    		process.exit(1);
+			process.exit(1);
 		}
 
 		if(PATH_TO_PROD_PRIVATE_KEY && typeof(PATH_TO_PROD_PRIVATE_KEY)!='string') {
 			console.error("SSL configuration: Private key has invalid format");
-    		process.exit(1);
+			process.exit(1);
 		}
 
 		if(PATH_TO_PROD_CERTIFICATE && typeof(PATH_TO_PROD_CERTIFICATE)!='string') {
 			console.error("SSL configuration: Private key has invalid format");
-    		process.exit(1);
+			process.exit(1);
 		}
 	}
 }
