@@ -31,10 +31,29 @@ export const ADMIN_PORT = process.env["ADMIN_PORT"];
 /***
  * paths To SSL Certificates
  */
-export const PATH_TO_DEV_PRIVATE_KEY = process.env["PATH_TO_DEV_PRIVATE_KEY"];
-export const PATH_TO_DEV_CERTIFICATE = process.env["PATH_TO_DEV_CERTIFICATE"];
-export const PATH_TO_PROD_PRIVATE_KEY = process.env["PATH_TO_PROD_PRIVATE_KEY"];
-export const PATH_TO_PROD_CERTIFICATE = process.env["PATH_TO_PROD_CERTIFICATE"];
+export const PATH_TO_DEV_PRIVATE_KEY:string = process.env["PATH_TO_DEV_PRIVATE_KEY"];
+export const PATH_TO_DEV_CERTIFICATE:string = process.env["PATH_TO_DEV_CERTIFICATE"];
+export const PATH_TO_PROD_PRIVATE_KEY:string = process.env["PATH_TO_PROD_PRIVATE_KEY"];
+export const PATH_TO_PROD_CERTIFICATE:string = process.env["PATH_TO_PROD_CERTIFICATE"];
+
+/***
+ * MLAB Configuration
+ */
+export const USE_MLAB_DB_HOST:boolean = Boolean(process.env["USE_MLAB_DB_HOST"]);
+export const MLAB_API_KEY:string = process.env["MLAB_API_KEY"];
+export const MLAB_DATABASE:string = process.env["MLAB_DATABASE"];
+
+if(USE_MLAB_DB_HOST) {
+	if(!MLAB_API_KEY || (MLAB_API_KEY && typeof MLAB_API_KEY != 'string')) {
+		console.error("DB Configuration: API Key MLAB is missing! Pleasse add one");
+		process.exit(1);
+	}
+
+	if(!MLAB_DATABASE || (MLAB_DATABASE && typeof MLAB_DATABASE != 'string')) {
+		console.error("DB Configuration: Name remote database is missing. Please add one");
+		process.exit(1);
+	}
+}
 
 /***
  * Google Auth
