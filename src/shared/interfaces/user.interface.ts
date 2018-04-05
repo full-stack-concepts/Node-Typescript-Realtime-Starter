@@ -1,7 +1,12 @@
+import { Document } from "mongoose";
 
-export interface IUser  {
+export interface IUser extends Document  {
 
-	increment?:any;
+	/*
+	increment:any;
+	model:any,
+	remove:Any,
+	*/
 
 	core: {
 		userName: string,
@@ -26,7 +31,7 @@ export interface IUser  {
 
 	userConfiguration: {	
 		isThumbnailSet: boolean,	
-		isGooglePlusUser: boolean
+		isGooglePlusUser?: boolean
 	},
 
 	profile: {

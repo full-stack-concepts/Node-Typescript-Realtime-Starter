@@ -28,7 +28,16 @@ class UserService {
 	}
 
 	private findUserByEmail():Promise<void> {
+
+		/*
+		return User.remoteFindOneOnly(this.queryForID)
+		.then(  user  => { return Promise.resolve(user); })
+		.catch( (err, user) => {		
+			return Promise.reject(err);
+		})
+		*/
 		return Promise.resolve();
+
 	}
 
 	private createProfileFromGoogleData(data:IGoogleUser):Promise<IUser> {
