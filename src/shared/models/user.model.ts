@@ -4,6 +4,7 @@ import axios from "axios";
 
 import { RepositoryBase, IUser } from "../interfaces";
 import { userSchema } from "../schemas";
+import { objectKeysLength, stringify, RemoteQueryBuilder } from "../../util";
 
 
 /***
@@ -17,7 +18,6 @@ class UserRepository extends RepositoryBase<IUser> {
 	}
 }
 
-
 export class UserModel  {
 
 	private _userModel: IUser;	
@@ -29,6 +29,26 @@ export class UserModel  {
 	/****
 	 * Define custom methods for MLAB Mongo Dataabse 
 	 */
+	static remoteCreateUser(_data:any) {		
+
+		return new Promise( (resolve, reject) => {
+
+			// throw error if user profile has no properties 
+			if( _data && objectKeysLength (_data) === 0 ) 
+				return reject(' Invalid Profile');			
+
+			// stringify data and build remote url for this collection
+			let data = stringify(_data);			
+			let rURL = RemoteQueryBuilder.buildCollectionURL('users');	
+
+			axios.post( rURL, data).then( response => { resolve(response.data); })
+	        .catch( (err) => {	       
+	        	reject(err);
+	        });
+		});
+	}
+
+
 
 	/****
 	 * Define custom methods for local onstance of MongoDB here	

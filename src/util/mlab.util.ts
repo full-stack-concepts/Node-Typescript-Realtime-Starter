@@ -7,7 +7,7 @@ import {
 	MLAB_DATABASE
 } from "./secrets";
 
-class RemoteQueryBuilder {
+export class RemoteQueryBuilder {
 
 	static stringify(obj:any):string { 
 		if(typeof obj === "string") return obj;
@@ -48,4 +48,3 @@ class RemoteQueryBuilder {
 }
 
 
-module.exports = RemoteQueryBuilder;
