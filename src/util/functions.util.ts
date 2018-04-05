@@ -12,7 +12,7 @@ export const objectKeysLength = (obj:any):number => {
 	return keys.length;
 }
 
-export const stringify = (obj:any) => { 
+export const stringify = (obj:any):string => { 
 	if(typeof obj === "string") return obj;
 	return JSON.stringify(obj); 
 }

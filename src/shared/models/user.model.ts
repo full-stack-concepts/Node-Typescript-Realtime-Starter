@@ -6,6 +6,12 @@ import { RepositoryBase, IUser } from "../interfaces";
 import { userSchema } from "../schemas";
 import { objectKeysLength, stringify, RemoteQueryBuilder } from "../../util";
 
+/*********************************************
+ * Define AXIOS constants
+ */
+axios.defaults.baseURL = 'https://api.mlab.com/api/1/databases';
+axios.defaults.headers.post['Content-Type'] = 'application/json';
+
 
 /***
  * Local Repository that contains all methods for 
@@ -27,28 +33,34 @@ export class UserModel  {
 	}
 
 	/****
-	 * Define custom methods for MLAB Mongo Dataabse 
+	 * Custom Methods for MLAB Mongo Databse				
 	 */
+
+	//** MLAB: Create user 
 	static remoteCreateUser(_data:any) {		
-
-		return new Promise( (resolve, reject) => {
-
-			// throw error if user profile has no properties 
-			if( _data && objectKeysLength (_data) === 0 ) 
-				return reject(' Invalid Profile');			
-
-			// stringify data and build remote url for this collection
+		return new Promise( (resolve, reject) => {			 
+			if( _data && objectKeysLength (_data) === 0 ) reject(' Invalid Profile');					
 			let data = stringify(_data);			
-			let rURL = RemoteQueryBuilder.buildCollectionURL('users');	
-
+			let rURL = RemoteQueryBuilder.buildCollectionURL('users');			
 			axios.post( rURL, data).then( response => { resolve(response.data); })
-	        .catch( (err) => {	       
-	        	reject(err);
-	        });
+			.catch( err => reject(err) );			
 		});
 	}
 
-
+	//** MLAB find single user
+	static remoteFindOneOnly(query:Object, collection:string) {
+		return new Promise( (resolve, reject) => {
+			query = stringify( query);
+			let rURL = RemoteQueryBuilder.findOneRemoteURL(collection, query);			
+			console.log(rURL)			
+			axios.get(rURL)
+			.then( response => { 	
+				let account = response.data;
+				resolve(account);
+			})
+        	.catch( err => reject(err) );        
+		});
+	}
 
 	/****
 	 * Define custom methods for local onstance of MongoDB here	
