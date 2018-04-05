@@ -8,8 +8,8 @@ import {
 	GOOGLE_CALLBACK_URL
 } from '../../util/secrets';
 
+import { u } from "../../services/user.service";
 
-console.log("==> Callback URl ", GOOGLE_CALLBACK_URL)
 
 /**************************************************************************************************
  *  Configure the Google strategy for use by Passport.js.
@@ -28,13 +28,26 @@ passport.use(new GoogleStrategy({
 	proxy:true
 }, (accessToken:any, refreshToken:any, profile:any, done:Function) => {
 
-		console.info("***** Google Access Token      ")
-		console.info(accessToken);
-		console.info(refreshToken)
+		
+		console.info("===> Incoming Google Access Token      ")
 		console.info(profile)	
+		
 
-		done(null, {});	
+		u.authenticateGoogleUser({
+			accessToken: accessToken,
+			refreshToken: refreshToken,
+			profile: profile
+		},
 
+		(err:any, user:any) => {
+
+			// after done passport hands over control to <User> router function
+			if(err) {
+				done(err, user );
+			} else {
+				done(null, user );
+			}			
+		});		
 	}) 
 );  
 

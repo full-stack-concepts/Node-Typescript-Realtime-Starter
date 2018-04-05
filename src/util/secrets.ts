@@ -42,6 +42,7 @@ export const PATH_TO_PROD_CERTIFICATE:string = process.env["PATH_TO_PROD_CERTIFI
 export const USE_MLAB_DB_HOST:boolean = Boolean(process.env["USE_MLAB_DB_HOST"]);
 export const MLAB_API_KEY:string = process.env["MLAB_API_KEY"];
 export const MLAB_DATABASE:string = process.env["MLAB_DATABASE"];
+export const MLAB_API_URL:string = process.env["MLAB_API_URL"];
 
 if(USE_MLAB_DB_HOST) {
 	if(!MLAB_API_KEY || (MLAB_API_KEY && typeof MLAB_API_KEY != 'string')) {
@@ -51,6 +52,11 @@ if(USE_MLAB_DB_HOST) {
 
 	if(!MLAB_DATABASE || (MLAB_DATABASE && typeof MLAB_DATABASE != 'string')) {
 		console.error("DB Configuration: Name remote database is missing. Please add one");
+		process.exit(1);
+	}
+
+	if(!MLAB_DATABASE || (MLAB_API_URL && typeof MLAB_API_URL != 'string')) {
+		console.error("DB Configuration: Remote API URL for mlab.com ismising. Please add one!");
 		process.exit(1);
 	}
 }
