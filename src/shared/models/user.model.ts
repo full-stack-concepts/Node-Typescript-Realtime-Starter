@@ -44,7 +44,7 @@ export class UserModel  {
 			let rURL = RemoteQueryBuilder.buildCollectionURL('users');			
 			axios.post( rURL, data)
 			.then( response => { resolve(response.data); })
-			.catch( err => reject(1040) );			
+			.catch( err => reject(err) );			
 		});
 	}
 
@@ -55,7 +55,7 @@ export class UserModel  {
 			let rURL = RemoteQueryBuilder.findOneRemoteURL(collection, query);					
 			axios.get(rURL)
 			.then( response => resolve(response.data) )			
-        	.catch( err => reject(1041) );        
+        	.catch( err => reject(err) );        
 		});
 	}
 

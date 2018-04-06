@@ -1,7 +1,8 @@
 export interface IError {
 	dataType?: string,
-	action?: number,
-	type?: number,
-	message?: string,
+	action?: string,
+	provider?: string,
+	number: number,
+	message: string,
 	stack?:string
 }

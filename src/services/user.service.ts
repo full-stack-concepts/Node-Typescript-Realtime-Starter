@@ -162,7 +162,7 @@ class UserService {
 				this.user = this.newUser;
 				return Promise.resolve();
 			})
-			.catch( err => { return Promise.reject(err); });	
+			.catch( err => { return Promise.reject(8010); });	
 		});		
 	}
 

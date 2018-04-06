@@ -2,19 +2,15 @@ import { IError } from "../interfaces";
 
 export class ErrorMessages {	
 
-	static returnUnspecifiedError():IError {
-		return this.getErrorMessage(9999);
-	}
-
-	static getErrorMessage (errorNumber:number, done?:Function):IError {		
+	static getErrorMessage (errorNumber:number, stack?:any, done?:Function):IError {		
 
 		let error:IError, 
 			errorType = errorNumber.toString();		
 
 		if(!errorType || (errorType && typeof errorType != "string") || (errorType && errorType.length < 4) ) {		
-			error = this.returnUnspecifiedError();		
+			error =  this.getType('9999');
 		} else {
-			error = this.getType(errorType);
+			error = this.getType(errorType. stack);
 		}
 
 		if(done && typeof done === 'function') {
@@ -24,14 +20,82 @@ export class ErrorMessages {
 		}		
 	}
 
-	static getType(errorType:string):IError {	
+	static getType(errorType:string, stack?:any):IError {	
 		console.log('==> processing error ', errorType);
 		let error:IError;
-		switch(errorType) {			
+		switch(errorType) {		
+
+			/***
+			 * Google User Authentication
+			 */
+			case '1030': 
+				error = { 
+					dataType: 'user', 
+					action: 'authentication', 
+					provider: 'google',
+					number: 1030, 
+					message: 'Authenticated Google user is not a natural person (business or organization).'
+				}; 
+				break;
+
+			case '1031':
+				error = { 
+					dataType: 'user', 
+					action: 'authentication', 
+					provider: 'google',
+					number: 1031, 
+					message: 'Authenticated Google user has no public ID or default Google Identifier.'
+				}; 
+				break;
+
+			case '1032':
+				error = { 
+					dataType: 'user', 
+					action: 'authentication', 
+					provider: 'google',
+					number: 1032, 
+					message: 'No valid user name could be constructed for authenticated Google user.'
+				}; 
+				break;
+
+			case '1033':
+				error = { 
+					dataType: 'user', 
+					action: 'authentication', 
+					provider: 'google',
+					number: 1033, 
+					message: 'No email account could be extracted from authenticated Google user\'s profile.'
+				}; 
+				break;
+
+			case '1034':
+				error = { 
+					dataType: 'user', 
+					action: 'authentication', 
+					provider: 'google',
+					number: 1034, 
+					message: 'No email account could be extracted from authenticated Google user\'s profile.'
+				}; 
+				break;
+
+			/***
+			 * Google User Authentication
+			 */
+
+			case '8010':
+				error = { 
+					dataType: 'user', 
+					action: 'save', 
+					provider: 'database',
+					number: 8010, 
+					message: 'An error occured when saving new user',
+					stack: stack
+				}; 
+				break
 
 			// default error message
 			case '9999':		
-			default: error = { type: 9999, message: 'An unexpected error has occured. The issue has been logged and will be investigated by our engineers.'}; break;
+			default: error = { number: 9999, message: 'An unexpected error has occured. The issue has been logged and will be investigated by our engineers.'}; break;
 		}
 
 		return error;
