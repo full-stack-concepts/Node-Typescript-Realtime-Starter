@@ -246,7 +246,7 @@ export class ObservableSocket {
 	}
 
 	// helper function error handling
-	_emitError(action:any, id:mumber, error:any) {
+	_emitError(action:any, id:number, error:any) {
 
 		// message defined on final thing that can be ran, this equals
 		// if(error === null && error.clientMessage === null) { message = "Fatal Error";}
