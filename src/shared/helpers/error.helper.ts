@@ -2,15 +2,15 @@ import { IError } from "../interfaces";
 
 export class ErrorMessages {	
 
-	static getErrorMessage (errorNumber:number, stack?:any, done?:Function):IError {		
+	static get (errorNumber:number, stack?:any, done?:Function):IError {			
 
 		let error:IError, 
 			errorType = errorNumber.toString();		
 
-		if(!errorType || (errorType && typeof errorType != "string") || (errorType && errorType.length < 4) ) {		
+		if(!errorType || (errorType && typeof errorType != "string") || (errorType && errorType.length < 4) ) {					
 			error =  this.getType('9999');
 		} else {
-			error = this.getType(errorType. stack);
+			error = this.getType(errorType, stack);
 		}
 
 		if(done && typeof done === 'function') {
@@ -20,8 +20,9 @@ export class ErrorMessages {
 		}		
 	}
 
+	// #TODO: replace errors with JSON file
 	static getType(errorType:string, stack?:any):IError {	
-		console.log('==> processing error ', errorType);
+	
 		let error:IError;
 		switch(errorType) {		
 
