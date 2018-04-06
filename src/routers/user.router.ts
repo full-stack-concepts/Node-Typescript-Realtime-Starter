@@ -3,11 +3,17 @@ import express from "express";
 import {Router, Request, Response, NextFunction} from "express";
 import passport from "passport";
 
+/***
+ * Import Niddleware functions
+ */
 import { 
 	allowCredentials,
 	allowMethods,
 	allowOrigin
 } from '../util/middleware.util';
+
+import { WebToken } from "./../services/token.service";
+import { IUser } from "../shared/interfaces";
 
 class UserRouter { 
 
@@ -65,11 +71,25 @@ class UserRouter {
 
   				// passport has serialized user and formatted as req.user
                 // we retreieve it and encrypt account types inside web token
-                let user = req.user;     
+                let user = req.user;  
 
-                console.log(user)
+                  WebToken.create( user.accounts, ( err:any, token:string) => {
 
-                res.json({verified:true});               
+                  	console.log(err, token)
+                
+                     // (1) set certificate as cookie
+                     // (2) make token available for real-time (sockets) validation without reading cookies                    
+                    if(!result.err) {       
+
+                    	/*                                                            
+                        res.cookie( keys.cookies.certificate, result.token);                        
+                        res.locals.token = result.token;                       
+                        */
+                    }                   
+
+                    res.json({});                      
+
+                });    		                           
   			}
 		);    
 	}
