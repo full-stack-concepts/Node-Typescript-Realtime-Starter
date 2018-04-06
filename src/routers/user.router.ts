@@ -14,6 +14,11 @@ import {
 
 import { WebToken } from "./../services/token.service";
 import { IUser } from "../shared/interfaces";
+import { 
+	STORE_WEBTOKEN_AS_COOKIE,
+	WEBTOKEN_COOKIE,
+	SEND_TOKEN_RESPONSE
+} from "../util/secrets";
 
 class UserRouter { 
 
@@ -78,16 +83,21 @@ class UserRouter {
                   	console.log(err, token)
                 
                      // (1) set certificate as cookie
-                     // (2) make token available for real-time (sockets) validation without reading cookies                    
-                    if(!result.err) {       
+                     // (2)              
+                    if(!err) {       
 
-                    	/*                                                            
-                        res.cookie( keys.cookies.certificate, result.token);                        
-                        res.locals.token = result.token;                       
-                        */
-                    }                   
+                    	// store webtoken as cookie
+                    	if(STORE_WEBTOKEN_AS_COOKIE) {
+                    		res.cookie(WEBTOKEN_COOKIE, token);
+                    	}                    	
 
-                    res.json({});                      
+                    	// store token in session to enable real-time authenticaion
+                    	res.locals.token = token;       
+
+                    	// send token with json response
+                    	(SEND_TOKEN_RESPONSE)?res.json({token:token}):res.json({})
+
+                    }                                     
 
                 });    		                           
   			}

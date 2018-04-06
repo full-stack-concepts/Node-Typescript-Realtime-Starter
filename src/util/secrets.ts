@@ -86,6 +86,23 @@ if(ENABLE_GOOGLE_AUTHENTICATION) {
 		process.exit(1);
 	}
 }
+  
+/***
+ * Definitions for User Authentication Response
+ */
+export const STORE_WEBTOKEN_AS_COOKIE:boolean = Boolean(process.env["STORE_WEBTOKEN_AS_COOKIE"]);
+export const WEBTOKEN_COOKIE:string = process.env["WEBTOKEN_COOKIE"];
+export const SEND_TOKEN_RESPONSE:boolean = process.env["SEND_TOKEN_RESPONSE"];
+
+console.log(SEND_TOKEN_RESPONSE)
+
+if(STORE_WEBTOKEN_AS_COOKIE) {
+
+	if(!WEBTOKEN_COOKIE || (WEBTOKEN_COOKIE && typeof(WEBTOKEN_COOKIE)!='string')) {
+		console.error("User authentication: please define a COOKIE SECRET for your webtoken cookie in your .env file");
+		process.exit(1);
+	}
+}
 
 /***
  * Checks before bootstrapping application
