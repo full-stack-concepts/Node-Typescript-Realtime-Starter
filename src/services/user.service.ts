@@ -47,7 +47,7 @@ class UserService {
 		) {
 			newUser.security.accountType = 1;
 		} else {
-			errType = 1110; // user has to a natural person
+			errType = 1030; // user has to a natural person
 		}		
 
 		/****
@@ -64,7 +64,7 @@ class UserService {
   		if(p.id && typeof p.id === 'string') {
   			newUser.accounts.googleID = p.id;
   		} else {
-  			errType =  1111; // no public gogole ID was provided
+  			errType =  1031; // no public gogole ID was provided
   		}
 
   		/****
@@ -75,12 +75,12 @@ class UserService {
   			newUser.profile.personalia.firstName = capitalizeString(p.name.givenName) || "";
   			newUser.profile.personalia.lastName = capitalizeString(p.name.familyName) || "";  			
   		} else {
-  			errType = 1112; // user remains nameless
+  			errType = 1032; // user remains nameless
   		}  		
   		if(p.emails && p.emails.length) {
   			newUser.core.email = p.emails[0].value;
   		} else {
-  			errType = 1113; // no email account was provided
+  			errType = 1033; // no email account was provided
   		}  	
 
   		/****  	
@@ -116,22 +116,34 @@ class UserService {
 
 	private formatProfileFromGoogleData():Promise<void> {
 
-		let p:any = deepCloneObject(this.newUser.profile.personalia);
+		let err:any;
 
-		/** format display names */ 
-		this.newUser.profile.displayNames.fullName = `${p.firstName} ${p.lastName}`;
-		this.newUser.profile.displayNames.sortName = `${p.firstName} ${p.lastName}`;
+		try {
 
-		/** user credentials: userName && url */
-		constructUserCredentials( this.newUser, (credentials:any) => {
-			this.newUser.core.userName = credentials.userName;
-			this.newUser.core.url = credentials.url;
-		});		
+			let p:any = deepCloneObject(this.newUser.profile.personalia);
 
-		/** set default user role: 3 orw hatever you like */
-		this.newUser.core.role = 3;	
-		
-		return Promise.resolve();
+			/** format display names */ 
+			this.newUser.profile.displayNames.fullName = `${p.firstName} ${p.lastName}`;
+			this.newUser.profile.displayNames.sortName = `${p.firstName} ${p.lastName}`;
+
+			/** user credentials: userName && url */
+			constructUserCredentials( this.newUser, (credentials:any) => {
+				this.newUser.core.userName = credentials.userName;
+				this.newUser.core.url = credentials.url;
+			});		
+
+			/** set default user role: 3 orw hatever you like */
+			this.newUser.core.role = 3;	
+
+		} 
+		catch (e) { err=e; }
+		finally {
+			if(err) {
+				return Promise.reject(1034);
+			} else {
+				return Promise.resolve();
+			}
+		}		
 	}
 
 	private createNewUser(profile:any):Promise<any> {

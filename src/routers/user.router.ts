@@ -67,7 +67,7 @@ class UserRouter {
                 // we retreieve it and encrypt account types inside web token
                 let user = req.user;     
 
-                console.log(user);
+                console.log(user)
 
                 res.json({verified:true});               
   			}
