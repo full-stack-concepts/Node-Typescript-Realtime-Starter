@@ -41,7 +41,9 @@ passport.use(new GoogleStrategy({
 
 		(err:any, user:any) => {
 
-			// after done passport hands over control to <User> router function
+			/**** 
+			 * After done is exexuted passport passes control back to <UserRouter>
+			 */
 			if(err) {
 				done(err, user );
 			} else {

@@ -24,8 +24,6 @@ import axios from "./util/axios";
 
 import {u} from "./services/user.service";
 
-u.test("Hallo", (r:any) => console.log(r))
-
 class App {
 
     // ref tot Express instance

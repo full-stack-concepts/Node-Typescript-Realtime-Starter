@@ -8,23 +8,17 @@ import { UserModel } from "../shared/models"
 import { deepCloneObject, capitalizeString } from "../util";
 import { constructUserCredentials } from "./user.util";
 
-
 class UserService {
 
 	private user:IUser;
 	private newUser:IUser;
 	private gmail:string;
 
-	constructor() {}
+	private promise:Promise<any>;
 
-	public test(data:any, done:any) {	
+	constructor() {}	
 
-		return done({
-			test: "geslaagd"
-		});
-	}
-
-	private grabEmailFromGoogleProfile(data:any):Promise<void> {
+	private grabEmailFromGoogleProfile(data:any):Promise<void> {		
 		this.gmail = data.profile.emails[0].value;
 		return Promise.resolve();
 	}
@@ -32,20 +26,17 @@ class UserService {
 	/***
 	 * Find third party authenticated user by email
 	 */
-	private findUserByEmail():Promise<void> {		
-		let query = { 'core.email': this.gmail };
+	private findUserByEmail():Promise<IUser> {		
+		let query = { 'core.email': this.gmail };		
 		return UserModel.remoteFindOneOnly(query, 'users')	
-		.then(  (user:IUser) => { 
-			this.user = user;
-			Promise.resolve(); 
-		})
-		.catch( (err:any)    => { Promise.reject(err); })	
+		.then(  (user:IUser) => { return Promise.resolve(user); })
+		.catch( (err:any)    => { return Promise.reject(err); })	
 	}
 
-	private createProfileFromGoogleData(data:IGoogleUser):Promise<IUser> {
+	private createProfileFromGoogleData(profile:any):Promise<IUser> {
 
 		let newUser:IUser = deepCloneObject(TUSER),
-			p:any = deepCloneObject(data.profile),
+			p:any = deepCloneObject(profile),
 			errType:number;
 
 		/****
@@ -125,7 +116,7 @@ class UserService {
 		});
 	}
 
-	private formatProfileFromGoogleData(data:IGoogleUser):Promise<void> {
+	private formatProfileFromGoogleData():Promise<void> {
 
 		let p:any = deepCloneObject(this.newUser.profile.personalia);
 
@@ -145,21 +136,37 @@ class UserService {
 		return Promise.resolve();
 	}
 
-	private createNewUser():Promise<void> {
+	private createNewUser(profile:any):Promise<any> {
+		
+		// process thick: create user profile
+		return this.createProfileFromGoogleData(profile)
 
-		return UserModel.remoteCreateUser( this.newUser)
-		.then( user => {			
-			console.log(user)
-			/*
-			#todo: proceed with chain to invoke creation of webtoken
-			this.currentUser = user;
-			return Promise.resolve( user ) 
-			*/
-		})
-		.catch( (err) => {
-			return Promise.reject(err);
-		});	
+		// process thick: format profile
+		.then( () => this.formatProfileFromGoogleData() )
 
+		// process thick: save new user
+		.then( () => {
+
+			return UserModel.remoteCreateUser( this.newUser)
+			.then( user => {	
+				console.log("===> DB Result ")		
+				console.log(user)
+				// assign new user to user container => #TODO create seperate container for profile
+				this.user = this.newUser;
+				return Promise.resolve();
+			})
+			.catch( (err) => {
+				return Promise.reject(err);
+			});	
+		});
+		
+	}
+
+	private cloneAndRemoveDatabaseID() {			
+
+		let user:IUser = deepCloneObject(this.user);
+		if(user && user["_id"] ) delete user._id;		
+		return user;
 	}
 
 	public authenticateGoogleUser(data:IGoogleUser, done:Function) {
@@ -170,36 +177,35 @@ class UserService {
 		// process thick: test for user
 		.then( () => this.findUserByEmail() )
 
-		// process thick: eval user
-		.then( () => {
-			if(this.user) return done({err:null, user: this.user}); 
-			if(!this.user) return this.createNewUser();
-		})
+		// process thick: eval user	
+		.then( user => {						
+			if(!user) {
+				return this.createNewUser( data.profile);
+			} else {
+				return this.user = user;			
+			}
+		})		
 
-		// process thick: create user profile
-		this.createProfileFromGoogleData(data)
+		// prcoess thick: clone user for serialization and remove db ID
+		.then( () => this.cloneAndRemoveDatabaseID() )
 
-		// preocess thick: format profile
-		.then( () => this.formatProfileFromGoogleData(data) )
+		// process thick: return to passport
+		.then( user => { return done(null, user); })		
 
-		return done({
-			test: "google-user"
-		});
+		// catch errors
+		.catch( err => {
+			console.log(err);
+			return done(err);
+		});		
 	}
 }
 
 
-export const u:any = {
+export const u:any = {	
 
-	test(data:any, done:Function) {
+	authenticateGoogleUser(data:IGoogleUser, done:Function) {	
 		let instance:any = new UserService();
-		instance.test( data, (result:any) => { return done(result); });	
-	},
-
-	authenticateGoogleUser(data:IGoogleUser, done:Function) {
-		console.log("==> authenticate google user")
-		let instance:any = new UserService();
-		instance.authenticateGoogleUser( data, (result:any) => { return done(result); });	
+		instance.authenticateGoogleUser( data, (err:any, user:IUser) => { console.log("RETURN", user); return done(err, user); });	
 	}
 
 
