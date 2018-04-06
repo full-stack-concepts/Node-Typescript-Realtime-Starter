@@ -11,15 +11,15 @@
     "scripts": {
         "start": "npm run serve",
         "build": "concurrently -k -n \"npm run delete-dist\" \"npm run build-ts\"",
-        "serve": "node ./dist/index.js",
+        "serve": "node ./dist/server.js",
         "watch": "cross-env NODE_ENV=dev concurrently -k -p \"[{name}]\" -n \"npm run delete-dist\" \"npm run watch-ts\" \"npm run watch-node\"",
-        "watch-node": "nodemon dist/index.js",
+        "watch-node": "nodemon dist/server.js",
         "test": "jest --forceExit --coverage --verbose",
         "build-ts": "tsc",
         "watch-ts": "tsc -w",
         "tslint": "tslint -c tslint.json -p tsconfig.json",
         "debug": "npm run build && npm run watch-debug",
-        "serve-debug": "nodemon --inspect dist/index.js",
+        "serve-debug": "nodemon --inspect dist/server.js",
         "watch-debug": "concurrently -k -p \"[{name}]\" -n \"Sass,TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-sass\" \"npm run watch-ts\" \"npm run serve-debug\"",
         "delete-dist": "rimraf -rf ./dist/"
     },

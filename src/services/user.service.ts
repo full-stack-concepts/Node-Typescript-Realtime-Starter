@@ -15,14 +15,7 @@ class UserService {
 	private newUser:IUser;
 	private gmail:string;
 
-	constructor() {}
-
-	public test(data:any, done:any) {	
-
-		return done({
-			test: "geslaagd"
-		});
-	}
+	constructor() {}	
 
 	private grabEmailFromGoogleProfile(data:any):Promise<void> {
 		this.gmail = data.profile.emails[0].value;
