@@ -24,7 +24,6 @@ import axios from "./util/axios";
 
 import {u} from "./services/user.service";
 
-
 class App {
 
     // ref tot Express instance

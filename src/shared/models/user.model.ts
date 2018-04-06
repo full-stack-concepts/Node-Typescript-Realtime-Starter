@@ -42,7 +42,8 @@ export class UserModel  {
 			if( _data && objectKeysLength (_data) === 0 ) reject(' Invalid Profile');					
 			let data = stringify(_data);			
 			let rURL = RemoteQueryBuilder.buildCollectionURL('users');			
-			axios.post( rURL, data).then( response => { resolve(response.data); })
+			axios.post( rURL, data)
+			.then( response => { resolve(response.data); })
 			.catch( err => reject(err) );			
 		});
 	}
@@ -51,13 +52,9 @@ export class UserModel  {
 	static remoteFindOneOnly(query:Object, collection:string) {
 		return new Promise( (resolve, reject) => {
 			query = stringify( query);
-			let rURL = RemoteQueryBuilder.findOneRemoteURL(collection, query);			
-			console.log(rURL)			
+			let rURL = RemoteQueryBuilder.findOneRemoteURL(collection, query);					
 			axios.get(rURL)
-			.then( response => { 	
-				let account = response.data;
-				resolve(account);
-			})
+			.then( response => resolve(response.data) )			
         	.catch( err => reject(err) );        
 		});
 	}

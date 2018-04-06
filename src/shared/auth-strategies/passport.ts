@@ -9,6 +9,7 @@ import {
 } from '../../util/secrets';
 
 import { u } from "../../services/user.service";
+import { IUser} from "../interfaces";
 
 
 /**************************************************************************************************
@@ -26,12 +27,7 @@ passport.use(new GoogleStrategy({
 	callbackURL: GOOGLE_CALLBACK_URL,
 	accessType: 'offline',
 	proxy:true
-}, (accessToken:any, refreshToken:any, profile:any, done:Function) => {
-
-		
-		console.info("===> Incoming Google Access Token      ")
-		console.info(profile)	
-		
+}, (accessToken:any, refreshToken:any, profile:any, done:Function) => {	
 
 		u.authenticateGoogleUser({
 			accessToken: accessToken,
@@ -39,9 +35,11 @@ passport.use(new GoogleStrategy({
 			profile: profile
 		},
 
-		(err:any, user:any) => {
+		(err:any, user:any) => {		
 
-			// after done passport hands over control to <User> router function
+			/**** 
+			 * After done is exexuted passport passes control back to <UserRouter>
+			 */
 			if(err) {
 				done(err, user );
 			} else {
