@@ -14,8 +14,6 @@ class UserService {
 	private newUser:IUser;
 	private gmail:string;
 
-	private promise:Promise<any>;
-
 	constructor() {}	
 
 	private grabEmailFromGoogleProfile(data:any):Promise<void> {		
@@ -130,7 +128,7 @@ class UserService {
 			this.newUser.core.url = credentials.url;
 		});		
 
-		/** set default user role: 3 orwhatever you like */
+		/** set default user role: 3 orw hatever you like */
 		this.newUser.core.role = 3;	
 		
 		return Promise.resolve();
@@ -146,20 +144,14 @@ class UserService {
 
 		// process thick: save new user
 		.then( () => {
-
 			return UserModel.remoteCreateUser( this.newUser)
-			.then( user => {	
-				console.log("===> DB Result ")		
-				console.log(user)
+			.then( user => {					
 				// assign new user to user container => #TODO create seperate container for profile
 				this.user = this.newUser;
 				return Promise.resolve();
 			})
-			.catch( (err) => {
-				return Promise.reject(err);
-			});	
-		});
-		
+			.catch( err => { return Promise.reject(err); });	
+		});		
 	}
 
 	private cloneAndRemoveDatabaseID() {			
@@ -193,10 +185,7 @@ class UserService {
 		.then( user => { return done(null, user); })		
 
 		// catch errors
-		.catch( err => {
-			console.log(err);
-			return done(err);
-		});		
+		.catch( err => { return done(err); });		
 	}
 }
 
@@ -205,7 +194,7 @@ export const u:any = {
 
 	authenticateGoogleUser(data:IGoogleUser, done:Function) {	
 		let instance:any = new UserService();
-		instance.authenticateGoogleUser( data, (err:any, user:IUser) => { console.log("RETURN", user); return done(err, user); });	
+		instance.authenticateGoogleUser( data, (err:any, user:IUser) => { return done(err, user); });	
 	}
 
 

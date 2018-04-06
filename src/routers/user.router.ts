@@ -1,6 +1,6 @@
 import path from "path";
 import express from "express";
-import {Router} from "express";
+import {Router, Request, Response, NextFunction} from "express";
 import passport from "passport";
 
 import { 
@@ -37,22 +37,20 @@ class UserRouter {
 	private setRoutes():void {
 
 		/*****
-         * Client Routes
+         * Client Authentication Routes
          */       
      
         // google authorization url
-        this.router.get( 
-        	'/auth/google',  
-        	(req, res, next) => {	
+        this.router.get( '/auth/google',  (req:Request, res:Response, next:NextFunction) => 
+        	{	
 				if (req.query.return) {
-    				req.session.oauth2return = req.query.return;
-    			}
+					req.session.oauth2return = req.query.return;
+				}
     			next();
     		},
 
-    		// Start OAuth 2 flow using Passport.js
-  			passport.authenticate('google', { scope: ['email', 'profile'] }),
-
+			// Start OAuth 2 flow using Passport.js
+			passport.authenticate('google', { scope: ['email', 'profile'] }) 
 		);
 
 		/***
@@ -63,7 +61,14 @@ class UserRouter {
 			'/auth/google/callback', 
 			passport.authenticate('google'),   
 			
-  			(req, res, next) => {            
+  			(req:Request, res:Response, next:NextFunction) => {            
+
+  				// passport has serialized user and formatted as req.user
+                // we retreieve it and encrypt account types inside web token
+                let user = req.user;     
+
+                console.log(user);
+
                 res.json({verified:true});               
   			}
 		);    
