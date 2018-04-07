@@ -2,7 +2,11 @@ import Promise from "bluebird";
 import mongoose from "mongoose";
 import axios from "axios";
 
-import { RepositoryBase, IUser } from "../interfaces";
+import { 
+	RepositoryBase, 
+	IUser,
+	IListOptions
+} from "../interfaces";
 import { userSchema } from "../schemas";
 import { objectKeysLength, stringify, RemoteQueryBuilder } from "../../util";
 

@@ -24,6 +24,10 @@ import axios from "./util/axios";
 
 import {u} from "./services/user.service";
 
+import { populateDatabase} from "./services/faker.service";
+populateDatabase();
+
+
 class App {
 
     // ref tot Express instance

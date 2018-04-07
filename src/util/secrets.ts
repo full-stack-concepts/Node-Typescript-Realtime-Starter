@@ -46,36 +46,44 @@ export const MLAB_DATABASE:string = process.env["MLAB_DATABASE"];
 export const MLAB_API_URL:string = process.env["MLAB_API_URL"];
 
 if(USE_MLAB_DB_HOST) {
-	if(!MLAB_API_KEY || (MLAB_API_KEY && typeof MLAB_API_KEY != 'string')) {
-		console.error("DB Configuration: API Key MLAB is missing! Pleasse add one");
-		process.exit(1);
-	}
 
-	if(!MLAB_DATABASE || (MLAB_DATABASE && typeof MLAB_DATABASE != 'string')) {
-		console.error("DB Configuration: Name remote database is missing. Please add one");
-		process.exit(1);
-	}
+	const mGroups:any[] = [
+			{ value: MLAB_API_KEY , txt: 'API Key MLAB' },
+			{ value: MLAB_DATABASE, txt: 'Name remote database on MLAB' },
+			{ value: MLAB_API_URL, txt:  'Remote API URL for mlab.com' }	
+	];
 
-	if(!MLAB_DATABASE || (MLAB_API_URL && typeof MLAB_API_URL != 'string')) {
-		console.error("DB Configuration: Remote API URL for mlab.com ismising. Please add one!");
-		process.exit(1);
-	}
+	mGroups.forEach( ({ value, txt }) => {		
+		if(!value || (value && typeof value != 'string')) {
+			console.error(`DB Configuration: ${txt} is missing! Pleasse add one`);
+			process.exit(1);	
+		}
+	});
 }
+
 
 /***
  * DB Population
  */
 export const DB_POPULATE = process.env["DB_POPULATE"];
 export const DB_POPULATE_SAFETY_FIRST = Boolean(process.env["DB_POPULATE_SAFETY_FIRST"]);
+export const DB_POPULATE_TEST_COLLECTIONS = process.env["DB_POPULATE_TEST_COLLECTIONS"].split(',');
 export const DB_POPULATE_ADMINS =  Number(process.env["DB_POPULATE_ADMINS"]);
 export const DB_POPULATE_POWER_USERS =  Number(process.env["DB_POPULATE_POWER_USERS"]);
 export const DB_POPULATE_AUTHORS = Number(process.env["DB_POPULATE_AUTHORS"]);
 export const DB_POPULATE_USERS =  Number(process.env["DB_POPULATE_USERS"]);
 
+console.log("==> Test for Array ",  DB_POPULATE_TEST_COLLECTIONS )
+
 if(DB_POPULATE) {
 
 	if(typeof DB_POPULATE_SAFETY_FIRST != 'boolean') {
 		console.error("Database Population: Please configure boolean DB_POPULATE_SAFETY_FIRST. overwrite existing DB data?");
+		process.exit(1);
+	}
+
+	if(!DB_POPULATE_TEST_COLLECTIONS || !Array.isArray(DB_POPULATE_TEST_COLLECTIONS) ) {
+		console.error("Database Population: Please configure DB_POPULATE_TEST_COLLECTIONS array: specify to test for which DB collections");
 		process.exit(1);
 	}
 

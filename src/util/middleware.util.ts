@@ -1,4 +1,7 @@
-import compression from "compression";
+/***
+ * #TODO: property filter does not exist on type options:CompressionOptions
+ */
+const compression:any = require("compression");
 import { Request, Response, NextFunction } from "express";
 
 import { ENVIRONMENT, PORT, CLIENT_PORT, ADMIN_PORT } from "./secrets";
@@ -26,7 +29,7 @@ export function allowMethods(req:Request, res:Response, next:NextFunction) {
 };  
 
 // remove http and https string from http headers origin
-export function strip(str:string) {    
+export function strip(str:any) {    
     if(!str) return;
     str.replace("http://", "").trim();
     str.replace("https://", "").trim();

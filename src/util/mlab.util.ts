@@ -7,24 +7,127 @@ import {
 	MLAB_DATABASE
 } from "./secrets";
 
-export class RemoteQueryBuilder {
+import {
+	IListOptions
+} from "../shared/interfaces";
 
-	static stringify(obj:any):string { 
-		if(typeof obj === "string") return obj;
-		return JSON.stringify(obj); 
-	}
-
-	static objectKeysLength(obj:any):number { 
-		let keys = Object.keys(obj)
-		return keys.length;
-	}
+export class RemoteQueryBuilder {	
 
 	// build relative url for MLAB hosted db, relative to default
 	static buildCollectionURL(collection:string):string { 
 		return `/${MLAB_DATABASE}/collections/${collection}?apiKey=${MLAB_API_KEY}`;	 
 	}
+	
+	static list({ 
+		
+		/***
+		 * Collection: @string
+		 */
+		collection, 
 
-	static findOneRemoteURL(collection:string, query:string):string { 
+		/***
+         * Query: mongodb query, @object
+         */
+		query,  
+
+		/***
+		 * Count: MLAB variable - @boolean
+		 */
+		count,  
+
+		/***
+		 * Fields: projection document to specify or restrict fields to return - @object
+		 */
+		fields,  
+
+		/***
+		 * FindOneOnly: MLAB variable - @boolean
+		 */
+		findOneOnly, 
+
+		/***
+		 * Sort: specifies the order in which the query returns matching documents - @object
+		 */
+		sort,
+
+		/***
+		 * Skip:  MLAB variable - @number
+		 */
+		skip,
+
+		/***
+		 * Limit:  MLAB variable - @number
+		 */
+		limit,
+
+	}:IListOptions):string {	
+		
+		/***
+		 * Build Default Query Str
+		 */
+		let url:string =  `/${MLAB_DATABASE}/collections/${collection}`;
+
+		/***
+		 * Query: return the result count for this query
+		 */
+		if( query && typeof query === 'object') {
+			url += `&q=${JSON.stringify(query)}`;			
+		}
+
+		/***
+		 * Count: return as its useless to add other options
+		 */
+		if( count && typeof count === 'boolean') {
+			url+=`&c=true&apiKey=${MLAB_API_KEY}`;
+			return url;
+		}
+
+		/***
+		 * Fields: specify the set of fields to include or exclude in each document (1 - include; 0 - exclude)
+		 */
+		if( fields && typeof fields === 'object') {
+			url+=`&f=${JSON.stringify(fields)}`;			
+		}
+
+		/*** 
+		 * Find One Only: return a single document
+		 */
+		if( findOneOnly && typeof findOneOnly === 'boolean') {
+			url+=`&fo=true`;
+		}
+
+		/***
+		 * Sort Order: specify the order in which to sort each specified field ( 1- ascending; -1 - descending)
+		 */
+		if( sort && typeof sort === 'object') {
+			url += `&q=${JSON.stringify(sort)}`;
+		}
+
+		/***
+		 * Skip: method on a cursor to control where MongoDB begins returning results. 
+		 * This approach may be useful in implementing paginated results.
+		 */
+		if( skip && Number.isInteger(skip) && skip > 0) {
+			url += `&sk=${skip}`;
+		}
+
+		/***
+		 * Limit: method on a cursor to specify the maximum number of documents the cursor will return
+		 */
+		if( limit && Number.isInteger(limit) && limit > 1) {
+			url += `&l=${limit}`;
+		}
+
+		/***
+		 * Add MLAB API
+		 */
+		url+=`&apiKey=${MLAB_API_KEY}`;
+
+		return url;		
+	}
+	
+
+	static findOneRemoteURL(collection:string, query:any):string { 
 		return  `/${MLAB_DATABASE}/collections/${collection}?q=${query}&fo=true&apiKey=${MLAB_API_KEY}`;
 	}	
 
