@@ -2,7 +2,8 @@ export {
 	deepCloneObject,
 	capitalizeString,
 	objectKeysLength,
-	stringify
+	stringify,
+	isEmail
 } from "./functions.util";
 
 export {

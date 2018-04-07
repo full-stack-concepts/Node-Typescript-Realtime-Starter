@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 import fs from "fs";
+import {isEmail} from "../util";
 
 if (fs.existsSync(".env")) {   
     dotenv.config({ path: ".env" });
@@ -62,9 +63,68 @@ if(USE_MLAB_DB_HOST) {
 }
 
 /***
+ * DB Population
+ */
+export const DB_POPULATE = process.env["DB_POPULATE"];
+export const DB_POPULATE_SAFETY_FIRST = Boolean(process.env["DB_POPULATE_SAFETY_FIRST"]);
+export const DB_POPULATE_ADMINS =  Number(process.env["DB_POPULATE_ADMINS"]);
+export const DB_POPULATE_POWER_USERS =  Number(process.env["DB_POPULATE_POWER_USERS"]);
+export const DB_POPULATE_AUTHORS = Number(process.env["DB_POPULATE_AUTHORS"]);
+export const DB_POPULATE_USERS =  Number(process.env["DB_POPULATE_USERS"]);
+
+if(DB_POPULATE) {
+
+	if(typeof DB_POPULATE_SAFETY_FIRST != 'boolean') {
+		console.error("Database Population: Please configure boolean DB_POPULATE_SAFETY_FIRST. overwrite existing DB data?");
+		process.exit(1);
+	}
+
+	const userGroups:any[] = [
+		{ value: DB_POPULATE_ADMINS, name: 'admins' },
+		{ value: DB_POPULATE_POWER_USERS, name: 'power users' },
+		{ value: DB_POPULATE_AUTHORS, name: 'authors' },
+		{ value: DB_POPULATE_USERS, name: 'users' }		
+	];
+
+	userGroups.forEach( ({ value, name}) => {		
+		if(!Number.isInteger(value) || Number.isInteger(value) && value<=0) {
+			console.error(`Database Population: Please specify amount of ${name} to be created!`);
+			process.exit(1);	
+		}
+	});
+}
+
+/***
+ * SuperAdmin Credentials
+ */
+export const SUPERADMIN_FIRST_NAME:string = process.env["SUPERADMIN_FIRST_NAME"];
+export const SUPERADMIN_LAST_NAME:string = process.env["SUPERADMIN_LAST_NAME"];
+export const SUPERADMIN_EMAIL:string = process.env["SUPERADMIN_EMAIL"];
+export const SUPERADMIN_PASSWORD:string = process.env["SUPERADMIN_PASSWORD"];
+
+const SA:any[] = [
+	{ value: SUPERADMIN_FIRST_NAME, name: 'first name' },
+	{ value: SUPERADMIN_LAST_NAME, name: 'last name' },
+	{ value: SUPERADMIN_EMAIL, name: 'email' },
+	{ value: SUPERADMIN_PASSWORD, name: 'password' }		
+];
+
+SA.forEach(({value, name}) => {
+	if(!value || value && typeof value != 'string') {
+		console.error(`Super Admin: Please specify value for super admin ${name} field!!`);
+		process.exit(1);
+	}
+});
+
+if(!isEmail(SUPERADMIN_EMAIL)) {
+	console.error(`Super Admin: Please specify value for Super Admin Email field!!`);
+	process.exit(1);
+}
+
+/***
  * Google Auth
  */
-export const ENABLE_GOOGLE_AUTHENTICATION:boolean = Boolean(process.env["ENABLE_GOOGLE_AUTHENTICATION"]);
+export const ENABLE_GOOGLE_AUTHENTICATION = process.env["ENABLE_GOOGLE_AUTHENTICATION"];
 export const GOOGLE_AUTH_ID = process.env["GOOGLE_AUTH_ID"];
 export const GOOGLE_AUTH_SECRET = process.env["GOOGLE_AUTH_SECRET"];
 export const GOOGLE_CALLBACK_URL = process.env["GOOGLE_CALLBACK_URL"];
@@ -90,11 +150,10 @@ if(ENABLE_GOOGLE_AUTHENTICATION) {
 /***
  * Definitions for User Authentication Response
  */
-export const STORE_WEBTOKEN_AS_COOKIE:boolean = Boolean(process.env["STORE_WEBTOKEN_AS_COOKIE"]);
-export const WEBTOKEN_COOKIE:string = process.env["WEBTOKEN_COOKIE"];
-export const SEND_TOKEN_RESPONSE:boolean = process.env["SEND_TOKEN_RESPONSE"];
+export const STORE_WEBTOKEN_AS_COOKIE = process.env["STORE_WEBTOKEN_AS_COOKIE"];
+export const WEBTOKEN_COOKIE = process.env["WEBTOKEN_COOKIE"];
+export const SEND_TOKEN_RESPONSE = process.env["SEND_TOKEN_RESPONSE"];
 
-console.log(SEND_TOKEN_RESPONSE)
 
 if(STORE_WEBTOKEN_AS_COOKIE) {
 
