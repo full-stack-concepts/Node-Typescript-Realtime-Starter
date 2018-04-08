@@ -1,6 +1,4 @@
-import faker from "faker";
 import fetch from "node-fetch";
-import axios from "axios";
 import Promise from "bluebird";
 
 import { IUser } from "../shared/interfaces";
@@ -23,6 +21,14 @@ import {
 	DB_POPULATE_USERS
 } from "../util/secrets";
 
+import {
+	createSuperAdmin,
+	createAdmin,
+	createPowerUser,
+	createAuthor,
+	createUser
+} from "../util";
+
 /***
  * Import SuperAdminCredentials
  */
@@ -33,33 +39,25 @@ import {
 	SUPERADMIN_PASSWORD
 } from "../util/secrets";
 
-export class DataBreeder {
+interface IDataType {
+	type:string,
+	amount: number
+}
 
-	private createSuperAdmin() {
-
-	}
-
-	private createAdmin() {
-	}
-
-	private createPowerUser() {}
-
-	private createAuthor() {}
-
-	private createUser() {}
+export class DataBreeder {	
 
 	private exitMessage():void {
 		console.log("** DB Configuration: no need to populate DB with data .....")
 	}
 
-	private async fetchCollections() {
+	private async _fetchCollections() {
 
 		let url:string = RemoteQueryBuilder.list({});		
 		return fetch(url).then( res => res.json()).then( collections => Promise.resolve(collections) )
 		.catch( err => Promise.reject(err) )
 	}
 
-	private filterForUserAllowedCollections(__remoteCollections:string[]):string[] {
+	private _filterForUserAllowedCollections(__remoteCollections:string[]):string[] {
 		
 		/*** 
 		 * Get settings collection list
@@ -105,7 +103,7 @@ export class DataBreeder {
 		});
 	}
 
-	private async testCollectionsForData( collections:string[]) {		
+	private async _testCollectionsForData( collections:string[]) {		
 
 		let counts:any=[];
 
@@ -117,10 +115,9 @@ export class DataBreeder {
 		)
 		.then( results => Promise.resolve(results) )
 		.catch( err => Promise.reject(err));
-
 	}	
 
-	private collectionsToPopulate( collections:any[]) {		
+	private _collectionsToPopulate( collections:any[]) {		
 		return collections.filter( (c:any) => {					
 			return c.count === 0 
 		});
@@ -131,22 +128,22 @@ export class DataBreeder {
 		/**
 		 * process thick: fetch DB collections list
 		 */
-		return this.fetchCollections()
+		return this._fetchCollections()
 
 		/*** 
 		 * process thick: filter collections by eliminating collections that we dont need to check for existing data
 		 */
-		.then( remoteCollections => this.filterForUserAllowedCollections(remoteCollections) )
+		.then( remoteCollections => this._filterForUserAllowedCollections(remoteCollections) )
 
 		/***
 		 * process thick: count Documents per collection
 		 */
-		.then( collections => this.testCollectionsForData(collections) )
+		.then( collections => this._testCollectionsForData(collections) )
 
 		/***
 		 * process thick: filter for collections that we need to populate
 		 */
-		.then( collections => this.collectionsToPopulate(collections) )
+		.then( collections => this._collectionsToPopulate(collections) )
 
 		/***
 		 * process thick: return to caller
@@ -156,12 +153,62 @@ export class DataBreeder {
 		.catch( err => Promise.reject(err) );
 	}
 
+	private _populationSettings():IDataType[] {
+		return  [
+			{ type: "superadmin", amount: 1},
+			{ type: "admin", amount: DB_POPULATE_ADMINS },
+			{ type: "poweruser", amount: DB_POPULATE_POWER_USERS },
+			{ type: "author", amount: DB_POPULATE_AUTHORS},
+			{ type: "user", amount:DB_POPULATE_USERS}
+		];	
+	}
+
+	private __eval( {type, amount}:IDataType ) {				
+		
+		return new Promise ( (resolve, reject) => {
+			switch( type) {
+				case 'superadmin':	resolve( createSuperAdmin( amount) ); break;
+				case 'admin': 		resolve( createAdmin(amount) ); break;
+				case 'poweruser': 	resolve( createPowerUser(amount)); break;
+				case 'author': 		resolve( createAuthor(amount) ); break;
+				case 'user': 		resolve( createUser(amount));  break;
+			}
+		});		
+	}
+
+	private _generateData(settings:IDataType[]) {
+		
+		return Promise.all(
+			settings.map ( setting => {		
+				console.log(setting)		
+				return Promise.resolve( this.__eval( setting ))
+			})
+		)
+		.then( data => console.log(data) );
+	}
+
+	/*
+	switch(setting.type) {
+				case 'superadmin':	this.createSuperAdmin().then( data => { return data; }); break;
+				case 'admin': 		this.createAdmin(x); break;
+				case 'poweruser': 	this.createPowerUser(x); break;
+				case 'author': 		this.createAuthor(x); break;
+				case 'user': 		this.createUser(x);break;
+			}
+
+			*/
+
 	/*****
 	 * 
 	 */
 	private async populate( collections:any[]) {
 
 		console.log("*** Start population")
+		// process thick: inventory data types
+		const settings:any[] = this._populationSettings();
+
+		// process thick: generate data
+		const data:any = this._generateData(settings);
 
 		return Promise.resolve(true);
 

@@ -13,3 +13,14 @@ export {
 	RemoteQueryBuilder
 } from "./mlab.util";
 
+export {
+	createSuperAdmin,
+	createAdmin,
+	createPowerUser,
+	createAuthor,
+	createUser
+} from "./data.util";
+
+
+
+

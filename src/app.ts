@@ -24,7 +24,7 @@ import axios from "./util/axios";
 
 import {u} from "./services/user.service";
 
-import { populateDatabase} from "./services/faker.service";
+import { populateDatabase} from "./services/data.service";
 populateDatabase();
 
 
