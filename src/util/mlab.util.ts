@@ -12,7 +12,8 @@ import {
 } from "./secrets";
 
 import {
-	IListOptions
+	IListOptions,
+	IUpdateOptions
 } from "../shared/interfaces";
 
 export class RemoteQueryBuilder {	
@@ -20,6 +21,66 @@ export class RemoteQueryBuilder {
 	// build relative url for MLAB hosted db, relative to default
 	static buildCollectionURL(collection:string):string { 
 		return `${MLAB_API_URL}/${MLAB_DATABASE}/collections/${collection}?apiKey=${MLAB_API_KEY}`;	 
+	}
+
+	/****
+	 * Returns url string for MLAB PPOST or PUT request
+	 */
+
+	static update({
+
+		/***
+		 * Collection: @string
+		 */
+		collection, 
+
+		/***
+         * Query: mongodb query, @object
+         */
+		query,  
+
+		/***
+         * All: mlab var, @boolean
+         * update all documents collection or query (if specified).
+         */
+		all,  
+
+		/***
+         * Upsert: mlab var , @boolean
+         * Upsert or put: insert the document defined in the request body if none match the specified query
+         */
+		upsert
+
+	}:IUpdateOptions):string {
+
+		/***
+		 * Build Default url string
+		 */
+		let url:string = `${MLAB_API_URL}${MLAB_DATABASE}/collections/${collection}?apiKey=${MLAB_API_KEY}`;
+
+		/***
+		 * Query: filter collection for this criteria
+		 */
+		if( query ) {			
+			query = JSON.stringify(query);
+			url += `&q=${query}`;		
+		}
+
+		/***
+		 * All: update all documents collection or query (if specified).
+		 */
+		if( all && typeof all === 'boolean') {
+			url+=`&m=true`;			
+		}
+
+		/***
+		 * Upsert:i nsert the document defined in the request body if none match the specified query
+		 */
+		if( upsert && typeof upsert === 'boolean') {
+			url+=`&u=true`;			
+		}
+
+		return url;
 	}
 	
 	static list({ 
@@ -94,7 +155,7 @@ export class RemoteQueryBuilder {
 		}
 
 		/***
-		 * Count: return as its useless to add other options
+		 * Count: count documents then return to caller
 		 */
 		if( count && typeof count === 'boolean') {
 			url+=`&c=true&apiKey=${MLAB_API_KEY}`;

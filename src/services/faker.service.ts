@@ -163,6 +163,8 @@ export class DataBreeder {
 
 		console.log("*** Start population")
 
+		return Promise.resolve(true);
+
 	}
 
 	public async test() {
