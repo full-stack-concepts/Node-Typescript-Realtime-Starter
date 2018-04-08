@@ -1,5 +1,5 @@
 export interface IListOptions {
-    collection:string,
+    collection?:string,
     query?: Object,
     count?: boolean,
     fields?: Object,

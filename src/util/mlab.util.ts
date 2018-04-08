@@ -1,8 +1,12 @@
 /*****
  * Query String Builders for MLAB MONOGODB queries
+ *
+ *  To get the collections in the specified database: /databases/{database}/collections
+ *   Example: https://api.mlab.com/api/1/databases/my-db/collections?apiKey=myAPIKey
  */
 
 import { 
+	MLAB_API_URL,
 	MLAB_API_KEY,
 	MLAB_DATABASE
 } from "./secrets";
@@ -15,7 +19,7 @@ export class RemoteQueryBuilder {
 
 	// build relative url for MLAB hosted db, relative to default
 	static buildCollectionURL(collection:string):string { 
-		return `/${MLAB_DATABASE}/collections/${collection}?apiKey=${MLAB_API_KEY}`;	 
+		return `${MLAB_API_URL}/${MLAB_DATABASE}/collections/${collection}?apiKey=${MLAB_API_KEY}`;	 
 	}
 	
 	static list({ 
@@ -60,18 +64,33 @@ export class RemoteQueryBuilder {
 		 */
 		limit,
 
-	}:IListOptions):string {	
+	}:IListOptions):string {		
 		
 		/***
-		 * Build Default Query Str
+		 * Build Default Query Str: returns list of collections
 		 */
-		let url:string =  `/${MLAB_DATABASE}/collections/${collection}`;
+		let url:string = `${MLAB_API_URL}${MLAB_DATABASE}/collections/`;
+
+		console.log(url)
+
+		/***
+		 * Collection: returns list of documents 
+		 */
+		if(collection && typeof collection === 'string') {
+			url+= `${collection}`;
+		}
+
+		/***
+		 * Question Mark: add <?> before url params are added
+		 */
+		 url+=`?`;
 
 		/***
 		 * Query: return the result count for this query
 		 */
-		if( query && typeof query === 'object') {
-			url += `&q=${JSON.stringify(query)}`;			
+		if( query ) {			
+			query = JSON.stringify(query);
+			url += `q=${query}`;		
 		}
 
 		/***
@@ -121,9 +140,9 @@ export class RemoteQueryBuilder {
 		/***
 		 * Add MLAB API
 		 */
-		url+=`&apiKey=${MLAB_API_KEY}`;
+		url+=`&apiKey=${MLAB_API_KEY}`;		
 
-		return url;		
+		return url;
 	}
 	
 

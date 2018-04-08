@@ -3,7 +3,10 @@ export {
 	capitalizeString,
 	objectKeysLength,
 	stringify,
-	isEmail
+	isEmail,
+	get,
+	set,
+	post
 } from "./functions.util";
 
 export {

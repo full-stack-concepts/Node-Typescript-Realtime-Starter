@@ -24,6 +24,7 @@
         "delete-dist": "rimraf -rf ./dist/"
     },
     "dependencies": {
+        "@types/node-fetch": "^1.6.8",
         "app-root-path": "^2.0.1",
         "async": "^2.6.0",
         "axios": "^0.18.0",
@@ -56,6 +57,7 @@
         "moment-timezone": "^0.5.14",
         "mongoose": "^5.0.12",
         "morgan": "^1.9.0",
+        "node-fetch": "^2.1.2",
         "node-libcurl": "latest",
         "node-ui": "0.0.0",
         "nodemailer": "^4.6.4",

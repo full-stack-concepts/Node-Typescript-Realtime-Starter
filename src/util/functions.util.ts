@@ -1,3 +1,5 @@
+import fetch from "node-fetch";
+import Promise from "bluebird";
 
 export const deepCloneObject = (obj:any):any => {
 	return JSON.parse(JSON.stringify(obj));	
@@ -21,4 +23,20 @@ export const isEmail = (str:string):boolean => {
 	if(!str || str && typeof str != 'string') return false;	
 	let emailRegEx:RegExp = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 	return emailRegEx.test(str);		
+}
+
+export const get = (url:string) => {
+
+	 return fetch(url)
+	 .then( res => res.json())
+	 .then( data => Promise.resolve(data) )
+	 .catch( err => Promise.reject(err) );
+}
+
+export const post = () => {
+	return true;
+}
+
+export const set = () => {
+	return true;
 }
