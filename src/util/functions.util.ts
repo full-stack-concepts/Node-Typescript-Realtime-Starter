@@ -1,6 +1,10 @@
 import fetch from "node-fetch";
 import Promise from "bluebird";
 
+/****
+ * Function helper: deep clone object
+ * #TODO: replace with spread operator
+ */
 export const deepCloneObject = (obj:any):any => {
 	return JSON.parse(JSON.stringify(obj));	
 }
@@ -25,8 +29,19 @@ export const isEmail = (str:string):boolean => {
 	return emailRegEx.test(str);		
 }
 
-export const get = (url:string) => {
+/****
+ * Function helper: countArrayItems for data service
+ * use with Array.prototype.reduce
+ */
+export const countArrayItems = (accum:any, current:any) => {
+    if(current.amount) accum.count += current.amount;
+    return accum;
+}
 
+/******
+ * Node Fetch Operations
+ */
+export const get = (url:string) => {
 	 return fetch(url)
 	 .then( res => res.json())
 	 .then( data => Promise.resolve(data) )

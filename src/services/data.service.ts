@@ -1,5 +1,7 @@
 import fetch from "node-fetch";
+import faker from "faker";
 import Promise from "bluebird";
+import chain from 'lodash/chain';
 
 import { IUser } from "../shared/interfaces";
 import { UserModel} from "../shared/models";
@@ -7,6 +9,7 @@ import { RemoteQueryBuilder } from "../util";
 import { IListOptions} from "../shared/interfaces";
 
 import { get} from "../util";
+
 
 /***
  * Import DB Population Settings
@@ -18,10 +21,21 @@ import {
 	DB_POPULATE_ADMINS,
 	DB_POPULATE_POWER_USERS,
 	DB_POPULATE_AUTHORS,
-	DB_POPULATE_USERS
+	DB_POPULATE_USERS,
+	DB_POPULATION_LOCALE
 } from "../util/secrets";
 
+console.log("****** locale ", DB_POPULATION_LOCALE )
+/***
+ * Default Faker language locale
+ * More info: https://github.com/marak/Faker.js/
+*/
+faker.locale =  DB_POPULATION_LOCALE;
+
 import {
+	countArrayItems,
+	createDefaultUser,
+	createUserSubType,
 	createSuperAdmin,
 	createAdmin,
 	createPowerUser,
@@ -163,40 +177,55 @@ export class DataBreeder {
 		];	
 	}
 
-	private __eval( {type, amount}:IDataType ) {				
-		
-		return new Promise ( (resolve, reject) => {
-			switch( type) {
-				case 'superadmin':	resolve( createSuperAdmin( amount) ); break;
-				case 'admin': 		resolve( createAdmin(amount) ); break;
-				case 'poweruser': 	resolve( createPowerUser(amount)); break;
-				case 'author': 		resolve( createAuthor(amount) ); break;
-				case 'user': 		resolve( createUser(amount));  break;
-			}
-		});		
+	private _calculateItems(arr:any[]):any {
+		return arr.reduce( countArrayItems, { count: 0} )
 	}
 
-	private _generateData(settings:IDataType[]) {
-		
-		return Promise.all(
-			settings.map ( setting => {		
-				console.log(setting)		
-				return Promise.resolve( this.__eval( setting ))
-			})
-		)
-		.then( data => console.log(data) );
+	private processDataCategory( { category, settings, count}:any ) {
+
+		console.log("*** config category ", category )		
+
+		switch(category) {
+			case 'users': 
+
+				// process thick: Create required amount of users				 
+				createDefaultUser(count.count)
+
+				// process thick: populate Per User Type				
+				.then( (users:IUser[]) => {									
+					return Promise.all(
+						settings.map ( (setting:any) => {		
+							console.log(setting)		
+							return Promise.resolve( createUserSubType( users, setting ))
+						})
+					)
+					.then( data => console.log(data) );
+				})
+
+				/****
+				 * 
+				 */
+				
+			break;
+		}
+
+		return category
 	}
 
-	/*
-	switch(setting.type) {
-				case 'superadmin':	this.createSuperAdmin().then( data => { return data; }); break;
-				case 'admin': 		this.createAdmin(x); break;
-				case 'poweruser': 	this.createPowerUser(x); break;
-				case 'author': 		this.createAuthor(x); break;
-				case 'user': 		this.createUser(x);break;
-			}
+	private _generateData( pConfiguration:any) {
 
-			*/
+		console.log("*** start data generation ", )
+
+		const test =  pConfiguration
+
+		.map( this.processDataCategory )
+
+		
+
+		console.log("result", test);
+		
+		
+	}
 
 	/*****
 	 * 
@@ -205,10 +234,17 @@ export class DataBreeder {
 
 		console.log("*** Start population")
 		// process thick: inventory data types
-		const settings:any[] = this._populationSettings();
+		const userPopulation:IDataType[] = this._populationSettings();
+
+		// process thick: count users
+		const userCount = this._calculateItems(userPopulation);
+
+		console.log("**** Creating " + userCount.count + " users")
 
 		// process thick: generate data
-		const data:any = this._generateData(settings);
+		const data:any = this._generateData([
+			{ category: 'users', settings: userPopulation, count: userCount }				
+		]);
 
 		return Promise.resolve(true);
 
@@ -226,8 +262,8 @@ export class DataBreeder {
 		/***
 		 * Perform safetycheck before populating database
 		 */
-		collections = await this.safetyCheck();
-		console.log("Collections to populate ", collections)
+		// collections = await this.safetyCheck();
+		// console.log("Collections to populate ", collections)
 
 		let result:boolean = await this.populate ( collections );
 

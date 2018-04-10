@@ -72,8 +72,7 @@ export const DB_POPULATE_ADMINS =  Number(process.env["DB_POPULATE_ADMINS"]);
 export const DB_POPULATE_POWER_USERS =  Number(process.env["DB_POPULATE_POWER_USERS"]);
 export const DB_POPULATE_AUTHORS = Number(process.env["DB_POPULATE_AUTHORS"]);
 export const DB_POPULATE_USERS =  Number(process.env["DB_POPULATE_USERS"]);
-
-console.log("==> Test for Array ",  DB_POPULATE_TEST_COLLECTIONS )
+export const DB_POPULATION_LOCALE = process.env["DB_POPULATION_LOCALE"];
 
 if(DB_POPULATE) {
 
@@ -101,6 +100,16 @@ if(DB_POPULATE) {
 		}
 	});
 }
+
+/***
+ * Test for faker langiage locale, defaults to en_US
+ */
+let locale:string = process.env["DB_POPULATION_LOCALE"];
+console.log( "****** locale ", locale)
+if( !locale || (locale && typeof locale != 'string') ) {
+	locale = 'en_US';
+}
+
 
 /***
  * SuperAdmin Credentials

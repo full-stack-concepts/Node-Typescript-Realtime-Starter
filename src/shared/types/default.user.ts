@@ -11,18 +11,22 @@ export const TUSER:IUser = {
 		archive: false,
 	},
 
+	password:null,
+
 	accounts: {
 		googleID: null
 	},
 
 	security: {	
 		accountType: null,
-		isAccountVerified: null
+		isAccountVerified: null,	
+		isPasswordEncrypted: null
 	},
 
 	userConfiguration: {	
 		isThumbnailSet: false,	
-		isGooglePlusUser: false
+		isGooglePlusUser: false,
+		isAddressSet: false
 	},
 
 	profile: {	
@@ -38,14 +42,34 @@ export const TUSER:IUser = {
 			sortName: null
 		},
 
+		address: {
+			street:null,
+			houseNumber:null,
+			suffix:null,
+			addition:null,
+			areacode:null,
+			city:null,
+			county:null,
+			country:null,
+			countryCode:null
+		},
+
+		location: {
+			latitude:null,
+			longitude: null
+		},
+
 		images: {	     		     		
-     		thumbnail: null		
+     		thumbnail: null,
+     		avatar: null
 		},
 
 		social: {
 			googleplus:null
 		}
-	}
+	},
+
+
 
 }
 

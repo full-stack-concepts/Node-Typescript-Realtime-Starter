@@ -6,7 +6,7 @@ import { IUser, IGoogleUser} from "../shared/interfaces";
 import { TUSER } from "../shared/types";
 import { UserModel } from "../shared/models"
 import { deepCloneObject, capitalizeString } from "../util";
-import { constructUserCredentials } from "./user.util";
+import { constructUserCredentials } from "../util";
 
 class UserService {
 

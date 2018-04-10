@@ -1,5 +1,10 @@
 import { Document } from "mongoose";
 
+import { 
+	IUserAddress,
+	IUserDevice
+} from "../interfaces";
+
 export interface IUser extends Document  {
 
 	/*
@@ -13,15 +18,19 @@ export interface IUser extends Document  {
 		url: string,
 		email: string,
 		role: number,
-		identifier: number,
+		identifier: string,
 		archive: boolean
 	},
+
+	password:string,
 
 	security: {
 		latestLogOn?: Date,
 		latestModification?: Date,
 		accountType: number,
-		isAccountVerified: boolean
+		isAccountVerified: boolean,
+		isTemporaryPassword?:boolean,
+		isPasswordEncrypted:boolean
 	},
 
 	accounts?: {
@@ -31,7 +40,8 @@ export interface IUser extends Document  {
 
 	userConfiguration: {	
 		isThumbnailSet: boolean,	
-		isGooglePlusUser?: boolean
+		isGooglePlusUser?: boolean,
+		isAddressSet?:boolean,
 	},
 
 	profile: {
@@ -46,13 +56,21 @@ export interface IUser extends Document  {
 			lastName:  string
 		},
 
+		address?:IUserAddress,
+
+		location?:{
+			longitude?:number,
+			latitude:number
+		},
+
 		displayNames?: {
 			fullName?: string,
 			sortName?: string
 		},
 
 		images: {	     		     		
-     		thumbnail: string		
+     		thumbnail?: string,
+     		avatar?: string	
 		},
 
 		social?: {
@@ -62,6 +80,8 @@ export interface IUser extends Document  {
 			twitter?:string,
 			instagram?:string,
 			stackoverflow?:string,
-		},
-	}
+		}	
+	},
+
+	devices?: IUserDevice[]
 }

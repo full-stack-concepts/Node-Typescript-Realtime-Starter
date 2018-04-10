@@ -4,6 +4,7 @@ export {
 	objectKeysLength,
 	stringify,
 	isEmail,
+	countArrayItems,
 	get,
 	set,
 	post
@@ -14,12 +15,18 @@ export {
 } from "./mlab.util";
 
 export {
+	createDefaultUser,
+	createUserSubType,
 	createSuperAdmin,
 	createAdmin,
 	createPowerUser,
 	createAuthor,
 	createUser
 } from "./data.util";
+
+export {
+	constructUserCredentials
+} from "./user.util";
 
 
 

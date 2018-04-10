@@ -56,8 +56,7 @@ export class UserModel  {
 	static remoteFindOneOnly(query:Object, collection:string) {
 		return new Promise( (resolve, reject) => {
 			query = stringify( query);
-			let rURL = RemoteQueryBuilder.findOneRemoteURL(collection, query);		
-			console.log(rURL)			
+			let rURL = RemoteQueryBuilder.findOneRemoteURL(collection, query);							
 			axios.get(rURL)
 			.then( response => resolve(response.data) )			
         	.catch( err => reject(err) );        

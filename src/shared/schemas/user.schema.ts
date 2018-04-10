@@ -13,11 +13,15 @@ let schema: Schema = new Schema({
 		archived: { type: Boolean, required:true, default: false}
 	},
 
+	password:  { type: String, required: true },
+
 	security: {
 		latestLogOn: { type:Date, required: false },
 		latestModification: { type:Date, required: false},
 		accountType: { type:Number, required:true},
-		isAccountVerified: { type: Boolean, required: true, default: false}		
+		isAccountVerified: { type: Boolean, required: true, default: false},
+		isTemporaryPassword: { type: Boolean, required: false, default: false},
+		isPasswordEncrypted: { type: Boolean, required: true, default: false},
 	},
 
 	accounts: {
@@ -27,7 +31,8 @@ let schema: Schema = new Schema({
 
 	userConfiguration: {	
 		isGooglePlusUser: { type: Boolean, required: false, default: false},
-		isThumbnailSet: { type: Boolean, required: true, default: false}					
+		isThumbnailSet: { type: Boolean, required: true, default: false},
+		isAddressSet: { type: Boolean, required: false, default: false }									
 	},
 
 	profile: {
@@ -45,9 +50,32 @@ let schema: Schema = new Schema({
 		displayNames: {
 			fullName:  {type: String, required: true },
 			sortName:  {type: String, required: false }
+		},	
+
+		address: {
+			street: 		{type: String, required: false },
+			houseNumber:	{type: String, required: false },
+			suffix:			{type: String, required: false },
+			addition:		{type: String, required: false },
+			areacode:		{type: String, required: false },
+			city:			{type: String, required: false },
+			county:			{type: String, required: false },
+			country:		{type: String, required: false },
+			countryCode:	{type: String, required: false },
 		},		
 
+		location: {
+			latitude:		{type: Number, required: false }, 
+			longitude: 		{type: String, required: false }
+		},
+
+		/****
+		 * Google Geo Object
+		 */
+		geo: { type:Object, required:false, default: {} },
+
 		social: {
+			googleplus:  {type: String, required: false },
 			facebook:  {type: String, required: false },
 			linkedin:  {type: String, required: false },
 			twitter:  {type: String, required: false },
@@ -64,9 +92,12 @@ let schema: Schema = new Schema({
 
 		images: {			
 		    thumbnail: { type: String, required: false},
+		    avatar: { type: String, required: false},
 		}
 
-	}
+	},
+
+	devices: { type:Array, required: false }
 }, 
 
 { 

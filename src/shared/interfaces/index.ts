@@ -7,3 +7,15 @@ export { IError } from "./error.interface";
 export { IListOptions } from './mlab.listquery.interface';
 export { IUpdateOptions} from './mlab.update.interface';
 
+export {
+	IUserJob,
+	IUserAddress,
+	IUserCommunication,
+	IUserSocial,
+	IUserImage,
+	IUserAccessControl,
+	IUserShortList,
+	IUserStatus,
+	IUserItemErrors,
+	IUserDevice
+} from "./user.item.interface";
