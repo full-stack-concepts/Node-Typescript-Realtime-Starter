@@ -46,6 +46,7 @@ export const DB_CONFIG_PORT = process.env["DB_CONFIG_PORT"];
 export const DB_CONFIG_USER = process.env["DB_CONFIG_USER"];
 export const DB_CONFIG_PASSWORD = process.env["DB_CONFIG_PASSWORD"];
 export const DB_CONFIG_DATABASE = process.env["DB_CONFIG_DATABASE"];
+export const DB_MAX_POOL_SIZE = process.env["DB_MAX_POOL_SIZE"] || 100;
 
 if(USE_LOCAL_MONGODB_SERVER) {	
 
@@ -54,7 +55,7 @@ if(USE_LOCAL_MONGODB_SERVER) {
 		process.exit(1);
 	}
 
-	let port:number = parseInt(DB_CONFIG_PORT);
+	const port:number = parseInt(DB_CONFIG_PORT);
 	if(!Number.isInteger(port) || Number.isInteger(port) && port<=0) {
 		console.error("Local Database: Please specify DB <port> in your environemntal file (.env or .prod)! ");
 		process.exit(1);
@@ -74,8 +75,13 @@ if(USE_LOCAL_MONGODB_SERVER) {
 		console.error("Local Database: Please specify DB <name> in your environemntal file (.env or .prod)! ");
 		process.exit(1);
 	}
-}
 
+	const poolSize:number = parseInt(DB_MAX_POOL_SIZE);
+	if(!Number.isInteger(poolSize) || Number.isInteger(poolSize) && poolSize<=0) {
+		console.error("Local Database: Please specify <PoolSize> in your environemntal file (.env or .prod)! ");
+		process.exit(1);
+	}
+}
 
 /***
  * MLAB Configuration

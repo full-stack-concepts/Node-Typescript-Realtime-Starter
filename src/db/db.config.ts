@@ -8,11 +8,25 @@ import {
 	DB_CONFIG_PORT,
 	DB_CONFIG_USER,
 	DB_CONFIG_PASSWORD,
-	DB_CONFIG_DATABASE
+	DB_CONFIG_DATABASE,
+	DB_MAX_POOL_SIZE
 } from "../util/secrets";
 
+import { IConnection } from "../shared/interfaces";
+
+/****
+ * Connection Settings Object
+ */
+const c:IConnection = {
+	host: DB_CONFIG_HOST, 
+	user: DB_CONFIG_USER,
+	password: DB_CONFIG_PASSWORD,
+	port: DB_CONFIG_PORT,
+	db: DB_CONFIG_DATABASE
+}
+
 const constructConnectionString = ():string => {
-	return `mongodb://${DB_CONFIG_USER}:${DB_CONFIG_PASSWORD}@${DB_CONFIG_HOST}:${DB_CONFIG_PORT}/${DB_CONFIG_DATABASE}?maxPoolSize=100`;	
+	return `mongodb://${c.user}:${c.password}@${c.host}:${c.port}/${c.db}?maxPoolSize=${DB_MAX_POOL_SIZE}`;	
 }
 
 /******************
@@ -21,6 +35,12 @@ const constructConnectionString = ():string => {
  *
  */
 class Database {
+
+	public live:boolean=false;
+
+ 	get isLive():boolean { 
+ 		return this.live; 
+ 	}
 
 	defaultErrorMessage():void {
 		console.error("Local Database : Could not connect to local instance of MONGODB or authentication failed.");
@@ -55,7 +75,10 @@ class Database {
 				db.on('error', err =>  console.error( "Local Database ", err) );
 				
 				// return db connection
-				db.on('open', () => { console.log("Local DB is now Live! "); return db;	});
+				db.on('open', () => { 
+					console.log("Local DB is now Live! "); 
+					return db;	
+				});
 			}
 		});
 	}
