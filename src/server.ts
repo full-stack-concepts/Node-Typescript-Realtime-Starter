@@ -14,6 +14,10 @@ const appRoot = require('app-root-path');
 // interfaces
 import { ServerOptions, ProcessEnv } from './shared/interfaces/';
 
+/***
+ * Local DB 
+ */
+import { db } from "./db";
 
 /**
  * EXPRESS APPLICATION CODE
@@ -119,8 +123,20 @@ function onListening():void {
    /*****
     * BOOTSTRAP APPLICATION  
     */    
+    bootStrapper();
 }
 
+/****
+ * Bootstrapper
+ */
+function bootStrapper() {
+
+    /****
+     * Configure Local Database
+     */
+    db.init();
+
+}
 
 /***
  * Create server instance
