@@ -78,6 +78,25 @@ export const phoneNumberFormat = ():string => {
 }
 
 /****
+ * Data generate functions: company
+ */
+export const companySuffixes = ():any[] => {
+	return faker.company.suffixes();
+}
+
+export const companyname = ():string => {
+	return faker.company.companyName();
+}
+
+export const companySuffix = ():string => {
+	return faker.company.companySuffix();
+}
+
+export const companySlogan = ():string=> {
+	return faker.company.catchPhrase();
+}
+
+/****
  * Data generate functions: address
  */
 export const city = ():string => {
@@ -108,6 +127,10 @@ export const streetSuffix = ():string => {
 	return faker.address.streetSuffix();
 }
 
+export const streetSuffix = ():string => {
+	return faker.address.streetSuffix();
+}
+
 export const county = ():string => {
 	return faker.address.county();
 }
@@ -125,6 +148,18 @@ export const state = ():string => {
 
 export const stateAbbr = ():string => {
 	return faker.address.stateAbbr();
+}
+
+export const addressLine1 = ():string => {
+	return `${streetName()} ${houseNumber()} ${streetPrefix()}`;
+}
+
+export const addressLine2 = ():string => {
+	return `${zipCode()} ${city()}`;
+}
+
+export const addressLine3 = ():string => {
+	return `${state()} ${country()}`;
 }
 
 /****
@@ -233,6 +268,11 @@ function getRandomArbitrary(min:number, max:number):number {
 export const creditCardNumber = ():string => {
 	return `${getRandomArbitrary(2000, 8000)}-${getRandomArbitrary(2000, 8000)}-${getRandomArbitrary(2000, 8000)}-${getRandomArbitrary(2000, 8000)}`;	
 }
+
+export const birthDay = ():string => {
+	return `${getRandomArbitrary(1930, 2000)}-${getRandomArbitrary(1, 12)}-${getRandomArbitrary(1, 31)}`;	
+}
+
 
 export const emailProvider = ():string => {
 
@@ -374,7 +414,7 @@ const fakeUserAddressAndLocation = (user:IUser):IUser => {
 	 * @suffix: string
 	 * @zipcode:string
 	 * @city:string
-	 * @county?:string,
+	 * @county:string,
 	 * @countyCode:string
 	 * @country:string
 	 * @countryCode:string

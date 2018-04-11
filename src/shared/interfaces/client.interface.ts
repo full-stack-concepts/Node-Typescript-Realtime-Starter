@@ -2,9 +2,9 @@ import { Document } from "mongoose";
 
 import { IPerson } from "./person.interface";
 
-export interface IUser extends IPerson {
+export interface IClient extends IPerson {
 
-	userConfiguration: {	
+	clientConfiguration: {	
 		isThumbnailSet: boolean,	
 		isGooglePlusUser?: boolean,
 		isAddressSet?:boolean,

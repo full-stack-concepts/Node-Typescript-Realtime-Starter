@@ -12,7 +12,9 @@ import {
 	DB_MAX_POOL_SIZE
 } from "../util/secrets";
 
-import { IConnection } from "../shared/interfaces";
+import { 
+	IConnection 
+} from "../shared/interfaces";
 
 /****
  * Connection Settings Object
