@@ -1,12 +1,12 @@
 {
-    "name": "express-typescript-starter",
-    "version": "0.1.0",
-    "description": "A starting point for Node.js express apps with TypeScript",
+    "name": "angular-react-nodejs-starter",
+    "version": "0.0.1",
+    "description": "A starting point for Node.js express apps with TypeScript, embedded clients and data generator.",
     "repository": {
         "type": "git",
-        "url": "https://github.com/Microsoft/TypeScript-Node-Starter"
+        "url": "https://github.com/tcaabv/Node-Typescript-Realtime-Starter"
     },
-    "author": "Bowden Kelly",
+    "author": "TCAA BV, Alkmaar, The Netherlands",
     "license": "MIT",
     "scripts": {
         "start": "npm run serve",
