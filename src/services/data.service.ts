@@ -35,8 +35,7 @@ faker.locale =  DB_POPULATION_LOCALE;
 import {
 	countArrayItems,
 	createDefaultUser,
-	formatUserSubType,
-	slicePortionsForEachSubType,
+	formatUserSubType,	
 	createSuperAdmin,
 	createAdmin,
 	createPowerUser,
@@ -210,37 +209,7 @@ export class DataBreeder {
 						})
 					)
 					.then( data => console.log(data) )
-
-					
-
-
-
-				})
-
-				
-
-
-
-
-
-					
-
-
-				// process thick: populate Per User Type				
-				/*
-				.then( (users:IUser[]) => {														
-					return Promise.all(
-						settings.map ( (setting:any) => {										
-							return Promise.resolve( createUserSubType( users, setting ))
-						})
-					)
-					.then( data => console.log(data) );
-				})
-				*/
-
-				/****
-				 * 
-				 */
+				})			
 				
 			break;
 		}

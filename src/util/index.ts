@@ -17,7 +17,6 @@ export {
 export {
 	createDefaultUser,	
 	formatUserSubType,
-	slicePortionsForEachSubType,
 	createSuperAdmin,
 	createAdmin,
 	createPowerUser,

@@ -513,52 +513,77 @@ export const createDefaultUser = (count:number) => {
 			}
 		);
 	}); 
-}
-    
-export const slicePortionsForEachSubType = ( subType:any, users:IUsers) => {
+}   
 
-	console.log( "==> Lets splice and slice these motehrfuckers ......")
-	console.log( "sub Type");
-}
 
 export const formatUserSubType = ({ type, amount, data }:any) => {
 
 	console.log("==> Incoming collection: ", type, amount, data.length)
-
-	/*
+	
 	return new Promise( (resolve, reject) => {
 		switch( type) {
-			// case 'superadmin':	resolve( createSuperAdmin( ) ); break;
-			case 'admin': 		resolve( createAdmin(users, amount) ); break;
-			case 'poweruser': 	resolve( createPowerUser(users, amount)); break;
-			case 'author': 		resolve( createAuthor(users, amount) ); break;
-			case 'user': 		resolve( createUser(users, amount));  break;
+			case 'superadmin':	resolve( createSuperAdmin( type, data ) ); break;
+			case 'admin': 		resolve( createAdmin( type, data) ); break;
+			case 'poweruser': 	resolve( createPowerUser( type, data )); break;
+			case 'author': 		resolve( createAuthor( type, data) ); break;
+			case 'user': 		resolve( createUser( type, data ));  break;
 		}
 	});		
-	*/
 }
 
 
-export const createSuperAdmin = ( ) => {
-	return Promise.resolve({ 'superadmin': [] });
+export const createSuperAdmin = ( type, users:IUser[] ) => {
+
+	users.forEach ( u => {
+		
+		// set role for this user type
+		u.core.role = u.security.accountType  = 1;
+		// #TODO: set specific access roles and policies for this group
+	});
+
+	return Promise.resolve({ [type]: users });
 }
 
-export const createAdmin = (users:IUser[], amount:ISetting) => {
-	console.log(`==> Create ${amount} admins`)
-	 // slice
+export const createAdmin = ( type, users:IUser[]) => {
 
-	 // format with faker
-	return Promise.resolve({ 'admins': [] });
+	users.forEach ( u => {
+		// set role for this user type
+		u.core.role = u.security.accountType  = 2;
+		// #TODO: set specific access roles and policies for this group
+	});
+	
+	return Promise.resolve({ [type]: users });
 }
 
-export const createPowerUser = (users:IUser[], amount:number) => {
-	return Promise.resolve({ 'powerusers': [] });
+export const createPowerUser = ( type, users:IUser[]) => {
+
+	users.forEach ( u => {
+		// set role for this user type
+		u.core.role = u.security.accountType  = 3;
+		// #TODO: set specific access roles and policies for this group
+	});
+	
+	return Promise.resolve({ [type]: users});
 }
 
-export const createAuthor = (users:IUser[], amount:number) => {
-	return Promise.resolve({ 'authors': [] });
+export const createAuthor = ( type, users:IUser[] ) => {
+
+	users.forEach ( u => {
+		// set role for this user type
+		u.core.role = u.security.accountType  = 4;
+		// #TODO: set specific access roles and policies for this group
+	});
+
+	return Promise.resolve({ [type]: users);
 }
 
-export const createUser = ( users:IUser[], amount:number) => {
-	return Promise.resolve({ 'users': [] });
+export const createUser = ( type, users:IUser[] ) => {
+
+	users.forEach ( u => {
+		// set role for this user type
+		u.core.role = u.security.accountType  = 5;
+		// #TODO: set specific access roles and policies for this group
+	});
+
+	return Promise.resolve({ [type]: users });
 }
