@@ -15,8 +15,9 @@ export {
 } from "./mlab.util";
 
 export {
-	createDefaultUser,
-	createUserSubType,
+	createDefaultUser,	
+	formatUserSubType,
+	slicePortionsForEachSubType,
 	createSuperAdmin,
 	createAdmin,
 	createPowerUser,

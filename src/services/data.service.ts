@@ -35,7 +35,8 @@ faker.locale =  DB_POPULATION_LOCALE;
 import {
 	countArrayItems,
 	createDefaultUser,
-	createUserSubType,
+	formatUserSubType,
+	slicePortionsForEachSubType,
 	createSuperAdmin,
 	createAdmin,
 	createPowerUser,
@@ -183,24 +184,59 @@ export class DataBreeder {
 
 	private processDataCategory( { category, settings, count}:any ) {
 
-		console.log("*** config category ", category )		
-
 		switch(category) {
 			case 'users': 
 
 				// process thick: Create required amount of users				 
 				createDefaultUser(count.count)
 
-				// process thick: populate Per User Type				
-				.then( (users:IUser[]) => {									
+				// process thick: slice portions per user sub type
+				.then( (users:IUser[]) => {														
 					return Promise.all(
-						settings.map ( (setting:any) => {		
-							console.log(setting)		
+						settings.map ( ({type, amount}:any) => {																			
+							let portion:IUser[] = users.slice(0, amount);	
+							users.splice(0, amount);
+							return Promise.resolve( { 'data': portion, 'type': type, 'amount': amount})
+						})
+					)
+					.then( (collection:any) => { return collection; } )												
+				})
+
+				// process thick: format collection per user sub type
+				.then( (collection: any) => {
+					return Promise.all(
+						collection.map( (collection:any) => {						
+							return Promise.resolve( formatUserSubType( collection ))
+						})
+					)
+					.then( data => console.log(data) )
+
+					
+
+
+
+				})
+
+				
+
+
+
+
+
+					
+
+
+				// process thick: populate Per User Type				
+				/*
+				.then( (users:IUser[]) => {														
+					return Promise.all(
+						settings.map ( (setting:any) => {										
 							return Promise.resolve( createUserSubType( users, setting ))
 						})
 					)
 					.then( data => console.log(data) );
 				})
+				*/
 
 				/****
 				 * 

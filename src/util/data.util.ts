@@ -283,7 +283,7 @@ export const gimmieCredentials = (fName:string, lName:string):any => {
     }
 }
 
-export const cosntructEmail = (fName:string, lName:string):string => {
+export const constructEmail = (fName:string, lName:string):string => {
 	return `${fName}.${lName}@${emailProvider()}`;
 }
 
@@ -330,7 +330,7 @@ const fakeUserPersonalia = (user:IUser):IUser => {
 	 	credentials:any= gimmieCredentials(fName, lName),
 	 	url:string = credentials.url,
 	 	userName:string = credentials.userName,
-	 	email:string = cosntructEmail(fName,lName),
+	 	email:string = constructEmail(fName,lName),
 	 	identifier:string = String(createIdentifier() ),
 	 	_avatar:string = String( avatar().trim() ),
 	 	_thumbnail:string = String( avatar().trim() );
@@ -338,8 +338,8 @@ const fakeUserPersonalia = (user:IUser):IUser => {
 	/***
 	 * Core Details
 	 */
-	user.core.email = email;
-	user.core.userName = createIdentifier();
+	user.core.email = email.trim().toLowerCase();
+	user.core.userName = userName;
 	user.core.url = url;	
 	user.core.identifier = identifier;
 
@@ -474,7 +474,7 @@ const fakeDataFor = (user:IUser):IUser => {
 	 */
 	 user = fakeUserDevice( user );
 
-	console.log("==> populate this user ", user);
+	// console.log("==> populate this user ", user);
 
 	return user;
 }
@@ -485,20 +485,21 @@ export const createDefaultUser = (count:number) => {
 		user:IUser;
 
 	return new Promise( (resolve, reject) => {
-		const source$:Observable<number> = Observable.interval(1000).take(count);
-		const sub$:Subscription = source$.subscribe(
-		
-			x => {	    		
 
-				// process thick: Clone default user and add to users array
-	    		user=deepCloneObject(TUSER);    		
+		const source$:Observable<number> = Observable.interval(10).take(count);
+		const sub$:Subscription = source$.subscribe(		
 
-	    		// process thick: 
-	    		console.log("--------------------------------")
-	    		user =  fakeDataFor(user);
-	    		
+			x => {
+				// clone default user	    					
+	    		user=deepCloneObject(TUSER);    			    	
 
+	    		// format user with unique data
+	    		user = fakeDataFor(user);
 
+	    		// add user to collection
+	    		users[x]=user;
+
+	    		// return at end of sequence
 	    		if (x=== (count-1)) return;	    
 			},
 
@@ -507,16 +508,24 @@ export const createDefaultUser = (count:number) => {
 
 			// On sequence end unsubscribe and resolve users array			
 			() => { 
-				sub$.unsubscribe(); 
+				sub$.unsubscribe(); 								
 				resolve(users); 
 			}
 		);
 	}); 
 }
+    
+export const slicePortionsForEachSubType = ( subType:any, users:IUsers) => {
 
-export const createUserSubType = (users:IUser[], {type, amount}:any) => {
+	console.log( "==> Lets splice and slice these motehrfuckers ......")
+	console.log( "sub Type");
+}
 
-	console.log("==> Incoming setting: ", users.length, type, amount)
+export const formatUserSubType = ({ type, amount, data }:any) => {
+
+	console.log("==> Incoming collection: ", type, amount, data.length)
+
+	/*
 	return new Promise( (resolve, reject) => {
 		switch( type) {
 			// case 'superadmin':	resolve( createSuperAdmin( ) ); break;
@@ -526,6 +535,7 @@ export const createUserSubType = (users:IUser[], {type, amount}:any) => {
 			case 'user': 		resolve( createUser(users, amount));  break;
 		}
 	});		
+	*/
 }
 
 
