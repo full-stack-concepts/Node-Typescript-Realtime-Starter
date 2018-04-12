@@ -12,7 +12,10 @@ export interface IUserAddress {
 	county?:string,
 	countyCode?:string,
 	country?:string,
-	countryCode?:string
+	countryCode?:string,
+	addressLine1?:string,
+	addressLine2?:string,
+	addressLine3?:string
 }
 
 export interface IUserCommunication {

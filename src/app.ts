@@ -24,14 +24,9 @@ import axios from "./util/axios";
 
 import {u} from "./services/user.service";
 
-/*****
- * Test ground
- */
 
-/*
 import { populateDatabase} from "./services/data.service";
 populateDatabase();
-*/
 
 
 class App {

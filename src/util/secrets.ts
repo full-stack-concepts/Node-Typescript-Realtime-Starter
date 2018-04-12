@@ -120,23 +120,43 @@ export const DB_POPULATE_AUTHORS = Number(process.env["DB_POPULATE_AUTHORS"]);
 export const DB_POPULATE_USERS =  Number(process.env["DB_POPULATE_USERS"]);
 export const DB_POPULATION_LOCALE = process.env["DB_POPULATION_LOCALE"];
 
+export const DB_CREATE_USERS = process.env["DB_CREATE_USERS"];
+export const DB_USERS_COLLECTION_NAME = process.env["DB_USERS_COLLECTION_NAME"];
+export const DB_CREATE_CLIENTS = process.env["DB_CREATE_CLIENTS"];
+export const DB_CLIENTS_COLLECTION_NAME = process.env["DB_CLIENTS_COLLECTION_NAME"];
+export const DB_CREATE_CUSTOMERS = process.env["DB_CREATE_CUSTOMERS"];
+export const DB_CUSTOMERS_COLLECTION_NAME = process.env["DB_CUSTOMERS_COLLECTION_NAME"];
+export const DB_POPULATE_DEFAULT_CLIENTS= Number(process.env["DB_POPULATE_DEFAULT_CLIENTS"]);
+export const DB_POPULATE_DEFAULT_CUSTOMERS= Number(process.env["DB_POPULATE_DEFAULT_CUSTOMERS"]);
+
+const isString = (str:string):boolean => {
+	return (!str || str && typeof str === 'string');
+} 
+
 if(DB_POPULATE) {
 
 	if(typeof DB_POPULATE_SAFETY_FIRST != 'boolean') {
-		console.error("Database Population: Please configure boolean DB_POPULATE_SAFETY_FIRST. overwrite existing DB data?");
+		console.error("DB Data Genersator: Please configure boolean DB_POPULATE_SAFETY_FIRST. overwrite existing DB data?");
 		process.exit(1);
 	}
 
 	if(!DB_POPULATE_TEST_COLLECTIONS || !Array.isArray(DB_POPULATE_TEST_COLLECTIONS) ) {
-		console.error("Database Population: Please configure DB_POPULATE_TEST_COLLECTIONS array: specify to test for which DB collections");
+		console.error("DB Data Genersator: Please configure DB_POPULATE_TEST_COLLECTIONS array: specify to test for which DB collections");
 		process.exit(1);
+	}
+
+	if(!isString(DB_USERS_COLLECTION_NAME) || !isString(DB_CLIENTS_COLLECTION_NAME) || !isString(DB_CUSTOMERS_COLLECTION_NAME)) {
+		console.log("DB Data Genersator: please provide collection names for each data Type (users, and/or clients and/or customers)")
+		process.exit(1)
 	}
 
 	const userGroups:any[] = [
 		{ value: DB_POPULATE_ADMINS, name: 'admins' },
 		{ value: DB_POPULATE_POWER_USERS, name: 'power users' },
 		{ value: DB_POPULATE_AUTHORS, name: 'authors' },
-		{ value: DB_POPULATE_USERS, name: 'users' }		
+		{ value: DB_POPULATE_USERS, name: 'users' },		
+		{ value: DB_POPULATE_DEFAULT_CLIENTS, name: 'default clients' },
+		{ value: DB_POPULATE_DEFAULT_CUSTOMERS, name: 'default customers' }
 	];
 
 	userGroups.forEach( ({ value, name}) => {		

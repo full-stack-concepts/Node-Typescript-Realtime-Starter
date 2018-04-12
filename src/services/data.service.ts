@@ -16,13 +16,21 @@ import { get} from "../util";
  */
 import {	
 	DB_POPULATE,
+	DB_CREATE_USERS,
+	DB_USERS_COLLECTION_NAME,
+	DB_CREATE_CLIENTS,
+	DB_CLIENTS_COLLECTION_NAME,
+	DB_CREATE_CUSTOMERS,
+	DB_CUSTOMERS_COLLECTION_NAME,
 	DB_POPULATE_SAFETY_FIRST,
 	DB_POPULATE_TEST_COLLECTIONS,
 	DB_POPULATE_ADMINS,
 	DB_POPULATE_POWER_USERS,
 	DB_POPULATE_AUTHORS,
 	DB_POPULATE_USERS,
-	DB_POPULATION_LOCALE
+	DB_POPULATION_LOCALE,
+	DB_POPULATE_DEFAULT_CLIENTS,
+	DB_POPULATE_DEFAULT_CUSTOMERS
 } from "../util/secrets";
 
 console.log("****** locale ", DB_POPULATION_LOCALE )
@@ -168,13 +176,25 @@ export class DataBreeder {
 	}
 
 	private _populationSettings():IDataType[] {
-		return  [
-			{ type: "superadmin", amount: 1},
-			{ type: "admin", amount: DB_POPULATE_ADMINS },
-			{ type: "poweruser", amount: DB_POPULATE_POWER_USERS },
-			{ type: "author", amount: DB_POPULATE_AUTHORS},
-			{ type: "user", amount:DB_POPULATE_USERS}
-		];	
+		
+		return  {
+			users: [
+				{ type: "superadmin", amount: 1},
+				{ type: "admin", amount: DB_POPULATE_ADMINS },
+				{ type: "poweruser", amount: DB_POPULATE_POWER_USERS },
+				{ type: "author", amount: DB_POPULATE_AUTHORS},
+				{ type: "user", amount:DB_POPULATE_USERS}
+			],
+
+			clients: [
+				{ type: "default", amount: "DB_POPULATE_DEFAULT_CLIENTS" }
+			],
+
+			customers: [
+				{ type: "default", amount: "DB_POPULATE_DEFAULT_CUSTOMERS" }
+			]
+		}
+
 	}
 
 	private _calculateItems(arr:any[]):any {
@@ -237,6 +257,10 @@ export class DataBreeder {
 	 */
 	private async populate( collections:any[]) {
 
+		/*
+
+		### for next commit
+
 		console.log("*** Start population")
 		// process thick: inventory data types
 		const userPopulation:IDataType[] = this._populationSettings();
@@ -250,6 +274,7 @@ export class DataBreeder {
 		const data:any = this._generateData([
 			{ category: 'users', settings: userPopulation, count: userCount }				
 		]);
+		*/
 
 		return Promise.resolve(true);
 
