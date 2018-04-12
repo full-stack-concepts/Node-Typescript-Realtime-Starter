@@ -41,7 +41,7 @@ class UserRouter {
         this.router.use(allowMethods);
 
         // type req to any -> origin property unkown on Request
-        this.router.use(allowOrigin);       
+        this.router.use(allowOrigin);     
 
 	}
 
@@ -80,10 +80,8 @@ class UserRouter {
 
                   WebToken.create( user.accounts, ( err:any, token:string) => {
 
-                  	console.log(err, token)
-                
-                     // (1) set certificate as cookie
-                     // (2)              
+                  	console.log(err, token)               
+                                            
                     if(!err) {       
 
                     	// store webtoken as cookie
