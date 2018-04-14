@@ -1,5 +1,5 @@
 /* Analyser: module that examines incoming client request */
-import * as Promise from "bluebird";
+import Promise from "bluebird";
 import { Request, Response } from 'express';
 
 
@@ -142,7 +142,7 @@ export class ClientAnalyzer {
  			this.viewport = this.__defineViewPort(); 		
 		}
 
-		catch(e:any) { err=e;}
+		catch(e) { err=e;}
 		finally {
 			return new Promise ( (resolve, reject) => {
 				(err) ? reject(err):resolve();				
@@ -150,7 +150,7 @@ export class ClientAnalyzer {
 		}
 	}  
 
-	private _buildResponseObject(osInfo) {
+	private _buildResponseObject(osInfo:any) {
 
 		this.osInfo = osInfo;
 		return {
@@ -181,7 +181,7 @@ export class ClientAnalyzer {
 
 	/* Public interface */
 	public client(req:Request, res:Response, done:Function) {
-		this.analyseHeader(req, res, (err, info) => {
+		this.analyseHeader(req, res, (err:any, info:any) => {
 			return done(err, info);
 		});
 	}
@@ -189,7 +189,7 @@ export class ClientAnalyzer {
 
 export function analyzeClient( req:Request, res:Response, done:Function) {
 	let instance = new ClientAnalyzer(req);
-	let process = instance.client( req, res, (err, info) => {			
+	let process = instance.client( req, res, (err:any, info:any) => {			
 		instance = null;
 		return done(err, info);
 	});	

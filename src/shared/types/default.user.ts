@@ -1,6 +1,8 @@
 import {IUser} from  "../interfaces";
 
-export const TUSER:IUser = {
+export const TUSER = <IUser> {
+
+	user: () => {},
 	
 	core: {
 		userName: null,

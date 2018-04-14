@@ -2,11 +2,15 @@
  * Tyoe Guards
  */
 
+import {
+	IPerson, IUser, IClient, ICustomer
+} from "../interfaces";
+
 export function isOfPersonType(person:IPerson | IUser | IClient | ICustomer):person is IPerson {
 	return (<IPerson>person).person !== undefined;
 }
 
-export function isOfUserType(user:IPerson | IUser | IClient | ICustomer):person is IUser {
+export function isOfUserType(user:IPerson | IUser | IClient | ICustomer):user is IUser {
 	return (<IUser>user).user !== undefined;
 }
 

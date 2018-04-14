@@ -41,6 +41,8 @@ export {
 	phoneNumber,
 	phoneFormats,
 	phoneNumberFormat,
+	companyName, 
+	companySuffix,
 	companySuffixes,
 	companySlogan,
 	companySubSlogan,

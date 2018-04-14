@@ -103,7 +103,7 @@ export interface IUserCompany {
 		addressLine3?:string
 	},
 
-	communication:? {
+	communication?: {
 		companyPhone?: string,
 		companyEmail?: string,
 		companyWebsite?: string

@@ -1,7 +1,10 @@
 import { IClient } from  "../interfaces";
 import { TCOMPANY } from "./default.company";
 
-export const TCLIENT:IClient = {
+export const TCLIENT = <IClient> {
+
+	user: () => {},
+	client: () => {},
 
 	core: {
 		userName: null,
@@ -24,7 +27,7 @@ export const TCLIENT:IClient = {
 		isPasswordEncrypted: null
 	},
 
-	userConfiguration: {	
+	clientConfiguration: {	
 		isThumbnailSet: false,	
 		isGooglePlusUser: false,
 		isAddressSet: false

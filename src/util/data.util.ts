@@ -16,10 +16,9 @@ import {
 
 	/* Person */
 	gender, genderPrefix, firstName, lastName, givenName, constructFullName, gimmieCredentials, constructEmail, jobTitle, jobArea, jobDescription, jobType, phoneNumber, phoneFormats, phoneNumberFormat, birthDay,
-	gimmieCredentials, 
 	
 	/* Company */
-	companySuffixes, companySlogan, companySubSlogan, constructCompanyEmail, constructCompanyWebsite, constructCompanyFacebookAccount,
+	companyName, companySuffix,  companySuffixes, companySlogan, companySubSlogan, constructCompanyEmail, constructCompanyWebsite, constructCompanyFacebookAccount,
 	constructCompanyTwitterAccount,
 
 	/* Address */
@@ -49,7 +48,7 @@ import {
 /***
  * Data Factory: user security
  */
-const fakeUserSecurity = (user:IUser):IUser => {
+const fakeUserSecurity = (user:IUser|IClient|ICustomer):IUser|IClient|ICustomer => {
 
 	/*************************************************************************************
 	 * User Security
@@ -72,7 +71,7 @@ const fakeUserSecurity = (user:IUser):IUser => {
 /***
  * Data Factory: user personalia and identifiers
  */
-const fakeUserPersonalia = (user:IUser):IUser => {
+const fakeUserPersonalia = (user:IUser|IClient|ICustomer):IUser|IClient|ICustomer => {
 
 	/*************************************************************************************
 	 * Use Core Details And Personalia
@@ -123,7 +122,7 @@ const fakeUserPersonalia = (user:IUser):IUser => {
 /***
  * Data Factory: user address & location
  */
-const fakeUserAddressAndLocation = (user:any):IUser | IClient | ICustomer => {
+const fakeUserAddressAndLocation = (user:IUser|IClient|ICustomer):IUser|IClient|ICustomer => {
 
 	/*************************************************************************************
 	 * User Address Details, location (modify as you like)
@@ -169,9 +168,15 @@ const fakeUserAddressAndLocation = (user:any):IUser | IClient | ICustomer => {
 		
 
 	// type assertionL and finally confirm that address has been configured
-	if(isOfPersonType(user)) user.userConfiguration.isAddressSet =true;
-	if(isOfClientType(user)) user.clientConfiguration.isAddressSet =true;
-	if(isOfCustomerType(user)) user.customerConfiguration.isAddressSet = true;
+	if(isOfUserType(user)) {
+		user.userConfiguration.isAddressSet =true;
+	}
+	if(isOfClientType(user)) {
+		user.clientConfiguration.isAddressSet =true;
+	}
+	if(isOfCustomerType(user)) {
+		user.customerConfiguration.isAddressSet = true;
+	}
 
 	return user;
 }
@@ -179,7 +184,7 @@ const fakeUserAddressAndLocation = (user:any):IUser | IClient | ICustomer => {
 /*****************************************************************************************
  * Data Factory: device
  */
-const fakeUserDevice = (user:IUser):IUser => {
+const fakeUserDevice = ( user:IUser|IClient|ICustomer):IUser|IClient|ICustomer => {
 
 	/*************************************************************************************
 	 * User Device Details
@@ -213,7 +218,7 @@ const fakeUserDevice = (user:IUser):IUser => {
 	 return user;
 }
 
-const fakeDataFor = (user:IUser):IUser => {
+const fakeDataFor = ( user:any) => {
 	
 	/**********************
 	 * User Securiy
@@ -246,7 +251,7 @@ const fakeDataFor = (user:IUser):IUser => {
  * @count:number
  * 
  */
-export const createUserType = (category:string, count:number):IUser | IClient | ICustomer => {	
+export const createUserType = (category:string, count:number) => {	
 
 	console.log( "*** Castegory: ", category)	
 	let users:IUser[]=[];
@@ -340,7 +345,7 @@ export const formatUserSubType = ({ category, amount, data }:any) => {
 }
 
 
-export const createSuperAdmin = ( category, users:IUser[] ):Promise<any> => {
+export const createSuperAdmin = ( category:string, users:IUser[] ) => {
 
 	users.forEach ( u => {
 		
@@ -352,7 +357,7 @@ export const createSuperAdmin = ( category, users:IUser[] ):Promise<any> => {
 	return Promise.resolve({ [category]: users });
 }
 
-export const createAdmin = ( category, users:IUser[]):Promise<any> => {
+export const createAdmin = ( category:string, users:IUser[]) => {
 
 	users.forEach ( u => {
 		// set role for this user type
@@ -363,7 +368,7 @@ export const createAdmin = ( category, users:IUser[]):Promise<any> => {
 	return Promise.resolve({ [category]: users });
 }
 
-export const createPowerUser = ( category, users:IUser[]):Promise<any> => {
+export const createPowerUser = ( category:string, users:IUser[]) => {
 
 	users.forEach ( u => {
 		// set role for this user type
@@ -374,7 +379,7 @@ export const createPowerUser = ( category, users:IUser[]):Promise<any> => {
 	return Promise.resolve({ [category]: users});
 }
 
-export const createAuthor = ( category, users:IUser[] ):Promise<any> => {
+export const createAuthor = ( category:string, users:IUser[] ) => {
 
 	users.forEach ( u => {
 		// set role for this user type
@@ -382,10 +387,10 @@ export const createAuthor = ( category, users:IUser[] ):Promise<any> => {
 		// #TODO: set specific access roles and policies for this group
 	});
 
-	return Promise.resolve({ [category]: users);
+	return Promise.resolve({ [category]: users});
 }
 
-export const createUser = ( category, users:IUser[] ):Promise<any> => {
+export const createUser = ( category:string, users:IUser[] ) => {
 
 	users.forEach ( u => {
 		// set role for this user type
@@ -397,12 +402,11 @@ export const createUser = ( category, users:IUser[] ):Promise<any> => {
 }
 
 
-export const createDefaultClient = ( category, users:IUser[] ):Promise<any[]> => {
+export const createDefaultClient = ( category:string, users:IClient[] ) => {
 
 	let err:any; 
 
 	try {
-
 
 		users.forEach ( u => {		
 
@@ -472,7 +476,7 @@ export const createDefaultClient = ( category, users:IUser[] ):Promise<any[]> =>
 }
 
 
-export const createDefaultCustomer = ( category, users:IUser[] ):Promise<any[]> => {
+export const createDefaultCustomer = ( category:string, users:ICustomer[] ) => {
 
 	users.forEach ( u => {		
 

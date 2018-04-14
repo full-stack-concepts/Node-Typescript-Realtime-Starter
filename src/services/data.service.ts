@@ -1,8 +1,11 @@
+/****
+ * Do not use es2016 async or await in conjunction with bluebird promises
+ * see https://github.com/Microsoft/TypeScript/issues/8331
+ */
 import fetch from "node-fetch";
 import faker from "faker";
 import Promise from "bluebird";
 import chain from 'lodash/chain';
-
 import { IUser } from "../shared/interfaces";
 import { UserModel} from "../shared/models";
 import { RemoteQueryBuilder } from "../util";
@@ -33,7 +36,6 @@ import {
 	DB_POPULATE_DEFAULT_CUSTOMERS
 } from "../util/secrets";
 
-console.log("****** locale ", DB_POPULATION_LOCALE )
 /***
  * Default Faker language locale
  * More info: https://github.com/marak/Faker.js/
@@ -72,7 +74,7 @@ export class DataBreeder {
 		console.log("** DB Configuration: no need to populate DB with data .....")
 	}
 
-	private async _fetchCollections() {
+	private _fetchCollections() {
 
 		let url:string = RemoteQueryBuilder.list({});		
 		return fetch(url).then( res => res.json()).then( collections => Promise.resolve(collections) )
@@ -111,7 +113,7 @@ export class DataBreeder {
 		};		
 	}
 
-	private async __countItems( collection:string) {
+	private __countItems( collection:string) {
 
 		let url:string = RemoteQueryBuilder.list({
 			collection:collection, 
@@ -125,7 +127,7 @@ export class DataBreeder {
 		});
 	}
 
-	private async _testCollectionsForData( collections:string[]) {		
+	private _testCollectionsForData( collections:string[]) {		
 
 		let counts:any=[];
 
@@ -145,7 +147,7 @@ export class DataBreeder {
 		});
 	}
 
-	private async safetyCheck() {		
+	private safetyCheck() {		
 		
 		/**
 		 * process thick: fetch DB collections list
@@ -175,78 +177,91 @@ export class DataBreeder {
 		.catch( err => Promise.reject(err) );
 	}
 
-	private processDataCategory( { category, cSettings, counter}:any ) {
+	private processDataCategory( { category, cSettings, counter}:any) {
 
 		// process thick: Create required amount of users				
 		createUserType( category, counter.count)
 
 		// process thick: slice portions per user sub type
-		.then( (users:IUser[]) => {	
+		.then( (users:any[]) => {	
 
-			switch(category) {
-
-				case 'users': 	
-
+			if( category === 'users' ) {
+				return Promise.all(						
+					cSettings.map ( ({ category, amount}:any) => {																			
+						let portion:IUser[] = users.slice(0, amount);	
+						users.splice(0, amount);
+						return Promise.resolve( { 
+							'category': category, 
+							'data': portion, 								
+							'amount': amount
+						})
+					})											
+				)					
+				// process thick: format collection per user sub type
+				.then( (collection: any) => {
 					return Promise.all(
-						cSettings.map ( ({ category, amount}:any) => {																			
-							let portion:IUser[] = users.slice(0, amount);	
-							users.splice(0, amount);
-							return Promise.resolve( { 
-								'category': category, 
-								'data': portion, 								
-								'amount': amount
-							})
-						})	
-					)
-					// process thick: format collection per user sub type
-					.then( (collection: any) => {
-						return Promise.all(
-							collection.map( (collection:any) => {						
-								return Promise.resolve( formatUserSubType( collection ))
-							})
-						)					
-					});	
-					break;
+						collection.map( (collection:any) => {						
+							return Promise.resolve( formatUserSubType( collection ))
+						})
+					)					
+				})
+				// proces thick: return to caller
+				.then( data => {  return Promise.resolve(data); });
 
-				
-				case 'clients':
-						formatUserSubType( { category: 'defaultClient', amount:  counter.count, data: users });	
-						// return Promise.resolve( formatUserSubType( collection ))		
-				break;
+			} else if(category === 'clients') {
 
+				// process thick: format collection per user sub type				
+				return formatUserSubType( { category: 'defaultClient', amount:  counter.count, data: users } )
+				// proces thick: return to caller
+				.then( data => {  return Promise.resolve(data); })
 
-				case 'customers':
-					formatUserSubType( { category: 'defaultCustomer', amount:  counter.count, data: users });
-					// return Promise.resolve( formatUserSubType( collection ))					
-				break;
+			} else if(category === 'customers' ) {
 
-				
+				// process thick: format collection per user sub type			
+				return formatUserSubType( { category: 'defaultCustomer', amount:  counter.count, data: users })
+				// proces thick: return to caller
+				.then( (data:any) => {  return Promise.resolve(data); })
+					
 			}
-		});
-
-		return category
+		})
+		.then( (collection:any) => {
+			console.log("**** Procesed Data category ", category)
+			console.log(collection)
+			return Promise.resolve(collection);
+		})	
 	}
 
 	private _generateData( pConfiguration:any) {		
 
 		let settings:any[] = pConfiguration.settings;
 
-		console.log(" ***** Process Data Generation ", settings)
-		console.log(pConfiguration.counters)
+		console.log(" ***** Process Data Generation ", settings);
+		console.log(pConfiguration.counters);
 
 		let categories:string[] = Object.keys(settings);		
-		const config:any[] = categories.map( (category:string) => {
-			let counter:number = pConfiguration.counters.find ( (counter) => counter.category === category),
-				cSettinga:any[] = settings[category];
-			console.log("** ", settings[category])
+		const config:any[] = categories.map( (category:any) => {
+
+			let counter:number = pConfiguration.counters.find ( (counter:any) => counter.category === category),
+				cSettings:any[] = settings[category];
+			
 			return { 
 				category: category, 
-				cSettings: cSettinga,
+				cSettings: cSettings,
 				counter: counter 
 			};
 		});
+
+		console.log("****************************************")
+		console.log(config);
+
+
+		Promise.all(
+			config.map ( configuration => {
+				this.processDataCategory(configuration);				
+			})
+		)
 	
-		config.map( this.processDataCategory )			
+		// config.map( this.processDataCategory )		
 
 	}
 
@@ -255,13 +270,13 @@ export class DataBreeder {
 	 */
 	private _calculateItemsPerCategory(items:any[]):any {		
 		let categories:string[] = Object.keys(items);		
-		return categories.map( (category:string) => {
+		return categories.map( (category:any) => {
 			return items[category].reduce( countArrayItems, { category: category, count: 0} )
 		});				
 	}
 
 
-	private _populationSettings():IDataType[] {		
+	private _populationSettings() {		
 		return  {
 			users: [
 				{ category: "superadmin", amount: 1},
@@ -278,10 +293,10 @@ export class DataBreeder {
 	/*****
 	 * 
 	 */
-	private async populate( collections:any[]) {
+	private populate( collections:any[]) {
 
 		// process thick: inventory data types
-		const settings:any[] = this._populationSettings();
+		const settings:any = this._populationSettings();
 
 		// process thick: count users
 		const categoryCounters:any[] = this._calculateItemsPerCategory(settings);		
@@ -291,10 +306,12 @@ export class DataBreeder {
 			settings:settings,
 			counters:categoryCounters
 		});	
+
+
 		return Promise.resolve(true);
 	}
 
-	public async test() {
+	public test() {
 
 		let collections:any[];
 
@@ -309,7 +326,7 @@ export class DataBreeder {
 		// collections = await this.safetyCheck();
 		// console.log("Collections to populate ", collections)
 
-		let result:boolean = await this.populate ( collections );
+		let result:Promise<boolean> = this.populate ( collections );
 
 		
 	}

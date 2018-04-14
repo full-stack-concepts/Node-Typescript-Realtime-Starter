@@ -74,7 +74,7 @@ class Database {
 				const db:any = mongoose.connection;			
 
 				// listen for connection errors
-				db.on('error', err =>  console.error( "Local Database ", err) );
+				db.on('error', (err:any) =>  console.error( "Local Database ", err) );
 				
 				// return db connection
 				db.on('open', () => { 

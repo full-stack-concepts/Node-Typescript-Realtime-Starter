@@ -46,7 +46,7 @@ export const DB_CONFIG_PORT = process.env["DB_CONFIG_PORT"];
 export const DB_CONFIG_USER = process.env["DB_CONFIG_USER"];
 export const DB_CONFIG_PASSWORD = process.env["DB_CONFIG_PASSWORD"];
 export const DB_CONFIG_DATABASE = process.env["DB_CONFIG_DATABASE"];
-export const DB_MAX_POOL_SIZE = process.env["DB_MAX_POOL_SIZE"] || 100;
+export const DB_MAX_POOL_SIZE = process.env["DB_MAX_POOL_SIZE"];
 
 if(USE_LOCAL_MONGODB_SERVER) {	
 

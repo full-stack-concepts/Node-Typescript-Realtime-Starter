@@ -8,7 +8,7 @@ import {
 export interface IPerson extends Document  {
 
 	// unique identifier method
-	person();
+	person?:Function,
 
 	core: {
 		userName: string,

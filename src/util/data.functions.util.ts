@@ -13,7 +13,7 @@ export const gender = ():number => {
 	}
 }
 
-export const genderPredix = ():string => {
+export const genderPrefix = ():string => {
 	return faker.name.prefix();
 }
 
@@ -254,7 +254,7 @@ export const macAddress = ():string => {
 	return faker.internet.mac();
 }
 
-function getRandomArbitrary(min:number, max:number):number {
+export function getRandomArbitrary(min:number, max:number):number {
 	return Math.floor(Math.random() * (max - min) + min);
 }
 
@@ -295,7 +295,7 @@ export const constructFullName = (firstName:string, lastName:string):string => {
 	return `${capitalizeString(firstName)} ${capitalizeString(lastName)}`;
 }
 
-const sliceMe = (str:string, pos:number) => {
+export const sliceMe = (str:string, pos:number) => {
     return str.slice(0, pos).trim().toLowerCase();
 }
 
