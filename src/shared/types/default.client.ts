@@ -1,7 +1,8 @@
-import {IUser} from  "../interfaces";
+import { IClient } from  "../interfaces";
+import { TCOMPANY } from "./default.company";
 
-export const TUSER:IUser = {
-	
+export const TCLIENT:IClient = {
+
 	core: {
 		userName: null,
 		url: null,
@@ -68,6 +69,8 @@ export const TUSER:IUser = {
 			googleplus:null
 		}
 	},
+
+	company: TCOMPANY
 
 
 

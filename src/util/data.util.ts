@@ -5,327 +5,46 @@ import "rxjs/add/operator/take";
 import "rxjs/add/operator/map";
 
 import { deepCloneObject} from "../util";
-import { IUser } from "../shared/interfaces";
-import { TUSER } from "../shared/types";
-import { capitalizeString } from "../util";
+import { IUser, IClient, ICustomer} from "../shared/interfaces"; 
+import { TUSER, TCLIENT, TCUSTOMER } from "../shared/types";
 import { constructUserCredentials } from "../util";
 
-interface ISetting {
-	type:string,
-	amount:number
-}
+/****
+ * Import Data Geenrator Functions
+ */
+import {
 
+	/* Person */
+	gender, genderPrefix, firstName, lastName, givenName, constructFullName, gimmieCredentials, constructEmail, jobTitle, jobArea, jobDescription, jobType, phoneNumber, phoneFormats, phoneNumberFormat, birthDay,
+	gimmieCredentials, 
+	
+	/* Company */
+	companySuffixes, companySlogan, companySubSlogan, constructCompanyEmail, constructCompanyWebsite, constructCompanyFacebookAccount,
+	constructCompanyTwitterAccount,
+
+	/* Address */
+	city, zipCode, cityPrefix, streetName, houseNumber, streetAddress, streetSuffix, streetPrefix, county, country, countryCode, 
+	state, stateAbbr, addressLine1, addressLine2, addressLine3, latitude, longitude,
+
+	/* Images */
+	image, avatar, imageURL, mimeType, randomImage,
+
+	/* System */
+	word, createIdentifier, generatePassword, protocol, url, domainName, domainSuffix, domainWord, ipType,
+	ipAddress, ip6Address, userAgent, color, macAddress, getRandomArbitrary, creditCardNumber, emailProvider, sliceMe
+	
+} from "./data.functions.util";
 
 /****
- * Data Generate functions : Person
+ * Import Type Guards
  */
-export const gender = ():number => {
-	let bool:boolean = faker.random.boolean();
-	if( bool) {
-		return 1;	// male
-	} else {
-		return 2;	// female
-	}
-}
-
-export const genderPredix = ():string => {
-	return faker.name.prefix();
-}
-
-/****
- * Data Generate functions : name
- */
-export const firstName = ():string => {
-	return faker.name.firstName();
-}
-
-export const lastName = ():string => {
-	return faker.name.lastName();
-}
-
-export const givenName = ():string => {
-	return faker.name.findName();
-}
-
-/****
- * Data Generate functions : job
- */
-export const jobTitle = ():string => {
-	return faker.name.jobTitle();
-}
-
-export const jobArea = ():string => {
-	return faker.name.jobArea();
-}
-
-export const jobDescription = ():string => {
-	return faker.name.jobDescriptor();
-}
-
-/****
- * Data generate functions: phone
- */
-export const phoneNumber = ():string => {
-	return faker.phone.phoneNumber();
-}
-
-export const phoneFormats = ():string => {
-	return faker.phone.phoneFormats();
-}
-
-export const phoneNumberFormat = ():string => {
-	return faker.phone.phoneNumberFormat();
-}
-
-/****
- * Data generate functions: company
- */
-export const companySuffixes = ():any[] => {
-	return faker.company.suffixes();
-}
-
-export const companyname = ():string => {
-	return faker.company.companyName();
-}
-
-export const companySuffix = ():string => {
-	return faker.company.companySuffix();
-}
-
-export const companySlogan = ():string=> {
-	return faker.company.catchPhrase();
-}
-
-/****
- * Data generate functions: address
- */
-export const city = ():string => {
-	return faker.address.city();
-}
-
-export const zipCode = ():string  => {
-	return faker.address.zipCode();
-}
-
-export const cityPrefix = ():string => {
-	return  faker.address.cityPrefix();
-}
-
-export const streetName = ():string => {
-	return faker.address.streetName();
-}
-
-export const houseNumber = ():number => {
-	return Math.random()*101|0;
-}
-
-export const streetAddress = ():string => {
-	return faker.address.streetAddress();
-}
-
-export const streetSuffix = ():string => {
-	return faker.address.streetSuffix();
-}
-
-export const streetSuffix = ():string => {
-	return faker.address.streetSuffix();
-}
-
-export const county = ():string => {
-	return faker.address.county();
-}
-
-export const country = ():string => {
-	return faker.address.country()
-}
-
-export const countryCode = ():string => {
-	return faker.address.countryCode();
-}
-export const state = ():string => {
-	return faker.address.state();
-}
-
-export const stateAbbr = ():string => {
-	return faker.address.stateAbbr();
-}
-
-export const addressLine1 = ():string => {
-	return `${streetName()} ${houseNumber()} ${streetPrefix()}`;
-}
-
-export const addressLine2 = ():string => {
-	return `${zipCode()} ${city()}`;
-}
-
-export const addressLine3 = ():string => {
-	return `${state()} ${country()}`;
-}
-
-/****
- * Data generate functions: system
- */
-export const latitude = ():number => {
-	return Number(faker.address.latitude());
-}
-
-export const longitude = ():number => {
-	return Number(faker.address.longitude());
-} 
-
-/****
- * Data generate functions: Imaging
- */
-export const image = ():string => {
-	return faker.image.image();
-}
-
-export const avatar = ():string => {
-	return faker.image.avatar();
-}
-
-export const imageURL = ():string => {
-	return faker.image.imageUrl();
-}
-
-export const mimeType = ():string => {
-	return faker.system.mimeType();
-}
-
-export const randomImage = ():string => {
-	return faker.random.image();
-}
-
-/****
- * Data generate functions: system
- */
-export const word = ():string => {
-	return faker.random.word();
-}
-
-
-export const createIdentifier = ():string => {
-	return faker.random.uuid().toString();
-}
-
-export const generatePassword = ():string => {
-	return faker.internet.password();
-}
-
-export const protocol = ():string => {
-	return faker.internet.protocol();
-}
-
-export const url = ():string => {
-	return faker.internet.url();
-}
-
-export const domainName = ():string => {
-	return faker.internet.domainName();
-}
-
-export const domainSuffix = ():string => {
-	return faker.internet.domainSuffix();	
-}
-
-export const domainWord = ():string => {
-	return faker.internet.domainWord();
-}
-
-export const ipType = ():string => {
-
-	let bool:boolean = faker.random.boolean(),
-		type:string;
-
-	(bool)?type='ipv4':type='ipv6';
-	return type;
-}
-
-export const ipAddress = ():string => {
-	return faker.internet.ip();
-}
-
-export const ip6Address = ():string => {
-	return faker.internet.ipv6();
-}
-
-export const userAgent = ():string => {
-	return faker.internet.userAgent();
-}
-
-export const color = ():string => {
-	return faker.internet.color();
-}
-
-export const macAddress = ():string => {
-	return faker.internet.mac();
-}
-
-function getRandomArbitrary(min:number, max:number):number {
-	return Math.floor(Math.random() * (max - min) + min);
-}
-
-export const creditCardNumber = ():string => {
-	return `${getRandomArbitrary(2000, 8000)}-${getRandomArbitrary(2000, 8000)}-${getRandomArbitrary(2000, 8000)}-${getRandomArbitrary(2000, 8000)}`;	
-}
-
-export const birthDay = ():string => {
-	return `${getRandomArbitrary(1930, 2000)}-${getRandomArbitrary(1, 12)}-${getRandomArbitrary(1, 31)}`;	
-}
-
-
-export const emailProvider = ():string => {
-
-	let n:number = getRandomArbitrary(0, 8), 
-		p:string;
-
-	switch(n) {
-		case 1: p='gmail.com'; break;
-		case 2: p='yahoo.com'; break;
-		case 3: p='outlook.com'; break;
-		case 4: p='gmx.com'; break;
-		case 5: p='zoho.com'; break;
-		case 6: p='icloud.com'; break;
-		case 7: p='aolmail.com'; break;
-		case 8: p='elude.com'; break;
-		default: p='flintstones.org'; break;
-	}
-	return p;
-}
-
-
-/*************************************************
- * Data generator  utiluty functions
- */
-
-export const constructFullName = (firstName:string, lastName:string):string => {
-	return `${capitalizeString(firstName)} ${capitalizeString(lastName)}`;
-}
-
-const sliceMe = (str:string, pos:number) => {
-    return str.slice(0, pos).trim().toLowerCase();
-}
-
-/****
- * #TODO: set configuration options for this policy
- */
-export const gimmieCredentials = (fName:string, lName:string):any => {   
-
-    let uPolicy:any = {
-        'firstName': sliceMe( fName, 4),
-        'lastName': sliceMe( lName , 5),
-        'number': faker.random.number()
-    }
-
-    return {
-    	userName: `${uPolicy.firstName}${uPolicy.lastName}${uPolicy.number}`,
-    	url: `${uPolicy.firstName}_${uPolicy.lastName}_${uPolicy.number}`
-    }
-}
-
-export const constructEmail = (fName:string, lName:string):string => {
-	return `${fName}.${lName}@${emailProvider()}`;
-}
+import {		
+	isOfPersonType,
+	isOfUserType,
+	isOfClientType,
+	isOfCustomerType
+	
+} from "../shared/interfaces";
 
 /***
  * Data Factory: user security
@@ -404,7 +123,7 @@ const fakeUserPersonalia = (user:IUser):IUser => {
 /***
  * Data Factory: user address & location
  */
-const fakeUserAddressAndLocation = (user:IUser):IUser => {
+const fakeUserAddressAndLocation = (user:any):IUser | IClient | ICustomer => {
 
 	/*************************************************************************************
 	 * User Address Details, location (modify as you like)
@@ -449,13 +168,15 @@ const fakeUserAddressAndLocation = (user:IUser):IUser => {
 	user.profile.location.longitude = longitude();
 		
 
-	// and finally confirm that address has been configured
-	user.userConfiguration.isAddressSet =true;
+	// type assertionL and finally confirm that address has been configured
+	if(isOfPersonType(user)) user.userConfiguration.isAddressSet =true;
+	if(isOfClientType(user)) user.clientConfiguration.isAddressSet =true;
+	if(isOfCustomerType(user)) user.customerConfiguration.isAddressSet = true;
 
 	return user;
 }
 
-/***
+/*****************************************************************************************
  * Data Factory: device
  */
 const fakeUserDevice = (user:IUser):IUser => {
@@ -519,60 +240,107 @@ const fakeDataFor = (user:IUser):IUser => {
 	return user;
 }
 
-export const createDefaultUser = (count:number) => {	
-	
-	let users:IUser[] = [],
-		user:IUser;
+/****
+ * Create either user, client or customer
+ * @category:string
+ * @count:number
+ * 
+ */
+export const createUserType = (category:string, count:number):IUser | IClient | ICustomer => {	
+
+	console.log( "*** Castegory: ", category)	
+	let users:IUser[]=[];
+	let clients:IClient[]=[];
+	let customers:ICustomer[]=[];
+	let user:IUser;
+	let client:IClient;
+	let customer:ICustomer;
 
 	return new Promise( (resolve, reject) => {
 
-		const source$:Observable<number> = Observable.interval(10).take(count);
+		const source$:Observable<number> = Observable.interval(75).take(count);
 		const sub$:Subscription = source$.subscribe(		
 
-			x => {
-				// clone default user	    					
-	    		user=deepCloneObject(TUSER);    			    	
+		x => { 
+			
+			if(category === "users") {
+			
+				// clone default user	   	
+				user=deepCloneObject(TUSER);    			
+				
+				// format user with unique data
+    			user = fakeDataFor(user);
 
-	    		// format user with unique data
-	    		user = fakeDataFor(user);
+    			// add sub user to collection
+    			users[x]=user;	    			
 
-	    		// add user to collection
-	    		users[x]=user;
+			} else if(category === "clients") {
 
-	    		// return at end of sequence
-	    		if (x=== (count-1)) return;	    
-			},
+				// clone default client
+				client=deepCloneObject(TCLIENT);    			
+				
+				// format user with unique data
+    			client = fakeDataFor(client);
 
-			// error handler
-			err => console.error(err),
+    			// add sub user to collection
+    			clients[x]=client;	    			
 
-			// On sequence end unsubscribe and resolve users array			
-			() => { 
-				sub$.unsubscribe(); 								
+			} else if(category === "customers") {
+
+				// clone default customer
+				customer=deepCloneObject(TCUSTOMER);    			
+				
+				// format with unique data
+    			customer = fakeDataFor(customer);
+
+    			// add sub user type <customer> to collection
+    			customers[x]=customer;
+			}    		
+
+    		// return at end of sequence
+    		if (x=== (count-1)) return;	    
+		},
+
+		// error handler
+		err => console.error(err),
+
+		// On sequence end unsubscribe and resolve users array			
+		() => { 
+			sub$.unsubscribe(); 
+			if(category === "users") {										
 				resolve(users); 
+			} else if(category === "clients") {
+				resolve(clients); 
+			} else if(category === "customers") {
+				resolve(customers);
 			}
-		);
+		}
+	);
 	}); 
+
+
 }   
 
 
-export const formatUserSubType = ({ type, amount, data }:any) => {
+export const formatUserSubType = ({ category, amount, data }:any) => {
 
-	console.log("==> Incoming collection: ", type, amount, data.length)
+	console.log("==> Incoming collection: ", category, amount, data.length)
 	
 	return new Promise( (resolve, reject) => {
-		switch( type) {
-			case 'superadmin':	resolve( createSuperAdmin( type, data ) ); break;
-			case 'admin': 		resolve( createAdmin( type, data) ); break;
-			case 'poweruser': 	resolve( createPowerUser( type, data )); break;
-			case 'author': 		resolve( createAuthor( type, data) ); break;
-			case 'user': 		resolve( createUser( type, data ));  break;
+		switch( category) {
+			case 'superadmin':		resolve( createSuperAdmin( category, data ) );		break;
+			case 'admin': 			resolve( createAdmin( category, data) ); 			break;
+			case 'poweruser': 		resolve( createPowerUser( category, data )); 		break;
+			case 'author': 			resolve( createAuthor( category, data) ); 			break;
+			case 'user': 			resolve( createUser( category, data ));  			break;
+			case 'defaultClient':	resolve( createDefaultClient( category, data)); 	break;
+			case 'defaultCustomer': resolve( createDefaultCustomer( category, data)); 	break;
 		}
 	});		
 }
 
 
-export const createSuperAdmin = ( type, users:IUser[] ) => {
+export const createSuperAdmin = ( category, users:IUser[] ):Promise<any> => {
 
 	users.forEach ( u => {
 		
@@ -581,10 +349,10 @@ export const createSuperAdmin = ( type, users:IUser[] ) => {
 		// #TODO: set specific access roles and policies for this group
 	});
 
-	return Promise.resolve({ [type]: users });
+	return Promise.resolve({ [category]: users });
 }
 
-export const createAdmin = ( type, users:IUser[]) => {
+export const createAdmin = ( category, users:IUser[]):Promise<any> => {
 
 	users.forEach ( u => {
 		// set role for this user type
@@ -592,10 +360,10 @@ export const createAdmin = ( type, users:IUser[]) => {
 		// #TODO: set specific access roles and policies for this group
 	});
 	
-	return Promise.resolve({ [type]: users });
+	return Promise.resolve({ [category]: users });
 }
 
-export const createPowerUser = ( type, users:IUser[]) => {
+export const createPowerUser = ( category, users:IUser[]):Promise<any> => {
 
 	users.forEach ( u => {
 		// set role for this user type
@@ -603,10 +371,10 @@ export const createPowerUser = ( type, users:IUser[]) => {
 		// #TODO: set specific access roles and policies for this group
 	});
 	
-	return Promise.resolve({ [type]: users});
+	return Promise.resolve({ [category]: users});
 }
 
-export const createAuthor = ( type, users:IUser[] ) => {
+export const createAuthor = ( category, users:IUser[] ):Promise<any> => {
 
 	users.forEach ( u => {
 		// set role for this user type
@@ -614,10 +382,10 @@ export const createAuthor = ( type, users:IUser[] ) => {
 		// #TODO: set specific access roles and policies for this group
 	});
 
-	return Promise.resolve({ [type]: users);
+	return Promise.resolve({ [category]: users);
 }
 
-export const createUser = ( type, users:IUser[] ) => {
+export const createUser = ( category, users:IUser[] ):Promise<any> => {
 
 	users.forEach ( u => {
 		// set role for this user type
@@ -625,5 +393,94 @@ export const createUser = ( type, users:IUser[] ) => {
 		// #TODO: set specific access roles and policies for this group
 	});
 
-	return Promise.resolve({ [type]: users });
+	return Promise.resolve({ [category]: users });
+}
+
+
+export const createDefaultClient = ( category, users:IUser[] ):Promise<any[]> => {
+
+	let err:any; 
+
+	try {
+
+
+		users.forEach ( u => {		
+
+			// set role for this user type, u = client user
+			u.core.role = u.security.accountType  = 10;	 
+
+			/*** 
+			 * Set client company, its address and job
+			 */
+			u.company.name = companyName().trim().toString();
+			u.company.type = companySuffix().trim().toString();
+			u.company.slogan = companySlogan().trim().toString();
+			u.company.subSlogan = companySubSlogan();
+			let cName = u.company.name;
+
+			/***
+			 *  Set Job At Company
+			 */
+			u.company.jobTitle = jobTitle();
+			u.company.jobType = jobType()
+
+			/***
+			 * Set Company's address
+			 */
+			u.company.address.street = streetName().trim();
+			u.company.address.houseNumber =  houseNumber().toString().trim();
+			u.company.address.suffix  = streetSuffix().trim();
+			u.company.address.addition = "";
+			u.company.address.areacode = zipCode().trim(),
+			u.company.address.city = city().trim();
+			u.company.address.county = county().trim();
+			u.company.address.country = country().trim();
+			u.company.address.countryCode =  countryCode().trim();
+			u.company.address.addressLine1 = addressLine1().trim();
+			u.company.address.addressLine2 = addressLine2().trim();
+			u.company.address.addressLine3 = addressLine3().trim();
+
+			/***
+			 * Set company's Communication profile
+			 */		
+			u.company.communication.companyPhone = phoneNumber().toString();
+			u.company.communication.companyEmail = constructCompanyEmail( cName );
+			u.company.communication.companyWebsite = constructCompanyWebsite ( cName );
+
+			/***
+			 * Set company's Socialk profile
+			 */	
+			u.company.social.facebook = constructCompanyFacebookAccount( cName );
+			u.company.social.twitter = constructCompanyTwitterAccount( cName );
+		
+		});
+
+	}
+
+	catch(e) {
+		err = e;
+	}
+
+	finally {
+
+		if(err) {
+			// #TODOK log error
+		} else {
+			return Promise.resolve({ [category]: users });
+		}
+	}	
+}
+
+
+export const createDefaultCustomer = ( category, users:IUser[] ):Promise<any[]> => {
+
+	users.forEach ( u => {		
+
+		// set role for this user type		
+		u.core.role = u.security.accountType  = 20;
+
+		// #TODO: set specific access roles and policies for this group		
+	});
+	
+	return Promise.resolve({ [category]: users });
 }

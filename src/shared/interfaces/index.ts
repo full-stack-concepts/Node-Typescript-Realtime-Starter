@@ -15,6 +15,7 @@ export { IPerson } from "./person.interface";
 export { IUser } from "./user.interface";
 export { IClient} from "./client.interface";
 export { ICustomer} from "./customer.interface";
+export { IPaymentMethod } from "./payment.method.interface";
 export {
 	IUserJob,
 	IUserAddress,
@@ -25,5 +26,14 @@ export {
 	IUserShortList,
 	IUserStatus,
 	IUserItemErrors,
-	IUserDevice
+	IUserDevice,
+	IUserCompany
 } from "./user.item.interface";
+
+// user type guards
+export {	
+	isOfPersonType,
+	isOfUserType,
+	isOfClientType,
+	isOfCustomerType	
+} from "./type.guards";

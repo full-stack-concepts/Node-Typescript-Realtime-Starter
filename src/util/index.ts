@@ -15,7 +15,7 @@ export {
 } from "./mlab.util";
 
 export {
-	createDefaultUser,	
+	createUserType,	
 	formatUserSubType,
 	createSuperAdmin,
 	createAdmin,
@@ -27,6 +27,134 @@ export {
 export {
 	constructUserCredentials
 } from "./user.util";
+
+export {
+	gender,
+	genderPrefix,
+	firstName,
+	lastName,
+	givenName,
+	jobTitle,
+	jobArea,
+	jobDescription,
+	jobType,
+	phoneNumber,
+	phoneFormats,
+	phoneNumberFormat,
+	companySuffixes,
+	companySlogan,
+	companySubSlogan,
+	city,
+	zipCode,
+	cityPrefix,
+	streetName,
+	houseNumber,
+	streetAddress,
+	streetSuffix,
+	streetPrefix,
+	county,
+	country,
+	countryCode,
+	state,
+	stateAbbr,
+	addressLine1,
+	addressLine2,
+	addressLine3,
+	latitude,
+	longitude,
+	image,
+	avatar,
+	imageURL,
+	mimeType,
+	randomImage,
+	word,
+	createIdentifier,
+	generatePassword,
+	protocol,
+	url,
+	domainName,
+	domainSuffix,
+	domainWord,
+	ipType,
+	ipAddress,
+	ip6Address,
+	userAgent,
+	color,
+	macAddress,
+	getRandomArbitrary,
+	creditCardNumber,
+	birthDay,
+	emailProvider,
+	constructFullName,
+	sliceMe,
+	gimmieCredentials,
+	constructEmail,
+	constructCompanyEmail,
+	constructCompanyWebsite,
+	constructCompanyFacebookAccount,
+	constructCompanyTwitterAccount
+} from "./data.functions.util";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

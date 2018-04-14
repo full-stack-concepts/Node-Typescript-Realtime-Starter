@@ -1,7 +1,7 @@
-import {IUser} from  "../interfaces";
+import {ICustomer} from  "../interfaces";
 
-export const TUSER:IUser = {
-	
+export const TCUSTOMER:ICustomer = {
+
 	core: {
 		userName: null,
 		url: null,
@@ -23,10 +23,8 @@ export const TUSER:IUser = {
 		isPasswordEncrypted: null
 	},
 
-	userConfiguration: {	
-		isThumbnailSet: false,	
-		isGooglePlusUser: false,
-		isAddressSet: false
+	customerConfiguration: {	
+		isThumbnailSet: false,			
 	},
 
 	profile: {	
@@ -67,6 +65,11 @@ export const TUSER:IUser = {
 		social: {
 			googleplus:null
 		}
+	},
+
+	customerPaymentMethods: {
+		preferredMethod:null,		
+		paymentMethods:null
 	},
 
 

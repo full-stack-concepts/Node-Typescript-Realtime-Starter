@@ -42,7 +42,7 @@ faker.locale =  DB_POPULATION_LOCALE;
 
 import {
 	countArrayItems,
-	createDefaultUser,
+	createUserType,
 	formatUserSubType,	
 	createSuperAdmin,
 	createAdmin,
@@ -175,81 +175,104 @@ export class DataBreeder {
 		.catch( err => Promise.reject(err) );
 	}
 
-	private _populationSettings():IDataType[] {
-		
-		return  {
-			users: [
-				{ type: "superadmin", amount: 1},
-				{ type: "admin", amount: DB_POPULATE_ADMINS },
-				{ type: "poweruser", amount: DB_POPULATE_POWER_USERS },
-				{ type: "author", amount: DB_POPULATE_AUTHORS},
-				{ type: "user", amount:DB_POPULATE_USERS}
-			],
+	private processDataCategory( { category, cSettings, counter}:any ) {
 
-			clients: [
-				{ type: "default", amount: "DB_POPULATE_DEFAULT_CLIENTS" }
-			],
+		// process thick: Create required amount of users				
+		createUserType( category, counter.count)
 
-			customers: [
-				{ type: "default", amount: "DB_POPULATE_DEFAULT_CUSTOMERS" }
-			]
-		}
+		// process thick: slice portions per user sub type
+		.then( (users:IUser[]) => {	
 
-	}
+			switch(category) {
 
-	private _calculateItems(arr:any[]):any {
-		return arr.reduce( countArrayItems, { count: 0} )
-	}
+				case 'users': 	
 
-	private processDataCategory( { category, settings, count}:any ) {
-
-		switch(category) {
-			case 'users': 
-
-				// process thick: Create required amount of users				 
-				createDefaultUser(count.count)
-
-				// process thick: slice portions per user sub type
-				.then( (users:IUser[]) => {														
 					return Promise.all(
-						settings.map ( ({type, amount}:any) => {																			
+						cSettings.map ( ({ category, amount}:any) => {																			
 							let portion:IUser[] = users.slice(0, amount);	
 							users.splice(0, amount);
-							return Promise.resolve( { 'data': portion, 'type': type, 'amount': amount})
-						})
+							return Promise.resolve( { 
+								'category': category, 
+								'data': portion, 								
+								'amount': amount
+							})
+						})	
 					)
-					.then( (collection:any) => { return collection; } )												
-				})
+					// process thick: format collection per user sub type
+					.then( (collection: any) => {
+						return Promise.all(
+							collection.map( (collection:any) => {						
+								return Promise.resolve( formatUserSubType( collection ))
+							})
+						)					
+					});	
+					break;
 
-				// process thick: format collection per user sub type
-				.then( (collection: any) => {
-					return Promise.all(
-						collection.map( (collection:any) => {						
-							return Promise.resolve( formatUserSubType( collection ))
-						})
-					)
-					.then( data => console.log(data) )
-				})			
 				
-			break;
-		}
+				case 'clients':
+						formatUserSubType( { category: 'defaultClient', amount:  counter.count, data: users });	
+						// return Promise.resolve( formatUserSubType( collection ))		
+				break;
+
+
+				case 'customers':
+					formatUserSubType( { category: 'defaultCustomer', amount:  counter.count, data: users });
+					// return Promise.resolve( formatUserSubType( collection ))					
+				break;
+
+				
+			}
+		});
 
 		return category
 	}
 
-	private _generateData( pConfiguration:any) {
+	private _generateData( pConfiguration:any) {		
 
-		console.log("*** start data generation ", )
+		let settings:any[] = pConfiguration.settings;
 
-		const test =  pConfiguration
+		console.log(" ***** Process Data Generation ", settings)
+		console.log(pConfiguration.counters)
 
-		.map( this.processDataCategory )
+		let categories:string[] = Object.keys(settings);		
+		const config:any[] = categories.map( (category:string) => {
+			let counter:number = pConfiguration.counters.find ( (counter) => counter.category === category),
+				cSettinga:any[] = settings[category];
+			console.log("** ", settings[category])
+			return { 
+				category: category, 
+				cSettings: cSettinga,
+				counter: counter 
+			};
+		});
+	
+		config.map( this.processDataCategory )			
 
-		
+	}
 
-		console.log("result", test);
-		
-		
+	/****
+	 * Calculate items per data type
+	 */
+	private _calculateItemsPerCategory(items:any[]):any {		
+		let categories:string[] = Object.keys(items);		
+		return categories.map( (category:string) => {
+			return items[category].reduce( countArrayItems, { category: category, count: 0} )
+		});				
+	}
+
+
+	private _populationSettings():IDataType[] {		
+		return  {
+			users: [
+				{ category: "superadmin", amount: 1},
+				{ category: "admin", amount: DB_POPULATE_ADMINS },
+				{ category: "poweruser", amount: DB_POPULATE_POWER_USERS },
+				{ category: "author", amount: DB_POPULATE_AUTHORS},
+				{ category: "user", amount:DB_POPULATE_USERS}
+			],
+			clients: [ { category: "default", amount: DB_POPULATE_DEFAULT_CLIENTS } ],
+			customers: [ { category: "default", amount: DB_POPULATE_DEFAULT_CUSTOMERS } ]
+		}
 	}
 
 	/*****
@@ -257,27 +280,18 @@ export class DataBreeder {
 	 */
 	private async populate( collections:any[]) {
 
-		/*
-
-		### for next commit
-
-		console.log("*** Start population")
 		// process thick: inventory data types
-		const userPopulation:IDataType[] = this._populationSettings();
+		const settings:any[] = this._populationSettings();
 
 		// process thick: count users
-		const userCount = this._calculateItems(userPopulation);
+		const categoryCounters:any[] = this._calculateItemsPerCategory(settings);		
 
-		console.log("**** Creating " + userCount.count + " users")
-
-		// process thick: generate data
-		const data:any = this._generateData([
-			{ category: 'users', settings: userPopulation, count: userCount }				
-		]);
-		*/
-
+		// process thick: generate data	
+		const data:any = this._generateData({
+			settings:settings,
+			counters:categoryCounters
+		});	
 		return Promise.resolve(true);
-
 	}
 
 	public async test() {

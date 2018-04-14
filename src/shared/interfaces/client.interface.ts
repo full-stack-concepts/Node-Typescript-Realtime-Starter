@@ -4,6 +4,9 @@ import { IPerson } from "./person.interface";
 
 export interface IClient extends IPerson {
 
+	// unique identifier method
+	client();
+
 	clientConfiguration: {	
 		isThumbnailSet: boolean,		
 		isCLientCompanySet?:boolean,

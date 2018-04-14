@@ -7,6 +7,9 @@ import {
 
 export interface IPerson extends Document  {
 
+	// unique identifier method
+	person();
+
 	core: {
 		userName: string,
 		url: string,
