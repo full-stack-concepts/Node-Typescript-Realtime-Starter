@@ -24,6 +24,12 @@ import axios from "./util/axios";
 
 import {u} from "./services/user.service";
 
+import { publicDirectoryManager, createPrivateDataStore } from "./util";
+
+createPrivateDataStore()
+.then( () => publicDirectoryManager() );
+
+
 
 import { populateDatabase} from "./services/data.service";
 populateDatabase();

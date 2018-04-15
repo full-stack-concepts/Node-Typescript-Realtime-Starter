@@ -6,6 +6,10 @@ if (fs.existsSync(".env")) {
     dotenv.config({ path: ".env" });
 }
 
+const isString = (str:string):boolean => {
+	return (!str || str && typeof str === 'string');
+} 
+
 export const ENVIRONMENT = process.env.NODE_ENV;
 const prod = ENVIRONMENT === "production"; // Anything else is treated as 'dev'
 
@@ -30,6 +34,74 @@ export const CLIENT_PORT = process.env["CLIENT_PORT"];
 export const ADMIN_PORT = process.env["ADMIN_PORT"];
 
 /***
+ * Public Directory Management
+ */
+export const SERVE_PUBLIC_RESOURCES = Boolean(process.env["SERVE_PUBLIC_RESOURCES"]);
+export const PUBLIC_ROOT_DIR:string = process.env["PUBLIC_ROOT_DIR"] || './public/';
+export const PUBLIC_ASSETS_DIR:string = process.env["PUBLIC_ASSETS_DIR"] || './assets/';
+export const PUBLIC_IMAGES_DIR:string = process.env["PUBLIC_IMAGES_DIR"] || './images/';
+export const PUBLIC_STYLES_DIR:string = process.env["PUBLIC_STYLES_DIR"] || './styles';
+export const PUBLIC_ASSETS_DIRS:string[] = process.env["PUBLIC_ASSETS_DIRS"].split(",");
+export const PUBLIC_STYLES_DIRS:string[] = process.env["PUBLIC_STYLES_DIRS"].split(",");
+
+if( SERVE_PUBLIC_RESOURCES && typeof  SERVE_PUBLIC_RESOURCES === 'boolean') {	
+
+	if(!PUBLIC_ROOT_DIR || typeof PUBLIC_ROOT_DIR != 'string') {
+		console.error("APP DIR: Please configure your public root directory in your environmental file.");
+		process.exit(1);
+	}
+
+	if(!PUBLIC_ASSETS_DIR || typeof PUBLIC_ASSETS_DIR != 'string') {
+		console.error("APP DIR: Please configure your public assets directory in your environmental file.");
+		process.exit(1);
+	}
+
+	if(!PUBLIC_IMAGES_DIR || typeof PUBLIC_IMAGES_DIR != 'string') {
+		console.error("APP DIR: Please configure public images directory in your environmental file.");
+		process.exit(1);
+	}
+
+	if(!PUBLIC_STYLES_DIR || typeof PUBLIC_STYLES_DIR != 'string') {
+		console.error("APP DIR: Please configure public styles directory in your environmental file.");
+		process.exit(1);
+	}
+
+	const assetsDirs:string[] = PUBLIC_ASSETS_DIRS;
+	if(assetsDirs && !Array.isArray(assetsDirs)) {
+		console.error("APP DIR: Please reconfigure your assets sub directories in your environmental file.");
+		process.exit(1);
+	} 
+
+	const stylesDirs:string[] = PUBLIC_STYLES_DIRS;
+	if(stylesDirs && !Array.isArray(stylesDirs)) {
+		console.error("APP DIR: Please reconfigure your styles sub directories in your environmental file.");
+		process.exit(1);
+	} 
+
+} else {
+	console.error("APP DIR: setting for serving public resources SERVE_PUBLIC_RESOURCES is missing or corrupted.");
+	process.exit(1);
+}
+
+/***
+ * Private Directory Management
+ */
+export const CREATE_DATASTORE = Boolean(process.env["CREATE_DATASTORE"]);
+export const PRIVATE_DATA_DIR:string = process.env["PEIVATE_DATA_DIR"] || './private/datastore';
+
+console.log("**** Testing Create ", CREATE_DATASTORE)
+
+if(!CREATE_DATASTORE || CREATE_DATASTORE && typeof CREATE_DATASTORE != 'boolean' ) {
+	console.error("APP DATASTORE: Please configure your datastore varriable in your environmental file as either TRUE or FALSE");
+	process.exit(1);
+} else {
+	if(PRIVATE_DATA_DIR && !isString(PRIVATE_DATA_DIR)) {
+		console.error("APP DATASTORE: Please configure private data directory in your environmental file.");
+		process.exit(1);
+	}
+}
+
+/***
  * paths To SSL Certificates
  */
 export const PATH_TO_DEV_PRIVATE_KEY:string = process.env["PATH_TO_DEV_PRIVATE_KEY"];
@@ -48,7 +120,7 @@ export const DB_CONFIG_PASSWORD = process.env["DB_CONFIG_PASSWORD"];
 export const DB_CONFIG_DATABASE = process.env["DB_CONFIG_DATABASE"];
 export const DB_MAX_POOL_SIZE = process.env["DB_MAX_POOL_SIZE"];
 
-if(USE_LOCAL_MONGODB_SERVER) {	
+if(USE_LOCAL_MONGODB_SERVER && typeof USE_LOCAL_MONGODB_SERVER === 'boolean' ) {	
 
 	if(!DB_CONFIG_HOST || (DB_CONFIG_HOST && typeof DB_CONFIG_HOST!='string')) {
 		console.error("Local Database: Please specify DB <host> name in your environemntal file (.env or .prod)! ");
@@ -128,10 +200,6 @@ export const DB_CREATE_CUSTOMERS = process.env["DB_CREATE_CUSTOMERS"];
 export const DB_CUSTOMERS_COLLECTION_NAME = process.env["DB_CUSTOMERS_COLLECTION_NAME"];
 export const DB_POPULATE_DEFAULT_CLIENTS= Number(process.env["DB_POPULATE_DEFAULT_CLIENTS"]);
 export const DB_POPULATE_DEFAULT_CUSTOMERS= Number(process.env["DB_POPULATE_DEFAULT_CUSTOMERS"]);
-
-const isString = (str:string):boolean => {
-	return (!str || str && typeof str === 'string');
-} 
 
 if(DB_POPULATE) {
 

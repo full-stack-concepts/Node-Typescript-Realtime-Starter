@@ -32,8 +32,10 @@ export {
 	getCertificate,
 	readPrivateKeyForTokenAuthentication,
 	readDevConfiguration,
-	readProdConfiguration
-} from "./paths.util";
+	readProdConfiguration,
+	createPrivateDataStore,
+	publicDirectoryManager
+} from "./infrastructure.util";
 
 export {
 	gender,
