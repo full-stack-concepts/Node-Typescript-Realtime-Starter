@@ -12,7 +12,7 @@ import { RemoteQueryBuilder } from "../util";
 import { IListOptions} from "../shared/interfaces";
 
 import { get} from "../util";
-
+import { DataStore } from "./datastore.service";
 
 /***
  * Import DB Population Settings
@@ -207,7 +207,7 @@ export class DataBreeder {
 					)					
 				})
 				// proces thick: return to caller
-				.then( data => {  return data; });
+				.then( data => {  return { users: data }; });
 
 			} else if(category === 'clients') {
 
@@ -290,7 +290,9 @@ export class DataBreeder {
 
 		// process thick: generate data	
 		this._generateData({ settings:settings,	counters:categoryCounters })
-		.then( data => console.log("**** FInal ", data))
+
+		// process thick: store locally
+		.then( (data:any) => DataStore.storeDataLocally(data) );
 		
 	}
 

@@ -33,6 +33,7 @@ export {
 	readPrivateKeyForTokenAuthentication,
 	readDevConfiguration,
 	readProdConfiguration,
+	getPathToDataStore,
 	createPrivateDataStore,
 	publicDirectoryManager
 } from "./infrastructure.util";

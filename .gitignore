@@ -42,3 +42,9 @@ coverage
 
 #ignore certificates dir
 config/certificates/*
+
+# dataStore
+private/*
+
+# public directories
+public/*

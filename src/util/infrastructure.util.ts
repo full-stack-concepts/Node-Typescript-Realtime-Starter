@@ -71,6 +71,10 @@ export const createDirectory = ( $dir:string ):Promise<any> => {
 	});
 }
 
+export const getPathToDataStore = ():string => {
+	return path.join( rootPath, PRIVATE_DATA_DIR );
+}
+
 /****
  * Private Directory Manager: creates public directories if they do not exist
  */
@@ -85,13 +89,16 @@ export const createPrivateDataStore = () => {
 	return createDirectory( $private )
 
 	// process thick: create three sub directories
-	.then( status => {
+	.then( () => {
 		return Promise.all(
-			$dirs.map( (dir:string) => createDirectory(  path.join( $private, dir.toString() ) ) 
+			$dirs.map( (dir:string) => {
+				let $dir:string =  path.join( $private, dir.toString() );
+				createDirectory( $dir );
+			 }) 
 		)
 	})
 
-	// process thick: return to caller
+	// process thick: return a promise so this function can be chained in our bootstrap procedure
 	.then( () => {
 		Promise.resolve() 
 	})
@@ -166,7 +173,7 @@ export const publicDirectoryManager = () => {
 	})
 
 	/****
-	 * proces thick: return so we can chain
+	 * proces thick: return a promise so this function can be chained in our bootstrap procedure
 	 */
 	.then( () => Promise.resolve() )
 
