@@ -9,8 +9,6 @@ import  path from 'path';
 import fs from 'fs';
 import * as Promise from 'bluebird';
 
-const appRoot = require('app-root-path');
-
 // interfaces
 import { ServerOptions, ProcessEnv } from './shared/interfaces/';
 
@@ -23,7 +21,8 @@ import { db } from "./db";
  * EXPRESS APPLICATION CODE
  */
 import App from './App';
-import { test, testForConfiguration } from './util/bootstrap.util';
+import { getCertificate } from "./util";
+import { testForConfiguration } from './util/bootstrap.util';
 import { 
     ENVIRONMENT,
     EXPRESS_SERVER_MODE,
@@ -93,23 +92,19 @@ function getSSL():ServerOptions {
 
     switch (ENVIRONMENT) {
         case 'dev': 
-            options.key = getCert(PATH_TO_DEV_PRIVATE_KEY);
-            options.cert =  getCert( PATH_TO_DEV_CERTIFICATE,);
+            options.key = getCertificate(PATH_TO_DEV_PRIVATE_KEY);
+            options.cert =  getCertificate( PATH_TO_DEV_CERTIFICATE,);
             break;
 
         case 'prod': 
-            options.key = getCert( PATH_TO_PROD_PRIVATE_KEY,);
-            options.cert =  getCert(  PATH_TO_PROD_CERTIFICATE);
+            options.key = getCertificate( PATH_TO_PROD_PRIVATE_KEY,);
+            options.cert =  getCertificate(  PATH_TO_PROD_CERTIFICATE);
             break;
     }
 
     return options;    
 }
 
-
-function getCert(pathToKey:string):Buffer { 
-    return fs.readFileSync( path.join ( appRoot.path.toString(), pathToKey));
-}
 
 /****
  * On Listening: called when our express app has inittialzied

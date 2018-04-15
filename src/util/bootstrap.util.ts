@@ -1,19 +1,14 @@
-import fs from "fs-extra";
-import path from "path";
-
-const appRoot = require("app-root-path"),
-	  root = appRoot.path.toString();
-
-export function test() {
-	console.log("test");
-}
+import {
+	readDevConfiguration,
+	readProdConfiguration
+} from "../util";
 
 const ENV:string = process.env.NODE_ENV;
 
 export function testForConfiguration() {
 
-	let devConfig = fs.existsSync( path.join( root, ".env"));
-	let prodConfig = fs.existsSync( path.join( root, ".prod"));
+	let devConfig = readDevConfiguration();
+	let prodConfig = readProdConfiguration();
 
 	/***
 	 * Test if  configuration settings have been loaded

@@ -180,12 +180,13 @@ export class DataBreeder {
 	private processDataCategory( { category, cSettings, counter}:any) {
 
 		// process thick: Create required amount of users				
-		createUserType( category, counter.count)
+		return createUserType( category, counter.count)
 
 		// process thick: slice portions per user sub type
 		.then( (users:any[]) => {	
 
 			if( category === 'users' ) {
+
 				return Promise.all(						
 					cSettings.map ( ({ category, amount}:any) => {																			
 						let portion:IUser[] = users.slice(0, amount);	
@@ -201,67 +202,53 @@ export class DataBreeder {
 				.then( (collection: any) => {
 					return Promise.all(
 						collection.map( (collection:any) => {						
-							return Promise.resolve( formatUserSubType( collection ))
+							return formatUserSubType( collection )
 						})
 					)					
 				})
 				// proces thick: return to caller
-				.then( data => {  return Promise.resolve(data); });
+				.then( data => {  return data; });
 
 			} else if(category === 'clients') {
 
 				// process thick: format collection per user sub type				
 				return formatUserSubType( { category: 'defaultClient', amount:  counter.count, data: users } )
 				// proces thick: return to caller
-				.then( data => {  return Promise.resolve(data); })
+				.then( data => {  return data; })
 
 			} else if(category === 'customers' ) {
 
 				// process thick: format collection per user sub type			
 				return formatUserSubType( { category: 'defaultCustomer', amount:  counter.count, data: users })
 				// proces thick: return to caller
-				.then( (data:any) => {  return Promise.resolve(data); })
+				.then( (data:any) => {  return data; })
 					
 			}
 		})
-		.then( (collection:any) => {
-			console.log("**** Procesed Data category ", category)
-			console.log(collection)
-			return Promise.resolve(collection);
-		})	
+		.then( (collection:any) => Promise.resolve(collection) )	
 	}
 
 	private _generateData( pConfiguration:any) {		
 
-		let settings:any[] = pConfiguration.settings;
-
-		console.log(" ***** Process Data Generation ", settings);
-		console.log(pConfiguration.counters);
+		let settings:any[] = pConfiguration.settings;	
 
 		let categories:string[] = Object.keys(settings);		
 		const config:any[] = categories.map( (category:any) => {
 
 			let counter:number = pConfiguration.counters.find ( (counter:any) => counter.category === category),
-				cSettings:any[] = settings[category];
-			
+				cSettings:any[] = settings[category];			
 			return { 
 				category: category, 
-				cSettings: cSettings,
+				cSettings: cSettings, 
 				counter: counter 
 			};
 		});
 
-		console.log("****************************************")
-		console.log(config);
-
-
-		Promise.all(
-			config.map ( configuration => {
-				this.processDataCategory(configuration);				
-			})
-		)
-	
-		// config.map( this.processDataCategory )		
+		return Promise.all(
+			config.map ( configuration => 
+				Promise.resolve( this.processDataCategory(configuration) 
+			))
+		).then( data => Promise.resolve(data));	
 
 	}
 
@@ -302,13 +289,9 @@ export class DataBreeder {
 		const categoryCounters:any[] = this._calculateItemsPerCategory(settings);		
 
 		// process thick: generate data	
-		const data:any = this._generateData({
-			settings:settings,
-			counters:categoryCounters
-		});	
-
-
-		return Promise.resolve(true);
+		this._generateData({ settings:settings,	counters:categoryCounters })
+		.then( data => console.log("**** FInal ", data))
+		
 	}
 
 	public test() {
@@ -326,7 +309,7 @@ export class DataBreeder {
 		// collections = await this.safetyCheck();
 		// console.log("Collections to populate ", collections)
 
-		let result:Promise<boolean> = this.populate ( collections );
+		let result:any = this.populate ( collections );
 
 		
 	}

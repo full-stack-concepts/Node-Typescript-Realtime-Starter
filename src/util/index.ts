@@ -29,6 +29,13 @@ export {
 } from "./user.util";
 
 export {
+	getCertificate,
+	readPrivateKeyForTokenAuthentication,
+	readDevConfiguration,
+	readProdConfiguration
+} from "./paths.util";
+
+export {
 	gender,
 	genderPrefix,
 	firstName,

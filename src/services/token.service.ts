@@ -3,10 +3,6 @@ import Promise from "bluebird";
 import path from "path";
 import mongoose from "mongoose";
 
-// no @types
-const appRoot = require('app-root-path');
-const root:string = appRoot.path.toString();
-
 import { IUser} from "../shared/interfaces";
 import { UserModel } from "../shared/models"
 import { deepCloneObject } from "../util";
@@ -15,14 +11,8 @@ import { deepCloneObject } from "../util";
  * Security JWT TOKEN
  */
 import jwt from "jsonwebtoken";
+import { readPrivateKeyForTokenAuthentication } from "../util";
 
-const readPrivateKeyForTokenAuthentication = () => {
-
-	let file:string = `private.pem`;
-	let filePath:string= path.join( root, 'config', 'webtoken', 'private.pem' );	
-	let key:Buffer = fs.readFileSync(filePath);
-	return key;
-}
 /***
  * Store private key on constant
  */
