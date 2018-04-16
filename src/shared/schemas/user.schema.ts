@@ -2,7 +2,13 @@ import mongoose from "mongoose";
 import { Schema } from "mongoose";
 import { IUser} from "../interfaces";
 
-let schema: Schema = new Schema({
+/******
+ * Default User Object, used to prototype
+ * @user schema
+ * @client schema
+ * @customer schema
+ */
+export const userPrototype = {
 
 	core: {
 		userName: { type: String, required: true, index: { unique:true} },
@@ -27,13 +33,7 @@ let schema: Schema = new Schema({
 	accounts: {
 		googleID: { type:String, required:false, index: { unique: true} },
 		facebookID: { type:String, required:false, index: { unique: true} }
-	},
-
-	userConfiguration: {	
-		isGooglePlusUser: { type: Boolean, required: false, default: false},
-		isThumbnailSet: { type: Boolean, required: true, default: false},
-		isAddressSet: { type: Boolean, required: false, default: false }									
-	},
+	},	
 
 	profile: {
 
@@ -98,13 +98,26 @@ let schema: Schema = new Schema({
 	},
 
 	devices: { type:Array, required: false }
-}, 
+};
 
-{ 
-    timestamps: true,
-    collection: 'users' 
+/*****
+ * Create default user object
+ */
+const user = Object.create(userPrototype);
 
-});	
+/****
+ * Extend Mongoose <user> object: User Configuration
+ */
+user.userConfiguration = {	
+	isGooglePlusUser: { type: Boolean, required: false, default: false},
+	isThumbnailSet: { type: Boolean, required: true, default: false},
+	isAddressSet: { type: Boolean, required: false, default: false }									
+};
+
+/*****
+ * Create user Schema
+ */
+const schema:Schema = new Schema( user );
 
 schema.pre('save', (next) => {
 
@@ -116,7 +129,7 @@ schema.pre('save', (next) => {
 	next();
 });
 
-export let userSchema = mongoose.model<IUser>('User', schema, 'users', true);
+export const userSchema = mongoose.model<IUser>('User', schema, 'users', true);
 
 
 

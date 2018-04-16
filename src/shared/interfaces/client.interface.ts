@@ -8,7 +8,7 @@ export interface IClient extends IPerson {
 	client():Function,
 
 	clientConfiguration: {	
-		isThumbnailSet: boolean,	
+		isThumbnailSet?: boolean,	
 		isGooglePlusUser?: boolean,
 		isAddressSet?:boolean,
 	},

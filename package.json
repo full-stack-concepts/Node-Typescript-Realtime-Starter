@@ -24,7 +24,6 @@
         "delete-dist": "rimraf -rf ./dist/"
     },
     "dependencies": {
-        "@types/node-fetch": "^1.6.8",
         "app-root-path": "^2.0.1",
         "async": "^2.6.0",
         "axios": "^0.18.0",
@@ -113,6 +112,7 @@
         "@types/mongoose": "^4.7.34",
         "@types/morgan": "^1.7.35",
         "@types/node": "^9.4.6",
+        "@types/node-fetch": "^1.6.8",
         "@types/nodemailer": "^4.3.4",
         "@types/passport": "^0.4.3",
         "@types/passport-facebook": "^2.1.7",

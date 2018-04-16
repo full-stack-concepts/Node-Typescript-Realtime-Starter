@@ -9,7 +9,7 @@ export interface ICustomer extends IPerson {
 	customer():Function,
 
 	customerConfiguration: {	
-		isThumbnailSet: boolean,	
+		isThumbnailSet?: boolean,	
 		isGooglePlusUser?: boolean,
 		isAddressSet?:boolean,
 	},

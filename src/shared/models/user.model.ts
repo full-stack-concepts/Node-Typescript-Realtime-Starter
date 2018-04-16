@@ -1,20 +1,12 @@
 import Promise from "bluebird";
 import mongoose from "mongoose";
-import axios from "axios";
+import fetch from "node-fetch";
 
-import { 
-	RepositoryBase, 
-	IUser,
-	IListOptions
-} from "../interfaces";
+import { RepositoryBase,  IUser, IListOptions } from "../interfaces";
 import { userSchema } from "../schemas";
 import { objectKeysLength, stringify, RemoteQueryBuilder } from "../../util";
 
-/*********************************************
- * Define AXIOS constants
- */
-axios.defaults.baseURL = 'https://api.mlab.com/api/1/databases';
-axios.defaults.headers.post['Content-Type'] = 'application/json';
+const headers:any= { 'Content-Type': 'application/json' };
 
 
 /***
@@ -46,8 +38,9 @@ export class UserModel  {
 			if( _data && objectKeysLength (_data) === 0 ) reject(' Invalid Profile');					
 			let data = stringify(_data);			
 			let rURL = RemoteQueryBuilder.buildCollectionURL('users');			
-			axios.post( rURL, data)
-			.then( response => { resolve(response.data); })
+			fetch(rURL, { method: 'POST', body: data, headers:headers })
+			.then( (res:any) =>res.json())
+			.then( (response:any) => { resolve(response); })
 			.catch( err => reject(err) );			
 		});
 	}
@@ -57,8 +50,9 @@ export class UserModel  {
 		return new Promise( (resolve, reject) => {
 			query = stringify( query);
 			let rURL = RemoteQueryBuilder.findOneRemoteURL(collection, query);							
-			axios.get(rURL)
-			.then( response => resolve(response.data) )			
+			fetch(rURL)
+			.then( (res:any) =>res.json())
+			.then( (response:any) => resolve(response) )			
         	.catch( err => reject(err) );        
 		});
 	}
