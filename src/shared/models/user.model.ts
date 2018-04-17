@@ -30,7 +30,7 @@ export class UserModel  {
 
 	/****
 	 * Custom Methods for MLAB Mongo Databse				
-	 */
+	 */   
 
 	//** MLAB: Create user 
 	static remoteCreateUser(_data:any) {		
@@ -60,15 +60,23 @@ export class UserModel  {
 	/****
 	 * Define custom methods for local onstance of MongoDB here	
 	 */
-	 static findAll():Promise<any> {
+
+	static createUsers(users:IUser[]): Promise<any> {
 		let repo = new UserRepository();
-		return new Promise ( (resolve, reject) => {	
-			repo.find().exec( (err:any, res:any) => {							
-				if(err) { reject (err); }
-				else if(!res) { resolve([]); } 
-				else { resolve(res);}		
+		return new Promise ( (resolve, reject) => {
+			repo.insertMany( users, (err:any, res:any) => {			
+				if(err) {reject(err); } else { resolve(res); }
 			});
-		});		
-	}
+		});
+	}	
+
+	static remove( cond:Object):Promise<any> { 
+		let repo = new UserRepository();
+		return new Promise ( (resolve, reject) => {
+			repo.remove( cond, (err:any) => {						
+				if(err) {reject(err); } else { resolve(); }
+			});
+		});
+	}	
 }
 

@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { Schema } from "mongoose";
 import { IUser} from "../interfaces";
+import { deepCloneObject} from "../../util";
 
 /******
  * Default User Object, used to prototype
@@ -103,7 +104,8 @@ export const userPrototype = {
 /*****
  * Create default user object
  */
-const user = Object.create(userPrototype);
+const user = Object.assign(userPrototype);
+
 
 /****
  * Extend Mongoose <user> object: User Configuration

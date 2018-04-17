@@ -183,7 +183,10 @@ if(USE_MLAB_DB_HOST) {
 /***
  * DB Population
  */
-export const DB_POPULATE = process.env["DB_POPULATE"];
+export const GENERATE_SAMPLE_DATA = Boolean(process.env["GENERATE_SAMPLE_DATA"]);
+export const POPULATE_LOCAL_DATASTORE = Boolean(process.env["POPULATE_LOCAL_DATASTORE"]);
+export const POPULATE_LOCAL_DATABASE  = Boolean(process.env["POPULATE_LOCAL_DATABASE"]);
+export const POPULATE_REMOTE_DATABASE  = Boolean(process.env["POPULATE_REMOTE_DATABASE"]);
 export const DB_POPULATE_SAFETY_FIRST = Boolean(process.env["DB_POPULATE_SAFETY_FIRST"]);
 export const DB_POPULATE_TEST_COLLECTIONS = process.env["DB_POPULATE_TEST_COLLECTIONS"].split(',');
 export const DB_POPULATE_ADMINS =  Number(process.env["DB_POPULATE_ADMINS"]);
@@ -201,7 +204,7 @@ export const DB_CUSTOMERS_COLLECTION_NAME = process.env["DB_CUSTOMERS_COLLECTION
 export const DB_POPULATE_DEFAULT_CLIENTS= Number(process.env["DB_POPULATE_DEFAULT_CLIENTS"]);
 export const DB_POPULATE_DEFAULT_CUSTOMERS= Number(process.env["DB_POPULATE_DEFAULT_CUSTOMERS"]);
 
-if(DB_POPULATE) {
+if(GENERATE_SAMPLE_DATA) {
 
 	if(typeof DB_POPULATE_SAFETY_FIRST != 'boolean') {
 		console.error("DB Data Genersator: Please configure boolean DB_POPULATE_SAFETY_FIRST. overwrite existing DB data?");

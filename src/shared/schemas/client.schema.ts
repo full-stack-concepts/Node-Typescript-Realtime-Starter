@@ -6,7 +6,7 @@ import { userPrototype } from "../schemas";
 /*****
  * Create default <client> object
  */
-const client = Object.create(userPrototype);
+const client = Object.assign(userPrototype);
 
 /****
  * Extend Mongoose <client> object: Client Configuration
@@ -16,7 +16,6 @@ client.clientConfiguration = {
 	isGooglePlusUser: { type: Boolean, required:false, default:false },
 	isAddressSet: { type: Boolean, required:false, default:false }
 };
-
 
 /****
  * Extend Mongoose <client> object: Company Configuration

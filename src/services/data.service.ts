@@ -6,19 +6,20 @@ import fetch from "node-fetch";
 import faker from "faker";
 import Promise from "bluebird";
 import chain from 'lodash/chain';
-import { IUser } from "../shared/interfaces";
+import { IUser, IClient, ICustomer } from "../shared/interfaces";
 import { UserModel, ClientModel, CustomerModel} from "../shared/models";
 import { RemoteQueryBuilder } from "../util";
 import { IListOptions} from "../shared/interfaces";
 
 import { get} from "../util";
-import { DataStore } from "./datastore.service";
+import { DataStore } from "./data.store.service";
+import { UserTypes } from "./data.usertypes.service";
 
 /***
  * Import DB Population Settings
  */
 import {	
-	DB_POPULATE,
+	GENERATE_SAMPLE_DATA,
 	DB_CREATE_USERS,
 	DB_USERS_COLLECTION_NAME,
 	DB_CREATE_CLIENTS,
@@ -69,6 +70,8 @@ interface IDataType {
 }
 
 export class DataBreeder {	
+
+	data:any; //#TODO: assign interface IDATA?
 
 	private exitMessage():void {
 		console.log("** DB Configuration: no need to populate DB with data .....")
@@ -291,9 +294,40 @@ export class DataBreeder {
 		// process thick: generate data	
 		this._generateData({ settings:settings,	counters:categoryCounters })
 
-		// process thick: store locally
-		.then( (data:any) => DataStore.storeDataLocally(data) );
-		
+		// process thick: assign data to global
+		.then( (data:any) => { return this.data = data; } )		
+
+		/*****
+		 * process thick: add generated data to local store 
+		 */
+		.then( () => DataStore.storeDataLocally( this.data ) )
+
+		/****
+		 * process thick: add generated data to local database
+		 */
+		.then( () => {
+
+			Promise.all(
+				this.data.map ( (obj:any,key:any) => {
+					let keys:string[] = Object.keys(this.data[key]),
+						category:string = keys[0];
+					console.log(keys);
+
+					if(category==='users') {
+						UserTypes.processGeneratedUsers( obj.users );
+					
+					} else if(category==='defaultClient') {
+						UserTypes.processGeneratedClients(obj, 'defaultClient')
+
+					} else if(category==='defaultCustomer') {					
+						UserTypes.processGeneratedCustomers(obj, 'defaultCustomer')
+					}
+				})
+
+			)
+			.then( () => {return Promise.resolve(); })
+			.catch( (err:any) => console.error(err) );
+		})		
 	}
 
 	public test() {
@@ -303,7 +337,7 @@ export class DataBreeder {
 		/***
 		 * Does the developer wants sample data for his application?
 		 */
-		if(!DB_POPULATE) this.exitMessage();
+		if(!GENERATE_SAMPLE_DATA) this.exitMessage();
 
 		/***
 		 * Perform safetycheck before populating database

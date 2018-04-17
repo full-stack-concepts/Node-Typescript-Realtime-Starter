@@ -58,6 +58,7 @@ const fakeUserSecurity = (user:IUser|IClient|ICustomer):IUser|IClient|ICustomer 
 	 */
 	 user.security.accountType = 5; // default user
 	 user.security.isAccountVerified = false;
+	 user.security.isPasswordEncrypted = false;
 	 user.core.role = 5;
 
 	 /***

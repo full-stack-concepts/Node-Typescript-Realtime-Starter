@@ -39,6 +39,23 @@ export class CustomerModel  {
 	/****
 	 * Define custom methods for local instance of MongoDB here	
 	 */
+	static insert(customers:ICustomer[]): Promise<any> {
+		let repo = new CustomerRepository();
+		return new Promise ( (resolve, reject) => {
+			repo.insertMany( customers, (err:any, res:any) => {			
+				if(err) {reject(err); } else { resolve(res); }
+			});
+		});
+	}	
+
+	static remove( cond:Object):Promise<any> { 
+		let repo = new CustomerRepository();
+		return new Promise ( (resolve, reject) => {
+			repo.remove( cond, (err:any) => {					
+				if(err) {reject(err); } else { resolve(); }
+			});
+		});
+	}	
 	 
 }
 

@@ -6,7 +6,7 @@ import { userPrototype } from "../schemas";
 /*****
  * Create default <customer> object
  */
-const customer = Object.create(userPrototype);
+const customer = Object.assign(userPrototype);
 
 /****
  * Extend Mongoose <customer> object: Customer Configuration

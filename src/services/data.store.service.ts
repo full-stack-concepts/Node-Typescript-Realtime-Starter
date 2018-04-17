@@ -11,6 +11,10 @@ import {
 } from "../shared/interfaces";
 
 import {
+	POPULATE_LOCAL_DATASTORE
+} from "../util/secrets";
+
+import {
 	getPathToDataStore
 } from "../util";
 
@@ -34,6 +38,10 @@ export class DataStore {
 	 * @dataStore = PRIVATE_DATA_DIR
 	 */
 	static storeDataLocally(data:IData) {
+
+		// return to caller if this config option is set to FALSE
+		if(!POPULATE_LOCAL_DATASTORE) 
+			return Promise.resolve();
 		
 		const $stores:string[]=["1","2","3"];
 		const $dataStore:string = getPathToDataStore();
