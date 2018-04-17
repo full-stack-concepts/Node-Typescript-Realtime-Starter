@@ -17,8 +17,40 @@ import {
 	CustomerModel
 } from "../shared/models";
 
+import {
+	POPULATE_LOCAL_DATABASE
+	} from "../util/secrets";
 
 export class UserTypes {
+
+	/******
+	 * Stores generated data in local MongoDB instance
+	 */
+	public static storeLocally(data:any) {
+
+		if(!POPULATE_LOCAL_DATABASE)
+			return Promise.resolve();
+
+		Promise.all(
+			data.map ( (obj:any,key:any) => {
+				let keys:string[] = Object.keys(data[key]),
+					category:string = keys[0];	
+
+				if(category==='users') {
+					UserTypes.processGeneratedUsers( obj.users );
+				
+				} else if(category==='defaultClient') {
+					UserTypes.processGeneratedClients(obj, 'defaultClient')
+
+				} else if(category==='defaultCustomer') {					
+					UserTypes.processGeneratedCustomers(obj, 'defaultCustomer')
+				}
+			})
+
+		)
+		.then( () => {return Promise.resolve(); })
+		.catch( (err:any) => console.error(err) );
+	}
 
 	/******
 	 * @userCollection is an object  {
@@ -89,6 +121,15 @@ export class UserTypes {
 		let keys:string[] = Object.keys( data );
 		let key:any = keys[0];	
 		if( cName === key) { return data[key]; } else { return []; }
+	}
+
+
+	/******
+	 * Stores generated data in local MongoDB instance
+	 */
+	public static storeRemote(data:any) {
+
+
 	}
 
 

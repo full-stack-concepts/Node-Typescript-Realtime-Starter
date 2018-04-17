@@ -1,6 +1,5 @@
 import path from "path";
 import Promise from "bluebird";
-import axios from "../util/axios";
 
 import { IUser, IGoogleUser} from "../shared/interfaces";
 import { TUSER } from "../shared/types";

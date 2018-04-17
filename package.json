@@ -25,8 +25,7 @@
     },
     "dependencies": {
         "app-root-path": "^2.0.1",
-        "async": "^2.6.0",
-        "axios": "^0.18.0",
+        "async": "^2.6.0",       
         "bcrypt-nodejs": "^0.0.3",
         "bluebird": "^3.5.1",
         "body-parser": "^1.18.2",
@@ -84,8 +83,7 @@
     },
     "devDependencies": {
         "@types/async": "^2.0.45",
-        "@types/aws-lambda": "0.0.34",
-        "@types/axios": "^0.14.0",
+        "@types/aws-lambda": "0.0.34",      
         "@types/bcrypt-nodejs": "^0.0.30",
         "@types/bluebird": "^3.5.20",
         "@types/body-parser": "^1.16.8",

@@ -297,37 +297,16 @@ export class DataBreeder {
 		// process thick: assign data to global
 		.then( (data:any) => { return this.data = data; } )		
 
-		/*****
-		 * process thick: add generated data to local store 
-		 */
+		// process thick: add generated data to local store 		
 		.then( () => DataStore.storeDataLocally( this.data ) )
+	
+		 // process thick: add generated users to local database		 
+		.then( () => UserTypes.storeLocally( this.data) )
 
-		/****
-		 * process thick: add generated data to local database
-		 */
-		.then( () => {
+		// process thick: add generated users to remote database
+		.then( () => UserTypes.storeRemote ( this.data) )
 
-			Promise.all(
-				this.data.map ( (obj:any,key:any) => {
-					let keys:string[] = Object.keys(this.data[key]),
-						category:string = keys[0];
-					console.log(keys);
-
-					if(category==='users') {
-						UserTypes.processGeneratedUsers( obj.users );
-					
-					} else if(category==='defaultClient') {
-						UserTypes.processGeneratedClients(obj, 'defaultClient')
-
-					} else if(category==='defaultCustomer') {					
-						UserTypes.processGeneratedCustomers(obj, 'defaultCustomer')
-					}
-				})
-
-			)
-			.then( () => {return Promise.resolve(); })
-			.catch( (err:any) => console.error(err) );
-		})		
+		.then( () => console.log("*** Proceed "))
 	}
 
 	public test() {
@@ -346,10 +325,8 @@ export class DataBreeder {
 		// console.log("Collections to populate ", collections)
 
 		let result:any = this.populate ( collections );
-
 		
-	}
-   
+	}   
 };
 
 export const populateDatabase = () => {
