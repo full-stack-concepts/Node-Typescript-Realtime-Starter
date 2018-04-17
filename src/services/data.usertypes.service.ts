@@ -4,6 +4,7 @@
  * @clients
  * @customers
  */
+import fetch from "node-fetch";
 
 import { 
 	IUser, 
@@ -18,7 +19,11 @@ import {
 } from "../shared/models";
 
 import {
-	POPULATE_LOCAL_DATABASE
+	POPULATE_LOCAL_DATABASE,
+	POPULATE_REMOTE_DATABASE,
+	DB_USERS_COLLECTION_NAME,
+	DB_CLIENTS_COLLECTION_NAME,
+	DB_CUSTOMERS_COLLECTION_NAME 
 	} from "../util/secrets";
 
 export class UserTypes {
@@ -61,7 +66,7 @@ export class UserTypes {
 	 * user: IUser
 	 * }
 	 */
-	public static processGeneratedUsers( usersCollection:any) {
+	private static processGeneratedUsers( usersCollection:any) {
 
 		console.log("==> Add generated users")
 		console.log(usersCollection)
@@ -93,7 +98,7 @@ export class UserTypes {
 	/*****
 	 *
 	 */
-	public static processGeneratedClients( data:any, cName:string) {
+	private static processGeneratedClients( data:any, cName:string) {
 
 		let collection:IClient[]= this.getSubCollection(data, cName)		
 		return (
@@ -107,7 +112,7 @@ export class UserTypes {
 	/*****
 	 *
 	 */
-	public static processGeneratedCustomers( data:any, cName:string ) {
+	private static processGeneratedCustomers( data:any, cName:string ) {
 		let collection:ICustomer[]= this.getSubCollection(data, cName)		
 		return ( 
 			CustomerModel.remove({})
@@ -129,8 +134,84 @@ export class UserTypes {
 	 */
 	public static storeRemote(data:any) {
 
+		if(!POPULATE_REMOTE_DATABASE)
+			return Promise.resolve();
+
+		Promise.all(
+			data.map ( (obj:any,key:any) => {
+				let keys:string[] = Object.keys(data[key]),
+					category:string = keys[0];				
+
+				if(category==='users') {
+					this.storeUsersRemote( obj.users );
+				
+				} else if(category==='defaultClient') {
+					this.storeClientsRemote(obj, 'defaultClient')
+
+				} else if(category==='defaultCustomer') {					
+					this.storeCustomersRemote(obj, 'defaultCustomer')
+				}
+
+			})
+		)
+
+		
+	}
+
+	private static storeUsersRemote( usersCollection:any ) {
+
+		// process thick: delete collection
+		return UserModel.mlab_deleteCollection( DB_USERS_COLLECTION_NAME  )
+
+		// process thick: insert users per category
+		.then( () => {
+			return Promise.all(
+				usersCollection.map( (_collection:any) => {
+					let keys:string[] = Object.keys(_collection),
+						key:any = keys[0];
+					let collection:IUser[]= _collection[key];						
+					return (
+						UserModel.mlab_insert( 
+							DB_USERS_COLLECTION_NAME,  
+							collection 
+						) 
+					)					
+				})
+			)
+			.then( res => Promise.resolve(res) )
+			.catch( (err:any) => Promise.reject(err) );
+		})
+
+		// process thick: return to caller
+		.then( (res:any) =>  { console.log(res); Promise.resolve(res) })
+
+		// error handling
+		.catch( (err:any) => console.error(err) );	
 
 	}
 
+	private static storeClientsRemote(  data:any, cName:string ) {
 
+		let collection:IClient[]= this.getSubCollection(data, cName)		
+		return (
+			ClientModel.mlab_deleteCollection( DB_CLIENTS_COLLECTION_NAME  )
+			.then( () => UserModel.mlab_insert( DB_CLIENTS_COLLECTION_NAME, collection ) ) 
+			.then( (res:any) => { console.log(res); Promise.resolve(res) })
+			.catch( (err:any) => Promise.reject(err))
+		);
+
+	}
+
+	private static storeCustomersRemote( data:any, cName:string ) {
+
+		let collection:ICustomer[]= this.getSubCollection(data, cName)		
+		return (
+			CustomerModel.mlab_deleteCollection( DB_CUSTOMERS_COLLECTION_NAME  )
+			.then( () => CustomerModel.mlab_insert( DB_CUSTOMERS_COLLECTION_NAME, collection ) ) 
+			.then( (res:any) => { console.log(res); Promise.resolve(res) })
+			.catch( (err:any) => Promise.reject(err))
+		);
+
+
+	}
 }

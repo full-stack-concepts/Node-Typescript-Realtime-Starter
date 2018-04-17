@@ -20,7 +20,7 @@ export class RemoteQueryBuilder {
 
 	// build relative url for MLAB hosted db, relative to default
 	static buildCollectionURL(collection:string):string { 
-		return `${MLAB_API_URL}/${MLAB_DATABASE}/collections/${collection}?apiKey=${MLAB_API_KEY}`;	 
+		return `${MLAB_API_URL}${MLAB_DATABASE}/collections/${collection}?apiKey=${MLAB_API_KEY}`;	 
 	}
 
 	/****
