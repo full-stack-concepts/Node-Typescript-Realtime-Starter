@@ -1,6 +1,6 @@
 import {ICustomer} from  "../interfaces";
 
-export const TCUSTOMER = <ICustomer>{
+export const TCUSTOMER:ICustomer = <ICustomer | any>{
 
 	customer: () => {},
 

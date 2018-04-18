@@ -6,7 +6,7 @@ import { IPaymentMethod} from "./payment.method.interface";
 export interface ICustomer extends IPerson {
 
 	// unique identifier method
-	customer():Function,
+	customer:Function,
 
 	customerConfiguration: {	
 		isThumbnailSet?: boolean,	

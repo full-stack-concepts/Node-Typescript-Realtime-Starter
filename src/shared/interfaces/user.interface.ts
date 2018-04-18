@@ -4,7 +4,7 @@ import { IPerson } from "./person.interface";
 export interface IUser extends IPerson {
 
 	// unique identifier method
-	user():Function,
+	user:Function,
 
 	userConfiguration: {	
 		isThumbnailSet: boolean,	

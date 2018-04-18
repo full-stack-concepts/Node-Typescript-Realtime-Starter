@@ -1,6 +1,6 @@
 import {IUser} from  "../interfaces";
 
-export const TUSER = <IUser> {
+export const TUSER:IUser = <IUser | any> {
 
 	user: () => {},
 	
