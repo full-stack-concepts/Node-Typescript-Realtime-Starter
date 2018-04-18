@@ -45,6 +45,7 @@ config/certificates/*
 
 # dataStore
 private/*
+private/datastore/*/**
 
 # public directories
 public/*
