@@ -48,7 +48,9 @@ class UserRouter {
 
 		/*****
          * Client Authentication Routes
-         */       
+         */ 
+
+        this.router.post('/login', this.postLogin);       
      
         // Google authorization url
         this.router.get( '/auth/google',  (req:Request, res:Response, next:NextFunction) => 
@@ -130,8 +132,10 @@ class UserRouter {
                  console.log(user);
   			}
 		);  
+	}
 
-
+	private postLogin( req:Request, res:Response, next:NextFunction) {
+		
 	}
 }
 

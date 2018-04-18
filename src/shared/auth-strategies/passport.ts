@@ -1,5 +1,6 @@
 import path from "path";
 import passport from "passport";
+import passportLocal from "passport-local";
 import passportFacebook from "passport-facebook";
 
 /******
@@ -22,8 +23,18 @@ import { IUser} from "../interfaces";
 /******
  * Degine Authentication Strategies
  */
+const LocalStrategy = passportLocal.Strategy;
 const FacebookStrategy = passportFacebook.Strategy;
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
+
+/**************************************************************************************************
+ *  Configure passport for Local Strategy
+ *
+ */
+passport.use(new LocalStrategy({ usernameField: "email" }, ( email:string, password:string, done:Function) => {
+	//#TODO Process user authentication
+}));
+
 
 
 /**************************************************************************************************
