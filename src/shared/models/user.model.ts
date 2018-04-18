@@ -63,7 +63,8 @@ export class UserModel  {
 	public static remoteFindOneOnly(query:Object, collection:string) {
 		return new Promise( (resolve, reject) => {
 			query = stringify( query);
-			let rURL = RemoteQueryBuilder.findOneRemoteURL(collection, query);							
+			let rURL = RemoteQueryBuilder.findOneRemoteURL(collection, query);
+			console.log(rURL);
 			fetch(rURL)
 			.then( (res:any) =>res.json())
 			.then( (response:any) => resolve(response) )			

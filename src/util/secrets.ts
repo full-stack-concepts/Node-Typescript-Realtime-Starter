@@ -278,7 +278,7 @@ if(!isEmail(SUPERADMIN_EMAIL)) {
 /***
  * Google Auth
  */
-export const ENABLE_GOOGLE_AUTHENTICATION = process.env["ENABLE_GOOGLE_AUTHENTICATION"];
+export const ENABLE_GOOGLE_AUTHENTICATION = Boolean(process.env["ENABLE_GOOGLE_AUTHENTICATION"]);
 export const GOOGLE_AUTH_ID = process.env["GOOGLE_AUTH_ID"];
 export const GOOGLE_AUTH_SECRET = process.env["GOOGLE_AUTH_SECRET"];
 export const GOOGLE_CALLBACK_URL = process.env["GOOGLE_CALLBACK_URL"];
@@ -299,6 +299,18 @@ if(ENABLE_GOOGLE_AUTHENTICATION) {
 		console.error("User Authentication: Google Auth has been enabled but no callback url was provided");
 		process.exit(1);
 	}
+}
+
+/***
+ * facebook Authentication
+ */
+export const ENABLE_FACEBOOK_AUTHENTICATION = Boolean(process.env["ENABLE_FACEBOOK_AUTHENTICATION"])
+export const FACEBOOK_ID =  process.env["FACEBOOK_ID"];
+export const FACEBOOK_SECRET= process.env["FACEBOOK_SECRET"];
+export const FACEBOOK_CALLBACK_URL = process.env["FACEBOOK_CALLBACK_URL"];
+
+if(ENABLE_FACEBOOK_AUTHENTICATION) {
+
 }
   
 /***

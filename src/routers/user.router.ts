@@ -50,7 +50,7 @@ class UserRouter {
          * Client Authentication Routes
          */       
      
-        // google authorization url
+        // Google authorization url
         this.router.get( '/auth/google',  (req:Request, res:Response, next:NextFunction) => 
         	{	
 				if (req.query.return) {
@@ -64,7 +64,7 @@ class UserRouter {
 		);
 
 		/***
-		 * OAuth 2 callback url. Use this url to configure your OAuth client 
+		 * Google OAuth 2 callback url. Use this url to configure your OAuth client 
 		 * in the Google Developers console
 		 */
 		this.router.get( 
@@ -98,7 +98,40 @@ class UserRouter {
 
                 });    		                           
   			}
-		);    
+		);  
+
+		// Facebook authorization url
+		this.router.get( '/auth/facebook',  (req:Request, res:Response, next:NextFunction) => 
+        	{	
+				if (req.query.return) {
+					req.session.oauth2return = req.query.return;
+				}
+    			next();
+    		},
+
+			// Start OAuth 2 flow using Passport.js
+			passport.authenticate('facebook', { scope: ['email', 'public_profile'] }) 
+		);	
+
+		/***
+		 * Google OAuth 2 callback url. Use this url to configure your OAuth client 
+		 * in the Google Developers console
+		 */
+		this.router.get( 
+			'/auth/facebook/callback', 
+			passport.authenticate('facebook'),   
+			
+  			(req:Request, res:Response, next:NextFunction) => {            
+
+  				// passport has serialized user and formatted as req.user
+                // we retreieve it and encrypt account types inside web token
+                let user = req.user;  
+
+                 console.log(user);
+  			}
+		);  
+
+
 	}
 }
 

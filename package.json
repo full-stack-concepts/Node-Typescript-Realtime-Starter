@@ -25,7 +25,7 @@
     },
     "dependencies": {
         "app-root-path": "^2.0.1",
-        "async": "^2.6.0",       
+        "async": "^2.6.0",
         "bcrypt-nodejs": "^0.0.3",
         "bluebird": "^3.5.1",
         "body-parser": "^1.18.2",
@@ -83,7 +83,7 @@
     },
     "devDependencies": {
         "@types/async": "^2.0.45",
-        "@types/aws-lambda": "0.0.34",      
+        "@types/aws-lambda": "0.0.34",
         "@types/bcrypt-nodejs": "^0.0.30",
         "@types/bluebird": "^3.5.20",
         "@types/body-parser": "^1.16.8",
@@ -113,7 +113,7 @@
         "@types/node-fetch": "^1.6.8",
         "@types/nodemailer": "^4.3.4",
         "@types/passport": "^0.4.3",
-        "@types/passport-facebook": "^2.1.7",
+        "@types/passport-facebook": "^2.1.8",
         "@types/passport-google-oauth": "^1.0.37",
         "@types/passport-google-oauth2": "^0.1.1",
         "@types/passport-local": "^1.0.32",

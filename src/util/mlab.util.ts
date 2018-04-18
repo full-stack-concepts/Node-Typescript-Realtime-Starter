@@ -208,15 +208,15 @@ export class RemoteQueryBuilder {
 	
 
 	static findOneRemoteURL(collection:string, query:any):string { 
-		return  `/${MLAB_DATABASE}/collections/${collection}?q=${query}&fo=true&apiKey=${MLAB_API_KEY}`;
+		return  `${MLAB_API_URL}${MLAB_DATABASE}/collections/${collection}?q=${query}&fo=true&apiKey=${MLAB_API_KEY}`;
 	}	
 
 	static selectRemoteURL(collection:string, query:string, filter:string, findOneOnly:string):string {
-		return  `/${MLAB_DATABASE}/collections/${collection}?q=${query}&f=${filter}&fo=${findOneOnly}&apiKey=${MLAB_API_KEY}`;
+		return  `${MLAB_API_URL}${MLAB_DATABASE}/collections/${collection}?q=${query}&f=${filter}&fo=${findOneOnly}&apiKey=${MLAB_API_KEY}`;
 	}
 
 	static updateDocumentURL(collection:string, query:string):string {
-		return `/${MLAB_DATABASE}/collections/${collection}?apiKey=${MLAB_API_KEY}&q=${query}`;
+		return `${MLAB_API_URL}${MLAB_DATABASE}/collections/${collection}?apiKey=${MLAB_API_KEY}&q=${query}`;
 	}
 
 	/***************************************************************************************************************
