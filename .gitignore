@@ -44,8 +44,9 @@ coverage
 config/certificates/*
 
 # dataStore
-private/*
-private/datastore/*/**
+private/datastore/1/data.json
+private/datastore/2/data.json
+private/datastore/3/data.json
 
 # public directories
 public/*
