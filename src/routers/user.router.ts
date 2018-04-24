@@ -30,8 +30,12 @@ class UserRouter {
 	  
 	    this.router = express.Router();  
 
+	    this.staticRoutes
 	    this.middleware();
         this.setRoutes();    
+	}
+
+	private staticRoutes():void {
 	}
 
 	private middleware():void {
@@ -79,9 +83,9 @@ class UserRouter {
                 // we retreieve it and encrypt account types inside web token
                 let user = req.user;  
 
-                  WebToken.create( user.accounts, ( err:any, token:string) => {
+                WebToken.create( user.accounts, ( err:any, token:string) => {
 
-                  	console.log(err, token)               
+                	console.log(err, token)               
                                             
                     if(!err) {       
 
@@ -129,7 +133,26 @@ class UserRouter {
                 // we retreieve it and encrypt account types inside web token
                 let user = req.user;  
 
-                 console.log(user);
+                WebToken.create( user.accounts, ( err:any, token:string) => {
+
+                	console.log(err, token)               
+                                            
+                    if(!err) {       
+
+                    	// store webtoken as cookie
+                    	if(STORE_WEBTOKEN_AS_COOKIE) {
+                    		res.cookie(WEBTOKEN_COOKIE, token);
+                    	}                    	
+
+                    	// store token in session to enable real-time authenticaion
+                    	res.locals.token = token;       
+
+                    	// send token with json response
+                    	(SEND_TOKEN_RESPONSE)?res.json({token:token}):res.json({})
+
+                    }                                     
+
+                });    	
   			}
 		);  
 	}

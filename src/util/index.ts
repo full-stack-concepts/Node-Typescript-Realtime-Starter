@@ -4,6 +4,7 @@ export {
 	objectKeysLength,
 	stringify,
 	isEmail,
+	isURL,
 	countArrayItems,
 	get,
 	set,
@@ -25,7 +26,11 @@ export {
 } from "./data.util";
 
 export {
-	constructUserCredentials
+	constructUserCredentials,
+	constructProfileFullName,
+	constructProfileSortName,
+	validateInfrastructure, 
+	validateUserIntegrity
 } from "./user.util";
 
 export {
@@ -35,8 +40,24 @@ export {
 	readProdConfiguration,
 	getPathToDataStore,
 	createPrivateDataStore,
-	publicDirectoryManager
+	publicDirectoryManager,
+	createUserDirectory,
+	createUserSubDirectories,
+	pathToDefaultUserThumbnail,
+	pathToUserThumbnail,
+	storeUserImage
 } from "./infrastructure.util";
+
+export {
+	grabEmailFromFacebookProfile,
+	extractFacebookProfile
+} from "./user.facebook.util";
+
+export {
+	grabEmailFromGoogleProfile,
+	createProfileFromGoogleData,
+	formatProfileFromGoogleData
+} from "./user.google.util";
 
 export {
 	gender,

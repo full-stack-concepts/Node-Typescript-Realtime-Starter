@@ -46,24 +46,24 @@ const _Container:DI_Container = {
 
         let className:any = _className.toString();      
        
-        Container._isClassNameProvided(className);
-        Container._isClassNameRegistered(className);     
-        Container._testFactory(className, dependencies, factory);
+        _Container._isClassNameProvided(className);
+        _Container._isClassNameRegistered(className);     
+        _Container._testFactory(className, dependencies, factory);
 
         /***
          * Create module object
          */
-        let module:any = Container._registerClassAsModule(className, dependencies, factory);     
+        let module:any = _Container._registerClassAsModule(className, dependencies, factory);     
 
         /***
          * Register module object
          */
-        Container.modules[className] = module;
+        _Container.modules[className] = module;
 
         /***
          * Start Module
          */
-        Container.startModule(className);     
+        _Container.startModule(className);     
 
         return this;
     },
@@ -75,7 +75,7 @@ const _Container:DI_Container = {
 
     _isClassNameRegistered: (className:any) => {
 
-        if(Container.modules[className] !== undefined) 
+        if(_Container.modules[className] !== undefined) 
              throw new Error('=> Class Name is already registered');
     },
 
@@ -102,9 +102,9 @@ const _Container:DI_Container = {
     startModule: (moduleName:any, callback?:any) => {   
 
         let instance,
-        moduleDef = Container._getRegisteredModule(moduleName);        
+        moduleDef = _Container._getRegisteredModule(moduleName);        
 
-        Container._testModuleConfig(moduleDef);
+        _Container._testModuleConfig(moduleDef);
 
         /***
          * Return instance if module was started previously
@@ -115,7 +115,7 @@ const _Container:DI_Container = {
         /***
          * Start module (create instance)
          */
-        instance = Container.getModule(moduleName);           
+        instance = _Container.getModule(moduleName);           
 
         if(!instance){
             throw new Error('Class ' + moduleName + ' failed to be instantiated');
@@ -140,16 +140,16 @@ const _Container:DI_Container = {
                 moduleDef.instance= instance;
 
                 // now update array
-                delete Container.modules[moduleName];
+                delete _Container.modules[moduleName];
 
-                Container.modules[moduleName] = moduleDef;
+                _Container.modules[moduleName] = moduleDef;
             }
         }
     },   
 
     _getRegisteredModule(moduleName:any) {  
 
-        let moduleDef:any = Container.modules[moduleName];
+        let moduleDef:any = _Container.modules[moduleName];
          if(!moduleDef)
             throw new Error('ES2015 class ' + moduleName + ' is not registered');       
 
@@ -163,8 +163,8 @@ const _Container:DI_Container = {
 
     getModule: function(moduleName:string) {      
 
-        let moduleDef:any = Container._getRegisteredModule(moduleName),
-            moduleDependencies:any = Container._getModuleDependencies(moduleDef);
+        let moduleDef:any = _Container._getRegisteredModule(moduleName),
+            moduleDependencies:any = _Container._getModuleDependencies(moduleDef);
 
         if(!moduleDef.instance) {
 
@@ -196,10 +196,10 @@ const _Container:DI_Container = {
     },
 
     inject(name:string, done:Function) {
-        let instance = Container.getModule(name);
+        let instance = _Container.getModule(name);
         return instance;       
     }
 }
 
-export const Container = _Container;
+export const ServiceContainer = _Container;
 

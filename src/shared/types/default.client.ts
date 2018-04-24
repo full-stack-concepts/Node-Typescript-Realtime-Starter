@@ -13,6 +13,7 @@ export const TCLIENT:IClient = <IClient | any> {
 		role: null,
 		identifier: null,
 		archive: false,
+		type: null				
 	},
 
 	password:null,
@@ -27,18 +28,19 @@ export const TCLIENT:IClient = <IClient | any> {
 		isPasswordEncrypted: null
 	},
 
-	clientConfiguration: {	
-		isThumbnailSet: false,	
+	configuration: {	
+		isThumbnailSet: false,		
+		isAddressSet: false,
 		isGooglePlusUser: false,
-		isAddressSet: false
+		isFacebbokuser: false,
 	},
 
 	profile: {	
 
 		personalia: {
-			firstName: null,
+			givenName: null,
 			insertion: null,
-			lastName:  null
+			familyName:  null
 		},	
 
 		displayNames: {
@@ -65,6 +67,7 @@ export const TCLIENT:IClient = <IClient | any> {
 
 		images: {	     		     		
      		thumbnail: null,
+     		externalThumbnailUrl: null,
      		avatar: null
 		},
 

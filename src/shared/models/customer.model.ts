@@ -52,6 +52,21 @@ export class CustomerModel extends DefaultModel  {
 			});
 		});
 	}	
+
+	public static findOne (cond:Object):Promise<any> {
+		let repo = new CustomerRepository();
+		return new Promise ( (resolve, reject) => {
+			repo.findOne ( cond, (err:any, res:any) => {				
+				if(err) {
+					reject(err);
+				} else if(!res) {
+					resolve();
+				} else {
+					resolve(res)
+				}
+			});
+		});
+	}
 	 
 }
 

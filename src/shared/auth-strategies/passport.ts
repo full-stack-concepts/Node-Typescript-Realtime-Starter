@@ -88,12 +88,30 @@ passport.use( new FacebookStrategy({
 	clientID: FACEBOOK_ID,
   	clientSecret: FACEBOOK_SECRET,
   	callbackURL: FACEBOOK_CALLBACK_URL,
-  	profileFields: ["name", "email", "link", "locale", "timezone"],
+  	profileFields: ["name", "email", "link", "locale", "timezone", "picture"],
   	passReqToCallback: true
 }, (req: any, accessToken:any, refreshToken:any, profile:any, done:any) => {
 
-	console.log(accessToken, profile)
-	// #TODO Extract Facebook Profile and create webtoken
+	console.log(" 1111111111111111111111111111111111111111111111111111 ")
+	console.log(profile)
+	console.log(" 1111111111111111111111111111111111111111111111111111 ")
+
+	u.authenticateFacebookUser({
+		accessToken: accessToken,		
+		profile: profile
+	},
+
+	(err:any, user:any) => {		
+
+		/**** 
+		 * After done is exexuted passport passes control back to <UserRouter>
+		 */
+		if(err) {
+			done(err, user );
+		} else {
+			done(null, user );
+		}			
+	});		
 
 
 }));

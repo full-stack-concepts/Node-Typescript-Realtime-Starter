@@ -1,5 +1,6 @@
 import fetch from "node-fetch";
 import Promise from "bluebird";
+import urlRegex from "url-regex";
 
 /****
  * Function helper: deep clone object
@@ -27,6 +28,11 @@ export const isEmail = (str:string):boolean => {
 	if(!str || str && typeof str != 'string') return false;	
 	let emailRegEx:RegExp = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 	return emailRegEx.test(str);		
+}
+
+export const isURL = (url:string):boolean => {	
+	if(!url) return false; // only test url, not if is required
+	return urlRegex().test( url.toString() )
 }
 
 /****

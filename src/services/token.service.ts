@@ -3,6 +3,9 @@ import Promise from "bluebird";
 import path from "path";
 import mongoose from "mongoose";
 
+Promise.promisifyAll(fs);
+Promise.promisifyAll(mongoose);
+
 import { IUser} from "../shared/interfaces";
 import { UserModel } from "../shared/models"
 import { deepCloneObject } from "../util";
@@ -102,7 +105,7 @@ export class WebToken {
 	 * (2) Facebook
 	 * (3) Defaut Account
 	 */
-	 static testForAccountType(data:any):Promise<any> { 
+	 static testForAccountType(data:any):Promise<any> {  
 
 	 	return new Promise( (resolve, reject) => {
 	 		

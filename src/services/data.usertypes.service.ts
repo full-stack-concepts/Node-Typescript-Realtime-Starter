@@ -83,7 +83,7 @@ export class UserTypes {
 						key:any = keys[0];
 					let collection:IUser[]= _collection[key];					
 
-					UserModel.createUsers( collection );
+					UserModel.insert( collection );
 				})
 			)
 			// process thick: return to caller

@@ -5,3 +5,9 @@ export interface IConnection{
 	port: string,
 	db: string
 }
+
+export interface IDatabasePriority {	
+	type: number,
+	host: string,
+	use: boolean
+}

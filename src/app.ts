@@ -10,22 +10,41 @@ import passport from "passport";
 // import passport for authentication support
 require("./shared/auth-strategies/passport");
 
+import {
+    PUBLIC_ROOT_DIR,
+    PRIVATE_DATA_DIR,
+    CREATE_DATASTORE
+} from "./util/secrets";
+
+////////////////////
+import { testFaceBookUserAuthentication } from "./services/user.service";
+import { WebToken } from "./services/token.service";
+
+/***
+ * Test ground for tests...
+ */
+
+
+
 /***
  * Router Controllers
  */
 import UserRouter from './routers/user.router';
 
-import { shouldCompress } from './util/middleware.util';
+import { shouldCompress } from './util/middleware.util'; 
 
 import {u} from "./services/user.service";
 
 import { publicDirectoryManager, createPrivateDataStore } from "./util";
 
+/*
 createPrivateDataStore()
 .then( () => publicDirectoryManager() );
 
 import { populateDatabase} from "./services/data.service";
 populateDatabase();
+
+*/
 
 
 class App {
@@ -84,6 +103,15 @@ class App {
     }
 
     private routes():void {
+
+        /**
+         * Public Directories
+         */
+        this.express.use(express.static ( PUBLIC_ROOT_DIR ) );       
+
+        if(CREATE_DATASTORE) {
+            this.express.use( express.static ( PRIVATE_DATA_DIR ) );              
+        }
 
         /***
          * User API

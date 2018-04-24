@@ -1,25 +1,52 @@
-import {IUser} from "../shared/interfaces";
+import randomNumber from "random-number";
 
-const sliceMe = (obj:any, prop:string, pos:number) => {
+import {IUser, IClient, ICustomer } from "../shared/interfaces";
+
+interface IName  {
+    givenName:string,
+    middleName:string,
+    familyName:string
+}
+
+export const sliceMe = (obj:any, prop:string, pos:number) => {
     return obj[prop].toString().slice(0, pos).trim().toLowerCase();
 }
 
-const randomInt = ():number => {
-    return Math.random()*101|0;
+export const randomInt = (min:number, max:number):number => {
+    return randomNumber({min:1001, max:8999, integer:true});
 }
 
 export const constructUserCredentials = (user:IUser, done:Function):any => {   
 
     let uPolicy:any = {
-        'firstName': sliceMe( user.profile.personalia, 'firstName', 4),
-        'lastName': sliceMe( user.profile.personalia, 'lastName', 5),
-        'number': randomInt()
+        'givenName': sliceMe( user.profile.personalia, 'givenName', 4),
+        'familyName': sliceMe( user.profile.personalia, 'familyName', 5),
+        'number': randomInt(1001, 3999)
     }
 
     return done({
-        userName: `${uPolicy.firstName}${uPolicy.lastName}${uPolicy.number}`,
-        url:  `${uPolicy.firstName}_${uPolicy.lastName}_${uPolicy.number}`
+        userName: `${uPolicy.givenName}${uPolicy.familyName}${uPolicy.number}`,
+        url:  `${uPolicy.givenName}_${uPolicy.familyName}_${uPolicy.number}`
     });
 }
 
-    	
+export const constructProfileFullName = ( {givenName, middleName, familyName }:IName ):string => {
+    let n:string = givenName;
+    if(middleName) n+= ` ${middleName}`;
+    if(familyName) n+= ` ${familyName}`;
+    return n;
+}
+
+export const constructProfileSortName = ( {givenName, middleName, familyName }:IName ):string => {   
+    return `${familyName}`;
+}
+
+export const validateInfrastructure = (user:IUser|IClient|ICustomer):Promise<boolean> => {
+    return Promise.resolve(true);
+}
+
+export const validateUserIntegrity = (user:IUser|IClient|ICustomer):Promise<boolean> =>  {
+    return Promise.resolve(true);
+}
+
+

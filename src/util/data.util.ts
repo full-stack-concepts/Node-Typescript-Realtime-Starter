@@ -84,12 +84,12 @@ const fakeUserPersonalia = (user:IUser|IClient|ICustomer):IUser|IClient|ICustome
 	 * @email:string
 	 * @identifier: string of type UUID
 	 */ 
-	let fName:string = firstName().trim(),
-		lName:string = lastName().trim(),
-	 	credentials:any= gimmieCredentials(fName, lName),
+	let givenName:string = firstName().trim(),
+		familyName:string = lastName().trim(),
+	 	credentials:any= gimmieCredentials(givenName, familyName),
 	 	url:string = credentials.url,
 	 	userName:string = credentials.userName,
-	 	email:string = constructEmail(fName,lName),
+	 	email:string = constructEmail(givenName,familyName),
 	 	identifier:string = String(createIdentifier() ),
 	 	_avatar:string = String( avatar().trim() ),
 	 	_thumbnail:string = String( avatar().trim() );
@@ -105,11 +105,11 @@ const fakeUserPersonalia = (user:IUser|IClient|ICustomer):IUser|IClient|ICustome
 	/***
 	 * Profile personalia && displayNames
 	 */
-	 user.profile.personalia.firstName = fName;
-	 user.profile.personalia.insertion = '';
-	 user.profile.personalia.lastName = lName;
-	 user.profile.displayNames.fullName = constructFullName(fName, lName);
-	 user.profile.displayNames.sortName = constructFullName(fName, lName).toLowerCase();
+	 user.profile.personalia.givenName = givenName;
+	 user.profile.personalia.middleName = '';
+	 user.profile.personalia.familyName = familyName;
+	 user.profile.displayNames.fullName = constructFullName(givenName, familyName);
+	 user.profile.displayNames.sortName = constructFullName(givenName, familyName).toLowerCase();
 
 	/***
 	 * User images
@@ -170,13 +170,13 @@ const fakeUserAddressAndLocation = (user:IUser|IClient|ICustomer):IUser|IClient|
 
 	// type assertionL and finally confirm that address has been configured
 	if(isOfUserType(user)) {
-		user.userConfiguration.isAddressSet =true;
+		user.configuration.isAddressSet =true;
 	}
 	if(isOfClientType(user)) {
-		user.clientConfiguration.isAddressSet =true;
+		user.configuration.isAddressSet =true;
 	}
 	if(isOfCustomerType(user)) {
-		user.customerConfiguration.isAddressSet = true;
+		user.configuration.isAddressSet = true;
 	}
 
 	return user;

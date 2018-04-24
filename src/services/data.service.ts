@@ -134,12 +134,10 @@ export class DataBreeder {
 
 		let counts:any=[];
 
-		return Promise.all(
-			collections.map ( collection => 
-				this.__countItems(collection)
-				 .then( count => ({collection:collection, count:count}) 
-			))
-		)
+		return Promise.map( collections, (collection:any) => {
+			this.__countItems(collection)
+			.then( count => ({collection:collection, count:count}) ) 
+		})	
 		.then( results => Promise.resolve(results) )
 		.catch( err => Promise.reject(err));
 	}	
@@ -190,24 +188,20 @@ export class DataBreeder {
 
 			if( category === 'users' ) {
 
-				return Promise.all(						
-					cSettings.map ( ({ category, amount}:any) => {																			
-						let portion:IUser[] = users.slice(0, amount);	
-						users.splice(0, amount);
-						return Promise.resolve( { 
-							'category': category, 
-							'data': portion, 								
-							'amount': amount
-						})
-					})											
-				)					
+				return Promise.map( cSettings, ({ category, amount}:any) => {
+					let portion:IUser[] = users.slice(0, amount);	
+					users.splice(0, amount);
+					return Promise.resolve( { 
+						'category': category, 
+						'data': portion, 								
+						'amount': amount
+					});
+				})	
 				// process thick: format collection per user sub type
-				.then( (collection: any) => {
-					return Promise.all(
-						collection.map( (collection:any) => {						
-							return formatUserSubType( collection )
-						})
-					)					
+				.then( (collections: any) => {
+					return Promise.map( collections, (collection:any) => {
+						return formatUserSubType( collection );
+					})								
 				})
 				// proces thick: return to caller
 				.then( data => {  return { users: data }; });
@@ -247,11 +241,8 @@ export class DataBreeder {
 			};
 		});
 
-		return Promise.all(
-			config.map ( configuration => 
-				Promise.resolve( this.processDataCategory(configuration) 
-			))
-		).then( data => Promise.resolve(data));	
+		return Promise.map( config, (configuration:any) => Promise.resolve( this.processDataCategory(configuration)) )
+		.then( data => Promise.resolve(data));	
 
 	}
 

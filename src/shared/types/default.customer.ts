@@ -11,6 +11,7 @@ export const TCUSTOMER:ICustomer = <ICustomer | any>{
 		role: null,
 		identifier: null,
 		archive: false,
+		type: null				
 	},
 
 	password:null,
@@ -25,16 +26,19 @@ export const TCUSTOMER:ICustomer = <ICustomer | any>{
 		isPasswordEncrypted: null
 	},
 
-	customerConfiguration: {	
-		isThumbnailSet: false,			
+	configuration: {	
+		isThumbnailSet: false,		
+		isAddressSet: false,
+		isGooglePlusUser: false,
+		isFacebbokuser: false,
 	},
 
 	profile: {	
 
 		personalia: {
-			firstName: null,
-			insertion: null,
-			lastName:  null
+			givenName: null,
+			middleName: null,
+			familyName:  null
 		},	
 
 		displayNames: {
@@ -61,6 +65,7 @@ export const TCUSTOMER:ICustomer = <ICustomer | any>{
 
 		images: {	     		     		
      		thumbnail: null,
+     		externalThumbnailUrl: null,
      		avatar: null
 		},
 

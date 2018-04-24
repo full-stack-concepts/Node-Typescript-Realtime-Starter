@@ -9,15 +9,6 @@ import { userPrototype } from "../schemas";
 const client = Object.assign(userPrototype);
 
 /****
- * Extend Mongoose <client> object: Client Configuration
- */
-client.clientConfiguration = {
-	isThumbnailSet: { type: Boolean, required:false, default:false },
-	isGooglePlusUser: { type: Boolean, required:false, default:false },
-	isAddressSet: { type: Boolean, required:false, default:false }
-};
-
-/****
  * Extend Mongoose <client> object: Company Configuration
  */
 client.company = {

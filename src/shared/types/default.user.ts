@@ -11,6 +11,7 @@ export const TUSER:IUser = <IUser | any> {
 		role: null,
 		identifier: null,
 		archive: false,
+		type: null		
 	},
 
 	password:null,
@@ -25,18 +26,19 @@ export const TUSER:IUser = <IUser | any> {
 		isPasswordEncrypted: null
 	},
 
-	userConfiguration: {	
-		isThumbnailSet: false,	
+	configuration: {	
+		isThumbnailSet: false,		
+		isAddressSet: false,
 		isGooglePlusUser: false,
-		isAddressSet: false
+		isFacebbokuser: false,
 	},
 
 	profile: {	
 
 		personalia: {
-			firstName: null,
-			insertion: null,
-			lastName:  null
+			givenName: null,
+			middleName: null,
+			familyName:  null
 		},	
 
 		displayNames: {
@@ -63,6 +65,7 @@ export const TUSER:IUser = <IUser | any> {
 
 		images: {	     		     		
      		thumbnail: null,
+     		externalThumbnailUrl: null,
      		avatar: null
 		},
 

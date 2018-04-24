@@ -20,7 +20,7 @@ export const userPrototype = {
 		archived: { type: Boolean, required:true, default: false}
 	},
 
-	password:  { type: String, required: true },
+	password:  { type: String, required: false },
 
 	security: {
 		latestLogOn: { type:Date, required: false },
@@ -31,9 +31,15 @@ export const userPrototype = {
 		isPasswordEncrypted: { type: Boolean, required: true, default: false},
 	},
 
+	configuration: {	
+		isGooglePlusUser: { type: Boolean, required: false, default: false},
+		isThumbnailSet: { type: Boolean, required: true, default: false},
+		isAddressSet: { type: Boolean, required: false, default: false }									
+	},
+
 	accounts: {
 		googleID: { type:String, required:false, index: { unique: true} },
-		facebookID: { type:String, required:false, index: { unique: true} }
+		facebookID: { type:String, required:false, index: { unique: true} }  
 	},	
 
 	profile: {
@@ -43,9 +49,9 @@ export const userPrototype = {
 		description: { type: String, required: false, default: "" },		
 
 		personalia: {
-			firstName:  { type: String, required: true },
-			insertion: { type: String, required: false },
-			lastName: { type: String, required: true }
+			givenName:  { type: String, required: true },
+			middleName: { type: String, required: false },
+			familyName: { type: String, required: true }
 		},
 
 		displayNames: {
@@ -106,15 +112,6 @@ export const userPrototype = {
  */
 const user = Object.assign(userPrototype);
 
-
-/****
- * Extend Mongoose <user> object: User Configuration
- */
-user.userConfiguration = {	
-	isGooglePlusUser: { type: Boolean, required: false, default: false},
-	isThumbnailSet: { type: Boolean, required: true, default: false},
-	isAddressSet: { type: Boolean, required: false, default: false }									
-};
 
 /*****
  * Create user Schema

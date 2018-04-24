@@ -5,7 +5,7 @@ export { RepositoryBase } from './mongoose.interface';
 export { IError } from "./error.interface";
 export { IListOptions } from './mlab.listquery.interface';
 export { IUpdateOptions } from './mlab.update.interface';
-export { IConnection } from "./db.interface";
+export { IConnection, IDatabasePriority } from "./db.interface";
 
 
 /***
@@ -37,3 +37,7 @@ export {
 	isOfClientType,
 	isOfCustomerType	
 } from "./type.guards";
+
+export {
+	IRawThumbnail
+} from "./rawthumbnail.image.interface";

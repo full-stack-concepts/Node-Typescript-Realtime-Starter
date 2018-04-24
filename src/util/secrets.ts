@@ -1,7 +1,16 @@
 import dotenv from "dotenv";
 import fs from "fs";
-import {isEmail} from "../util";
 
+/****
+ * Import interfaces and types for database host priorities array
+ */
+import { TDBP_local, TDBP_mlab} from "../shared/types";
+import { IDatabasePriority } from "../shared/interfaces";
+import { isEmail } from "../util";
+
+/****
+ * Note: Use equality operator (==) to cast dotenv strings to boolean (your settings file)
+ */
 if (fs.existsSync(".env")) {   
     dotenv.config({ path: ".env" });
 }
@@ -21,7 +30,7 @@ export const EXPRESS_SERVER_MODE = process.env["EXPRESS_SERVER_MODE"];
 /**
  * Express Server Port Number
  */
-export const PORT = process.env["PORT"];
+export const PORT = process.env["PORT"];  
 
 /**
  * PORT WEB CLIENT
@@ -33,65 +42,85 @@ export const CLIENT_PORT = process.env["CLIENT_PORT"];
  */
 export const ADMIN_PORT = process.env["ADMIN_PORT"];
 
+/**
+ * SITE NAME
+ */
+export const SITE_NAME = process.env["SITE_URL"];
+
+/**
+ * DEFAULT SITE URL
+ */
+export const SITE_URL = `${EXPRESS_SERVER_MODE}://${SITE_NAME}:${PORT}/`;
+
 /***
  * Public Directory Management
  */
-export const SERVE_PUBLIC_RESOURCES = Boolean(process.env["SERVE_PUBLIC_RESOURCES"]);
+export const SERVE_PUBLIC_RESOURCES = process.env["SERVE_PUBLIC_RESOURCES"] == 'true';
 export const PUBLIC_ROOT_DIR:string = process.env["PUBLIC_ROOT_DIR"] || './public/';
 export const PUBLIC_ASSETS_DIR:string = process.env["PUBLIC_ASSETS_DIR"] || './assets/';
 export const PUBLIC_IMAGES_DIR:string = process.env["PUBLIC_IMAGES_DIR"] || './images/';
 export const PUBLIC_STYLES_DIR:string = process.env["PUBLIC_STYLES_DIR"] || './styles';
 export const PUBLIC_ASSETS_DIRS:string[] = process.env["PUBLIC_ASSETS_DIRS"].split(",");
 export const PUBLIC_STYLES_DIRS:string[] = process.env["PUBLIC_STYLES_DIRS"].split(",");
+export const PUBLIC_USER_DIR:string = process.env["PUBLIC_USER_DIR"] || "./users/";
+export const PUBLIC_USER_SUBDIRECTORIES:string[]=process.env["PUBLIC_USER_SUBDIRECTORIES"].split(",");
 
-if( SERVE_PUBLIC_RESOURCES && typeof  SERVE_PUBLIC_RESOURCES === 'boolean') {	
 
-	if(!PUBLIC_ROOT_DIR || typeof PUBLIC_ROOT_DIR != 'string') {
-		console.error("APP DIR: Please configure your public root directory in your environmental file.");
-		process.exit(1);
-	}
 
-	if(!PUBLIC_ASSETS_DIR || typeof PUBLIC_ASSETS_DIR != 'string') {
-		console.error("APP DIR: Please configure your public assets directory in your environmental file.");
-		process.exit(1);
-	}
+console.log("==> Puyblic Root Dir ", PUBLIC_ROOT_DIR)
 
-	if(!PUBLIC_IMAGES_DIR || typeof PUBLIC_IMAGES_DIR != 'string') {
-		console.error("APP DIR: Please configure public images directory in your environmental file.");
-		process.exit(1);
-	}
-
-	if(!PUBLIC_STYLES_DIR || typeof PUBLIC_STYLES_DIR != 'string') {
-		console.error("APP DIR: Please configure public styles directory in your environmental file.");
-		process.exit(1);
-	}
-
-	const assetsDirs:string[] = PUBLIC_ASSETS_DIRS;
-	if(assetsDirs && !Array.isArray(assetsDirs)) {
-		console.error("APP DIR: Please reconfigure your assets sub directories in your environmental file.");
-		process.exit(1);
-	} 
-
-	const stylesDirs:string[] = PUBLIC_STYLES_DIRS;
-	if(stylesDirs && !Array.isArray(stylesDirs)) {
-		console.error("APP DIR: Please reconfigure your styles sub directories in your environmental file.");
-		process.exit(1);
-	} 
-
-} else {
-	console.error("APP DIR: setting for serving public resources SERVE_PUBLIC_RESOURCES is missing or corrupted.");
+if(!PUBLIC_ROOT_DIR || typeof PUBLIC_ROOT_DIR != 'string') {
+	console.error("APP DIR: Please configure your public root directory in your environmental file.");
 	process.exit(1);
 }
+
+if(!PUBLIC_ASSETS_DIR || typeof PUBLIC_ASSETS_DIR != 'string') {
+	console.error("APP DIR: Please configure your public assets directory in your environmental file.");
+	process.exit(1);
+}
+
+if(!PUBLIC_IMAGES_DIR || typeof PUBLIC_IMAGES_DIR != 'string') {
+	console.error("APP DIR: Please configure public images directory in your environmental file.");
+	process.exit(1);
+}
+
+if(!PUBLIC_STYLES_DIR || typeof PUBLIC_STYLES_DIR != 'string') {
+	console.error("APP DIR: Please configure public styles directory in your environmental file.");
+	process.exit(1);
+}
+
+const assetsDirs:string[] = PUBLIC_ASSETS_DIRS;
+if(assetsDirs && !Array.isArray(assetsDirs)) {
+	console.error("APP DIR: Please reconfigure your assets sub directories in your environmental file.");
+	process.exit(1);
+} 
+
+const stylesDirs:string[] = PUBLIC_STYLES_DIRS;
+if(stylesDirs && !Array.isArray(stylesDirs)) {
+	console.error("APP DIR: Please reconfigure your styles sub directories in your environmental file.");
+	process.exit(1);
+} 
+
+if(!isString(PUBLIC_USER_DIR)) {
+	console.error("APP PUBLIC USERS DIR: Please specify your public users directory in your environmental file.");
+	process.exit(1);	
+}
+
+const subUsersDirs:string[] = PUBLIC_USER_SUBDIRECTORIES;
+if(subUsersDirs && !Array.isArray(subUsersDirs)) {
+	console.error("APP DIR: Please reconfigure your user sub directories in your environmental file.");
+	process.exit(1);
+} 
+
+
 
 /***
  * Private Directory Management
  */
-export const CREATE_DATASTORE = Boolean(process.env["CREATE_DATASTORE"]);
+export const CREATE_DATASTORE = process.env["CREATE_DATASTORE"] == 'true';
 export const PRIVATE_DATA_DIR:string = process.env["PEIVATE_DATA_DIR"] || './private/datastore';
 
-console.log("**** Testing Create ", CREATE_DATASTORE)
-
-if(!CREATE_DATASTORE || CREATE_DATASTORE && typeof CREATE_DATASTORE != 'boolean' ) {
+if(typeof CREATE_DATASTORE != 'boolean' ) {
 	console.error("APP DATASTORE: Please configure your datastore varriable in your environmental file as either TRUE or FALSE");
 	process.exit(1);
 } else {
@@ -112,7 +141,7 @@ export const PATH_TO_PROD_CERTIFICATE:string = process.env["PATH_TO_PROD_CERTIFI
 /***
  * LOCAL MONGODB SERVER
  */
-export const USE_LOCAL_MONGODB_SERVER = Boolean(process.env["USE_LOCAL_MONGODB_SERVER"]);
+export const USE_LOCAL_MONGODB_SERVER = process.env["USE_LOCAL_MONGODB_SERVER"] == 'true';
 export const DB_CONFIG_HOST = process.env["DB_CONFIG_HOST"];
 export const DB_CONFIG_PORT = process.env["DB_CONFIG_PORT"];
 export const DB_CONFIG_USER = process.env["DB_CONFIG_USER"];
@@ -120,7 +149,12 @@ export const DB_CONFIG_PASSWORD = process.env["DB_CONFIG_PASSWORD"];
 export const DB_CONFIG_DATABASE = process.env["DB_CONFIG_DATABASE"];
 export const DB_MAX_POOL_SIZE = process.env["DB_MAX_POOL_SIZE"];
 
-if(USE_LOCAL_MONGODB_SERVER && typeof USE_LOCAL_MONGODB_SERVER === 'boolean' ) {	
+console.log(process.env["USE_LOCAL_MONGODB_SERVER"])
+console.log("**** Testing LOCAL DB ", USE_LOCAL_MONGODB_SERVER, typeof USE_LOCAL_MONGODB_SERVER === 'boolean')
+
+if( typeof USE_LOCAL_MONGODB_SERVER === 'boolean' ) {	
+
+	console.log("**** is booelan" )
 
 	if(!DB_CONFIG_HOST || (DB_CONFIG_HOST && typeof DB_CONFIG_HOST!='string')) {
 		console.error("Local Database: Please specify DB <host> name in your environemntal file (.env or .prod)! ");
@@ -158,7 +192,7 @@ if(USE_LOCAL_MONGODB_SERVER && typeof USE_LOCAL_MONGODB_SERVER === 'boolean' ) {
 /***
  * MLAB Configuration
  */
-export const USE_MLAB_DB_HOST:boolean = Boolean(process.env["USE_MLAB_DB_HOST"]);
+export const USE_MLAB_DB_HOST:boolean = process.env["USE_MLAB_DB_HOST"] == 'true';
 export const MLAB_API_KEY:string = process.env["MLAB_API_KEY"];
 export const MLAB_DATABASE:string = process.env["MLAB_DATABASE"];
 export const MLAB_API_URL:string = process.env["MLAB_API_URL"];
@@ -179,15 +213,67 @@ if(USE_MLAB_DB_HOST) {
 	});
 }
 
+/****
+ * Export Array of DB Hosts: specifies priority of db hosts
+ */
+const _dbPriorities:IDatabasePriority[] = [
+	
+	// local MongoDB instance
+	TDBP_local,
+
+	// Remote MLAB Host
+	TDBP_mlab
+];
+
+// Update DB Hosts Prorioty Array  with application settings
+const dbPriorities:IDatabasePriority[] = _dbPriorities.map( (priority:IDatabasePriority) => {
+	if(priority.type===1) priority.use = USE_LOCAL_MONGODB_SERVER;
+	if(priority.type===2) priority.use = USE_MLAB_DB_HOST;
+	return priority;
+});
+
+/*****
+ * Ensure that we have only one DB Host active
+ */
+const vHosts:IDatabasePriority[] = dbPriorities.filter ( host => host.use === true );
+if(vHosts.length > 1) {
+	console.error(`DB Host Priority: This application can use only a single MongoDB Host. Please check your environemntal file (.env or .prod`);
+	process.exit(1);	
+}
+
+export const DB_HOSTS_PRIORITY = dbPriorities;
+
+/*****
+ * User Resources
+ */
+export const DEFAULT_USER_THUMBNAIL = process.env["DEFAULT_USER_THUMBNAIL"];
+
+// #TODO: extend with file load test
+if(!isString(DEFAULT_USER_THUMBNAIL)) {
+	console.error(`USer Resources: Please add a default user image to your .env or .prod file. Assign the image to DEFAULT_USER_THUMBNAIL setting and store it in your PUBLIC_IMAGES_DIR`);
+	process.exit(1);	
+}
+
+/*******
+ * Person Sub Types
+ */
+export const PERSON_SUBTYPE_USER = process.env["PERSON_SUBTYPE_USER"];
+export const PERSON_SUBTYPE_CLIENT = process.env["PERSON_SUBTYPE_CLIENT"];
+export const PERSON_SUBTYPE_CUSTOMER = process.env["PERSON_SUBTYPE_CUSTOMER"];
+
+export const USE_PERSON_SUBTYPE_USER = process.env["USE_PERSON_SUBTYPE_USER"] == 'true';
+export const USE_PERSON_SUBTYPE_CLIENT = process.env["USE_PERSON_SUBTYPE_CLIENT"] == 'true';
+export const USE_PERSON_SUBTYPE_CUSTOMER = process.env["USE_PERSON_SUBTYPE_CUSTOMER"] == 'true';
+
 
 /***
  * DB Population
  */
-export const GENERATE_SAMPLE_DATA = Boolean(process.env["GENERATE_SAMPLE_DATA"]);
-export const POPULATE_LOCAL_DATASTORE = Boolean(process.env["POPULATE_LOCAL_DATASTORE"]);
-export const POPULATE_LOCAL_DATABASE  = Boolean(process.env["POPULATE_LOCAL_DATABASE"]);
-export const POPULATE_REMOTE_DATABASE  = Boolean(process.env["POPULATE_REMOTE_DATABASE"]);
-export const DB_POPULATE_SAFETY_FIRST = Boolean(process.env["DB_POPULATE_SAFETY_FIRST"]);
+export const GENERATE_SAMPLE_DATA = process.env["GENERATE_SAMPLE_DATA"] == 'true';
+export const POPULATE_LOCAL_DATASTORE = process.env["POPULATE_LOCAL_DATASTORE"] == 'true';
+export const POPULATE_LOCAL_DATABASE  = process.env["POPULATE_LOCAL_DATABASE"] == 'true';
+export const POPULATE_REMOTE_DATABASE  = process.env["POPULATE_REMOTE_DATABASE"] == 'true';
+export const DB_POPULATE_SAFETY_FIRST = process.env["DB_POPULATE_SAFETY_FIRST"] == 'true';
 export const DB_POPULATE_TEST_COLLECTIONS = process.env["DB_POPULATE_TEST_COLLECTIONS"].split(',');
 export const DB_POPULATE_ADMINS =  Number(process.env["DB_POPULATE_ADMINS"]);
 export const DB_POPULATE_POWER_USERS =  Number(process.env["DB_POPULATE_POWER_USERS"]);
@@ -196,10 +282,10 @@ export const DB_POPULATE_USERS =  Number(process.env["DB_POPULATE_USERS"]);
 export const DB_POPULATION_LOCALE = process.env["DB_POPULATION_LOCALE"];
 
 export const DB_CREATE_USERS = process.env["DB_CREATE_USERS"];
-export const DB_USERS_COLLECTION_NAME = process.env["DB_USERS_COLLECTION_NAME"];
+export const DB_USERS_COLLECTION_NAME = process.env["DB_USERS_COLLECTION_NAME"] || "users";
 export const DB_CREATE_CLIENTS = process.env["DB_CREATE_CLIENTS"];
-export const DB_CLIENTS_COLLECTION_NAME = process.env["DB_CLIENTS_COLLECTION_NAME"];
-export const DB_CREATE_CUSTOMERS = process.env["DB_CREATE_CUSTOMERS"];
+export const DB_CLIENTS_COLLECTION_NAME = process.env["DB_CLIENTS_COLLECTION_NAME"] || "clients";
+export const DB_CREATE_CUSTOMERS = process.env["DB_CREATE_CUSTOMERS"] || "customers";
 export const DB_CUSTOMERS_COLLECTION_NAME = process.env["DB_CUSTOMERS_COLLECTION_NAME"];
 export const DB_POPULATE_DEFAULT_CLIENTS= Number(process.env["DB_POPULATE_DEFAULT_CLIENTS"]);
 export const DB_POPULATE_DEFAULT_CUSTOMERS= Number(process.env["DB_POPULATE_DEFAULT_CUSTOMERS"]);
@@ -278,7 +364,7 @@ if(!isEmail(SUPERADMIN_EMAIL)) {
 /***
  * Google Auth
  */
-export const ENABLE_GOOGLE_AUTHENTICATION = Boolean(process.env["ENABLE_GOOGLE_AUTHENTICATION"]);
+export const ENABLE_GOOGLE_AUTHENTICATION = process.env["ENABLE_GOOGLE_AUTHENTICATION"] == 'true';
 export const GOOGLE_AUTH_ID = process.env["GOOGLE_AUTH_ID"];
 export const GOOGLE_AUTH_SECRET = process.env["GOOGLE_AUTH_SECRET"];
 export const GOOGLE_CALLBACK_URL = process.env["GOOGLE_CALLBACK_URL"];
@@ -304,7 +390,7 @@ if(ENABLE_GOOGLE_AUTHENTICATION) {
 /***
  * facebook Authentication
  */
-export const ENABLE_FACEBOOK_AUTHENTICATION = Boolean(process.env["ENABLE_FACEBOOK_AUTHENTICATION"])
+export const ENABLE_FACEBOOK_AUTHENTICATION = process.env["ENABLE_FACEBOOK_AUTHENTICATION"] == 'true';
 export const FACEBOOK_ID =  process.env["FACEBOOK_ID"];
 export const FACEBOOK_SECRET= process.env["FACEBOOK_SECRET"];
 export const FACEBOOK_CALLBACK_URL = process.env["FACEBOOK_CALLBACK_URL"];
@@ -337,12 +423,12 @@ if(!EXPRESS_SERVER_MODE) {
     process.exit(1);
 }
 
-if(EXPRESS_SERVER_MODE==='https') {
+if(EXPRESS_SERVER_MODE=='https') {
 
 	/***
 	 * Test for SSL certificates in development mode
 	 */
-	if(ENVIRONMENT==='dev') {
+	if(ENVIRONMENT=='dev') {
 
 		if(!PATH_TO_DEV_PRIVATE_KEY || !PATH_TO_DEV_CERTIFICATE ) {
 			console.error("SSL configuration: Either Private key or certificate file is missing");

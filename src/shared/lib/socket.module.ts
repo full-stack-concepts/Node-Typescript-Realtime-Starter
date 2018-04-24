@@ -5,7 +5,7 @@ import { Observable } from "rxjs";
  * Each data type gets its own store class, a child from this parent.
  */
 /* eslint no-onused-vars: "off" */
-export class ModuleBase {
+export class SocketModuleBase {
 
 	io:any;	
 

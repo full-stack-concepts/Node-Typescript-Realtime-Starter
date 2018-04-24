@@ -1,8 +1,10 @@
 import fs from "fs-extra";
 import Promise from "bluebird";
 import path from "path";
+import jsonFile from  "jsonfile";
 
-const jsonFile:any = Promise.promisifyAll(require('jsonfile'));
+Promise.promisifyAll(fs);
+Promise.promisifyAll(jsonFile);
 
 import { 
 	IUser, 
@@ -45,14 +47,13 @@ export class DataStore {
 		
 		const $stores:string[]=["1","2","3"];
 		const $dataStore:string = getPathToDataStore();
-		return Promise.all(
-			$stores.map( (store:string) => {			
-				let pathToFile:string = `${path.join($dataStore,store)}\\data.json`;				
-				jsonFile.writeFile( pathToFile, data, {spaces:1}, (err:any) => {															
-					(err)? Promise.reject(err):Promise.resolve();				
-				});	
-			})
-		)
+
+		return Promise.map( $stores, (store:string) => {
+			let pathToFile:string = `${path.join($dataStore,store)}\\data.json`;				
+			jsonFile.writeFile( pathToFile, data, {spaces:1}, (err:any) => {															
+				(err)? Promise.reject(err):Promise.resolve();				
+			});	
+		})
 		.then( () => Promise.resolve() )
 		.catch( (err:any) => {
 			console.error("Local DataStore: generated data could not be saved. ", err );

@@ -16,7 +16,8 @@ export interface IPerson extends Document  {
 		email: string,
 		role: number,
 		identifier: string,
-		archive: boolean
+		archive: boolean,
+		type?:string
 	},
 
 	password:string,
@@ -30,6 +31,15 @@ export interface IPerson extends Document  {
 		isPasswordEncrypted:boolean
 	},
 
+	configuration: {
+		isThumbnailSet?: boolean,	
+		isGooglePlusUser?: boolean,
+		isFacebookUser?:boolean,
+		isAddressSet?:boolean,
+		hasExternalThumbnailUrl?:boolean
+	},
+
+
 	accounts?: {
 		googleID: string,
 		facebookID?: string
@@ -42,9 +52,9 @@ export interface IPerson extends Document  {
 		gender?: number,
 
 		personalia: {
-			firstName: string,
-			insertion: string,
-			lastName:  string
+			givenName: string,
+			middleName: string,
+			familyName:  string
 		},
 
 		address?:IUserAddress,
@@ -61,6 +71,7 @@ export interface IPerson extends Document  {
 
 		images: {	     		     		
      		thumbnail?: string,
+     		externalThumbnailUrl?: string,
      		avatar?: string	
 		},
 
@@ -73,6 +84,8 @@ export interface IPerson extends Document  {
 			stackoverflow?:string,
 		}	
 	},
+
+	profileRaw?:Object,
 
 	devices?: IUserDevice[]
 

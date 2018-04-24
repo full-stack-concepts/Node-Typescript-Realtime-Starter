@@ -21,7 +21,13 @@ import { db } from "./db";
  * EXPRESS APPLICATION CODE
  */
 import App from './App';
-import { getCertificate } from "./util";
+
+import { 
+    getCertificate,
+    publicDirectoryManager,
+    createPrivateDataStore
+} from "./util";
+
 import { testForConfiguration } from './util/bootstrap.util';
 import { 
     ENVIRONMENT,
@@ -33,7 +39,7 @@ import {
     PATH_TO_PROD_CERTIFICATE
 } from './util/secrets';
 
-/**
+/***
  * Test if Environment variables for this development mode dev|prod are loaded
  * if no configuration for this environment was found exit with error message
  */
@@ -130,6 +136,16 @@ function bootStrapper() {
      * Configure Local Database
      */
     db.init();
+
+    /***
+     * Private DataStore
+     */
+    createPrivateDataStore()
+
+    /***
+     * Public static directories
+     */
+    .then( () => publicDirectoryManager() );
 
 }
 

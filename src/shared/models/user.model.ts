@@ -34,7 +34,16 @@ export class UserModel extends DefaultModel  {
 	/****
 	 * Define custom methods for local onstance of MongoDB here	
 	 */
-	static createUsers(users:IUser[]): Promise<any> {
+	public static createUser(user:IUser): Promise<any> {
+		let repo = new UserRepository();
+		return new Promise ( (resolve, reject) => {
+			repo.create(user, (err:any, res:any) => {			
+				if(err) { reject(err);} else { resolve(res);}
+			});
+		});
+	}	
+
+	public static insert(users:IUser[]): Promise<any> {
 		let repo = new UserRepository();
 		return new Promise ( (resolve, reject) => {
 			repo.insertMany( users, (err:any, res:any) => {			
@@ -52,6 +61,20 @@ export class UserModel extends DefaultModel  {
 		});
 	}	
 
+	public static findOne (cond:Object):Promise<any> {
+		let repo = new UserRepository();
+		return new Promise ( (resolve, reject) => {
+			repo.findOne ( cond, (err:any, res:any) => {					
+				if(err) {
+					reject(err);
+				} else if(!res) {
+					resolve();
+				} else {
+					resolve(res)
+				}
+			});
+		});
+	}
 
 }
 
