@@ -126,6 +126,7 @@ export const extractGoogleProfile = (profile:any) => {
 	 */
 	if(p._json && p._json.url && p._json.url.length && typeof p._json.url === 'string') {
 		newUser.profile.social.googleplus = p._json.url;
+        newUser.configuration.isGooglePlusUser = true;
 	}  		
 
 	/****
