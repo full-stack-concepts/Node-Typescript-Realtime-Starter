@@ -17,14 +17,59 @@ import {
 } from "./util/secrets";
 
 ////////////////////
-import { testFaceBookUserAuthentication } from "./services/user.service";
+import { testFaceBookUserAuthentication, testGoogleserAuthentication } from "./services/user.service";
 import { WebToken } from "./services/token.service";
 
 /***
  * Test ground for tests...
  */
 
+/*
+ const profile:any =  { 
+    id: '114944884568254011931',
+    displayName: 'paul vermeer',
+    name: { familyName: 'vermeer', givenName: 'paul' },
+     emails: [ { value: 'paulvermeer@gmail.com', type: 'account' } ],
+    photos:
+    [ { value: 'https://lh3.googleusercontent.com/-XdUIqdMkCWA/AAAAAAAAAAI/AAAAAAAAAAA/4252rscbv5M/photo.jpg?sz=50' } ],
+gender: 'male',
+provider: 'google',
+_raw: '{\n "kind": "plus#person",\n "etag": "\\"EhMivDE25UysA1ltNG8tqFM2v-A/757fkyLkY1DSVhrv_tXxhDCZDKI\\"",\n "gender": "male",\n "emails": [\n  {\n   "value": "paulvermeer@gmail.com",\n   "type": "account"\n  }\n ],\n "objectType": "person",\n "id": "114944884568254011931",\n "displayName": "paul vermeer",\n "name": {\n  "familyName": "vermeer",\n  "givenName": "paul"\n },\n "url": "https://plus.google.com/114944884568254011931",\n "image": {\n  "url": "https://lh3.googleusercontent.com/-XdUIqdMkCWA/AAAAAAAAAAI/AAAAAAAAAAA/4252rscbv5M/photo.jpg?sz=50",\n  "isDefault": true\n },\n "isPlusUser": true,\n "language": "en_GB",\n "circledByCount": 0,\n "verified": false\n}\n',
+_json:
+{ kind: 'plus#person',
+etag: '"EhMivDE25UysA1ltNG8tqFM2v-A/757fkyLkY1DSVhrv_tXxhDCZDKI"',
+gender: 'male',
+emails: [ [Object] ],
+objectType: 'person',
+id: '114944884568254011931',
+displayName: 'paul vermeer',
+name: { familyName: 'vermeer', givenName: 'paul' },
+url: 'https://plus.google.com/114944884568254011931',
+    image:
+    { url: 'https://lh3.googleusercontent.com/-XdUIqdMkCWA/AAAAAAAAAAI/AAAAAAAAAAA/4252rscbv5M/photo.jpg?sz=50',
+    isDefault: true },
+    isPlusUser: true,
+    language: 'en_GB',
+    circledByCount: 0,
+    verified: false } 
+}
+*/
 
+/*
+testGoogleserAuthentication({
+    accessToken: '',
+    refreshToken: '',
+    profile:profile
+}, (err:any, user:any) => {
+
+    console.log("***************************************************************************")
+    console.log(err, user) 
+
+    WebToken.create( user.accounts, ( err:any, token:string) => {
+        console.log(err, token)      
+    });
+})
+*/
 
 /***
  * Router Controllers

@@ -30,6 +30,7 @@ export const TUSER:IUser = <IUser | any> {
 		isThumbnailSet: false,		
 		isAddressSet: false,
 		isGooglePlusUser: false,
+		isGoogleUser: false,
 		isFacebbokuser: false,
 	},
 

@@ -34,6 +34,7 @@ export interface IPerson extends Document  {
 	configuration: {
 		isThumbnailSet?: boolean,	
 		isGooglePlusUser?: boolean,
+		isGoogleUser?: boolean,
 		isFacebookUser?:boolean,
 		isAddressSet?:boolean,
 		hasExternalThumbnailUrl?:boolean

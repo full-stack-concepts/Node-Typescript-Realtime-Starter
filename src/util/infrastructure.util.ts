@@ -189,21 +189,12 @@ export const storeUserImage = ( rawThumbnail:IRawThumbnail, $userName:string)=> 
 	return new Promise( (resolve, reject) => {
 		writeStream.on('finish', () => resolve({stored:true}) );
 		writeStream.on('error', (err:any) => reject({stored:false, err: err}) );
-		writeStream.end( () => resolve({stored:true}) ); 
-	})
-
-	/*
-	writeStream.on('finish', () => { return Promise.resolve({stored:true}); });
-	writeStream.on('error', (err:any) => { 
-		return Promise.reject({stored:false, err: err}); 
-	});
-	*/ 
-	
+		writeStream.end( () => resolve({stored:true}) );
+	});	
 }   	
 
-export const pathToUserThumbnail = ( rawThumbnail:IRawThumbnail, $userName:string):string => {
-	const $pathToUserDir:string = path.join(pathToUsersDirectory(), $userName);
-	return  `${$pathToUserDir}/img/thumb.${rawThumbnail.fileName}`;
+export const pathToUserThumbnail = ( rawThumbnail:IRawThumbnail, userName:string):string => {
+	return `${SITE_URL}${PUBLIC_USER_DIR}/${userName}/img/thumb.${rawThumbnail.fileName}`;
 }
 
 /****

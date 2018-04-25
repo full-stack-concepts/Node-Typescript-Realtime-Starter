@@ -55,8 +55,7 @@ export {
 
 export {
 	grabEmailFromGoogleProfile,
-	createProfileFromGoogleData,
-	formatProfileFromGoogleData
+	extractGoogleProfile	
 } from "./user.google.util";
 
 export {

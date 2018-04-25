@@ -14,8 +14,6 @@ import {
 } from "../util";
 
 export const grabEmailFromFacebookProfile = (fProfile:any):Promise<string | number> => {	
-	console.log("==> Testing for email ")			
-	console.log(fProfile)
 	let email:string = fProfile.emails[0].value;		
 	if(email && isEmail(email) ) {
 		return Promise.resolve(email)

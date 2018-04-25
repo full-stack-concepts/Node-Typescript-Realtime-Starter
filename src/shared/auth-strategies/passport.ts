@@ -54,6 +54,8 @@ passport.use(new GoogleStrategy({
 	proxy:true
 }, (accessToken:any, refreshToken:any, profile:any, done:Function) => {	
 
+		console.log(profile)
+
 		u.authenticateGoogleUser({
 			accessToken: accessToken,
 			refreshToken: refreshToken,
@@ -90,11 +92,7 @@ passport.use( new FacebookStrategy({
   	callbackURL: FACEBOOK_CALLBACK_URL,
   	profileFields: ["name", "email", "link", "locale", "timezone", "picture"],
   	passReqToCallback: true
-}, (req: any, accessToken:any, refreshToken:any, profile:any, done:any) => {
-
-	console.log(" 1111111111111111111111111111111111111111111111111111 ")
-	console.log(profile)
-	console.log(" 1111111111111111111111111111111111111111111111111111 ")
+}, (req: any, accessToken:any, refreshToken:any, profile:any, done:any) => {	
 
 	u.authenticateFacebookUser({
 		accessToken: accessToken,		

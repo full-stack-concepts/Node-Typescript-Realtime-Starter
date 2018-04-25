@@ -34,8 +34,7 @@ import {
 	grabEmailFromFacebookProfile,
 	extractFacebookProfile,
 	grabEmailFromGoogleProfile,
-	createProfileFromGoogleData,
-	formatProfileFromGoogleData
+	extractGoogleProfile	
 } from "../util";
 
 import {
@@ -86,8 +85,7 @@ class UserService {
 	 */
 	private hostsService:any = serviceManager.inject("DBModelService");
 
-	private user:IUser;
-	private newUser:IUser;
+	private user:IUser;	
 	private gmail:string;
 
 	private models:IModelSetting[];
@@ -97,7 +95,6 @@ class UserService {
 	}	
 
 	private configureSubscribers():void {
-
 		this.hostsService.models$.subscribe( (models:IModelSetting[]) => {		
 			this.models = models;
 		});
@@ -112,26 +109,6 @@ class UserService {
 		.then(  (user:IUser) => { return Promise.resolve(user); })
 		.catch( (err:any)    => { return Promise.reject(err); })	
 	}	
-	
-	private ExtractGoogleProfile(profile:any) {
-		
-		// process thick: create user profile
-		return createProfileFromGoogleData(profile)
-
-		// process thick: format profile
-		.then( (newUser:IUser) => formatProfileFromGoogleData(newUser) )
-
-		// process thick: save new user
-		.then( ( newUser:IUser) => {
-			return UserModel.remoteCreateUser( newUser)
-			.then( user => {					
-				// assign new user to user container => #TODO create seperate container for profile
-				this.user = this.newUser;
-				return Promise.resolve();
-			})
-			.catch( err => { return Promise.reject(8010); });	
-		});		
-	}
 
 	private cloneAndRemoveDatabaseID() {			
 
@@ -140,31 +117,56 @@ class UserService {
 		return user;
 	}
 
-	public authenticateGoogleUser(data:IGoogleUser, done:Function) {
+	/*****
+	 * @accessToken: string, Google access token
+	 * @refreshYoken: string, Google refresh token
+	 * @profile: json object, Google suer profile
+	 */
+	public authenticateGoogleUser(accessToken:string, refreshToken:string, profile:any) {
 
-		// process thick: test for email address
-		grabEmailFromGoogleProfile(data)
+		/**** 
+		 * process thick: test for DB Hosts
+		 */
+		this.testForDatabaseHosts();		
 
-		// process thick: test for account
-		.then( () => this.findUserByEmail() )
+		/****
+		 * process thick: grab email from Google profile
+		 * => use this to find sub suer item
+		 */		
+		return grabEmailFromGoogleProfile(profile)
 
-		// process thick: eval user	
-		.then( (user:IUser|IClient|ICustomer|any) => {						
-			if(!user) {
-				return this.ExtractGoogleProfile( data.profile);
-			} else {
-				return this.user = user;			
-			}
-		})		
+		/****
+		 * process thick: test for account type 
+		 * => as we have defined multiple person types
+		 * ( by default person, user, client, customer)
+		 * we want to identify the account type and grab the user
+		 */// process thick: test for account
+		.then( ( email:string ) => this.testForAccountType( email) ) 
 
-		// prcoess thick: clone user for serialization and remove db ID
-		.then( () => this.cloneAndRemoveDatabaseID() )
 
-		// process thick: return to passport
-		.then( (user:any) => { return done(null, user); })		
+		// process thick: create new user or return 
+		.then( (person:IUser|IClient|ICustomer|undefined) => {		
+			console.log(person);
+			if(!person) {		
+				console.log("==> Create new Goolge User")					
+				// process thick: build user object
+				return extractGoogleProfile(profile)
+				// process thick: build user object
+				.then( (user:IUser) => this.newUser(user) );  
+			} else {			
+				console.log("==> Validate Existing Google user")
+				return this.validateUser( person );		  	
+			}			
+		})
 
-		// catch errors
-		.catch( (err:any) => { return done(err); });		
+		// process thick: return to caller so webtoken can be created
+		.then( ( user:IUser|IClient|ICustomer) => {		 	
+			return Promise.resolve(user); 
+		})	
+
+		.catch( (err:any) => {
+			Promise.reject(err);
+		});	
 	}
 
 	/*****
@@ -249,8 +251,16 @@ class UserService {
 
 		let err:any;
 		let url:string = user.profile.images.externalThumbnailUrl;
-		url="https://scontent-ams3-1.xx.fbcdn.net/v/t1.0-1/c12.12.155.155/1505426_10202353096223045_1977986292_n.jpg?_nc_cat=0&oh=85bb9b8bd69a699896427f544308c96b&oe=5B4FFB9A";
+		// url="https://scontent-ams3-1.xx.fbcdn.net/v/t1.0-1/c12.12.155.155/1505426_10202353096223045_1977986292_n.jpg?_nc_cat=0&oh=85bb9b8bd69a699896427f544308c96b&oe=5B4FFB9A";
 		console.log(url)
+
+		/****
+		 * If provider profile has no imageURL we assign default user image
+		 */
+		if(!url || (url && typeof(url) != 'string')) {
+			let rawThumbnail:IRawThumbnail = this.getDefaultThumbnail();    				
+    		return Promise.resolve(rawThumbnail);  
+		}
 
 		let rawThumbnail:IRawThumbnail = deepCloneObject(TI_RAW_THUMBNAIL);
 
@@ -332,7 +342,7 @@ class UserService {
 	 * (3) Insert new user
 	 * (4) Store Thumbnail
 	 */
-	private newFacebookUser( user:IUser):Promise<any> { 	
+	private newUser( user:IUser):Promise<any> { 	
  
 		// process thick: execute tasks (1, 2)					  
 		return Promise.join<any>(
@@ -340,7 +350,7 @@ class UserService {
 			createUserDirectory (user.core.userName),		
 		).spread( (thumbnail:IRawThumbnail, userDirectory:any) => {		
 
-			console.log( "New FB User: ", thumbnail, userDirectory )
+			console.log( "New User: ", thumbnail, userDirectory )
 
 			// ** Error: User Directories could not be created
 			if(!userDirectory.dirCreated) {
@@ -360,8 +370,8 @@ class UserService {
 				user.configuration.isThumbnailSet = true;
 
 				return Promise.resolve({ 
-					user:user , 
-					thumbnail:thumbnail 
+					user:user, 
+					thumbnail:thumbnail
 				});
 			}				
 
@@ -384,7 +394,10 @@ class UserService {
 
 		// process thick: return to caller
 		.then ( (user:IUser) => Promise.resolve(user) )	
-		.catch( (err:any) => Promise.reject(err) );		 
+		.catch( (err:any) => {
+			console.log(err)
+			Promise.reject(err) 
+		});		 
 	}
 	
 	public authenticateFacebookUser(token:string, fProfile:any, done:Function) {
@@ -414,7 +427,7 @@ class UserService {
 				// process thick: build user object
 				return extractFacebookProfile(fProfile)
 				// process thick: build user object
-				.then( (user:IUser) => this.newFacebookUser(user) );  
+				.then( (user:IUser) => this.newUser(user) );  
 			} else {			
 				return this.validateUser( person );		 	
 			}
@@ -423,15 +436,21 @@ class UserService {
 		// process thick: return to caller so webtoken can be created
 		.then( ( user:IUser|IClient|ICustomer) => {		 	
 			return Promise.resolve(user); 
-		})		
+		})
+
+		.catch( (err:any) => {
+			Promise.reject(err);
+		});	
 	}
 }
 
-export const u:any = {	
+export const u:any = { 	
 
-	authenticateGoogleUser(data:IGoogleUser, done:Function) {	
+	authenticateGoogleUser({accessToken, refreshToken, profile }:IGoogleUser, done:Function) {	
 		let instance:any = new UserService();
-		instance.authenticateGoogleUser( data, (err:any, user:any) => { return done(err, user); });	
+		instance.authenticateGoogleUser( accessToken, refreshToken, profile)  		
+			.then( (user:IUser|IClient|ICustomer) => { return done(null, user);	})
+			.catch( (err:any) => { return done(err); });		
 	},
 
 	authenticateFacebookUser(settings:any, done:Function) {
@@ -450,6 +469,16 @@ export const testFaceBookUserAuthentication = (token:string, fbUserProfile:any, 
 		.then( (user:IUser|IClient|ICustomer) => { return done(null, user);	})
 		.catch( (err:any) => { return done(err); });
 }
+
+export const testGoogleserAuthentication = ({accessToken, refreshToken, profile }:any, done:Function) => {
+
+	let instance:any = new UserService();
+	instance.authenticateGoogleUser( accessToken, refreshToken, profile)  		
+		.then( (user:IUser|IClient|ICustomer) => { return done(null, user);	})
+		.catch( (err:any) => { return done(err); });		
+}
+
+
 
 
 

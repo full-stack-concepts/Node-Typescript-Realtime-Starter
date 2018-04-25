@@ -32,6 +32,7 @@ export const userPrototype = {
 	},
 
 	configuration: {	
+		isGoogleUser: { type: Boolean, required: false, default: false},
 		isGooglePlusUser: { type: Boolean, required: false, default: false},
 		isThumbnailSet: { type: Boolean, required: true, default: false},
 		isAddressSet: { type: Boolean, required: false, default: false }									
