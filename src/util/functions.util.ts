@@ -10,6 +10,11 @@ export const deepCloneObject = (obj:any):any => {
 	return JSON.parse(JSON.stringify(obj));	
 }
 
+export const cloneArray= (arr:any):Array<any> => {	
+	if(!arr || (arr && !Array.isArray(arr))) return [];	
+	return arr.slice(0) || [];
+}
+
 export const capitalizeString = (str:string):string => {
 	return str.charAt(0).toUpperCase() + str.slice(1);
 }

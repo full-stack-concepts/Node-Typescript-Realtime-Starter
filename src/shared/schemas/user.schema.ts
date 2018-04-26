@@ -1,7 +1,8 @@
 import mongoose from "mongoose";
 import { Schema } from "mongoose";
-import { IUser} from "../interfaces";
+import { IUser, ILoginTracker } from "../interfaces";
 import { deepCloneObject} from "../../util";
+
 
 /******
  * Default User Object, used to prototype
@@ -21,6 +22,8 @@ export const userPrototype = {
 	},
 
 	password:  { type: String, required: false },
+
+	logins: { type: Array, required: false }, 
 
 	security: {
 		latestLogOn: { type:Date, required: false },

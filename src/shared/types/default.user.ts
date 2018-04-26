@@ -16,6 +16,8 @@ export const TUSER:IUser = <IUser | any> {
 
 	password:null,
 
+	logins:[],
+
 	accounts: {
 		googleID: null
 	},

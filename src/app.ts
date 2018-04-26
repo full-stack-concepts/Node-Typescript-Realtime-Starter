@@ -19,12 +19,29 @@ import {
 ////////////////////
 import { testFaceBookUserAuthentication, testGoogleserAuthentication } from "./services/user.service";
 import { WebToken } from "./services/token.service";
+import moment from "moment-timezone";
+
+import {
+    TIME_ZONE,
+    TIME_FORMAT,
+    DATE_FORMAT
+} from "./util/secrets";
 
 /***
  * Test ground for tests...
  */
+    let ts:number = Math.round(+new Date());
+    let date:Date = new Date(ts);
 
- 
+   const login:any = {
+        timestamp: ts,
+        date: moment(date).tz( TIME_ZONE ).toString(),
+        formattedDate:  moment(date).tz( TIME_ZONE ).format( DATE_FORMAT ),
+        formattedTime: moment(date).tz( TIME_ZONE ).format( TIME_FORMAT ),
+    } 
+
+    console.log(login)
+
 /***
  * Router Controllers
  */

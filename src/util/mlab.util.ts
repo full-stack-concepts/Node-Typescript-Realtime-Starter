@@ -24,9 +24,16 @@ export class RemoteQueryBuilder {
 	}
 
 	/****
-	 * Returns url string for MLAB PPOST or PUT request
+	 * Update Single Document
 	 */
+	 static updateSingleDocument(collection:string, documentID:string ):string {
+	 	return `${MLAB_API_URL}${MLAB_DATABASE}/collections/${collection}/${documentID}?apiKey=${MLAB_API_KEY}`;
+	 }
 
+	/****
+	 * Returns url string for MLAB PPOST or PUT request
+	 * Update Multiple Documents
+	 */
 	static update({
 
 		/***
@@ -205,6 +212,8 @@ export class RemoteQueryBuilder {
 
 		return url;
 	}
+
+
 	
 
 	static findOneRemoteURL(collection:string, query:any):string { 

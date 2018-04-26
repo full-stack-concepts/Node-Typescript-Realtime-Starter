@@ -2,14 +2,15 @@ import { Document } from "mongoose";
 
 import { 
 	IUserAddress,
-	IUserDevice
+	IUserDevice,
+	ILoginTracker
 } from "../interfaces";
 
 export interface IPerson extends Document  {
 
 	// unique identifier method
 	person?:Function,
-
+	
 	core: {
 		userName: string,
 		url: string,
@@ -21,6 +22,8 @@ export interface IPerson extends Document  {
 	},
 
 	password:string,
+
+	logins: ILoginTracker[],
 
 	security: {
 		latestLogOn?: Date,

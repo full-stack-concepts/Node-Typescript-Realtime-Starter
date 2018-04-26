@@ -1,5 +1,6 @@
 export {
 	deepCloneObject,
+	cloneArray,
 	capitalizeString,
 	objectKeysLength,
 	stringify,
@@ -30,7 +31,9 @@ export {
 	constructProfileFullName,
 	constructProfileSortName,
 	validateInfrastructure, 
-	validateUserIntegrity
+	validateUserIntegrity,
+	updateUserForAuthenticationProvider,
+	authenticationTracker
 } from "./user.util";
 
 export {

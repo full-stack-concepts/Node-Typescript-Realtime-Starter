@@ -15,13 +15,25 @@ export class DefaultModel {
 	//** MLAB: Create user 
 	public static remoteCreateUser(_data:any) {		
 		return new Promise( (resolve, reject) => {			 
-			if( _data && objectKeysLength (_data) === 0 ) reject(' Invalid Profile');					
+			if( _data && objectKeysLength (_data) === 0 ) reject(' Invalid Data');					
 			let data = stringify(_data);			
 			let rURL = RemoteQueryBuilder.buildCollectionURL('users');			
 			fetch(rURL, { method: 'POST', body: data, headers:headers })
 			.then( (res:any) =>res.json())
 			.then( (response:any) => { resolve(response); })
 			.catch( err => reject(err) );			
+		});
+	}
+
+	//** MLAB: Update entire User object
+	public static remoteUpdateEntireUserObject( collection:string, id:string, data:any) {
+		return new Promise( (resolve, reject) => {
+			if( data && objectKeysLength (data) === 0 ) reject(' Invalid Data');			
+			let rURL = RemoteQueryBuilder.updateSingleDocument(collection, id );	
+			fetch(rURL, { method: 'PUT', body: JSON.stringify(data), headers:headers })	
+			.then( (res:any) =>res.json())
+			.then( (response:any) => { resolve(response); })
+			.catch( err => reject(err) );
 		});
 	}
 

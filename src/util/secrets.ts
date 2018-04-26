@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 import fs from "fs";
+import moment from "moment-timezone";
 
 /****
  * Import interfaces and types for database host priorities array
@@ -51,6 +52,26 @@ export const SITE_NAME = process.env["SITE_URL"];
  * DEFAULT SITE URL
  */
 export const SITE_URL = `${EXPRESS_SERVER_MODE}://${SITE_NAME}:${PORT}/`;
+
+/**
+ * Timezone
+ */
+export const TIME_ZONE = String(process.env["TIME_ZONE"]);
+
+/**
+ * Date Format
+ */
+export const DATE_FORMAT = String(process.env["DATE_FORMAT"]);
+
+/**
+ * Time format
+ */
+export const TIME_FORMAT = String(process.env["TIME_FORMAT"]);
+
+if(!moment.tz.zone (TIME_ZONE) ) {
+	console.error("TIME ZONE: Your timezone does not exist. Please consult moment-timezone documentation, then update your environmental files");
+	process.exit(1);
+}
 
 /***
  * Public Directory Management

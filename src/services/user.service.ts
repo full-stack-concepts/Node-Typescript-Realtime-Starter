@@ -13,7 +13,7 @@ Promise.promisifyAll(fileType);
 const uuidv1 = require("uuid/v1");
 
 import { 
-	IUser, IClient, ICustomer, IGoogleUser, IDatabasePriority, IRawThumbnail
+	IUser, IClient, ICustomer, IGoogleUser, IDatabasePriority, IRawThumbnail, ILoginTracker
 } from "../shared/interfaces";
 
 import { 
@@ -25,16 +25,21 @@ import {
 } from "../shared/models";
 
 import { 
-	deepCloneObject, capitalizeString, createUserSubDirectories, constructUserCredentials,
+	deepCloneObject, cloneArray, capitalizeString, createUserSubDirectories, constructUserCredentials,
 	constructProfileFullName,constructProfileSortName, createUserDirectory, isEmail, isURL,
 	pathToDefaultUserThumbnail, pathToUserThumbnail, storeUserImage, validateInfrastructure, validateUserIntegrity
 } from "../util";
 
+/*****
+ * Provider functions
+ */
 import {
 	grabEmailFromFacebookProfile,
 	extractFacebookProfile,
 	grabEmailFromGoogleProfile,
-	extractGoogleProfile	
+	extractGoogleProfile,
+	updateUserForAuthenticationProvider	,
+	authenticationTracker
 } from "../util";
 
 import {
@@ -110,9 +115,9 @@ class UserService {
 		.catch( (err:any)    => { return Promise.reject(err); })	
 	}	
 
-	private cloneAndRemoveDatabaseID() {			
+	private cloneAndRemoveDatabaseID(_user:IUser|IClient|ICustomer) {			
 
-		let user:IUser = deepCloneObject(this.user);
+		let user:IUser|IClient|ICustomer = deepCloneObject(_user);
 		if(user && user["_id"] ) delete user._id;		
 		return user;
 	}
@@ -146,16 +151,14 @@ class UserService {
 
 		// process thick: create new user or return 
 		.then( (person:IUser|IClient|ICustomer|undefined) => {		
-			console.log(person);
-			if(!person) {		
-				console.log("==> Create new Goolge User")					
+		
+			if(!person) {					
 				// process thick: build user object
 				return extractGoogleProfile(profile)
 				// process thick: build user object
 				.then( (user:IUser) => this.newUser(user) );  
-			} else {			
-				console.log("==> Validate Existing Google user")
-				return this.validateUser( person );		  	
+			} else {							
+				return this.validateUser( profile, person );		  	
 			}			
 		})
 
@@ -236,8 +239,7 @@ class UserService {
 		.then( (person:IUser|IClient|ICustomer) => Promise.resolve(person))		
 
 		// error handler
-		.catch( (err:any) => {
-			console.log(err) 
+		.catch( (err:any) => {		
 			return Promise.reject(err);
 		});		
 	}	
@@ -250,9 +252,7 @@ class UserService {
 	private fetchUserImage( user:IUser | IClient | ICustomer ) {
 
 		let err:any;
-		let url:string = user.profile.images.externalThumbnailUrl;
-		// url="https://scontent-ams3-1.xx.fbcdn.net/v/t1.0-1/c12.12.155.155/1505426_10202353096223045_1977986292_n.jpg?_nc_cat=0&oh=85bb9b8bd69a699896427f544308c96b&oe=5B4FFB9A";
-		console.log(url)
+		let url:string = user.profile.images.externalThumbnailUrl;		
 
 		/****
 		 * If provider profile has no imageURL we assign default user image
@@ -318,39 +318,101 @@ class UserService {
 		}			
 	}
 
+	private updateUser (user:any) {
+
+		/*****
+		 * Update on local mongoDB instance
+		 */
+		if(this.hostType === 1) {	
+			return new Promise ( (resolve, reject) => {
+				user.save( (err:any) => {					
+					if(err) { reject(err); } else { resolve(user); }
+				});
+			});		
+		}
+
+		/*****
+		 * Update on MLAB
+		 * TODO: test this feature
+		 */
+		if(this.hostType===2) {
+			let userID:string = user._id;
+			let _user:any = this.cloneAndRemoveDatabaseID( user);
+			return UserModel.remoteUpdateEntireUserObject( 'users', user._id, _user)
+			.then( res => Promise.resolve(user))
+			.catch( err => Promise.reject(err));
+		}
+	}
+
 	/****
 	 * Tasks
 	 * (1) Validate user directories and resources
 	 * (2) Valdiate user profile for missing actions
-	 * // TODO write tasks (1), (2)
+	 * (3) Create authentication time object
+	 * (4) Add auth time to user object
+	 * (5) update user for different Authentication Provider if necessary
+	 * // TODO extend tasks (1), (2)
 	 */
-	private validateUser( user:IUser|IClient|ICustomer) {	
+	private validateUser( profile:any, user:IUser|IClient|ICustomer) {	
 
+		// process thick: tasks (1) (2) (3)
 		return Promise.join<any>(
 			validateInfrastructure(user),
-			validateUserIntegrity(user)
+			validateUserIntegrity(user),
+			authenticationTracker()	
 		)
-		.spread( (infatructure:boolean, integrity:boolean) => {
+
+		// process thick: task (4)
+		.spread( (infatructure:boolean, integrity:boolean, login:ILoginTracker) => {	
+					
+			// TODO: put this in new function
+			let logins:ILoginTracker[];
+			if( user.logins && Array.isArray(user.logins)) {				
+				logins = cloneArray(user.logins);		
+			} else {
+				logins = [];
+			}							
+			logins.push(login);
+			user.logins=logins;		
 			return Promise.resolve(user);
 		})		
-		.catch( (err:any) => Promise.reject(err))
+
+		
+		// process thick: update user for Authentication Provider
+		.then( (user:IUser|IClient|ICustomer) => updateUserForAuthenticationProvider(profile, user) )	
+
+		.then( ( user:IUser|IClient|ICustomer) => {
+
+			return this.updateUser(user) 
+		})
+		
+		// process thick: return to caller so webtoken can be created
+		.then( ( user:IUser|IClient|ICustomer|any) => {					
+			return Promise.resolve(user); 
+		})
+
+		.catch( (err:any) => {		
+			Promise.reject(err);
+		});	
 	}
+
+
 
 	/*****	
 	 * (1) Fetch user thumbnail
 	 * (2) Create public infrastructure for this user
-	 * (3) Insert new user
-	 * (4) Store Thumbnail
+	 * (3) Create authentication time object
+	 * (4) Insert new user
+	 * (5) Store Thumbnail
 	 */
 	private newUser( user:IUser):Promise<any> { 	
  
 		// process thick: execute tasks (1, 2)					  
 		return Promise.join<any>(
 			this.fetchUserImage( user),
-			createUserDirectory (user.core.userName),		
-		).spread( (thumbnail:IRawThumbnail, userDirectory:any) => {		
-
-			console.log( "New User: ", thumbnail, userDirectory )
+			createUserDirectory (user.core.userName),	
+			authenticationTracker()		
+		).spread( (thumbnail:IRawThumbnail, userDirectory:any, login:ILoginTracker) => {				
 
 			// ** Error: User Directories could not be created
 			if(!userDirectory.dirCreated) {
@@ -368,6 +430,15 @@ class UserService {
  
 				// update user configuration
 				user.configuration.isThumbnailSet = true;
+
+				let logins:ILoginTracker[];
+				if(user.hasOwnProperty('logins') && user.logins && Array.isArray(user.logins)) {
+					logins = cloneArray(user.logins);
+				} else {
+					logins = [];
+				}							
+				logins.push(login);
+				user.logins=logins;		
 
 				return Promise.resolve({ 
 					user:user, 
@@ -394,8 +465,7 @@ class UserService {
 
 		// process thick: return to caller
 		.then ( (user:IUser) => Promise.resolve(user) )	
-		.catch( (err:any) => {
-			console.log(err)
+		.catch( (err:any) => {		
 			Promise.reject(err) 
 		});		 
 	}
@@ -429,16 +499,16 @@ class UserService {
 				// process thick: build user object
 				.then( (user:IUser) => this.newUser(user) );  
 			} else {			
-				return this.validateUser( person );		 	
+				return this.validateUser( fProfile, person );		 	
 			}
 		})
 
 		// process thick: return to caller so webtoken can be created
-		.then( ( user:IUser|IClient|ICustomer) => {		 	
+		.then( ( user:IUser|IClient|ICustomer|any) => {		 				
 			return Promise.resolve(user); 
 		})
 
-		.catch( (err:any) => {
+		.catch( (err:any) => {		
 			Promise.reject(err);
 		});	
 	}
@@ -457,7 +527,8 @@ export const u:any = {
 	
 		let instance:any = new UserService();
 		instance.authenticateFacebookUser( settings.accessToken, settings.profile)  
-			.then( (user:IUser|IClient|ICustomer) => { return done(null, user);	})
+			.then( (user:IUser|IClient|ICustomer) => { 				
+				return done(null, user);	})
 			.catch( (err:any) => { return done(err); });
 	}
 }
