@@ -4,10 +4,11 @@ import moment from "moment-timezone";
 import { 
     TIME_ZONE, 
     DATE_FORMAT,
-    TIME_FORMAT
+    TIME_FORMAT,
+    MAX_LENGTH_USER_LOGINS_EVENTS
 } from "./secrets";
 
-import { deepCloneObject} from "../util";
+import { deepCloneObject, cloneArray } from "../util";
 import { IUser, IClient, ICustomer, ILoginTracker } from "../shared/interfaces";
 
 interface IName  {
@@ -66,7 +67,19 @@ export const validateInfrastructure = (user:IUser|IClient|ICustomer):Promise<boo
     return Promise.resolve(true);
 }
 
+/****
+ * 
+ */
 export const validateUserIntegrity = (user:IUser|IClient|ICustomer):Promise<boolean> =>  {
+
+    // TODO: writer Promise.join and add test for devices
+    let l:number = user.logins.length;
+    if(user.logins && l > MAX_LENGTH_USER_LOGINS_EVENTS ) {        
+        let toSlice:number = (l - MAX_LENGTH_USER_LOGINS_EVENTS);
+        let arr:any = cloneArray(user.logins);
+        arr.slice(0, toSlice);
+    }
+
     return Promise.resolve(true);
 }
 

@@ -268,10 +268,16 @@ export const DB_HOSTS_PRIORITY = dbPriorities;
  * User Resources
  */
 export const DEFAULT_USER_THUMBNAIL = process.env["DEFAULT_USER_THUMBNAIL"];
+export const MAX_LENGTH_USER_LOGINS_EVENTS = Number(process.env["MAX_LENGTH_USER_LOGINS_EVENTS"]);
 
 // #TODO: extend with file load test
 if(!isString(DEFAULT_USER_THUMBNAIL)) {
 	console.error(`USer Resources: Please add a default user image to your .env or .prod file. Assign the image to DEFAULT_USER_THUMBNAIL setting and store it in your PUBLIC_IMAGES_DIR`);
+	process.exit(1);	
+}
+
+if(!Number.isInteger(MAX_LENGTH_USER_LOGINS_EVENTS)) {
+	console.error(`USer Resources: Please set MAX_LENGTH_USER_LOGINS_EVENTS as an integer`);
 	process.exit(1);	
 }
 

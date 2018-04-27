@@ -432,7 +432,7 @@ class UserService {
 				user.configuration.isThumbnailSet = true;
 
 				let logins:ILoginTracker[];
-				if(user.hasOwnProperty('logins') && user.logins && Array.isArray(user.logins)) {
+				if( user.logins && Array.isArray(user.logins)) {
 					logins = cloneArray(user.logins);
 				} else {
 					logins = [];
