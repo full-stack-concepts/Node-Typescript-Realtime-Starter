@@ -265,20 +265,40 @@ if(vHosts.length > 1) {
 export const DB_HOSTS_PRIORITY = dbPriorities;
 
 /*****
- * User Resources
+ * User (profile) Resources
  */
 export const DEFAULT_USER_THUMBNAIL = process.env["DEFAULT_USER_THUMBNAIL"];
 export const MAX_LENGTH_USER_LOGINS_EVENTS = Number(process.env["MAX_LENGTH_USER_LOGINS_EVENTS"]);
+export const MAX_LENGTH_USER_DEVICES_ARRAY = Number(process.env["MAX_LENGTH_USER_DEVICES_ARRAY"]);
+export const USE_DEFAULT_USER_PASSWORD = process.env["USE_DEFAULT_USER_PASSWORD"] == 'true';
+export const DEFAULT_PASSWORD_SYSTEM_USER = process.env["DEFAULT_PASSWORD_SYSTEM_USER"] || "";
+export const DEFAULT_PASSWORD_USER =  process.env["DEFAULT_PASSWORD_USER"] || "";
+
 
 // #TODO: extend with file load test
-if(!isString(DEFAULT_USER_THUMBNAIL)) {
-	console.error(`USer Resources: Please add a default user image to your .env or .prod file. Assign the image to DEFAULT_USER_THUMBNAIL setting and store it in your PUBLIC_IMAGES_DIR`);
+if( !isString(DEFAULT_USER_THUMBNAIL)) {
+	console.error(`User Resources: Please add a default user image to your .env or .prod file. Assign the image to DEFAULT_USER_THUMBNAIL setting and store it in your PUBLIC_IMAGES_DIR`);
 	process.exit(1);	
 }
 
-if(!Number.isInteger(MAX_LENGTH_USER_LOGINS_EVENTS)) {
-	console.error(`USer Resources: Please set MAX_LENGTH_USER_LOGINS_EVENTS as an integer`);
+if( !Number.isInteger(MAX_LENGTH_USER_LOGINS_EVENTS)) {
+	console.error(`User Resources: Please set MAX_LENGTH_USER_LOGINS_EVENTS as an integer with a minimum value of 1`);
 	process.exit(1);	
+}
+
+if( !Number.isInteger(MAX_LENGTH_USER_DEVICES_ARRAY)) {
+	console.error(`User Resources: Please set MAX_LENGTH_USER_DEVICES_ARRAY as an integer with a minimum value of 1`);
+	process.exit(1);
+}
+
+if( typeof(USE_DEFAULT_USER_PASSWORD) != 'boolean') {
+	console.error(`User Resources: Please set boolean value for USE_DEFAULT_USER_PASSWORD param/`);
+	process.exit(1);
+}
+
+if( !isString(DEFAULT_PASSWORD_SYSTEM_USER) || !isString(DEFAULT_PASSWORD_USER)) {
+	console.error(`User Resources: Please set passwords for automated user generation`);
+	process.exit(1);
 }
 
 /*******

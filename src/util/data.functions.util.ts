@@ -1,6 +1,12 @@
 import faker from "faker";
 import { capitalizeString } from "../util";
 
+import { 
+	USE_DEFAULT_USER_PASSWORD,
+	DEFAULT_PASSWORD_USER 
+} from "./secrets";
+
+
 /****
  * Data Generate functions : Person
  */
@@ -202,7 +208,11 @@ export const createIdentifier = ():string => {
 }
 
 export const generatePassword = ():string => {
-	return faker.internet.password();
+	if(USE_DEFAULT_USER_PASSWORD) {
+		return DEFAULT_PASSWORD_USER;
+	} else {
+		return faker.internet.password();
+	}
 }
 
 export const protocol = ():string => {
