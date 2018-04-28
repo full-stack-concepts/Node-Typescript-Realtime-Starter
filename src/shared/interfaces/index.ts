@@ -12,6 +12,7 @@ export { ILoginTracker } from "./login.tracker.interface";
  * IPerson interfaces
  */
 export { IPerson } from "./person.interface";
+export { ISystemUser } from "./systemuser.interface";
 export { IUser } from "./user.interface";
 export { IClient} from "./client.interface";
 export { ICustomer} from "./customer.interface";
