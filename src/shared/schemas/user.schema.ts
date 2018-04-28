@@ -21,7 +21,12 @@ export const userPrototype = {
 		archived: { type: Boolean, required:true, default: false}
 	},
 
-	password:  { type: String, required: false },
+	password:  { 
+		type: String, 
+		required: false, 
+		match: /(?=.*[a-zA-Z])(?=.*[0-9]+).*/,
+		minlength:12
+	},
 
 	logins: { type: Array, required: false }, 
 

@@ -33,7 +33,9 @@ export {
 	validateInfrastructure, 
 	validateUserIntegrity,
 	updateUserForAuthenticationProvider,
-	authenticationTracker
+	authenticationTracker,
+	encryptPassword,
+	comparePassword
 } from "./user.util";
 
 export {

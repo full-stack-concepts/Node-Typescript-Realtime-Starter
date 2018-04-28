@@ -273,7 +273,7 @@ export const MAX_LENGTH_USER_DEVICES_ARRAY = Number(process.env["MAX_LENGTH_USER
 export const USE_DEFAULT_USER_PASSWORD = process.env["USE_DEFAULT_USER_PASSWORD"] == 'true';
 export const DEFAULT_PASSWORD_SYSTEM_USER = process.env["DEFAULT_PASSWORD_SYSTEM_USER"] || "";
 export const DEFAULT_PASSWORD_USER =  process.env["DEFAULT_PASSWORD_USER"] || "";
-
+export const USER_PASSWORD_SALT_ROUNDS = Number(process.env["USER_PASSWORD_SALT_ROUNDS"]);
 
 // #TODO: extend with file load test
 if( !isString(DEFAULT_USER_THUMBNAIL)) {

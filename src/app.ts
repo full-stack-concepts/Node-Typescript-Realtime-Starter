@@ -20,6 +20,16 @@ import {
 import { testFaceBookUserAuthentication, testGoogleserAuthentication } from "./services/user.service";
 import { WebToken } from "./services/token.service";
 import moment from "moment-timezone";
+import {encryptPassword, comparePassword } from "./util";
+
+let pw:string="12345678";
+let hash:string="$2b$16$9n.Xbsr41tc/AiymYmzX0.HDz11MQ6lVKrap3074bz84XNIdyStT2";
+
+encryptPassword(pw)
+.then( (hash:string) => console.log(hash));
+
+comparePassword(pw, hash)
+.then( (valid:boolean) => console.log(valid));
 
 import {
     TIME_ZONE,

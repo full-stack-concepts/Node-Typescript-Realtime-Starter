@@ -1,11 +1,15 @@
 import randomNumber from "random-number";
 import moment from "moment-timezone";
+import Promise from "bluebird";
+
+const bcrypt = Promise.promisifyAll(require("bcrypt"));
 
 import { 
     TIME_ZONE, 
     DATE_FORMAT,
     TIME_FORMAT,
-    MAX_LENGTH_USER_LOGINS_EVENTS
+    MAX_LENGTH_USER_LOGINS_EVENTS,
+    USER_PASSWORD_SALT_ROUNDS
 } from "./secrets";
 
 import { deepCloneObject, cloneArray } from "../util";
@@ -17,11 +21,26 @@ interface IName  {
     familyName:string
 }
 
+export const encryptPassword = ( password:string):Promise<string> => {
+
+    return bcrypt.genSalt(USER_PASSWORD_SALT_ROUNDS)
+    .then( (salt:string) => bcrypt.hash( password, salt ))
+    .then( (hash:string) => Promise.resolve( hash ))
+    .catch( (err:any) => Promise.reject( err ));    
+}
+
+export const comparePassword = ( password:string, hash:string):Promise<boolean> => {
+
+    return bcrypt.compare(password, hash)
+    .then( (valid:boolean) => Promise.resolve(valid))
+    .catch( (err:any) => Promise.reject( err));
+}
+
 /*****
  * Configure any date to start at 00:00 
  */
 export const configureDate = (date:Date):string=> {
-    let TZ = this.siteConfiguration.TIME_ZONE_AMS;              
+    let TZ = TIME_ZONE;              
        return moment
                 .tz(date, TZ )
                 .startOf('day')
