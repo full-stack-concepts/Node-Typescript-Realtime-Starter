@@ -10,17 +10,17 @@ import passport from "passport";
 // import passport for authentication support
 require("./shared/auth-strategies/passport");
 
+//////////////////// Testground inmports
 import {
     PUBLIC_ROOT_DIR,
     PRIVATE_DATA_DIR,
     CREATE_DATASTORE
 } from "./util/secrets";
 
-////////////////////
 import { testFaceBookUserAuthentication, testGoogleserAuthentication } from "./services/user.service";
 import { WebToken } from "./services/token.service";
 import moment from "moment-timezone";
-import {encryptPassword, comparePassword } from "./util";
+import {encryptPassword, comparePassword, generatePassword, FormValidation } from "./util";
 
 let pw:string="12345678";
 let hash:string="$2b$16$9n.Xbsr41tc/AiymYmzX0.HDz11MQ6lVKrap3074bz84XNIdyStT2";
@@ -40,17 +40,14 @@ import {
 /***
  * Test ground for tests...
  */
-    let ts:number = Math.round(+new Date());
-    let date:Date = new Date(ts);
+console.log("==> generate Password")
+let pw1:string = generatePassword();
+console.log(pw1)
 
-   const login:any = {
-        timestamp: ts,
-        date: moment(date).tz( TIME_ZONE ).toString(),
-        formattedDate:  moment(date).tz( TIME_ZONE ).format( DATE_FORMAT ),
-        formattedTime: moment(date).tz( TIME_ZONE ).format( TIME_FORMAT ),
-    } 
+let pw3:string = "Aaaaaa222@@@@@@@@@@";
+console.log("*** Is Password 2 valid? ", FormValidation.testPassword(pw3))
 
-    console.log(login)
+//////////////////// End test ground
 
 /***
  * Router Controllers
@@ -62,16 +59,6 @@ import { shouldCompress } from './util/middleware.util';
 import {u} from "./services/user.service";
 
 import { publicDirectoryManager, createPrivateDataStore } from "./util";
-
-/*
-createPrivateDataStore()
-.then( () => publicDirectoryManager() );
-
-import { populateDatabase} from "./services/data.service";
-populateDatabase();
-
-*/
-
 
 class App {
 
@@ -133,8 +120,11 @@ class App {
         /**
          * Public Directories
          */
-        this.express.use(express.static ( PUBLIC_ROOT_DIR ) );       
+        this.express.use(express.static ( PUBLIC_ROOT_DIR ) );   
 
+         /**
+         * Private Directories
+         */    
         if(CREATE_DATASTORE) {
             this.express.use( express.static ( PRIVATE_DATA_DIR ) );              
         }

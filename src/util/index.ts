@@ -64,6 +64,10 @@ export {
 } from "./user.google.util";
 
 export {
+	FormValidation
+} from "./form.validation.util";
+
+export {
 	gender,
 	genderPrefix,
 	firstName,

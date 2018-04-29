@@ -1,9 +1,11 @@
 import faker from "faker";
 import { capitalizeString } from "../util";
+import passwordGenerator from "generate-password";
 
 import { 
 	USE_DEFAULT_USER_PASSWORD,
-	DEFAULT_PASSWORD_USER 
+	DEFAULT_PASSWORD_USER,
+	PASSWORD_MIN_LENGTTH
 } from "./secrets";
 
 
@@ -210,8 +212,11 @@ export const createIdentifier = ():string => {
 export const generatePassword = ():string => {
 	if(USE_DEFAULT_USER_PASSWORD) {
 		return DEFAULT_PASSWORD_USER;
-	} else {
-		return faker.internet.password();
+	} else {		
+		return passwordGenerator.generate({
+			length: PASSWORD_MIN_LENGTTH,
+			numbers:true
+		});
 	}
 }
 

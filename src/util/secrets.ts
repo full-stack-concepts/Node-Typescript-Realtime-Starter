@@ -301,6 +301,20 @@ if( !isString(DEFAULT_PASSWORD_SYSTEM_USER) || !isString(DEFAULT_PASSWORD_USER))
 	process.exit(1);
 }
 
+/*****
+ * Password Policies
+ */
+export const PASSWORD_MIN_LENGTTH = Number(process.env["PASSWORD_MIN_LENGTTH"]);
+export const PASSWORD_HAS_UPPERCASE = process.env["PASSWORD_HAS_UPPERCASE"] == 'true';
+export const PASSWORD_HAS_LOWERCASE = process.env["PASSWORD_HAS_LOWERCASE"] == 'true';
+export const PASSWORD_HAS_NUMBER = process.env["PASSWORD_HAS_SPECIAL_CHAR"] == 'true';
+export const PASSWORD_HAS_SPECIAL_CHAR = process.env["PASSWORD_HAS_SPECIAL_CHAR"] == 'true';
+
+if( !Number.isInteger(PASSWORD_MIN_LENGTTH)) {
+	console.error(`Password Policy: Please set PASSWORD_MINIMUM_LENGTTH as an integer with a minimum value of 1`);
+	process.exit(1);
+}
+
 /*******
  * Person Sub Types
  */
