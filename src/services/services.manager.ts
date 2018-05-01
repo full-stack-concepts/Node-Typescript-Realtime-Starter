@@ -2,6 +2,7 @@
  * Import Dependency Injection Container Object
  */
 import { ServiceContainer } from "../shared/lib";
+
 import { DBModelService } from "./db.model.service";
 import { DatabaseService } from "./db.service";
 
@@ -27,10 +28,11 @@ class ServiceManager {
 		/****************************
 		 * Register DBModels Service 
 		 */
-		this.services.registerClass('DBModelService', [], DBModelService);				
+		this.services.registerClass('DBModelService', [], DBModelService);			
+			
 	}
 
-	public inject(service:string) {
+	public inject(service:string):Function {
 		return this.services.get(service);		
 	}
 }

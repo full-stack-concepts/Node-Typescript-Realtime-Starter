@@ -21,6 +21,10 @@ import {
 	IConnection 
 } from "../shared/interfaces";
 
+import {
+	proxyService
+} from "../services";
+
 /****
  * Connection Settings Object
  */
@@ -31,6 +35,7 @@ const c:IConnection = {
 	port: DB_CONFIG_PORT,
 	db: DB_CONFIG_DATABASE
 }
+
 
 
 /******************
@@ -45,12 +50,15 @@ export class DatabaseService {
  	// all conncurrent posts
     private nativeConnnectionSubject:BehaviorSubject<any> = new BehaviorSubject<any>({});
     public db$: Observable<any> = this.nativeConnnectionSubject.asObservable();
+
+    // inject proxy service
+    private proxyService:any = proxyService;
 	
-	get live():boolean {
+	private get live():boolean {
 		return this._live;
 	}
 		
-	set live(state:boolean){
+	private set live(state:boolean){
 		this._live = state;
 	}
 
@@ -66,6 +74,11 @@ export class DatabaseService {
 		 * Connect to local MongoDB Instance
 		 */
 		this.connect();
+
+		/****
+		 * Configure Subscribers
+		 */
+		this.configureSubscribers();
 	}
 
 	private constructConnectionString():string {
@@ -81,7 +94,7 @@ export class DatabaseService {
 		// mongoose connection string
 		const connStr:string = this.constructConnectionString();	
 
-		mongoose.connect( connStr, (err:any) => {
+		return mongoose.connect( connStr, (err:any) => {
 
 			if(err) {
 				console.log(err)
@@ -101,10 +114,18 @@ export class DatabaseService {
 				
 				// on open event
 				db.on('open', () => {});
+
+				Promise.resolve();
 			}
 
 
 		});
+
+	}
+
+	private configureSubscribers():void {
+
+		this.proxyService.db$.subscribe( (state:boolean) => this._live = state );		
 
 	}
 

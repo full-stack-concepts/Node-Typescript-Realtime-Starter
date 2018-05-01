@@ -12,6 +12,12 @@ import * as Promise from 'bluebird';
 // interfaces
 import { ServerOptions, ProcessEnv } from './shared/interfaces/';
 
+/****
+ * App Services
+ */
+import { serviceManager} from "./services/services.manager";
+import { proxyService } from "./services/";
+
 /**
  * EXPRESS APPLICATION CODE
  */
@@ -128,14 +134,19 @@ function onListening():void {
 function bootStrapper() {   
 
     /***
-     * Private DataStore
+     * Private DataStore if needed
      */
     createPrivateDataStore()
 
     /***
      * Public static directories
      */
-    .then( () => publicDirectoryManager() );
+    .then( () => publicDirectoryManager() )
+
+    /***
+     * Clear Access for local db operations
+     */
+    .then( () => proxyService.setLocalDBLive() );
 
 }
 
