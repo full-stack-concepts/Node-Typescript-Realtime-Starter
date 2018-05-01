@@ -12,11 +12,6 @@ import * as Promise from 'bluebird';
 // interfaces
 import { ServerOptions, ProcessEnv } from './shared/interfaces/';
 
-/***
- * Local DB 
- */
-import { db } from "./db";
-
 /**
  * EXPRESS APPLICATION CODE
  */
@@ -130,12 +125,7 @@ function onListening():void {
 /****
  * Bootstrapper
  */
-function bootStrapper() {
-
-    /****
-     * Configure Local Database
-     */
-    db.init();
+function bootStrapper() {   
 
     /***
      * Private DataStore

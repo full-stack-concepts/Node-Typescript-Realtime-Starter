@@ -54,8 +54,6 @@ passport.use(new GoogleStrategy({
 	proxy:true
 }, (accessToken:any, refreshToken:any, profile:any, done:Function) => {	
 
-		console.log(profile)
-
 		u.authenticateGoogleUser({
 			accessToken: accessToken,
 			refreshToken: refreshToken,

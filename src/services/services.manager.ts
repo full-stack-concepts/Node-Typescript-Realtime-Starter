@@ -3,6 +3,7 @@
  */
 import { ServiceContainer } from "../shared/lib";
 import { DBModelService } from "./db.model.service";
+import { DatabaseService } from "./db.service";
 
 class ServiceManager {
 
@@ -15,9 +16,15 @@ class ServiceManager {
 	/*****
 	 * Register Singleton Services
 	 */
-	private registerServices() {		
+	private registerServices() {	
 
-		/****************************************************************************
+		/***************************
+		 * Configure Local Database
+		 * USE_LOCAL_MONGODB_SERVER=true
+		 */	
+		this.services.registerClass('db', [], DatabaseService);
+
+		/****************************
 		 * Register DBModels Service 
 		 */
 		this.services.registerClass('DBModelService', [], DBModelService);				

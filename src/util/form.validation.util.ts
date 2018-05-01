@@ -11,9 +11,7 @@ import {
 
 export class FormValidation {
 
-	public static testPassword(pw:string) {	
-
-		console.log("*** Validate password ", pw);
+	public static testPassword(pw:string) {			
 
 		let tests:boolean[]=[];
 
@@ -51,3 +49,4 @@ export class FormValidation {
 		
 	}
 }
+
