@@ -38,14 +38,9 @@ import {
 } from "./util/secrets";
 
 /***
- * Test ground for tests...
+ * Playground for sinple tests...
  */
-console.log("==> generate Password")
-let pw1:string = generatePassword();
-console.log(pw1)
 
-let pw3:string = "Aaaaaa222@@@@@@@@@@";
-console.log("*** Is Password 2 valid? ", FormValidation.testPassword(pw3))
 
 //////////////////// End test ground
 

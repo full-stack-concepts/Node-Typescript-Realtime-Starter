@@ -1,5 +1,6 @@
 // TODO Rewrite this class with JS Proxy
-// TODO Add policy support for dynamic password validation
+
+import urlRegex from "url-regex";
 
 import {
 	PASSWORD_MIN_LENGTTH,
@@ -72,6 +73,43 @@ export class FormValidation {
    		if(!value) value="";   				
    		return (value.length <= l);
    	}
-  
+
+   	public static minValue(n:number, min:number):boolean {
+   		if(!n || isNaN(n)) return false;
+   		return (n>=min);
+   	}
+
+   	public static maxValue(n:number, max:number):boolean {
+   		if(!n || isNaN(n)) return false;   		
+   		return (n<=max);
+   	} 
+
+   	public static isBoolean(v:any) {
+   		if(!v) return true;
+   		return (typeof v === 'boolean');
+   	}
+
+	/* <areacode> policy
+	 * minlength: 6 chars
+	 * maxlength: 6 chars
+	 * 4 chars, 2 numbers
+	 */
+	public static testDutchAreacode(str:string):boolean {		
+		if(!str || typeof str != 'string') return false;
+		let testRegex:RegExp = /^[1-9][0-9]{3}[\s]?[A-Za-z]{2}$/;			
+		return testRegex.test( str.toString() );	
+	}
+
+	public static isURL(url:string):boolean {	
+		if(!url || typeof url != 'string') return false;
+		return urlRegex().test( url.toString() )
+	}
+
+	public static isInteger(n:number):boolean {
+		if(!n || isNaN(n)) return false;
+		return Number.isInteger(n);
+	}
 }
+
+
 
