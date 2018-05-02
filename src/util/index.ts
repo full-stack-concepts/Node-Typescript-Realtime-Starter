@@ -44,13 +44,15 @@ export {
 	readDevConfiguration,
 	readProdConfiguration,
 	getPathToDataStore,
-	createPrivateDataStore,
-	publicDirectoryManager,
-	createUserDirectory,
+	createPrivateDataStore,	
+	createPublicUserDirectory,
+	createPrivateUserDirectory,
 	createUserSubDirectories,
 	pathToDefaultUserThumbnail,
 	pathToUserThumbnail,
-	storeUserImage
+	storeUserImage,
+	publicDirectoryManager,
+	privateDirectoryManager
 } from "./infrastructure.util";
 
 export {

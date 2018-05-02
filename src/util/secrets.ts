@@ -166,7 +166,9 @@ if(subUsersDirs && !Array.isArray(subUsersDirs)) {
  * Private Directory Management
  */
 export const CREATE_DATASTORE = process.env["CREATE_DATASTORE"] == 'true';
-export const PRIVATE_DATA_DIR:string = process.env["PEIVATE_DATA_DIR"] || './private/datastore';
+export const PRIVATE_ROOT_DIR = process.env["PRIVATE_ROOT_DIR"] || './private/';
+export const PRIVATE_USERS_DIR = process.env["PRIVATE_USERS_DIR"] || './users/';
+export const PRIVATE_DATA_DIR:string = process.env["PEIVATE_DATA_DIR"] || './datastore';
 
 if(typeof CREATE_DATASTORE != 'boolean' ) {
 	console.error("APP DATASTORE: Please configure your datastore varriable in your environmental file as either TRUE or FALSE");

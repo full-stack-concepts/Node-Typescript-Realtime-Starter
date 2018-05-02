@@ -27,7 +27,7 @@ import {
 
 import { 
 	deepCloneObject, cloneArray, capitalizeString, createUserSubDirectories, constructUserCredentials,
-	constructProfileFullName,constructProfileSortName, createUserDirectory, isEmail, isURL,
+	constructProfileFullName,constructProfileSortName, createPublicUserDirectory, isEmail, isURL,
 	pathToDefaultUserThumbnail, pathToUserThumbnail, storeUserImage, validateInfrastructure, validateUserIntegrity
 } from "../util";
 
@@ -313,7 +313,7 @@ class UserService {
 		}
 
 		if(this.hostType===2) {
-			return UserModel.remoteCreateUser( user )
+			return UserModel.remoteCreateUser( user, 'users' )
 			.then( res => Promise.resolve({ userCreated:true }) )
 			.catch( err => Promise.reject({ userCreated:false, err: err }) );
 		}			
@@ -411,7 +411,7 @@ class UserService {
 		// process thick: execute tasks (1, 2)					  
 		return Promise.join<any>(
 			this.fetchUserImage( user),
-			createUserDirectory (user.core.userName),	
+			createPublicUserDirectory (user.core.userName),	
 			authenticationTracker()		
 		).spread( (thumbnail:IRawThumbnail, userDirectory:any, login:ILoginTracker) => {				
 

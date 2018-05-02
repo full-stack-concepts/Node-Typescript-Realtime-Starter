@@ -39,7 +39,7 @@ export const extractGoogleProfile = (profile:any) => {
 		errType:number;
 
     /****
-     * Test if FB Profile contains essential params
+     * Test if Profile contains essential params
      */
     if( !p.hasOwnProperty('id') || (p.id && typeof p.id != 'string') )
 

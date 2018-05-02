@@ -26,7 +26,8 @@ import App from './App';
 import { 
     getCertificate,
     publicDirectoryManager,
-    createPrivateDataStore
+    privateDirectoryManager,
+    createPrivateDataStore,
 } from "./util";
 
 import { testForConfiguration } from './util/bootstrap.util';
@@ -143,6 +144,11 @@ function bootStrapper() {
      * Public static directories
      */
     .then( () => publicDirectoryManager() )
+
+    /***
+     * Private static directories
+     */
+    .then( () => privateDirectoryManager() )
 
     /***
      * Clear Access for local db operations

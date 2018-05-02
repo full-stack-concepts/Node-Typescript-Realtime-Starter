@@ -20,6 +20,8 @@ import {
 	PUBLIC_ASSETS_DIRS,
 	PUBLIC_STYLES_DIRS,
 	CREATE_DATASTORE,
+	PRIVATE_ROOT_DIR,
+	PRIVATE_USERS_DIR,
 	PRIVATE_DATA_DIR,
 	PUBLIC_USER_DIR,
 	PUBLIC_USER_SUBDIRECTORIES,
@@ -141,8 +143,12 @@ export const createPrivateDataStore = () => {
 	});		
 }
 
-export const pathToUsersDirectory = ():string => {
+export const pathToPublicUsersDirectory = ():string => {
 	return  path.join( rootPath, PUBLIC_ROOT_DIR, PUBLIC_USER_DIR);
+}
+
+export const pathToPrivateUsersDirectory = ():string => {
+	return  path.join( rootPath, PRIVATE_ROOT_DIR, PRIVATE_USERS_DIR);
 }
 
 export const createUserSubDirectories = ($userDir:string) => {
@@ -160,9 +166,12 @@ export const pathToDefaultUserThumbnail = ():string => {
 	return `${SITE_URL}${PUBLIC_ASSETS_DIR}/${PUBLIC_IMAGES_DIR}/${DEFAULT_USER_THUMBNAIL}`;
 }
 
-export const createUserDirectory = ($userName:string):PromiseLike<IAUserDirectory> => {
+/***
+ * Public UserDirectory
+ */
+export const createPublicUserDirectory = ($userName:string):PromiseLike<IAUserDirectory> => {
 
-	const $users:string = pathToUsersDirectory();
+	const $users:string = pathToPublicUsersDirectory();
 	const $pathToUserDir:string = path.join( $users, $userName);
 
 	return createDirectory( $pathToUserDir )
@@ -171,16 +180,31 @@ export const createUserDirectory = ($userName:string):PromiseLike<IAUserDirector
 	.catch( (err:any) => Promise.reject({ dirCreated: false, err: err }) );
 }
 
+/***
+ * Private user Directory
+ * (dont expose system users in public api's)
+ */
+export const createPrivateUserDirectory =  ($userName:string):PromiseLike<IAUserDirectory> => {
+
+	const $users:string = pathToPrivateUsersDirectory();
+	const $pathToUserDir:string = path.join( $users, $userName);
+
+	return createDirectory( $pathToUserDir )
+	.then( () => createUserSubDirectories( $pathToUserDir ))
+	.then( () => Promise.resolve({ dirCreated:true }) )
+	.catch( (err:any) => Promise.reject({ dirCreated: false, err: err }) ); 
+}
+
 /*****
  * Use this function only for Facebook and Google Authentication
  * or add checks for file size and image dimensions
  */
-export const storeUserImage = ( rawThumbnail:IRawThumbnail, $userName:string)=> {
+export const storeUserImage = ( rawThumbnail:IRawThumbnail, $userName:string)=> {	
 
 	// return to caller if user has default user thumbnail
 	if(rawThumbnail.defaultImage) return Promise.resolve({stored:true});
 
-	const $pathToUserDir:string = path.join(pathToUsersDirectory(), $userName);
+	const $pathToUserDir:string = path.join(pathToPublicUsersDirectory(), $userName);
 	const $pathToFile:string = `${$pathToUserDir}/img/thumb.${rawThumbnail.fileName}`;		
 
 	const writeStream = fs.createWriteStream($pathToFile); 
@@ -195,6 +219,45 @@ export const storeUserImage = ( rawThumbnail:IRawThumbnail, $userName:string)=> 
 
 export const pathToUserThumbnail = ( rawThumbnail:IRawThumbnail, userName:string):string => {
 	return `${SITE_URL}${PUBLIC_USER_DIR}/${userName}/img/thumb.${rawThumbnail.fileName}`;
+}
+
+/***
+ * Private Directory Manager
+ */
+export const privateDirectoryManager = () => {
+
+	const $private:string = path.join( rootPath, PRIVATE_ROOT_DIR);
+	const $users:string = path.join( $private, PRIVATE_USERS_DIR);
+	const $store:string =  path.join( $private, PRIVATE_DATA_DIR);
+
+	/****
+	 * process thick: private directory
+	 */
+	return createDirectory( $private )	
+
+	/****
+	 * process thick: $private/$users directory
+	 */
+	.then( status => createDirectory($users) )
+
+	/****
+	 * process thick: $private/$store directory
+	 */
+	.then( status => createDirectory($store) )
+
+	/****
+	 * proces thick: return a promise so this function can be chained in our bootstrap procedure
+	 */
+	.then( () => Promise.resolve() )
+
+	/****
+	 * Handle Critical Error
+	 */
+	.catch( err   => {
+		console.error("Private Directories: could not construct all directories. Please check your error log or provide ysstem priviliges.") 
+		console.error("Private Directories: ", err );
+		process.exit(1);		
+	});	
 }
 
 /****
@@ -262,7 +325,7 @@ export const publicDirectoryManager = () => {
 	.then( () => Promise.resolve() )
 
 	/****
-	 * Error Handler
+	 * Handle Critical Error
 	 */
 	.catch( err   => {
 		console.error("Public Directories: could not construct all directories. Please check your error log or provide ysstem priviliges.") 

@@ -2,6 +2,8 @@
  * Core User Operations
  */
 import Promise from "bluebird";
+import fetch from "node-fetch";
+import fileType from "file-type";
 const uuidv1 = require("uuid/v1");
 
 import {
@@ -15,17 +17,29 @@ import {
 	FormValidation,
 	constructUserCredentials,
 	constructProfileFullName,
-	capitalizeString
+	capitalizeString,
+	deepCloneObject,
+	pathToDefaultUserThumbnail,
+	pathToUserThumbnail
 } from "../util";
 
 import {
-	IPerson, IUser, ISystemUser, IClient, ICustomer, IDatabasePriority
+	IPerson, IUser, ISystemUser, IClient, ICustomer, IDatabasePriority, IRawThumbnail
 } from "../shared/interfaces"; 
+
+import {
+	TI_RAW_THUMBNAIL
+} from "../shared/types";
 
 interface IModelSetting {
 	model:any,
 	type: string,
 	collection:string
+}
+
+interface IFileType {
+	ext: string,
+	mime: string
 }
 
 export class UserOperations {
@@ -206,6 +220,88 @@ export class UserOperations {
 		});		
 	}	
 
+	private _getDefaultThumbnail():IRawThumbnail {
+		let rawThumbnail:IRawThumbnail = deepCloneObject(TI_RAW_THUMBNAIL);
+    	return rawThumbnail;   	
+	}
+
+	/****
+	 *
+	 */
+	protected evalThumbnailObjectThenSetPath({ user, thumbnail }:any) {
+		// Process image: assign default url to thumbnail property of user object
+		if(thumbnail.defaultImage) {				
+ 			user.profile.images.thumbnail = pathToDefaultUserThumbnail();
+
+		// Process image: assing user specific thumnail url
+		} else {
+			user.profile.images.thumbnail = pathToUserThumbnail(thumbnail, user.core.userName);
+		}
+
+		return Promise.resolve({
+			thumbnail:thumbnail,
+			user:user
+		});
+	}
+
+	/****
+	 * Fetch User Image
+	 * return default url or fetch thumnail from external provider
+	 */
+	protected fetchUserImage( user:ISystemUser|IUser|IClient|ICustomer ) {
+
+		let err:any;
+		let url:string = user.profile.images.externalThumbnailUrl;		
+
+		/****
+		 * If provider profile has no imageURL we assign default user image
+		 */
+		if(!url || (url && typeof(url) != 'string')) {
+			let rawThumbnail:IRawThumbnail = this._getDefaultThumbnail();    				
+    		return Promise.resolve(rawThumbnail);  
+		}
+
+		let rawThumbnail:IRawThumbnail = deepCloneObject(TI_RAW_THUMBNAIL);
+
+		return fetch(url)
+		.then( res => res.buffer())
+    	.then( buffer => {
+
+    		// get image type: extension and mime
+    		try {
+
+    			let imageType:IFileType = fileType(buffer);    
+    			let userName:string = user.core.userName;
+    			let extension:string = imageType.ext;    			
+
+    			rawThumbnail = {
+    				defaultImage: false,
+    				buffer:buffer,
+    				extension: extension,
+    				mime: imageType.mime,
+    				fileName: `${userName}.${extension}`
+    			};
+    		} 
+
+    		catch(e) {  
+    			err = e;
+    		}
+
+    		finally {
+
+    			/*****
+    			 * Error: URL to user profile image expired or is faulty
+    			 * reset default raw thumnail obejct so user get unixsex default user thumbnail
+    			 */
+    			if(err) {    				    		
+    				rawThumbnail = this._getDefaultThumbnail();    				
+    			}     		
+    			return Promise.resolve(rawThumbnail);    			
+    		}  	
+    	})    	   
+		.catch( err => Promise.reject( this._getDefaultThumbnail()) );
+	}
+
 	private _getModelSetting(userType:string):IModelSetting{
 
 		const setting:IModelSetting = this.models.find( (setting:IModelSetting) => {
@@ -257,6 +353,9 @@ export class UserOperations {
 			});				
 		}	
 
+		/***
+		 * MLAB MongoDB instance
+		 */
 		if(hostType === 2) {			
 			return model.remoteFindOneOnly(query, collection)	
 			.then(  (user:IUser) => { return Promise.resolve(user); })
@@ -267,7 +366,7 @@ export class UserOperations {
 	/***
 	 * Create New User per model
 	 */
-	protected createUser( userType:string, user:IPerson|ISystemUser|IUser|IClient|ICustomer) {
+	protected insertUser( userType:string, user:IPerson|ISystemUser|IUser|IClient|ICustomer) {
 
 		/****
 		 * Degine HostType
@@ -311,7 +410,6 @@ export class UserOperations {
 			.catch( (err:any) => console.error('<errorNumberXX>') );					
 		}
 	}		
-
 }
 
 

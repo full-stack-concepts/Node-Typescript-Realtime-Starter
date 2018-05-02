@@ -5,7 +5,7 @@ import Promise from "bluebird";
 import { UserOperations } from "./user.ops.service";
 import { proxyService } from "./proxy.service";
 import { SystemUserModel } from "../shared/models";
-import { IUser, ISystemUser} from "../shared/interfaces";
+import { IUser, ISystemUser, IRawThumbnail } from "../shared/interfaces";
 import { TSYSTEMUSER } from "../shared/types";
 
 import  {
@@ -19,7 +19,9 @@ import  {
 
 import {
 	encryptPassword,
-	FormValidation
+	FormValidation,
+	createPrivateUserDirectory,
+	storeUserImage
 } from "../util";
 
 export class SystemUserService extends UserOperations {
@@ -61,13 +63,38 @@ export class SystemUserService extends UserOperations {
 		// process thick: set default priviliges for System Admin Account
 		.then( (u:ISystemUser) => this.setDefaultPriviliges(u) )	
 
-		// process thick: create user
-		.then( (u:ISystemUser) => this.createUser(PERSON_SUBTYPE_SYSTEM_USER, u) )
+		// process thick: insert userinto DB
+		.then( (u:ISystemUser) => this.insertUser(PERSON_SUBTYPE_SYSTEM_USER, u) )
+
+		// process thick: create user directory && fetch user image
+		.then( (u:ISystemUser) => {
+			return Promise.join<any>(
+
+				/***
+				 * User Thumbnail Image
+				 */
+				this.fetchUserImage(u),
+
+				/***
+				 * User Directory
+				 */
+				createPrivateUserDirectory (u.core.userName)
+
+			).spread ( (thumbnail:IRawThumbnail, userDirectory:any) => Promise.resolve({user:u, thumbnail:thumbnail}) )
+		})		
+
+		// process thick: eval thumbnail object
+		.then( (settings:any) => this.evalThumbnailObjectThenSetPath(settings))
+
+		// proces thick: store user image
+		.then( ({ user, thumbnail}) => storeUserImage( thumbnail, user.core.userName) )
+
+		// process thick: return to caller
+		.then( (res) => Promise.resolve() )
 
 		// catch error
 		.catch( (err:any) => Promise.reject(err) );
-
-	}
+	}	
 
 	private setDefaultPriviliges(u:ISystemUser):ISystemUser{
 
