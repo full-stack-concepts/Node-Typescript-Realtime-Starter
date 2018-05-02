@@ -8,6 +8,8 @@ class ProxyService {
 
 	public db$:Subject<boolean> = new Subject();
 	public systemUser$:Subject<boolean> = new Subject();
+	public localDBInstance$:Subject<boolean> = new Subject();
+	private _db:any;
 
 	constructor() {}
 
@@ -31,6 +33,15 @@ class ProxyService {
 	public createSystemUser():void {
 		this.systemUser$.next(true);
 	}
+
+	public setLocalDBInstance(db:any) {	
+		this.db=db;
+		this.localDBInstance$.next(true);
+	}
+
+	public set db( db:any) { this._db = db; }
+	public get db() { return this._db; }
+	
 }
 
 export const proxyService = new ProxyService();

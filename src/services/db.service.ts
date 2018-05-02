@@ -45,11 +45,7 @@ const c:IConnection = {
  */
 export class DatabaseService {
 
- 	public _live:boolean;
-
- 	// all conncurrent posts
-    private nativeConnnectionSubject:BehaviorSubject<any> = new BehaviorSubject<any>({});
-    public db$: Observable<any> = this.nativeConnnectionSubject.asObservable();
+ 	public _live:boolean; 	
 
     // inject proxy service
     private proxyService:any = proxyService;
@@ -107,7 +103,7 @@ export class DatabaseService {
 				 * Propagate NativeConnnection
 				 */
 				const db:any = mongoose.connection;	
-				this.nativeConnnectionSubject.next(db);				
+				proxyService.setLocalDBInstance(db);			
 
 				// listen for connection errors
 				db.on('error', (err:any) =>  console.error( "Local Database ", err) );

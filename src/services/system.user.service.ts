@@ -33,6 +33,7 @@ export class SystemUserService extends UserOperations {
 	private lastName:string = SYSTEM_ADMIN_LAST_NAME;
 
 	private proxyService:any = proxyService;
+	private db:any;
 
 	constructor() {		
 		super();
@@ -42,12 +43,20 @@ export class SystemUserService extends UserOperations {
 	private configureSubscribers():void {
 
 		/****
-		 *
+		 * Subscriber: Bootstrap Manager signals system user
 		 */
 		proxyService.systemUser$.subscribe( (state:boolean) => {
 			return this.createSystemUser() 
 			.then( () => Promise.resolve() );
 		});
+
+		/****
+		 * Subscriber: when proxyService flags that localDB is connected
+		 * we want to fetch dbInstance so we can create roles for system user accounts
+		 */		
+		proxyService.localDBInstance$.subscribe( (state:boolean) => {		
+			if(proxyService.db) this.db = proxyService.db;					
+		});		
 	}		
 
 	private insertDefaultSystemUser(){
