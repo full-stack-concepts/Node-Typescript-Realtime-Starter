@@ -35,7 +35,7 @@ export class UserModel extends DefaultModel  {
 	 * Define custom methods for local onstance of MongoDB here	
 	 */
 	public static createUser(user:IUser): Promise<any> {
-		let repo = new UserRepository();
+		const repo = new UserRepository();
 		return new Promise ( (resolve, reject) => {
 			repo.create(user, (err:any, res:any) => {			
 				if(err) { reject(err);} else { resolve(res);}
@@ -44,7 +44,7 @@ export class UserModel extends DefaultModel  {
 	}	
 
 	public static insert(users:IUser[]): Promise<any> {
-		let repo = new UserRepository();
+		const repo = new UserRepository();
 		return new Promise ( (resolve, reject) => {
 			repo.insertMany( users, (err:any, res:any) => {			
 				if(err) {reject(err); } else { resolve(res); }
@@ -53,7 +53,7 @@ export class UserModel extends DefaultModel  {
 	}	
 
 	public static remove( cond:Object):Promise<any> { 
-		let repo = new UserRepository();
+		const repo = new UserRepository();
 		return new Promise ( (resolve, reject) => {
 			repo.remove( cond, (err:any) => {						
 				if(err) {reject(err); } else { resolve(); }
@@ -62,7 +62,7 @@ export class UserModel extends DefaultModel  {
 	}	
 
 	public static findOne (cond:Object):Promise<any> {
-		let repo = new UserRepository();
+		const repo = new UserRepository();
 		return new Promise ( (resolve, reject) => {
 			repo.findOne ( cond, (err:any, res:any) => {					
 				if(err) {

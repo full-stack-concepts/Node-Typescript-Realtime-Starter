@@ -129,7 +129,8 @@ function onListening():void {
 }
 
 /****
- * Bootstrapper
+ * Bootstrap Manager
+ * 3TODO: Move later to seperate class
  */
 function bootStrapper() {   
 
@@ -146,7 +147,14 @@ function bootStrapper() {
     /***
      * Clear Access for local db operations
      */
-    .then( () => proxyService.setLocalDBLive() );
+    .then( () => proxyService.setLocalDBLive() )
+
+    /***
+     * Inject System User
+     */
+    .then( () => proxyService.createSystemUser() )
+
+    .then( () => console.log("*** Bootstrap Status OK ")); 
 
 }
 

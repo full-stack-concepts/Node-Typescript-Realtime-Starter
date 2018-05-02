@@ -120,6 +120,7 @@ export const extractFacebookProfile = (profile:any) => {
 	 */ 	
 	newUser.profile.displayNames.fullName = constructProfileFullName(p.name);
 	newUser.profile.displayNames.sortName = constructProfileSortName(p.name);
+	
 	/****
 	 * user credentials: userName && url 
 	 */
@@ -127,7 +128,6 @@ export const extractFacebookProfile = (profile:any) => {
 		newUser.core.userName = credentials.userName;
 		newUser.core.url = credentials.url;  
 	});	
-
 
 	console.log("*** Profile Error ", errType)
 

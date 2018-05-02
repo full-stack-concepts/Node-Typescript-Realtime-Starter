@@ -45,6 +45,7 @@ export class SystemUserModel extends DefaultModel  {
 			});
 		});
 	}	
+	
 	public static insert(users:ISystemUser[]): Promise<any> {
 		let repo = new SystemUserRepository();
 		return new Promise ( (resolve, reject) => {

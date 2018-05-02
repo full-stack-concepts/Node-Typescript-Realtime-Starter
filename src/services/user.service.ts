@@ -6,6 +6,7 @@ import fileType from "file-type";
 
 import { Subscription } from "rxjs/subscription";
 import { serviceManager } from "./services.manager";
+import { dbModelService } from "./db.model.service";
 
 const join = Promise.join;
 Promise.promisifyAll(fs);
@@ -88,7 +89,7 @@ class UserService {
 	/****
 	 * DBModelService Service
 	 */
-	private hostsService:any = serviceManager.inject("DBModelService");
+	private hostsService:any = dbModelService;
 
 	private user:IUser;	
 	private gmail:string;
@@ -504,9 +505,7 @@ class UserService {
 		})
 
 		// process thick: return to caller so webtoken can be created
-		.then( ( user:IUser|IClient|ICustomer|any) => {		 				
-			return Promise.resolve(user); 
-		})
+		.then( ( user:IUser|IClient|ICustomer|any) => Promise.resolve(user) )
 
 		.catch( (err:any) => {		
 			Promise.reject(err);

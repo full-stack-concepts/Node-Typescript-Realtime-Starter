@@ -34,9 +34,17 @@ export class ClientModel extends DefaultModel  {
 	/****
 	 * Define custom methods for local instance of MongoDB here	
 	 */
+	public static createUser(client:IClient): Promise<any> {
+		const repo = new ClientRepository();
+		return new Promise ( (resolve, reject) => {
+			repo.create(client, (err:any, res:any) => {			
+				if(err) { reject(err);} else { resolve(res);}
+			});
+		});
+	}	
 
 	static insert(clients:IClient[]): Promise<any> {
-		let repo = new ClientRepository();
+		const repo = new ClientRepository();
 		return new Promise ( (resolve, reject) => {
 			repo.insertMany( clients, (err:any, res:any) => {			
 				if(err) {reject(err); } else { resolve(res); }
@@ -45,7 +53,7 @@ export class ClientModel extends DefaultModel  {
 	}	
 
 	static remove( cond:Object):Promise<any> { 
-		let repo = new ClientRepository();
+		const repo = new ClientRepository();
 		return new Promise ( (resolve, reject) => {
 			repo.remove( cond, (err:any) => {					
 				if(err) {reject(err); } else { resolve(); }
@@ -54,7 +62,7 @@ export class ClientModel extends DefaultModel  {
 	}	
 
 	public static findOne (cond:Object):Promise<any> {
-		let repo = new ClientRepository();
+		const repo = new ClientRepository();
 		return new Promise ( (resolve, reject) => {
 			repo.findOne ( cond, (err:any, res:any) => {				
 				if(err) {

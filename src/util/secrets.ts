@@ -74,6 +74,33 @@ if(!moment.tz.zone (TIME_ZONE) ) {
 }
 
 /***
+ * System Account
+ */
+export const SET_SYSTEM_ADMIN_ACCOUNT = process.env["SET_SYSTEM_ADMIN_ACCOUNT"] == 'true';
+export const SYSTEM_ADMIN_FIRST_NAME = process.env["SYSTEM_ADMIN_FIRST_NAME"];
+export const SYSTEM_ADMIN_LAST_NAME = process.env["SYSTEM_ADMIN_LAST_NAME"];
+export const SYSTEM_ADMIN_EMAIL = process.env["SYSTEM_ADMIN_EMAIL"];
+export const SYSTEM_ADMIN_PASSWORD = process.env["SYSTEM_ADMIN_PASSWORD"];
+
+if(SET_SYSTEM_ADMIN_ACCOUNT) {
+
+	const sAccount:any[] = [
+			{ value: SYSTEM_ADMIN_FIRST_NAME , txt: ' System Admin Account property first name' },
+			{ value: SYSTEM_ADMIN_LAST_NAME, txt: '  System Admin Account property last name' },
+			{ value: SYSTEM_ADMIN_EMAIL, txt:  ' System Admin Account property email address' },
+			{ value: SYSTEM_ADMIN_PASSWORD, txt:  ' System Admin Account property password' }		
+	];
+
+	sAccount.forEach( ({ value, txt }) => {		
+		if(!value || (value && typeof value != 'string')) {
+			console.error(`DB Configuration: ${txt} is missing! Pleasse add one`);
+			process.exit(1);	
+		}
+	});
+}
+
+
+/***
  * Public Directory Management
  */
 export const SERVE_PUBLIC_RESOURCES = process.env["SERVE_PUBLIC_RESOURCES"] == 'true';
@@ -318,6 +345,7 @@ if( !Number.isInteger(PASSWORD_MIN_LENGTTH)) {
 /*******
  * Person Sub Types
  */
+export const PERSON_SUBTYPE_SYSTEM_USER = process.env["PERSON_SUBTYPE_SYSTEM_USER"];
 export const PERSON_SUBTYPE_USER = process.env["PERSON_SUBTYPE_USER"];
 export const PERSON_SUBTYPE_CLIENT = process.env["PERSON_SUBTYPE_CLIENT"];
 export const PERSON_SUBTYPE_CUSTOMER = process.env["PERSON_SUBTYPE_CUSTOMER"];
@@ -343,6 +371,7 @@ export const DB_POPULATE_USERS =  Number(process.env["DB_POPULATE_USERS"]);
 export const DB_POPULATION_LOCALE = process.env["DB_POPULATION_LOCALE"];
 
 export const DB_CREATE_USERS = process.env["DB_CREATE_USERS"];
+export const DB_SYSTEM_USERS_COLLECTION_NAME = process.env["DB_SYSTEM_USERS_COLLECTION_NAME"] || "users";
 export const DB_USERS_COLLECTION_NAME = process.env["DB_USERS_COLLECTION_NAME"] || "users";
 export const DB_CREATE_CLIENTS = process.env["DB_CREATE_CLIENTS"];
 export const DB_CLIENTS_COLLECTION_NAME = process.env["DB_CLIENTS_COLLECTION_NAME"] || "clients";

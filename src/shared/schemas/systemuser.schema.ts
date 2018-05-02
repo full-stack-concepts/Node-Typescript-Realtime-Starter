@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { Schema } from "mongoose";
-import { IClient } from "../interfaces";
+import { ISystemUser } from "../interfaces";
 import { userPrototype } from "./user.schema";
 
 
@@ -24,35 +24,35 @@ systemUser.priviliges = {
 	/****
 	 * Collection management roles (CRUD)
 	 * find, insert, remove, update, bypassDocumentValidation
-	 */
+	 */	
 	systemUsers: {
-	 	create: { type:Boolean, required: true, defailt: false },
-	 	read: { type:Boolean, required: true, defailt: false },
-	 	update: { type:Boolean, required: true, defailt: false },
-	 	delete: { type:Boolean, required: true, defailt: false }
+	 	create: { type:Boolean, required: true},
+	 	read: { type:Boolean, required: true},
+	 	update: { type:Boolean, required: true},
+	 	delete: { type:Boolean, required: true, default: false }
 	},
 
 	users: {
-	 	create: { type:Boolean, required: true, defailt: false },
-	 	read: { type:Boolean, required: true, defailt: false },
-	 	update: { type:Boolean, required: true, defailt: false },
-	 	delete: { type:Boolean, required: true, defailt: false }
+	 	create: { type:Boolean, required: true },
+	 	read: { type:Boolean, required: true },
+	 	update: { type:Boolean, required: true },
+	 	delete: { type:Boolean, required: true }
 	},
 
 	clients: {
-	 	create: { type:Boolean, required: true, defailt: false },
-	 	read: { type:Boolean, required: true, defailt: false },
-	 	update: { type:Boolean, required: true, defailt: false },
-	 	delete: { type:Boolean, required: true, defailt: false }
+	 	create: { type:Boolean, required: true },
+	 	read: { type:Boolean, required: true },
+	 	update: { type:Boolean, required: true },
+	 	delete: { type:Boolean, required: true }
 	},
 
 	customers: {
-	 	create: { type:Boolean, required: true, defailt: false },
-	 	read: { type:Boolean, required: true, defailt: false },
-	 	update: { type:Boolean, required: true, defailt: false },
-	 	delete: { type:Boolean, required: true, defailt: false }
+	 	create: { type:Boolean, required: true },
+	 	read: { type:Boolean, required: true },
+	 	update: { type:Boolean, required: true },
+	 	delete: { type:Boolean, required: true }
 	}
-
+	
 };
 
 /*****
@@ -70,5 +70,5 @@ schema.pre('save', (next) => {
 	next();
 });
 
-export const systemUserSchema = mongoose.model<IClient>('SystemUser', schema, 'systemusers', true);
+export const systemUserSchema = mongoose.model<ISystemUser>('SystemUser', schema, 'systemusers', true);
 

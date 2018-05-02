@@ -13,11 +13,11 @@ export class DefaultModel {
 	 */   
 
 	//** MLAB: Create user 
-	public static remoteCreateUser(_data:any) {		
+	public static remoteCreateUser(_data:any, collection:string) {		
 		return new Promise( (resolve, reject) => {			 
 			if( _data && objectKeysLength (_data) === 0 ) reject(' Invalid Data');					
 			let data = stringify(_data);			
-			let rURL = RemoteQueryBuilder.buildCollectionURL('users');			
+			let rURL = RemoteQueryBuilder.buildCollectionURL(collection);			
 			fetch(rURL, { method: 'POST', body: data, headers:headers })
 			.then( (res:any) =>res.json())
 			.then( (response:any) => { resolve(response); })

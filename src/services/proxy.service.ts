@@ -7,6 +7,7 @@ import { Subject } from "rxjs";
 class ProxyService {
 
 	public db$:Subject<boolean> = new Subject();
+	public systemUser$:Subject<boolean> = new Subject();
 
 	constructor() {}
 
@@ -22,6 +23,13 @@ class ProxyService {
 	 */
 	public setLocalDBOffline():void {
 		this.db$.next(false);
+	}
+
+	/***
+	 * Inject Main System User
+	 */
+	public createSystemUser():void {
+		this.systemUser$.next(true);
 	}
 }
 

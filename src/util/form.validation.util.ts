@@ -48,5 +48,30 @@ export class FormValidation {
 		return tests.every( (v:boolean) => v === true )			
 		
 	}
+
+	public static isEmail(str:string):boolean {
+		if(!str || str && typeof str != 'string') return false;	
+		let emailRegEx:RegExp = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+		return emailRegEx.test(str);		
+	}
+
+	public static isString(str:string):boolean {
+		return (!str || str && typeof str === 'string');
+   	} 
+
+   	public static required(value:any):boolean {   			
+   		return (value !==null);
+   	}
+
+   	public static minLength(value:string, l:number):boolean {
+   		if(!value) value="";   			
+   		return (value.length >= l);
+   	}
+
+   	public static maxLength(value:string, l:number):boolean {
+   		if(!value) value="";   				
+   		return (value.length <= l);
+   	}
+  
 }
 
