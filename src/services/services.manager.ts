@@ -1,8 +1,13 @@
-/*
+/***
  * Import Dependency Injection Container Object
  */
 import { ServiceContainer } from "../shared/lib";
-import { DatabaseService } from "./db.service";
+
+/***
+ * Import Database Services
+ */
+import { DBConfigService } from "./db.config.service";
+import { DBOpsService } from "./db.ops.service";
 import { SystemUserService } from "./system.user.service";
 
 class ServiceManager {
@@ -22,7 +27,14 @@ class ServiceManager {
 		 * Configure Local Database
 		 * USE_LOCAL_MONGODB_SERVER=true
 		 */	
-		this.services.registerClass('db', [], DatabaseService);
+		this.services.registerClass('db', [], DBConfigService);
+
+
+		/***************************
+		 * Configure Local Database
+		 * USE_LOCAL_MONGODB_SERVER=true
+		 */	
+		this.services.registerClass('admin', [], DBOpsService  );
 
 		/***************************
 		 * Register System user Service

@@ -198,6 +198,7 @@ export const DB_CONFIG_USER = process.env["DB_CONFIG_USER"];
 export const DB_CONFIG_PASSWORD = process.env["DB_CONFIG_PASSWORD"];
 export const DB_CONFIG_DATABASE = process.env["DB_CONFIG_DATABASE"];
 export const DB_MAX_POOL_SIZE = process.env["DB_MAX_POOL_SIZE"];
+export const DB_MAX_POOL_SIZE_ADMIN_CONN=process.env["DB_MAX_POOL_SIZE_ADMIN_CONN"];
 
 console.log(process.env["USE_LOCAL_MONGODB_SERVER"])
 console.log("**** Testing LOCAL DB ", USE_LOCAL_MONGODB_SERVER, typeof USE_LOCAL_MONGODB_SERVER === 'boolean')

@@ -11,6 +11,7 @@ import {
 } from "../util/secrets";
 
 import { dbModelService } from "./db.model.service";
+import { proxyService } from "./proxy.service";
 
 import {
 	encryptPassword,
@@ -60,6 +61,11 @@ export class UserOperations {
 	 */
 	private dbModelService:any = dbModelService;
 
+	/****
+	 * Local DB instance
+	 */
+	protected db:any;
+
 	constructor() {
 
 		/***
@@ -90,6 +96,14 @@ export class UserOperations {
 	private configureMySubscribers():void {
 
 		this.dbModelService.models$.subscribe( (models:IModelSetting[]) => this.models = models );
+
+		/****
+		 * Subscriber: when proxyService flags that localDB is connected
+		 * we want to fetch dbInstance so we can create roles for system user accounts
+		 */		
+		proxyService.localDBInstance$.subscribe( (state:boolean) => {		
+			if(proxyService.db) this.db = proxyService.db;						
+		});		
 	}
 
 	private  testString(str:string, required?:boolean, minLength?:number, maxLength?:number):Promise<boolean> {
@@ -409,7 +423,11 @@ export class UserOperations {
 			.then( (res:any) => { return Promise.resolve(user); })
 			.catch( (err:any) => console.error('<errorNumberXX>') );					
 		}
-	}		
+	}	
+
+	/***
+	 * DB Role: Manage Current Operatons
+	 */	
 }
 
 

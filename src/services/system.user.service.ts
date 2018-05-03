@@ -33,7 +33,6 @@ export class SystemUserService extends UserOperations {
 	private lastName:string = SYSTEM_ADMIN_LAST_NAME;
 
 	private proxyService:any = proxyService;
-	private db:any;
 
 	constructor() {		
 		super();
@@ -48,14 +47,6 @@ export class SystemUserService extends UserOperations {
 		proxyService.systemUser$.subscribe( (state:boolean) => {
 			return this.createSystemUser() 
 			.then( () => Promise.resolve() );
-		});
-
-		/****
-		 * Subscriber: when proxyService flags that localDB is connected
-		 * we want to fetch dbInstance so we can create roles for system user accounts
-		 */		
-		proxyService.localDBInstance$.subscribe( (state:boolean) => {		
-			if(proxyService.db) this.db = proxyService.db;					
 		});		
 	}		
 
@@ -97,6 +88,10 @@ export class SystemUserService extends UserOperations {
 
 		// proces thick: store user image
 		.then( ({ user, thumbnail}) => storeUserImage( thumbnail, user.core.userName) )
+
+		// process thick: create dbRoles
+
+
 
 		// process thick: return to caller
 		.then( (res) => Promise.resolve() )
