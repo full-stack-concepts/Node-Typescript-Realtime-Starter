@@ -3,39 +3,39 @@ import { IPerson } from "./person.interface";
 
 export interface ISystemUser extends IPerson {
 
-	systemUser?:Function,
-
-	/****
-	 * Dataabse roles 
-	 */
-	manageOpRole?: boolean,
-	mongostatRole?: boolean,
-	dropSystemViewsAnyDatabase?: boolean,
+	systemUser?:Function,	
 
 	priviliges: {
 
-		systemUsers: {
+		/****
+		 * Dataabse roles 
+		 */
+		manageOpRole?: boolean,
+		mongostatRole?: boolean,
+		dropSystemViewsAnyDatabase?: boolean,
+
+		systemUsers?: {
 		 	create?: boolean,
 		 	read?: boolean,
 		 	update?: boolean,
 		 	delete?: boolean
 		},
 
-		users: {
+		users?: {
 		 	create?: boolean,
 		 	read?: boolean,
 		 	update?: boolean,
 		 	delete?: boolean
 		},
 
-		clients: {
+		clients?: {
 		 	create?: boolean,
 		 	read?: boolean,
 		 	update?: boolean,
 		 	delete?: boolean
 		},
 
-		customers: {
+		customers?: {
 			create?: boolean,
 		 	read?: boolean,
 		 	update?: boolean,

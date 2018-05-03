@@ -224,7 +224,7 @@ export class DBOpsService {
 		// process thick: return to caller
 		.then( () => Promise.resolve() )
 
-		.catch( (err:any) => this.defaultErrorMessage(err) )		
+		.catch( (err:any) => this.defaultErrorMessage(err) );	
 	
 	}
 
@@ -238,7 +238,7 @@ export class DBOpsService {
 	/****
 	 *
 	 */
-	public modifyUser
+	public modifyUser() {}
 }
 
 

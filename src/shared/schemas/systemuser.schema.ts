@@ -3,6 +3,14 @@ import { Schema } from "mongoose";
 import { ISystemUser } from "../interfaces";
 import { userPrototype } from "./user.schema";
 
+/****
+ * Import Environmental settings for user Sub Types
+ */
+import {
+	USE_PERSON_SUBTYPE_USER,
+	USE_PERSON_SUBTYPE_CLIENT,
+	USE_PERSON_SUBTYPE_CUSTOMER
+} from "../../util/secrets";
 
 /*****
  * Create default <client> object
@@ -19,41 +27,45 @@ systemUser.priviliges = {
 	 */
 	manageOpRole: { type:Boolean, required: false, default: false},
 	mongostatRole: { type:Boolean, required: false, default: false},
-	dropSystemViewsAnyDatabase:  { type:Boolean, required: false, default: false},
+	dropSystemViewsAnyDatabase:  { type:Boolean, required: false, default: false} 
+}
 
-	/****
-	 * Collection management roles (CRUD)
-	 * find, insert, remove, update, bypassDocumentValidation
-	 */	
-	systemUsers: {
-	 	create: { type:Boolean, required: true},
-	 	read: { type:Boolean, required: true},
-	 	update: { type:Boolean, required: true},
-	 	delete: { type:Boolean, required: true, default: false }
-	},
-
-	users: {
-	 	create: { type:Boolean, required: true },
-	 	read: { type:Boolean, required: true },
-	 	update: { type:Boolean, required: true },
-	 	delete: { type:Boolean, required: true }
-	},
-
-	clients: {
-	 	create: { type:Boolean, required: true },
-	 	read: { type:Boolean, required: true },
-	 	update: { type:Boolean, required: true },
-	 	delete: { type:Boolean, required: true }
-	},
-
-	customers: {
-	 	create: { type:Boolean, required: true },
-	 	read: { type:Boolean, required: true },
-	 	update: { type:Boolean, required: true },
-	 	delete: { type:Boolean, required: true }
-	}
-	
+/****
+ * Collection management roles (CRUD)	 
+ */	
+systemUser.priviliges.systemUsers =  {
+ 	create: { type:Boolean, required: true},
+ 	read: { type:Boolean, required: true},
+ 	update: { type:Boolean, required: true},
+ 	delete: { type:Boolean, required: true, default: false }
 };
+
+if(USE_PERSON_SUBTYPE_USER) {
+	systemUser.priviliges.users =  {
+	 	create: { type:Boolean, required: true },
+	 	read: { type:Boolean, required: true },
+	 	update: { type:Boolean, required: true },
+	 	delete: { type:Boolean, required: true }
+	};
+}
+
+if(USE_PERSON_SUBTYPE_CLIENT) {
+	systemUser.priviliges.clients =  {
+	 	create: { type:Boolean, required: true },
+	 	read: { type:Boolean, required: true },
+	 	update: { type:Boolean, required: true },
+	 	delete: { type:Boolean, required: true }
+	};
+}
+
+if(USE_PERSON_SUBTYPE_CUSTOMER) {
+	systemUser.priviliges.customers = {
+	 	create: { type:Boolean, required: true },
+	 	read: { type:Boolean, required: true },
+	 	update: { type:Boolean, required: true },
+	 	delete: { type:Boolean, required: true }
+	};	
+}
 
 /*****
  * Create Schema

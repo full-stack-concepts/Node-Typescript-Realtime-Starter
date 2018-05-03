@@ -200,12 +200,8 @@ export const DB_CONFIG_DATABASE = process.env["DB_CONFIG_DATABASE"];
 export const DB_MAX_POOL_SIZE = process.env["DB_MAX_POOL_SIZE"];
 export const DB_MAX_POOL_SIZE_ADMIN_CONN=process.env["DB_MAX_POOL_SIZE_ADMIN_CONN"];
 
-console.log(process.env["USE_LOCAL_MONGODB_SERVER"])
-console.log("**** Testing LOCAL DB ", USE_LOCAL_MONGODB_SERVER, typeof USE_LOCAL_MONGODB_SERVER === 'boolean')
-
 if( typeof USE_LOCAL_MONGODB_SERVER === 'boolean' ) {	
-
-	console.log("**** is booelan" )
+	
 
 	if(!DB_CONFIG_HOST || (DB_CONFIG_HOST && typeof DB_CONFIG_HOST!='string')) {
 		console.error("Local Database: Please specify DB <host> name in your environemntal file (.env or .prod)! ");
@@ -356,7 +352,6 @@ export const PERSON_SUBTYPE_CUSTOMER = process.env["PERSON_SUBTYPE_CUSTOMER"];
 export const USE_PERSON_SUBTYPE_USER = process.env["USE_PERSON_SUBTYPE_USER"] == 'true';
 export const USE_PERSON_SUBTYPE_CLIENT = process.env["USE_PERSON_SUBTYPE_CLIENT"] == 'true';
 export const USE_PERSON_SUBTYPE_CUSTOMER = process.env["USE_PERSON_SUBTYPE_CUSTOMER"] == 'true';
-
 
 /***
  * DB Population

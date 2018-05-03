@@ -1,6 +1,6 @@
 import {ISystemUser} from  "../interfaces";
 
-export const TSYSTEMUSER:ISystemUser = <ISystemUser | any> {
+const _TSYSTEMUSER:ISystemUser = <ISystemUser | any> {
 
 	systemUser: () => {},
 	
@@ -75,46 +75,50 @@ export const TSYSTEMUSER:ISystemUser = <ISystemUser | any> {
 		social: {
 			googleplus:null
 		}
-	},
+	}
+}
+
+_TSYSTEMUSER.priviliges = {
 
 	/***
 	 * DB Rules
 	 */
 	manageOpRole: null,
 	mongostatRole: null,
-	dropSystemViewsAnyDatabase: null,
-
-	/***
-	 * Priviliges
-	 */
-	priviliges: {
-		systemUsers: {
-		 	create: null,
-		 	read: null,
-		 	update: null,
-		 	delete: null
-		},
-
-		users: {
-		 	create: null,
-		 	read: null,
-		 	update: null,
-		 	delete: null
-		},
-
-		clients: {
-		 	create: null,
-		 	read: null,
-		 	update: null,
-		 	delete: null
-		},
-
-		customers: {
-		 	create: null,
-		 	read: null,
-		 	update: null,
-		 	delete: null
-		}
-	}
+	dropSystemViewsAnyDatabase: null
 }
+
+_TSYSTEMUSER.priviliges.systemUsers = {
+ 	create: null,
+ 	read: null,
+ 	update: null,
+ 	delete: null
+};
+
+_TSYSTEMUSER.priviliges.users =  {
+ 	create: null,
+ 	read: null,
+ 	update: null,
+ 	delete: null
+};
+
+
+_TSYSTEMUSER.priviliges.clients =  {
+ 	create: null,
+ 	read: null,
+ 	update: null,
+ 	delete: null
+};
+
+
+_TSYSTEMUSER.priviliges.customers =  {
+ 	create: null,
+ 	read: null,
+ 	update: null,
+ 	delete: null
+};
+
+
+export const TSYSTEMUSER:ISystemUser = _TSYSTEMUSER;
+
 
