@@ -68,6 +68,13 @@ export const DATE_FORMAT = String(process.env["DATE_FORMAT"]);
  */
 export const TIME_FORMAT = String(process.env["TIME_FORMAT"]);
 
+/**
+ * DB NAMES (!)
+ */
+export const DB_USERS_DATABASE_NAME = process.env["DB_USERS_DATABASE_NAME"] || 'users';
+export const DB_PRODUCT_DATABASE_NAME = process.env["DB_PRODUCT_DATABASE_NAME"] || 'products';
+
+
 if(!moment.tz.zone (TIME_ZONE) ) {
 	console.error("TIME ZONE: Your timezone does not exist. Please consult moment-timezone documentation, then update your environmental files");
 	process.exit(1);
@@ -199,6 +206,9 @@ export const DB_CONFIG_PASSWORD = process.env["DB_CONFIG_PASSWORD"];
 export const DB_CONFIG_DATABASE = process.env["DB_CONFIG_DATABASE"];
 export const DB_MAX_POOL_SIZE = process.env["DB_MAX_POOL_SIZE"];
 export const DB_MAX_POOL_SIZE_ADMIN_CONN=process.env["DB_MAX_POOL_SIZE_ADMIN_CONN"];
+
+
+
 
 if( typeof USE_LOCAL_MONGODB_SERVER === 'boolean' ) {	
 	

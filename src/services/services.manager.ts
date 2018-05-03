@@ -6,8 +6,9 @@ import { ServiceContainer } from "../shared/lib";
 /***
  * Import Database Services
  */
-import { DBConfigService } from "./db.config.service";
-import { DBOpsService } from "./db.ops.service";
+import { DBAdminService } from "./db.admin.service";
+import { DBUserService } from "./db.user.service";
+import { DBProductService } from "./db.product.service";
 import { SystemUserService } from "./system.user.service";
 
 class ServiceManager {
@@ -24,17 +25,19 @@ class ServiceManager {
 	private registerServices() {	
 
 		/***************************
-		 * Configure Local Database
-		 * 
+		 * Configure Local Database		
 		 */	
-		this.services.registerClass('db', [], DBConfigService);
-
+		this.services.registerClass('db', [], DBUserService);
 
 		/***************************
-		 * Configure Local Database
-		 * 
+		 * Configure Local Database		
 		 */	
-		this.services.registerClass('adminDB', [], DBOpsService  );
+		this.services.registerClass('adminDB', [], DBAdminService  );
+
+		/***************************
+		 * Configure Product Database		
+		 */	
+		this.services.registerClass('productDB', [], DBProductService  );
 
 		/***************************
 		 * Register System user Service
