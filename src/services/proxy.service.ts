@@ -7,7 +7,7 @@ import { Subject } from "rxjs";
 class ProxyService {
 
 	public db$:Subject<boolean> = new Subject();
-	public adminDB$:Subject<boolean> = new Subject();
+	public mongoClient$:Subject<boolean> = new Subject();
 	public systemUser$:Subject<boolean> = new Subject();
 	public localDBInstance$:Subject<boolean> = new Subject();
 	
@@ -15,12 +15,7 @@ class ProxyService {
 	/****
 	 * Default MongoDB instance
 	 */
-	private _db:any;
-
-	/****
-	 * Admin MongoDB instance
-	 */
-	private _adminDB:any;
+	private _db:any;	
 
 	constructor() {}
 
@@ -54,15 +49,7 @@ class ProxyService {
 		this.localDBInstance$.next(true);
 	}
 	public set db( db:any) { this._db = db; }
-	public get db() { return this._db; }
-
-	public setLocalAdminDbInstance(db:any) {	
-		this._adminDB=db;	
-		this.adminDB$.next(true);
-	}
-
-	public set adminDB ( db:any) { this._adminDB = db; }
-	public get adminDB() { return this._adminDB; }
+	public get db() { return this._db; }	
 	
 }
 

@@ -25,16 +25,16 @@ class ServiceManager {
 
 		/***************************
 		 * Configure Local Database
-		 * USE_LOCAL_MONGODB_SERVER=true
+		 * 
 		 */	
 		this.services.registerClass('db', [], DBConfigService);
 
 
 		/***************************
 		 * Configure Local Database
-		 * USE_LOCAL_MONGODB_SERVER=true
+		 * 
 		 */	
-		this.services.registerClass('admin', [], DBOpsService  );
+		this.services.registerClass('adminDB', [], DBOpsService  );
 
 		/***************************
 		 * Register System user Service

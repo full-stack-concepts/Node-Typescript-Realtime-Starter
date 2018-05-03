@@ -42,6 +42,11 @@ import {
 } from './util/secrets';
 
 /***
+ * Inject DB operation Service
+ */
+const AdminService:any = serviceManager.inject("adminDB");
+
+/***
  * Test if Environment variables for this development mode dev|prod are loaded
  * if no configuration for this environment was found exit with error message
  */
@@ -133,7 +138,12 @@ function onListening():void {
  * Bootstrap Manager
  * 3TODO: Move later to seperate class
  */
-function bootStrapper() {   
+function bootStrapper() {    
+
+    /***
+     * Test MongoCLient f
+     */
+    proxyService.mongoClient$.next(true); 
 
     /***
      * Private DataStore if needed

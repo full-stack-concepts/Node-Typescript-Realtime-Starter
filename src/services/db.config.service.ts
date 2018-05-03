@@ -1,11 +1,6 @@
 import mongoose from "mongoose";
 import Promise from "bluebird";
-const MongoDB = require("mongodb");
-const MongoClient = MongoDB.MongoClient;
 
-
-Promise.promisifyAll(MongoDB);
-Promise.promisifyAll(MongoClient);
 mongoose.Promise = global.Promise;
 
 import { deepCloneObject} from "../util";
@@ -78,11 +73,6 @@ export class DBConfigService {
 		this.connect();
 
 		/****
-		 * Connect to local MongoDB Admin Database
-		 */
-		this.adminConnect()
-
-		/****
 		 * Configure Subscribers
 		 */
 		this.configureSubscribers();
@@ -99,6 +89,7 @@ export class DBConfigService {
 	private defaultErrorMessage(err:any):void {
 		console.error("Local Database : Could not connect to local instance of MONGODB or authentication failed. Please check your configuration.");
 		console.error(err);
+		process.exit(1);
 	}
 
 	/****
@@ -147,42 +138,7 @@ export class DBConfigService {
 		 */
 		 .catch( (err:any) => this.defaultErrorMessage(err) );	
 
-	}
-
-	/****
-	 * Set up connectoin with MoongoDB Admin DB
-	 */
-	private adminConnect() {
-
-		/****
-		 * Connection String
-		 */
-		const connStr:string = this.constructAdminConnectionString();	
-		
-		/****
-		 * Connect
-		 */
-		return MongoClient.connect( connStr )
-
-		/****
-		 * Propagate Admin DB Native Connection
-		 */
-		.then( (db:any) => {
-			proxyService.setLocalAdminDbInstance(db);	
-			proxyService.adminDB$.next(true);
-		})
-
-		/****
-		 * Retunn to caller
-		 */
-		.then( () => Promise.resolve() )
-
-		/****
-		 * Critical error
-		 */
-		 .catch( (err:any) => this.defaultErrorMessage(err) );		
-
-	}
+	}	
 
 	private configureSubscribers():void {
 
