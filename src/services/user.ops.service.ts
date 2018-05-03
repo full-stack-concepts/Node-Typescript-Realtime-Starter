@@ -408,7 +408,7 @@ export class UserOperations {
 		if(hostType === 1) {		
 
 			return model.createUser(user)
-			.then( (res:any) => { return Promise.resolve(user) })
+			.then( (res:any) => { return Promise.resolve(res) })
 			.catch( (err:any) => {
 				console.log(err);
 				console.error('<errorNumberX>'); 

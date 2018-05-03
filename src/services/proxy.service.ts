@@ -6,9 +6,24 @@ import { Subject } from "rxjs";
 
 class ProxyService {
 
+	/***
+	 * App Event Bus: Native Mongoose connection is ready
+	 */
 	public db$:Subject<boolean> = new Subject();
+
+	/***
+	 * App Event Bus: signal MongoCLient for test
+	 */
 	public mongoClient$:Subject<boolean> = new Subject();
+
+	/***
+	 * App Event Bus: signal Database Service to create DB User
+	 * @MongoID
+	 */
+	public dbUser$:Subject<string> = new Subject();
+
 	public systemUser$:Subject<boolean> = new Subject();
+
 	public localDBInstance$:Subject<boolean> = new Subject();
 	
 	

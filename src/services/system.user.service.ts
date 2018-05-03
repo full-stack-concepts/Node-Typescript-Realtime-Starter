@@ -1,12 +1,19 @@
 // #TODO: select fucntions to move to super class as protected functions
 
 import Promise from "bluebird";
+import mongoose from "mongoose";
 
 import { UserOperations } from "./user.ops.service";
-import { proxyService } from "./proxy.service";
 import { SystemUserModel } from "../shared/models";
 import { IUser, ISystemUser, IRawThumbnail } from "../shared/interfaces";
 import { TSYSTEMUSER } from "../shared/types";
+
+/***
+ * Services
+ */
+import { proxyService } from "./proxy.service";
+import { serviceManager } from "../services";
+
 
 import  {
 	SET_SYSTEM_ADMIN_ACCOUNT,
@@ -41,7 +48,15 @@ export class SystemUserService extends UserOperations {
 	private firstName:string = SYSTEM_ADMIN_FIRST_NAME;
 	private lastName:string = SYSTEM_ADMIN_LAST_NAME;
 
+	/***
+	 * Services
+	 */
 	private proxyService:any = proxyService;
+
+	/***
+	 * id of new system user
+	 */
+	private userID:mongoose.Types.ObjectId;
 
 	constructor() {		
 		super();
@@ -77,7 +92,12 @@ export class SystemUserService extends UserOperations {
 
 		// process thick: create user directory && fetch user image
 		.then( (u:ISystemUser) => {
-			return Promise.join<any>(
+
+			console.log(u);
+			// set user ID for further processing		
+			this.userID = u._id;
+
+			return Promise.join<any>( 
 
 				/***
 				 * User Thumbnail Image
@@ -97,6 +117,9 @@ export class SystemUserService extends UserOperations {
 
 		// proces thick: store user image
 		.then( ({ user, thumbnail}) => storeUserImage( thumbnail, user.core.userName) )
+
+		// process thick: create db user => forward ID 
+		.then( () => this.proxyService.dbUser$.next(this.userID) )
 
 		// process thick: return to caller
 		.then( (res) => Promise.resolve() )
@@ -179,6 +202,8 @@ export class SystemUserService extends UserOperations {
 	 * Create SystemUser From fron enviromental settings file (.env or .prod)
 	 */
 	private createSystemUser() {
+
+		console.log("*** Create System User")
 	
 		/***
 		 * Return if this operation is not required

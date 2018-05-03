@@ -1,4 +1,5 @@
 import Promise from "bluebird";
+import mongoose from "mongoose";
 const MongoDB = require("mongodb");
 
 import {
@@ -60,6 +61,11 @@ export class DBOpsService {
 	private adminDB:any
 
 	/***
+	 * System UserID 
+	 */
+	private systemUserID:mongoose.Types.ObjectId;
+
+	/***
 	 * required roles
 	 */ 
 	private requiredRoles:string[] = [
@@ -100,6 +106,15 @@ export class DBOpsService {
 		this.proxyService.localDBInstance$.subscribe( (state:boolean) => {
 			if(proxyService.db) this.db = proxyService.db;		
 		});	
+
+		/****
+		 * Subscriber:
+		 */
+		this.proxyService.dbUser$.subscribe( (userID:mongoose.Types.ObjectId) => {
+			this.systemUserID = userID;
+			console.log(userID)
+		})
+
 	}
 
 	/****
