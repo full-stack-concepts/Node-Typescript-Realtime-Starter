@@ -9,6 +9,8 @@ import {
 	SYSTEM_ADMIN_USER,
 	SYSTEM_ADMIN_PASSWORD,
 
+	DB_SYSTEM_USERS,
+
 	/***
 	 * MongoDB settings: db names
 	 */
@@ -75,7 +77,13 @@ interface IDB_GET_ROLE_OPTION {
 	showBuiltinRoles: boolean;
 }
 
-export class DBAdminService {
+interface IndexSignature {
+  [key: string]: any;
+}
+
+export class DBAdminService implements IndexSignature {
+
+	 [key: string]: any;
 
 	/***
 	 * Proxy Service
@@ -116,7 +124,8 @@ export class DBAdminService {
 	 * required databases
 	 */
 	private requiredDatabases:string[] = [
-		DB_USERS_DATABASE_NAME
+		DB_USERS_DATABASE_NAME,
+		DB_PRODUCT_DATABASE_NAME
 	];
 
 	/***
@@ -167,8 +176,7 @@ export class DBAdminService {
 		 * Subscriber:
 		 */
 		this.proxyService.dbUser$.subscribe( (userID:string) => {
-			this.systemUserID = userID;
-			this.addUser(this.systemUserID);
+			this.systemUserID = userID;		
 		});
 
 	}
@@ -304,7 +312,7 @@ export class DBAdminService {
 		})
 		.then( (res:any) => Promise.resolve() )
 		.catch( (err:any) => Promise.reject(err) );
-	}
+	}	
 
 	/****
 	 * Current Database Roles
@@ -322,30 +330,72 @@ export class DBAdminService {
 		.catch( (err:any) => Promise.reject(err) );
 	}
 
-	private evalUserDatabases() {		
-		const userDBEntry:any = this.dbList.databases.find( ( entry:any) => entry.name === DB_USERS_DATABASE_NAME );
-		if(!userDBEntry) {
-			console.error("Critical Error: Database ",DB_USERS_DATABASE_NAME, " does not exist!")
-			process.exit(1);
-		} else {
-			return Promise.resolve();
-		}
+	/***
+	 * Evaluate required roles: if role does not exist create it
+	 */
+	private evalRoles() {	
+	
+		const roles:any =  this.requiredRoles.map( ( requiredRole:string) => {			
+			if(!this.dbRoles.roles.find( (entry:any) => entry.role === requiredRole ) ) {			
+				return requiredRole;
+			} else {
+				return null;
+			}
+		});
+
+		return Promise.map( roles, (role:any) => {
+			if(!role) return;
+			if(role) return this[role](); 			
+		})
+		.then( (roles:any) => Promise.resolve(roles) )
+		.catch( (err:any) => Promise.reject(err) );
+	}	
+
+	/****
+	 *
+	 */
+	private manageOpRole() {
+		return this.adminDB.command({
+			createRole: "manageOpRole",
+			privileges: [
+       			{ resource: { cluster: true }, actions: [ "killop", "inprog" ] },
+       			{ resource: { db: "", collection: "" }, actions: [ "killCursors" ] }
+     		],
+     		roles: []
+		})
+		.then( (roles:any) => Promise.resolve(roles) )
+		.catch( (err:any) => Promise.reject(err) );
 	}
+
+	/****
+	 *
+	 */
+	private mongostatRole() {
+		return this.adminDB.command({
+			createRole: "mongostatRole",
+			privileges: [ { resource: { cluster: true }, actions: [ "serverStatus" ] } ],
+     		roles: []
+		})
+		.then( (roles:any) => Promise.resolve(roles) )
+		.catch( (err:any) => Promise.reject(err) );
+	}
+
+	private dropSystemViewsAnyDatabase() {
+		return this.adminDB.command({
+			createRole: "dropSystemViewsAnyDatabase",
+			privileges: [{
+				actions: [ "dropCollection" ],
+         		resource: { db: "", collection: "system.views" } 
+         	}],
+     		roles: []
+		})
+		.then( (roles:any) => Promise.resolve(roles) )
+		.catch( (err:any) => Promise.reject(err) );
+	}	
 
 	private closeConnection():void {
 		this.client.close();
-	}	
-
-	/***
-	 * Return a list of required roles
-	 */
-	private evalRoles():string[] {	
-		return this.requiredRoles.map( ( requiredRole:string) => {			
-			if(!this.dbRoles.roles.find( (role:string) => role === requiredRole ) ) {			
-				return requiredRole;
-			}
-		});
-	}
+	}		
 
 	private defaultErrorMessage(err:any):void {
 		console.error("Local Database : Could not configure MongoClient. Please check your configuration.");
@@ -448,11 +498,8 @@ export class DBAdminService {
 				.catch( (err:any) => Promise.reject(err) );
 
 			});
-		})
-
-		// process thick: eval databases
-		.then( () => this.evalUserDatabases() )	
-
+		})		
+		
 		// process thick: eval roles
 		.then( () => this.evalRoles() )
 
