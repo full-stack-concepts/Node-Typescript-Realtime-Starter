@@ -6,14 +6,7 @@ export interface ISystemUser extends IPerson {
 	systemUser?:Function,	
 
 	priviliges: {
-
-		/****
-		 * Dataabse roles 
-		 */
-		manageOpRole?: boolean,
-		mongostatRole?: boolean,
-		dropSystemViewsAnyDatabase?: boolean,
-
+			
 		systemUsers?: {
 		 	create?: boolean,
 		 	read?: boolean,

@@ -20,14 +20,7 @@ const systemUser = Object.assign(userPrototype);
 /****
  * Extend Mongoose <System User> object: priviliges
  */
-systemUser.priviliges = {
-
-	/****
-	 * Dataabse roles 
-	 */
-	manageOpRole: { type:Boolean, required: false, default: false},
-	mongostatRole: { type:Boolean, required: false, default: false},
-	dropSystemViewsAnyDatabase:  { type:Boolean, required: false, default: false} 
+systemUser.priviliges = {	
 }
 
 /****

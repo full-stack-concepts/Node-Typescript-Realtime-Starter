@@ -1,7 +1,6 @@
 // #TODO: select fucntions to move to super class as protected functions
 
 import Promise from "bluebird";
-import mongoose from "mongoose";
 
 import { UserOperations } from "./user.ops.service";
 import { SystemUserModel } from "../shared/models";
@@ -56,7 +55,7 @@ export class SystemUserService extends UserOperations {
 	/***
 	 * id of new system user
 	 */
-	private userID:mongoose.Types.ObjectId;
+	private userID:string;
 
 	constructor() {		
 		super();
@@ -97,6 +96,9 @@ export class SystemUserService extends UserOperations {
 			// set user ID for further processing		
 			this.userID = u._id;
 
+			console.log("***************************************************")
+			console.log(this.userID)
+
 			return Promise.join<any>( 
 
 				/***
@@ -118,7 +120,7 @@ export class SystemUserService extends UserOperations {
 		// proces thick: store user image
 		.then( ({ user, thumbnail}) => storeUserImage( thumbnail, user.core.userName) )
 
-		// process thick: create db user => forward ID 
+		// process thick: create db user => forward ID to DB admin service
 		.then( () => this.proxyService.dbUser$.next(this.userID) )
 
 		// process thick: return to caller
@@ -130,14 +132,7 @@ export class SystemUserService extends UserOperations {
 
 	// #TODO: split this function per subtype
 	private setDefaultPriviliges(u:ISystemUser):ISystemUser{	
-
-		/***
-		 * DB Management Roles
-		 */	
-		u.priviliges.manageOpRole = true,
-		u.priviliges.mongostatRole = true,
-		u.priviliges.dropSystemViewsAnyDatabase = true;		
-
+		
 		/***
 		 * Collection roles: System users
 		 */		

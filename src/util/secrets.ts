@@ -87,6 +87,7 @@ export const SET_SYSTEM_ADMIN_ACCOUNT = process.env["SET_SYSTEM_ADMIN_ACCOUNT"] 
 export const SYSTEM_ADMIN_FIRST_NAME = process.env["SYSTEM_ADMIN_FIRST_NAME"];
 export const SYSTEM_ADMIN_LAST_NAME = process.env["SYSTEM_ADMIN_LAST_NAME"];
 export const SYSTEM_ADMIN_EMAIL = process.env["SYSTEM_ADMIN_EMAIL"];
+export const SYSTEM_ADMIN_USER = process.env["SYSTEM_ADMIN_USER"];
 export const SYSTEM_ADMIN_PASSWORD = process.env["SYSTEM_ADMIN_PASSWORD"];
 
 if(SET_SYSTEM_ADMIN_ACCOUNT) {
@@ -95,6 +96,7 @@ if(SET_SYSTEM_ADMIN_ACCOUNT) {
 			{ value: SYSTEM_ADMIN_FIRST_NAME , txt: ' System Admin Account property first name' },
 			{ value: SYSTEM_ADMIN_LAST_NAME, txt: '  System Admin Account property last name' },
 			{ value: SYSTEM_ADMIN_EMAIL, txt:  ' System Admin Account property email address' },
+			{ value: SYSTEM_ADMIN_USER, txt:  ' System Admin Account property user' },
 			{ value: SYSTEM_ADMIN_PASSWORD, txt:  ' System Admin Account property password' }		
 	];
 
@@ -106,6 +108,32 @@ if(SET_SYSTEM_ADMIN_ACCOUNT) {
 	});
 }
 
+/***
+ * Ssytem DB Accounts
+ */
+export const SYSTEM_DB_USERS_ADMIN_USER = process.env["SYSTEM_DB_USERS_ADMIN_USER"];
+export const SYSTEM_DB_USERS_ADMIN_PASSWORD = process.env["SYSTEM_DB_USERS_ADMIN_PASSWORD"] || "";
+export const SYSTEM_DB_USERS_READONLY_USER = process.env["SYSTEM_DB_USERS_READONLY_USER"];
+export const SYSTEM_DB_USERS_READONLY_PASSWORD = process.env["SYSTEM_DB_USERS_READONLY_PASSWORD"] || "";
+
+export const SYSTEM_DB_PRODUCTS_ADMIN_USER = process.env["SYSTEM_DB_PRODUCTS_ADMIN_USER"];
+export const SYSTEM_DB_PRODUCTS_ADMIN_PASSWORD = process.env["SYSTEM_DB_PRODUCTS_ADMIN_PASSWORD"] || "";
+export const SYSTEM_DB_PRODUCTS_READONLY_USER = process.env["SYSTEM_DB_PRODUCTS_READONLY_USER"];
+export const SYSTEM_DB_PRODUCTS_READONLY_PASSWORD = process.env["SYSTEM_DB_PRODUCTS_READONLY_PASSWORD"] || "";
+
+const dbAccounts:any[] = [
+		{ value: SYSTEM_DB_USERS_ADMIN_USER , txt: ' DB USERS Admin account ' },
+		{ value: SYSTEM_DB_USERS_READONLY_USER, txt: '  DB USERS readonly account ' },
+		{ value: SYSTEM_DB_PRODUCTS_ADMIN_USER, txt:  ' DB PRODUCTS Admin account ' },
+		{ value: SYSTEM_DB_PRODUCTS_READONLY_USER, txt:  ' DB PRODUCTS readonly account ' }		
+];
+
+dbAccounts.forEach( ({ value, txt }) => {		
+	if(!value || (value && typeof value != 'string')) {
+		console.error(`DB System Account: ${txt} is missing! Pleasse add one`);
+		process.exit(1);	
+	}
+});
 
 /***
  * Public Directory Management

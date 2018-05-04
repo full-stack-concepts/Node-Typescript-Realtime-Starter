@@ -130,7 +130,7 @@ function onListening():void {
 
    /*****
     * BOOTSTRAP APPLICATION  
-    */    
+    */       
     bootStrapper();
 }
 
@@ -138,12 +138,12 @@ function onListening():void {
  * Bootstrap Manager
  * 3TODO: Move later to seperate class
  */
-function bootStrapper() {    
+function bootStrapper() {       
 
     /***
-     * Test MongoCLient f
+     * Test MongoCLient 
      */
-    proxyService.mongoClient$.next(true); 
+    proxyService.configureMongoDBClient();
 
     /***
      * Private DataStore if needed

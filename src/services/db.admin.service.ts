@@ -1,10 +1,36 @@
 import Promise from "bluebird";
-import mongoose from "mongoose";
 const MongoDB = require("mongodb");
 
 import {
+
+	/***
+	 * SuperAdmin Credentials
+	 */
+	SYSTEM_ADMIN_USER,
+	SYSTEM_ADMIN_PASSWORD,
+
+	/***
+	 * MongoDB settings: db names
+	 */
 	DB_USERS_DATABASE_NAME,
-	DB_PRODUCT_DATABASE_NAME
+	DB_PRODUCT_DATABASE_NAME,
+
+	/***
+	 * Ssytem DB Accounts
+	 */
+	SYSTEM_DB_USERS_ADMIN_USER,
+	SYSTEM_DB_USERS_ADMIN_PASSWORD,
+	SYSTEM_DB_USERS_READONLY_USER,
+	SYSTEM_DB_USERS_READONLY_PASSWORD,
+
+	SYSTEM_DB_PRODUCTS_ADMIN_USER,
+	SYSTEM_DB_PRODUCTS_ADMIN_PASSWORD,
+	SYSTEM_DB_PRODUCTS_READONLY_USER,
+	SYSTEM_DB_PRODUCTS_READONLY_PASSWORD,
+
+	/***
+	 * MongoDB connection settings
+	 */
 	USE_LOCAL_MONGODB_SERVER,
 	DB_CONFIG_HOST,
 	DB_CONFIG_PORT,
@@ -12,11 +38,20 @@ import {
 	DB_CONFIG_PASSWORD,
 	DB_CONFIG_DATABASE,
 	DB_MAX_POOL_SIZE,
-	DB_MAX_POOL_SIZE_ADMIN_CONN
+	DB_MAX_POOL_SIZE_ADMIN_CONN,
+
+	/***
+	 * Usage of pre-defined user-subtype collections
+	 */
+	USE_PERSON_SUBTYPE_USER,
+	USE_PERSON_SUBTYPE_CLIENT,
+	USE_PERSON_SUBTYPE_CUSTOMER
+
 } from "../util/secrets";
 
-import { IConnection } from "../shared/interfaces";
+import { ISystemUser, IConnection } from "../shared/interfaces";
 import { proxyService } from "../services";
+import { SystemUserModel } from "../shared/models";
 
 /****
  * Default Connection Settings Object
@@ -51,6 +86,7 @@ export class DBAdminService {
 	 * Instance of MongoDB CLient
 	 */
 	private client:any;
+	private isClientTested:boolean=false;
 
 	/***
 	 * Instance of Mongoose CLient
@@ -65,7 +101,7 @@ export class DBAdminService {
 	/***
 	 * System UserID 
 	 */
-	private systemUserID:mongoose.Types.ObjectId;
+	private systemUserID:string;
 
 	/***
 	 * required roles
@@ -82,6 +118,17 @@ export class DBAdminService {
 	private requiredDatabases:string[] = [
 		DB_USERS_DATABASE_NAME
 	];
+
+	/***
+	 * required accounts
+	 */
+	private dbList:any;
+	private dbRoles:any;
+	private hasSystemAccount:boolean;
+	private hasUsersAdmin:boolean;
+	private hasProductsAdmin:boolean;
+	private hasUsersReadOnlyUser:boolean;
+	private hasProductsReadOnlyUser:boolean;
 
 	/***
 	 * Current roles
@@ -105,8 +152,8 @@ export class DBAdminService {
 		 * Subscriber: proxyService flags to test MongoClient
 		 * get instance through get call to proxy service
 		 */		
-		this.proxyService.mongoClient$.subscribe( (state:boolean) => {		
-			if(state) this.adminDB = this.testMongoClient();
+		this.proxyService.mongoClient$.subscribe( (state:boolean) => {	
+			if(state) this.adminDB = this.configureMongoDBClient();
 		});	
 
 		/****
@@ -119,10 +166,10 @@ export class DBAdminService {
 		/****
 		 * Subscriber:
 		 */
-		this.proxyService.dbUser$.subscribe( (userID:mongoose.Types.ObjectId) => {
+		this.proxyService.dbUser$.subscribe( (userID:string) => {
 			this.systemUserID = userID;
-			console.log(userID)
-		})
+			this.addUser(this.systemUserID);
+		});
 
 	}
 
@@ -179,19 +226,84 @@ export class DBAdminService {
 		.catch( (err:any) => Promise.reject(err) );
 	}
 
-	private evalUserDatabases(list:any) {
-
-		const userDBEntry:any = list.databases.find( ( entry:any) => entry.name === DB_USERS_DATABASE_NAME );
-		if(!userDBEntry) {
-			console.error("Critical Error: Database ",DB_USERS_DATABASE_NAME, " does not exist!")
-			process.exit(1);
-		} else {
-			return Promise.resolve();
-		}
+	/****
+	 *
+	 */
+	private listDatabaseUser(user:string, database:string) {		
+		return this.client.db(database).admin().command({
+			usersInfo: { user: user, db: "admin"}
+		})
+		.then( (res:any) => {				
+			if(res.users.length === 0) {
+				return Promise.resolve(false);
+			} else {
+				return Promise.resolve(true);
+			}	
+		})
+		.catch( (err:any) => Promise.reject(err) );
 	}
 
-	private closeConnection():void {
-		this.client.close();
+	/***
+	 *
+	 */
+	private dropUser(_userName:string) {		
+		let userName:string = String(`${_userName}`);		
+		return this.client.db("admin").admin().command({
+			dropUser:userName.toString(),
+			writeConcern: {
+				w: "majority", 
+				wtimeout: 5000
+			}
+		})
+		.then( (res:any) => Promise.resolve() )
+		.catch( (err:any) => Promise.reject(err) );
+	}
+
+	/****
+	 *
+	 */
+	private createSystemAdminAccount({user, password}:any) {	
+
+		return this.adminDB.command({ 
+			createUser: user,
+			pwd: password,
+			roles: [ 
+				{ role: "userAdminAnyDatabase", db: "admin" } 
+			] 
+		})
+		.then( (res:any) => Promise.resolve() )
+		.catch( (err:any) => Promise.reject(err) );
+	}
+
+	/****
+	 *
+	 */
+	private createSystemDBAccount({user, password, db}:any) {
+
+		return this.adminDB.command({
+			createUser: user,
+			pwd: password,
+			roles: [ 
+				{ role: "userAdmin", db: db }, 
+				{ role: "readWrite", db: db }
+			]
+		})
+		.then( (res:any) => Promise.resolve() )
+		.catch( (err:any) => Promise.reject(err) );
+
+	}
+
+	/****
+	 *
+	 */
+	private createSystemReadOnlyAccount({user, password, db}:any) {		
+		return this.adminDB.command({
+			createUser: user,
+			pwd: password,
+			roles: [ { role: "read", db: db }]
+		})
+		.then( (res:any) => Promise.resolve() )
+		.catch( (err:any) => Promise.reject(err) );
 	}
 
 	/****
@@ -210,19 +322,33 @@ export class DBAdminService {
 		.catch( (err:any) => Promise.reject(err) );
 	}
 
+	private evalUserDatabases() {		
+		const userDBEntry:any = this.dbList.databases.find( ( entry:any) => entry.name === DB_USERS_DATABASE_NAME );
+		if(!userDBEntry) {
+			console.error("Critical Error: Database ",DB_USERS_DATABASE_NAME, " does not exist!")
+			process.exit(1);
+		} else {
+			return Promise.resolve();
+		}
+	}
+
+	private closeConnection():void {
+		this.client.close();
+	}	
+
 	/***
 	 * Return a list of required roles
 	 */
-	private evalRoles( list:any):string[] {
+	private evalRoles():string[] {	
 		return this.requiredRoles.map( ( requiredRole:string) => {			
-			if(!list.roles.find( (role:string) => role === requiredRole ) ) {			
+			if(!this.dbRoles.roles.find( (role:string) => role === requiredRole ) ) {			
 				return requiredRole;
 			}
 		});
 	}
 
 	private defaultErrorMessage(err:any):void {
-		console.error("Local Database : Could not configure MongoClient.Please check your configuration.");
+		console.error("Local Database : Could not configure MongoClient. Please check your configuration.");
 		console.error(err);
 		process.exit(1);
 	}		
@@ -230,27 +356,106 @@ export class DBAdminService {
 	/****
 	 *
 	 */
-	public testMongoClient() {		
+	public configureMongoDBClient() {				
 
 		// process thick: connect
-		return this.connect()
+		return this.connect()		
 		
 		// process thick: set Admin DB
 		.then( () => this.selectAdminDB() )
 
-		// process thick: list databases
-		.then( () => this.listDatabases() )
+		.then( () => {
+
+			return Promise.join<any>(
+
+				//List Databases/
+				this.listDatabases(),
+
+				//  Current DB Roles
+				this.getCurrentDBRoles(),
+
+				// Test for required db users
+				this.listDatabaseUser(SYSTEM_ADMIN_USER, "admin"),
+				this.listDatabaseUser(SYSTEM_DB_USERS_ADMIN_USER, "admin"),
+				this.listDatabaseUser(SYSTEM_DB_PRODUCTS_ADMIN_USER, "admin"),
+				this.listDatabaseUser(SYSTEM_DB_USERS_READONLY_USER, "admin"),
+				this.listDatabaseUser(SYSTEM_DB_PRODUCTS_READONLY_USER, "admin")				
+			)
+			.spread ( (
+				dbList:any, 
+				dbRoles:any, 			
+				hasSystemAccount:boolean,
+				hasUsersAdmin:boolean,
+				hasProductsAdmin:boolean,
+				hasUsersReadOnlyUser:boolean,
+				hasProductsReadOnlyUser:boolean		
+			) => {
+				
+				this.dbList = dbList;
+				this.dbRoles = dbRoles;				
+
+				let sAccounts=[];
+				if(!hasSystemAccount) sAccounts.push({ 
+					type: 1, 
+					user:SYSTEM_ADMIN_USER, 
+					password: SYSTEM_ADMIN_PASSWORD, 
+					db: "admin"}
+				);
+
+				if(!hasUsersAdmin) sAccounts.push({
+					type: 2, 
+					user:SYSTEM_DB_USERS_ADMIN_USER,
+					password: SYSTEM_DB_USERS_ADMIN_PASSWORD,
+					db: DB_USERS_DATABASE_NAME
+				}); 	
+
+				if(!hasUsersReadOnlyUser) sAccounts.push({
+					type: 3, 
+					user: SYSTEM_DB_USERS_READONLY_USER,
+					password: SYSTEM_DB_USERS_READONLY_PASSWORD,
+					db: DB_USERS_DATABASE_NAME,
+				});	
+
+				if(!hasProductsAdmin) sAccounts.push({ 
+					type: 2, 
+					user:SYSTEM_DB_PRODUCTS_ADMIN_USER,
+					password: SYSTEM_DB_PRODUCTS_ADMIN_PASSWORD,
+					db: DB_PRODUCT_DATABASE_NAME
+				});	
+
+				if(!hasProductsReadOnlyUser) sAccounts.push({
+					type: 3, 
+					user:SYSTEM_DB_PRODUCTS_READONLY_USER,
+					password: SYSTEM_DB_PRODUCTS_READONLY_PASSWORD,
+					db: DB_PRODUCT_DATABASE_NAME
+				});				
+
+				return Promise.map( sAccounts, (account:any) => {					
+
+					if(account.type === 1) {
+						return this.createSystemAdminAccount(account);	
+					}					
+
+					else if(account.type === 2) {
+						return this.createSystemDBAccount(account);							
+					}
+
+					else if(account.type === 3) {
+						return this.createSystemReadOnlyAccount(account);
+					}
+				})
+				.then( () => Promise.resolve() )
+				.catch( (err:any) => Promise.reject(err) );
+
+			});
+		})
 
 		// process thick: eval databases
-		.then( (list:any) => this.evalUserDatabases (list) )
-
-		// process thick: get current db roles
-		.then( () => this.getCurrentDBRoles() )
+		.then( () => this.evalUserDatabases() )	
 
 		// process thick: eval roles
-		.then( (roles:string[]) => this.evalRoles(roles) )
+		.then( () => this.evalRoles() )
 
-		// process thick:
 		.then( ( roles:string[] ) => {
 			this.currentRoles = roles 
 			return console.log("*** Current undefined roles ", this.currentRoles )
@@ -261,22 +466,11 @@ export class DBAdminService {
 
 		// process thick: return to caller
 		.then( () => Promise.resolve() )
-
-		.catch( (err:any) => this.defaultErrorMessage(err) );	
+		.catch( (err:any) => this.defaultErrorMessage(err) );
 	
 	}
+	
 
-	/****
-	 *
-	 */
-	public addUser() {
-
-	}
-
-	/****
-	 *
-	 */
-	public modifyUser() {}
 }
 
 

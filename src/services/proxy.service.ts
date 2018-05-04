@@ -65,6 +65,13 @@ class ProxyService {
 	}
 	public set db( db:any) { this._db = db; }
 	public get db() { return this._db; }	
+
+	/***
+	 * Start MongoDB Client COnfiguratoin
+	 */
+	public configureMongoDBClient():void {
+		this.mongoClient$.next(true); 
+	}
 	
 }
 

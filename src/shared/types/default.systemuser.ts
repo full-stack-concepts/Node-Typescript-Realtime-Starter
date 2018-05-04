@@ -78,14 +78,7 @@ const _TSYSTEMUSER:ISystemUser = <ISystemUser | any> {
 	}
 }
 
-_TSYSTEMUSER.priviliges = {
-
-	/***
-	 * DB Rules
-	 */
-	manageOpRole: null,
-	mongostatRole: null,
-	dropSystemViewsAnyDatabase: null
+_TSYSTEMUSER.priviliges = {	
 }
 
 _TSYSTEMUSER.priviliges.systemUsers = {

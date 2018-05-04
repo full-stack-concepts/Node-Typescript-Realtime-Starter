@@ -1,4 +1,5 @@
 import Promise from "bluebird";
+import mongoose from "mongoose";
 
 import { DefaultModel} from "./default.model";
 import { RepositoryBase,  ISystemUser, IListOptions } from "../interfaces";
@@ -62,7 +63,7 @@ export class SystemUserModel extends DefaultModel  {
 				if(err) {reject(err); } else { resolve(); }
 			});
 		});
-	}	
+	}  	
 
 	public static findOne (cond:Object):Promise<any> {
 		let repo = new SystemUserRepository();
