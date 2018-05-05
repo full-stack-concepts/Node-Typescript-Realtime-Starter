@@ -27,7 +27,38 @@ export interface IBulk<T> {
     remove: (cond:Object, callback: ( error:any) => void ) => void;
 }
 
+/****
+ * Seperate Repositoy Class for readOnly DB Connections and models
+ */
+export class MReadOnlyRespositoryBase<T extends mongoose.Document> implements IRead<T> {
 
+    private _model: mongoose.Model<mongoose.Document>;
+
+    constructor(schemaModel: mongoose.Model<mongoose.Document>) {
+        this._model = schemaModel;
+    }
+
+    retrieve(callback: (error: any, result: T) => void) {
+        this._model.find({}, callback);
+    }
+
+    findById(_id: string, callback: (error: any, result: T) => void) {
+        this._model.findById(_id, callback);
+    }
+
+    findOne(cond?: Object, callback?: (err: any, res: T) => void): any {
+        return this._model.findOne(cond, callback);
+    }
+
+    find(cond?: Object, fields?: Object, options?: Object, callback?: (err: any, res: T[]) => void): any {
+        return this._model.find(cond, options, callback);
+    }   
+
+}
+
+/****
+ * Repository Class for RedWrite Models
+ */
 export class RepositoryBase<T extends mongoose.Document> implements IRead<T>, IWrite<T>, IManagement<T>, IBulk<T>  {
 
     private _model: mongoose.Model<mongoose.Document>;

@@ -9,26 +9,14 @@ import {
 	SYSTEM_ADMIN_USER,
 	SYSTEM_ADMIN_PASSWORD,
 
-	DB_SYSTEM_USERS,
+	DB_SYSTEM_USERS,	
+	REQUIRED_USERS_PER_DATABASE,
 
 	/***
 	 * MongoDB settings: db names
 	 */
 	DB_USERS_DATABASE_NAME,
-	DB_PRODUCT_DATABASE_NAME,
-
-	/***
-	 * Ssytem DB Accounts
-	 */
-	SYSTEM_DB_USERS_ADMIN_USER,
-	SYSTEM_DB_USERS_ADMIN_PASSWORD,
-	SYSTEM_DB_USERS_READONLY_USER,
-	SYSTEM_DB_USERS_READONLY_PASSWORD,
-
-	SYSTEM_DB_PRODUCTS_ADMIN_USER,
-	SYSTEM_DB_PRODUCTS_ADMIN_PASSWORD,
-	SYSTEM_DB_PRODUCTS_READONLY_USER,
-	SYSTEM_DB_PRODUCTS_READONLY_PASSWORD,
+	DB_PRODUCT_DATABASE_NAME,	
 
 	/***
 	 * MongoDB connection settings
@@ -63,7 +51,7 @@ const a:IConnection = {
 	user: DB_CONFIG_USER,
 	password: DB_CONFIG_PASSWORD,
 	port: DB_CONFIG_PORT,
-	db: DB_CONFIG_DATABASE
+	db: "admin"
 }
 
 const MongoClient = MongoDB.MongoClient;
@@ -121,23 +109,18 @@ export class DBAdminService implements IndexSignature {
 	];
 
 	/***
-	 * required databases
+	 * Required databases
 	 */
 	private requiredDatabases:string[] = [
 		DB_USERS_DATABASE_NAME,
 		DB_PRODUCT_DATABASE_NAME
-	];
+	];	
 
 	/***
 	 * required accounts
 	 */
 	private dbList:any;
-	private dbRoles:any;
-	private hasSystemAccount:boolean;
-	private hasUsersAdmin:boolean;
-	private hasProductsAdmin:boolean;
-	private hasUsersReadOnlyUser:boolean;
-	private hasProductsReadOnlyUser:boolean;
+	private dbRoles:any;	
 
 	/***
 	 * Current roles
@@ -171,14 +154,6 @@ export class DBAdminService implements IndexSignature {
 		this.proxyService.localDBInstance$.subscribe( (state:boolean) => {
 			if(proxyService.db) this.db = proxyService.db;		
 		});	
-
-		/****
-		 * Subscriber:
-		 */
-		this.proxyService.dbUser$.subscribe( (userID:string) => {
-			this.systemUserID = userID;		
-		});
-
 	}
 
 	/****
@@ -226,6 +201,7 @@ export class DBAdminService implements IndexSignature {
 	 * List Current Databases
 	 */
 	private listDatabases() {
+
 		return this.adminDB.listDatabases() 
 		.then( (list:any) => {
 			console.log(list)
@@ -235,16 +211,74 @@ export class DBAdminService implements IndexSignature {
 	}
 
 	/****
-	 *
+	 * Builds list of required System DB users that dont exist
 	 */
-	private listDatabaseUser(user:string, database:string) {		
+	private analysePreDefinedDatabaseUsers() {
+
+		let usersToInsert:string[]=[];
+
+		/***
+		 * Get Users Lost for each Database
+		 */
+		return Promise.map( REQUIRED_USERS_PER_DATABASE, ( {accounts, dbName}) => {
+			return this.client.db(dbName).command({usersInfo:1})	
+			.then( (users:any) => Promise.resolve({[dbName]: users}) )
+		})
+
+		/***
+		 * Test Per Dabase if required account exists
+		 */
+		.then( ( allUsers:any) => {	
+
+			let i:number=0;
+			return Promise.map( REQUIRED_USERS_PER_DATABASE,  ({ accounts, dbName}:any) => {
+
+				// db reqquired users
+				let requiredUsers:any=[];		
+
+				// find current users list for this db
+				const currentDBUsers:any = allUsers.filter ( 
+					(dbUsers:any) => dbUsers.dbName = dbName 
+				)[i][dbName].users;
+
+				// increase counter
+				i++;
+
+				// find missing users
+				const test = [];
+				accounts.map( ({user, password, type, db}:any) => {
+					let hasAccount;				
+					if(!currentDBUsers.length) {
+						hasAccount=false;
+					} else {
+					  	hasAccount= currentDBUsers.filter( (userObj:any) => (userObj.user === user ) );
+					  	if(hasAccount.length===0) hasAccount=false;
+					}				
+
+					if(!hasAccount) requiredUsers.push( {user:user, password: password, type: type, db:dbName});
+				});							
+
+				return Promise.resolve({ [dbName]: requiredUsers })
+			})
+			.then( (requiredUsers) => Promise.resolve(requiredUsers) )
+			.catch( (err:any) => Promise.reject(err) )
+		})
+
+		.then( (requiredUsers) => Promise.resolve(requiredUsers) )	
+	}
+
+	/***
+	 * Get Database User
+	 */
+	private getUser(user:string, database:string) {		
+
 		return this.client.db(database).admin().command({
 			usersInfo: { user: user, db: "admin"}
 		})
-		.then( (res:any) => {				
-			if(res.users.length === 0) {
+		.then( (res:any) => {			
+			if(res.users.length === 0) {				
 				return Promise.resolve(false);
-			} else {
+			} else {	
 				return Promise.resolve(true);
 			}	
 		})
@@ -252,11 +286,11 @@ export class DBAdminService implements IndexSignature {
 	}
 
 	/***
-	 *
+	 * Drop any user
 	 */
-	private dropUser(_userName:string) {		
+	private dropUser(_userName:string, _dbName:string) {		
 		let userName:string = String(`${_userName}`);		
-		return this.client.db("admin").admin().command({
+		return this.client.db(_dbName).admin().command({
 			dropUser:userName.toString(),
 			writeConcern: {
 				w: "majority", 
@@ -268,7 +302,7 @@ export class DBAdminService implements IndexSignature {
 	}
 
 	/****
-	 *
+	 * MOngoDB System Account
 	 */
 	private createSystemAdminAccount({user, password}:any) {	
 
@@ -284,28 +318,27 @@ export class DBAdminService implements IndexSignature {
 	}
 
 	/****
-	 *
+	 * DB ReadWrite Account: usd for Mongoose Model
 	 */
-	private createSystemDBAccount({user, password, db}:any) {
-
-		return this.adminDB.command({
+	private createDatabaseAdmin({user, password, db}:any) {
+	
+		const _db:any = this.client.db(db);
+		return _db.command({
 			createUser: user,
 			pwd: password,
-			roles: [ 
-				{ role: "userAdmin", db: db }, 
-				{ role: "readWrite", db: db }
-			]
+			roles: [{role: "readWrite", db: db}]
 		})
 		.then( (res:any) => Promise.resolve() )
 		.catch( (err:any) => Promise.reject(err) );
-
 	}
 
 	/****
-	 *
+	 * DB ReadOnly Account: used for Mongoose Model
 	 */
-	private createSystemReadOnlyAccount({user, password, db}:any) {		
-		return this.adminDB.command({
+	private createSystemReadOnlyAccount({user, password, db}:any) {	
+
+		const _db:any = this.client.db(db);
+		return _db.command({		
 			createUser: user,
 			pwd: password,
 			roles: [ { role: "read", db: db }]
@@ -339,9 +372,9 @@ export class DBAdminService implements IndexSignature {
 			if(!this.dbRoles.roles.find( (entry:any) => entry.role === requiredRole ) ) {			
 				return requiredRole;
 			} else {
-				return null;
+				return;
 			}
-		});
+		});	
 
 		return Promise.map( roles, (role:any) => {
 			if(!role) return;
@@ -352,7 +385,7 @@ export class DBAdminService implements IndexSignature {
 	}	
 
 	/****
-	 *
+	 * Cluster Administratoin Role
 	 */
 	private manageOpRole() {
 		return this.adminDB.command({
@@ -368,7 +401,7 @@ export class DBAdminService implements IndexSignature {
 	}
 
 	/****
-	 *
+	 * Mongo  Statistics Role
 	 */
 	private mongostatRole() {
 		return this.adminDB.command({
@@ -404,9 +437,9 @@ export class DBAdminService implements IndexSignature {
 	}		
 
 	/****
-	 *
+	 * Configure Databases with MongoDB Client
 	 */
-	public configureMongoDBClient() {				
+	public configureMongoDBClient() {		
 
 		// process thick: connect
 		return this.connect()		
@@ -425,88 +458,42 @@ export class DBAdminService implements IndexSignature {
 				this.getCurrentDBRoles(),
 
 				// Test for required db users
-				this.listDatabaseUser(SYSTEM_ADMIN_USER, "admin"),
-				this.listDatabaseUser(SYSTEM_DB_USERS_ADMIN_USER, "admin"),
-				this.listDatabaseUser(SYSTEM_DB_PRODUCTS_ADMIN_USER, "admin"),
-				this.listDatabaseUser(SYSTEM_DB_USERS_READONLY_USER, "admin"),
-				this.listDatabaseUser(SYSTEM_DB_PRODUCTS_READONLY_USER, "admin")				
+				this.analysePreDefinedDatabaseUsers()			
 			)
 			.spread ( (
 				dbList:any, 
 				dbRoles:any, 			
-				hasSystemAccount:boolean,
-				hasUsersAdmin:boolean,
-				hasProductsAdmin:boolean,
-				hasUsersReadOnlyUser:boolean,
-				hasProductsReadOnlyUser:boolean		
+				dbUsersList:any				
 			) => {
 				
 				this.dbList = dbList;
-				this.dbRoles = dbRoles;				
+				this.dbRoles = dbRoles;															
 
-				let sAccounts=[];
-				if(!hasSystemAccount) sAccounts.push({ 
-					type: 1, 
-					user:SYSTEM_ADMIN_USER, 
-					password: SYSTEM_ADMIN_PASSWORD, 
-					db: "admin"}
-				);
-
-				if(!hasUsersAdmin) sAccounts.push({
-					type: 2, 
-					user:SYSTEM_DB_USERS_ADMIN_USER,
-					password: SYSTEM_DB_USERS_ADMIN_PASSWORD,
-					db: DB_USERS_DATABASE_NAME
-				}); 	
-
-				if(!hasUsersReadOnlyUser) sAccounts.push({
-					type: 3, 
-					user: SYSTEM_DB_USERS_READONLY_USER,
-					password: SYSTEM_DB_USERS_READONLY_PASSWORD,
-					db: DB_USERS_DATABASE_NAME,
-				});	
-
-				if(!hasProductsAdmin) sAccounts.push({ 
-					type: 2, 
-					user:SYSTEM_DB_PRODUCTS_ADMIN_USER,
-					password: SYSTEM_DB_PRODUCTS_ADMIN_PASSWORD,
-					db: DB_PRODUCT_DATABASE_NAME
-				});	
-
-				if(!hasProductsReadOnlyUser) sAccounts.push({
-					type: 3, 
-					user:SYSTEM_DB_PRODUCTS_READONLY_USER,
-					password: SYSTEM_DB_PRODUCTS_READONLY_PASSWORD,
-					db: DB_PRODUCT_DATABASE_NAME
-				});				
-
-				return Promise.map( sAccounts, (account:any) => {					
-
-					if(account.type === 1) {
-						return this.createSystemAdminAccount(account);	
-					}					
-
-					else if(account.type === 2) {
-						return this.createSystemDBAccount(account);							
-					}
-
-					else if(account.type === 3) {
-						return this.createSystemReadOnlyAccount(account);
-					}
+				// push all required users omtp single array
+				const requiredUsers:any=[];
+				let counter:number=0;
+				dbUsersList.forEach( (obj:any) => {
+					const firstKey:string = Object.keys(obj)[0];				
+					const list:any = dbUsersList[counter][firstKey];				
+					list.forEach( (entry:any) => requiredUsers.push(entry));					
+					counter++;
+				})			
+				
+				return Promise.map( requiredUsers, (account:any) => {
+					let ac:number=account.type;									
+					if(ac === 1) return this.createSystemAdminAccount(account);	
+					if(ac === 2) return this.createDatabaseAdmin(account);							
+					if(ac === 3) return this.createSystemReadOnlyAccount(account);
 				})
 				.then( () => Promise.resolve() )
-				.catch( (err:any) => Promise.reject(err) );
-
+				.catch( (err:any) => Promise.reject(err) );		
 			});
 		})		
 		
 		// process thick: eval roles
-		.then( () => this.evalRoles() )
+		.then( () => this.evalRoles() )		
 
-		.then( ( roles:string[] ) => {
-			this.currentRoles = roles 
-			return console.log("*** Current undefined roles ", this.currentRoles )
-		})
+		.then( () => proxyService.connectToUsersDatabase() )
 
 		// process thick: clsoe conenction
 		.then( () => this.closeConnection() )
@@ -516,7 +503,6 @@ export class DBAdminService implements IndexSignature {
 		.catch( (err:any) => this.defaultErrorMessage(err) );
 	
 	}
-	
 
 }
 

@@ -122,13 +122,87 @@ export const SYSTEM_DB_PRODUCTS_READONLY_USER = process.env["SYSTEM_DB_PRODUCTS_
 export const SYSTEM_DB_PRODUCTS_READONLY_PASSWORD = process.env["SYSTEM_DB_PRODUCTS_READONLY_PASSWORD"] || "";
 
 export const DB_SYSTEM_USERS:any= [
-	{ user: SYSTEM_ADMIN_USER, password: SYSTEM_ADMIN_PASSWORD},
-	{ user: SYSTEM_DB_USERS_ADMIN_USER, password: SYSTEM_DB_USERS_ADMIN_PASSWORD},
-	{ user: SYSTEM_DB_USERS_READONLY_USER, password: SYSTEM_DB_USERS_READONLY_PASSWORD },
-	{ user: SYSTEM_DB_PRODUCTS_ADMIN_USER, password: SYSTEM_DB_PRODUCTS_ADMIN_PASSWORD},
-	{ user: SYSTEM_DB_PRODUCTS_READONLY_USER, password: SYSTEM_DB_PRODUCTS_READONLY_PASSWORD }
+	{
+		user: SYSTEM_ADMIN_USER, 
+		password: SYSTEM_ADMIN_PASSWORD,
+		db: 'admin', 
+		type: 1 
+	},
+	{ 
+		user: SYSTEM_DB_USERS_ADMIN_USER, 
+		password: SYSTEM_DB_USERS_ADMIN_PASSWORD,
+		db: DB_USERS_DATABASE_NAME, 
+		type: 2
+	},
+	{ 
+		user: SYSTEM_DB_USERS_READONLY_USER, 
+		password: SYSTEM_DB_USERS_READONLY_PASSWORD,
+		db: DB_USERS_DATABASE_NAME, 
+		type: 3 
+	},
+	{ 
+		user: SYSTEM_DB_PRODUCTS_ADMIN_USER, 
+		password: SYSTEM_DB_PRODUCTS_ADMIN_PASSWORD,
+		db :DB_PRODUCT_DATABASE_NAME, 
+		type: 2 
+	},
+	{ 
+		user: SYSTEM_DB_PRODUCTS_READONLY_USER, 
+		password: SYSTEM_DB_PRODUCTS_READONLY_PASSWORD,
+		db: DB_USERS_DATABASE_NAME, 
+		type: 3
+	}
+];	
 
-]
+/***
+ * Required DB Accounts Admin Database
+ */
+export const requiredAccountsAdminDatabase:any = [
+	{	user: SYSTEM_ADMIN_USER, 
+		password: SYSTEM_ADMIN_PASSWORD, 
+		db: 'admin', 
+		type: 1 
+	}
+];
+
+/***
+ * Required DB Accounts Users Database
+ */
+export const requiredAccountsUsersDatabase:any = [
+	{ 	user: SYSTEM_DB_USERS_ADMIN_USER,	
+		password: SYSTEM_DB_USERS_ADMIN_PASSWORD,
+		db: DB_USERS_DATABASE_NAME, 
+		type: 2
+	},
+	{	user: SYSTEM_DB_USERS_READONLY_USER, 
+		password: SYSTEM_DB_USERS_READONLY_PASSWORD,
+		db: DB_USERS_DATABASE_NAME, 
+		type: 3 
+	}
+];
+
+/***
+ * Required DB Accounts Producs Database
+ */
+export const requiredAccountsProductsDatabase:any = [
+	{ 
+		user: SYSTEM_DB_PRODUCTS_ADMIN_USER,
+		password: SYSTEM_DB_PRODUCTS_ADMIN_PASSWORD,
+		db :DB_PRODUCT_DATABASE_NAME, 
+		type: 2 
+	},
+	{ 	user: SYSTEM_DB_PRODUCTS_READONLY_USER, 
+		password: SYSTEM_DB_PRODUCTS_READONLY_PASSWORD,
+		db: DB_USERS_DATABASE_NAME, 
+		type: 3
+	}
+];
+
+export const REQUIRED_USERS_PER_DATABASE:any = [
+	{ accounts: requiredAccountsAdminDatabase, dbName: "admin" },
+	{ accounts: requiredAccountsUsersDatabase, dbName: DB_USERS_DATABASE_NAME },
+	{ accounts: requiredAccountsProductsDatabase, dbName: DB_PRODUCT_DATABASE_NAME }
+];
 
 const dbAccounts:any[] = [
 		{ value: SYSTEM_DB_USERS_ADMIN_USER , txt: ' DB USERS Admin account ' },

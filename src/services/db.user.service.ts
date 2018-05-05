@@ -13,7 +13,10 @@ import {
 	DB_CONFIG_PASSWORD,
 	DB_CONFIG_DATABASE,
 	DB_MAX_POOL_SIZE,
-	DB_MAX_POOL_SIZE_ADMIN_CONN
+	DB_MAX_POOL_SIZE_ADMIN_CONN, 
+
+	SYSTEM_DB_USERS_ADMIN_USER, 
+	SYSTEM_DB_USERS_ADMIN_PASSWORD
 } from "../util/secrets";
 
 import { 
@@ -29,10 +32,10 @@ import {
  */
 const c:IConnection = {
 	host: DB_CONFIG_HOST, 
-	user: DB_CONFIG_USER,
-	password: DB_CONFIG_PASSWORD,
+	user: SYSTEM_DB_USERS_ADMIN_USER,
+	password: SYSTEM_DB_USERS_ADMIN_PASSWORD,
 	port: DB_CONFIG_PORT,
-	db: DB_CONFIG_DATABASE
+	db: "gitlab"
 }
 
 const a:IConnection = deepCloneObject(c);
@@ -65,17 +68,24 @@ export class DBUserService {
 		 * Return if local MongoDB instance is 
 		 * not configured in environmental file (.env or .prod)
 		 */
-		if(!USE_LOCAL_MONGODB_SERVER) return;
-
-		/****
-		 * Connect to local MongoDB Instance
-		 */
-		this.connect();
+		if(!USE_LOCAL_MONGODB_SERVER) return;		
 
 		/****
 		 * Configure Subscribers
 		 */
 		this.configureSubscribers();
+	}
+
+	private configureSubscribers():void {
+
+		this.proxyService.db$.subscribe( (state:boolean) => this._live = state );	
+
+		/****
+		 * Connect after DBAdmin signals that DB Account for this db exists
+		 */
+
+		this.proxyService.connectUsersDatabase$.subscribe( (state:boolean) => this.connect() );	
+
 	}
 
 	private constructConnectionString():string {
@@ -100,7 +110,12 @@ export class DBUserService {
 		/****
 		 * Connection String
 		 */
-		const connStr:string = this.constructConnectionString();	
+		const connStr:string = this.constructConnectionString();
+
+		console.log(connStr)	
+		console.log(SYSTEM_DB_USERS_ADMIN_USER)
+		console.log(SYSTEM_DB_USERS_ADMIN_PASSWORD)
+
 
 		/****
 		 * Connect
@@ -138,12 +153,6 @@ export class DBUserService {
 		 */
 		 .catch( (err:any) => this.defaultErrorMessage(err) );	
 
-	}	
-
-	private configureSubscribers():void {
-
-		this.proxyService.db$.subscribe( (state:boolean) => this._live = state );		
-
-	}
+	}		
 
 }

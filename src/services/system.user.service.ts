@@ -94,10 +94,7 @@ export class SystemUserService extends UserOperations {
 
 			console.log(u);
 			// set user ID for further processing		
-			this.userID = u._id;
-
-			console.log("***************************************************")
-			console.log(this.userID)
+			this.userID = u._id;		
 
 			return Promise.join<any>( 
 
@@ -118,10 +115,7 @@ export class SystemUserService extends UserOperations {
 		.then( (settings:any) => this.evalThumbnailObjectThenSetPath(settings))
 
 		// proces thick: store user image
-		.then( ({ user, thumbnail}) => storeUserImage( thumbnail, user.core.userName) )
-
-		// process thick: create db user => forward ID to DB admin service
-		.then( () => this.proxyService.dbUser$.next(this.userID) )
+		.then( ({ user, thumbnail}) => storeUserImage( thumbnail, user.core.userName) )	
 
 		// process thick: return to caller
 		.then( (res) => Promise.resolve() )
@@ -132,7 +126,7 @@ export class SystemUserService extends UserOperations {
 
 	// #TODO: split this function per subtype
 	private setDefaultPriviliges(u:ISystemUser):ISystemUser{	
-		
+
 		/***
 		 * Collection roles: System users
 		 */		

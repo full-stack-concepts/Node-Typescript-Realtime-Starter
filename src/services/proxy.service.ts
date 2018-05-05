@@ -14,13 +14,13 @@ class ProxyService {
 	/***
 	 * App Event Bus: signal MongoCLient for test
 	 */
-	public mongoClient$:Subject<boolean> = new Subject();
+	public mongoClient$:Subject<boolean> = new Subject();	
 
 	/***
-	 * App Event Bus: signal Database Service to create DB User
-	 * @MongoID
+	 * App Event Bus: signal DB Users Service to connect
 	 */
-	public dbUser$:Subject<string> = new Subject();
+	public connectUsersDatabase$:Subject<boolean> = new Subject();
+
 
 	public systemUser$:Subject<boolean> = new Subject();
 
@@ -71,6 +71,13 @@ class ProxyService {
 	 */
 	public configureMongoDBClient():void {
 		this.mongoClient$.next(true); 
+	}
+
+	/***
+	 * Conenct to users database
+	 */
+	public connectToUsersDatabase():void {
+		this.connectUsersDatabase$.next(true);
 	}
 	
 }
