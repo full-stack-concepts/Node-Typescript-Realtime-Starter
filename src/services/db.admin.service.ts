@@ -151,8 +151,8 @@ export class DBAdminService implements IndexSignature {
 		/****
 		 * Subscriber: Mongoose Native Connection
 		 */			
-		this.proxyService.localDBInstance$.subscribe( (state:boolean) => {
-			if(proxyService.db) this.db = proxyService.db;		
+		this.proxyService.userDB$.subscribe( (state:boolean) => {
+			if(proxyService.userDB) this.db = proxyService.userDB;		
 		});	
 	}
 
@@ -495,6 +495,9 @@ export class DBAdminService implements IndexSignature {
 
 		.then( () => proxyService.connectToUsersDatabase() )
 
+		// process thick: trigger BootstrapController that DBs have been configured
+		.then( () => proxyService.dbReady$.next(true) )
+
 		// process thick: clsoe conenction
 		.then( () => this.closeConnection() )
 
@@ -503,7 +506,14 @@ export class DBAdminService implements IndexSignature {
 		.catch( (err:any) => this.defaultErrorMessage(err) );
 	
 	}
-
 }
 
-
+/****
+ * Export for Bootstrap Controller
+ */
+export const configureDatabases = () => {
+		const instance:any = new DBAdminService();
+	return instance.configureMongoDBClient()
+	.then( () => Promise.resolve() )
+	.catch( (err:any) => Promise.reject(err) );	
+}

@@ -1,0 +1,1 @@
+export { bootstrapController} from "./bootstrap.controller";

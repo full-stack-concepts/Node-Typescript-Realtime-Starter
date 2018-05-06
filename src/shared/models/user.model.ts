@@ -13,7 +13,7 @@ import { objectKeysLength, stringify, RemoteQueryBuilder } from "../../util";
 class UserRepository extends RepositoryBase<IUser> {
 	
 	constructor() {
-		super(userSchema);
+		super(userSchema, 'user');
 	}
 }
 

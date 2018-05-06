@@ -1,16 +1,46 @@
 import Promise from "bluebird";
 import fetch from "node-fetch";
 
+import { proxyService } from "../../services";
 import { RepositoryBase,  IUser, IListOptions } from "../interfaces";
 import { objectKeysLength, stringify, RemoteQueryBuilder } from "../../util";
 
 const headers:any= { 'Content-Type': 'application/json' };
 
+/****
+ * Custom Methods for MLAB Mongo Databse				
+ */   
 export class DefaultModel {
 
 	/****
-	 * Custom Methods for MLAB Mongo Databse				
-	 */   
+	 * Native Connections
+	 * inejected into Repository classes
+	 */
+	protected userDB:any;
+	protected productDB:any;
+
+	constructor() {
+		this.configureSubscribers();		
+	}
+
+	protected configureSubscribers() {
+
+		console.log("***** CONFIGURE LISTENERS DEFAULT MODEL ")
+
+		/***
+		 * Subsriber: get UserDB native connection
+		 */		
+		proxyService.userDB$.subscribe( (state:boolean) => {	
+			if(proxyService.userDB) this.userDB = proxyService.userDB;
+		});
+
+		/***
+		 * Subsriber: get Product DB native connection
+		 */		
+		proxyService.productDB$.subscribe( (state:boolean) => {	
+			if(proxyService.productDB) this.productDB = proxyService.productDB;
+		});
+	}
 
 	//** MLAB: Create user 
 	public static remoteCreateUser(_data:any, collection:string) {		

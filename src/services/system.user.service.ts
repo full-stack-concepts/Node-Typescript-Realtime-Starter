@@ -249,5 +249,14 @@ export class SystemUserService extends UserOperations {
 			process.exit(1);
 		});
 	}
+}
 
+/****
+ * Export for Bootstrap Controller
+ */
+export const testForSystemUser = () => {
+	const instance:any = new SystemUserService();
+	return instance.createSystemUser()
+	.then( () => Promise.resolve() )
+	.catch( (err:any) => Promise.reject(err) );	
 }

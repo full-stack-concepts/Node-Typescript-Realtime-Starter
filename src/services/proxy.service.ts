@@ -4,12 +4,32 @@
  */
 import { Subject } from "rxjs";
 
+/****
+ * 
+ */
+const myGlobal:any = global;
+
 class ProxyService {
 
 	/***
 	 * App Event Bus: Native Mongoose connection is ready
 	 */
 	public db$:Subject<boolean> = new Subject();
+
+	/*****
+	 * App Event bus: Database sequence has finalized
+	 */
+	public dbReady$:Subject<boolean> = new Subject();
+
+	/*****
+	 * Ap Event bus: Users DB ReadWrite Native connection ready
+	 */
+	public userDB$:Subject<boolean> = new Subject();
+
+	/*****
+	 * Ap Event bus: Product DB ReadWrite Native connection ready
+	 */
+	public productDB$:Subject<boolean> = new Subject();
 
 	/***
 	 * App Event Bus: signal MongoCLient for test
@@ -22,29 +42,27 @@ class ProxyService {
 	public connectUsersDatabase$:Subject<boolean> = new Subject();
 
 
-	public systemUser$:Subject<boolean> = new Subject();
-
-	public localDBInstance$:Subject<boolean> = new Subject();
-	
+	public systemUser$:Subject<boolean> = new Subject();	
 	
 	/****
-	 * Default MongoDB instance
+	 * native connections
 	 */
-	private _db:any;	
+	private _userDB:any;
+	private _productDB:any;	
 
 	constructor() {}
 
 	/****
 	 * Set state of local MongoDB Instance to live
 	 */
-	public setLocalDBLive():void {				
+	public setUserDBLive():void {				
 		this.db$.next(true);
 	}
 
 	/****
 	 * Set state of local MongoDB Instance to offline
 	 */
-	public setLocalDBOffline():void {
+	public setUserDBOffline():void {
 		this.db$.next(false);
 	}
 
@@ -56,15 +74,27 @@ class ProxyService {
 	}
 
 	/***
-	 * Database service propagates local DB instance
+	 * Database service propagates User DB instance
 	 * ==> inform subscribers
 	 */
-	public setLocalDBInstance(db:any) {	
-		this.db=db;
-		this.localDBInstance$.next(true);
+	public setUserDB(db:any) {	
+		this._userDB=db;		
+		this.userDB$.next(true);
 	}
-	public set db( db:any) { this._db = db; }
-	public get db() { return this._db; }	
+	public set userDB( db:any) { this._userDB = db; }
+	public get userDB() { return this._userDB; }	
+
+
+	/***
+	 * Database service propagates Product DB instance
+	 * ==> inform subscribers
+	 */
+	public setProductDB(db:any) {	
+		this._productDB=db;		
+		this.productDB$.next(true);
+	}
+	public set productDB( db:any) { this._productDB = db; }
+	public get productDB() { return this._productDB; }	
 
 	/***
 	 * Start MongoDB Client COnfiguratoin

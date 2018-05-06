@@ -1,6 +1,6 @@
 import Promise from "bluebird";
 import mongoose from "mongoose";
-
+import { proxyService} from "../../services";
 import { DefaultModel} from "./default.model";
 import { RepositoryBase,  ISystemUser, IListOptions } from "../interfaces";
 import { systemUserSchema } from "../schemas";
@@ -11,10 +11,11 @@ import { objectKeysLength, stringify, RemoteQueryBuilder } from "../../util";
  * Local Repository that contains all methods for 
  * local instance of MongoDB
  */
+
 class SystemUserRepository extends RepositoryBase<ISystemUser> {
 	
 	constructor() {
-		super(systemUserSchema);
+		super(systemUserSchema, 'systemUser');
 	}
 }
 

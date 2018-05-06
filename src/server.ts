@@ -16,7 +16,11 @@ import { ServerOptions, ProcessEnv } from './shared/interfaces/';
  * App Services
  */
 import { serviceManager} from "./services/services.manager";
-import { proxyService } from "./services/";
+
+/****
+ * Bootstrap Controller
+ */
+import { bootstrapController } from "./controllers";
 
 /**
  * EXPRESS APPLICATION CODE
@@ -46,6 +50,14 @@ import {
  */
 const AdminService:any = serviceManager.inject("adminDB");
 
+/****
+ * 
+ */
+// typescript fix for global
+const myGlobal:any = global;
+myGlobal.userDB
+myGlobal.productDB;
+
 /***
  * Test if Environment variables for this development mode dev|prod are loaded
  * if no configuration for this environment was found exit with error message
@@ -61,10 +73,6 @@ let
     env:string=ENVIRONMENT.toString(),
 	options:ServerOptions = {};
 
-const    
-    myGlobal:any = global;
-
-// #TODO: move functions to utility file
 
 /****
  * For node application with multiple instances
@@ -131,47 +139,7 @@ function onListening():void {
    /*****
     * BOOTSTRAP APPLICATION  
     */       
-    bootStrapper();
-}
-
-/****
- * Bootstrap Manager
- * 3TODO: Move later to seperate class
- */
-function bootStrapper() {       
-
-    /***
-     * Test MongoCLient 
-     */
-    proxyService.configureMongoDBClient();
-
-    /***
-     * Private DataStore if needed
-     */
-    createPrivateDataStore()
-
-    /***
-     * Public static directories
-     */
-    .then( () => publicDirectoryManager() )
-
-    /***
-     * Private static directories
-     */
-    .then( () => privateDirectoryManager() )
-
-    /***
-     * Clear Access for local db operations
-     */
-    .then( () => proxyService.setLocalDBLive() )
-
-    /***
-     * Inject System User
-     */
-    .then( () => proxyService.createSystemUser() )
-
-    .then( () => console.log("*** Bootstrap Status OK ")); 
-
+    bootstrapController.init();
 }
 
 /***

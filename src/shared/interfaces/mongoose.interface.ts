@@ -1,7 +1,14 @@
 import mongoose from 'mongoose';
 import Promise from "bluebird";
 import { Schema } from "mongoose";
+import { proxyService } from "../../services";
+import { Observable, Subscription} from "rxjs";
 Promise.promisifyAll(mongoose);
+
+/****
+ * 
+ */
+const myGlobal:any = global;
 
 export let ObjectId = mongoose.Schema.Types.ObjectId;
 export let Mixed = mongoose.Schema.Types.Mixed;
@@ -56,15 +63,55 @@ export class MReadOnlyRespositoryBase<T extends mongoose.Document> implements IR
 
 }
 
+interface IProperties<T> {
+    _userDB:any;
+}
+
+
 /****
  * Repository Class for RedWrite Models
  */
-export class RepositoryBase<T extends mongoose.Document> implements IRead<T>, IWrite<T>, IManagement<T>, IBulk<T>  {
+export class RepositoryBase<T extends mongoose.Document>    
+    implements IProperties<T>, IRead<T>, IWrite<T>, IManagement<T>, IBulk<T>  {    
 
     private _model: mongoose.Model<mongoose.Document>;
 
-    constructor(schemaModel: mongoose.Model<mongoose.Document>) {
-        this._model = schemaModel;
+    _userDB:any;
+
+    _productDB:any;
+
+    constructor(schemaModel: mongoose.Model<mongoose.Document>, schemaIdentifier:string) {        
+        console.log("*** Incoming Identifier: ", schemaIdentifier)
+        this._model = schemaModel;      
+
+        /****
+         *
+         */
+        const source$:Observable<number> = Observable.interval(75).take(100);
+        const sub$:Subscription = source$.subscribe(
+            (i:number) => {
+
+                if(myGlobal.userDB) {
+                    this._userDB = myGlobal.userDB;
+                    myGlobal.userDB=null;
+                }
+
+                if(myGlobal.productDB) {
+                    this._productDB = myGlobal.productDB;
+                    myGlobal.productDB=null;
+                }
+
+                const uID:string = schemaIdentifier;
+                if(this._userDB) {
+                    if(uID === 'systemUser' || uID === 'user' || uID === 'client' || uID === 'customer') {
+                        this._model = schemaModel;      
+                    }
+                }
+
+
+            }
+        ) 
+
     }
 
     create(item: T, callback: (error: any, result: T) => void) {

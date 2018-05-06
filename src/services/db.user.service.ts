@@ -112,11 +112,6 @@ export class DBUserService {
 		 */
 		const connStr:string = this.constructConnectionString();
 
-		console.log(connStr)	
-		console.log(SYSTEM_DB_USERS_ADMIN_USER)
-		console.log(SYSTEM_DB_USERS_ADMIN_PASSWORD)
-
-
 		/****
 		 * Connect
 		 */
@@ -135,7 +130,7 @@ export class DBUserService {
 			/****
 			 * Propagate NativeConnnection
 			 */
-		 	proxyService.setLocalDBInstance(db);					
+		 	proxyService.setUserDB(db);					
 
 			/****
 			 * Listen for connection errors

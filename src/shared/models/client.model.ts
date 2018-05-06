@@ -12,7 +12,7 @@ import { objectKeysLength, stringify, RemoteQueryBuilder } from "../../util";
 class ClientRepository extends RepositoryBase<IClient> {
 	
 	constructor() {
-		super(clientSchema);
+		super(clientSchema, 'client');
 	}
 }
 
