@@ -25,7 +25,7 @@ import { bootstrapController } from "./controllers";
 /**
  * EXPRESS APPLICATION CODE
  */
-import App from './App';
+import App from './controllers/express.controller';
 
 import { 
     getCertificate,

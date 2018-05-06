@@ -8,54 +8,22 @@ import logger from "morgan";
 import passport from "passport";
 
 // import passport for authentication support
-require("./shared/auth-strategies/passport");
+require("../shared/auth-strategies/passport");
 
-//////////////////// Testground inmports
 import {
     PUBLIC_ROOT_DIR,
     PRIVATE_DATA_DIR,
     CREATE_DATASTORE
-} from "./util/secrets";
-
-import { testFaceBookUserAuthentication, testGoogleserAuthentication } from "./services/user.service";
-import { WebToken } from "./services/token.service";
-import moment from "moment-timezone";
-import {encryptPassword, comparePassword, generatePassword, FormValidation } from "./util";
-
-let pw:string="12345678";
-let hash:string="$2b$16$9n.Xbsr41tc/AiymYmzX0.HDz11MQ6lVKrap3074bz84XNIdyStT2";
-
-encryptPassword(pw)
-.then( (hash:string) => console.log(hash));
-
-comparePassword(pw, hash)
-.then( (valid:boolean) => console.log(valid));
-
-import {
-    TIME_ZONE,
-    TIME_FORMAT,
-    DATE_FORMAT
-} from "./util/secrets";
-
-
-/***
- * Playground for sinple tests...
- */
-
-//////////////////// End test ground
+} from "../util/secrets";
 
 /***
  * Router Controllers
  */
-import UserRouter from './routers/user.router';
+import UserRouter from '../routers/user.router';
 
-import { shouldCompress } from './util/middleware.util'; 
+import { shouldCompress } from '../util/middleware.util'; 
 
-import {u} from "./services/user.service";
-
-import { publicDirectoryManager, createPrivateDataStore } from "./util";
-
-class App {
+class ExpressController {
 
     // ref tot Express instance
     public express: express.Application;
@@ -132,7 +100,7 @@ class App {
     }
 }
 
-export default new App().express;
+export default new ExpressController().express;
 
 
 
