@@ -137,7 +137,7 @@ schema.pre('save', (next) => {
 	next();
 });
 
-export const userSchema = mongoose.model<IUser>('User', schema, 'users', true);
+export const userSchema:Schema = schema;
 
 
 

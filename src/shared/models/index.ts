@@ -1,5 +1,5 @@
 export { DefaultModel } from "./default.model";
-export { SystemUserModel } from "./systemuser.model";
-export { UserModel } from "./user.model";
-export { ClientModel} from "./client.model";
-export { CustomerModel} from "./customer.model";
+export { systemUserModel, SystemUserModel } from "./systemuser.model";
+export { userModel, UserModel } from "./user.model";
+export { clientModel, ClientModel} from "./client.model";
+export { customerModel, CustomerModel} from "./customer.model";

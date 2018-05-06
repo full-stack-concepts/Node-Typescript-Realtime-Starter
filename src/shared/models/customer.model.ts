@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 
 import { DefaultModel } from "./default.model";
 import { RepositoryBase, ICustomer, IListOptions } from "../interfaces";
-
+import { TCUSTOMER } from "../types";
 import { customerSchema } from "../schemas";
 import { objectKeysLength, stringify, RemoteQueryBuilder } from "../../util";
 
@@ -13,8 +13,8 @@ import { objectKeysLength, stringify, RemoteQueryBuilder } from "../../util";
  */
 class CustomerRepository extends RepositoryBase<ICustomer> {
 	
-	constructor() {
-		super(customerSchema, 'customer');
+	constructor(connection:mongoose.Model<mongoose.Document>) {
+		super( 'Customer', connection );
 	}
 }
 
@@ -35,8 +35,8 @@ export class CustomerModel extends DefaultModel  {
 	/****
 	 * Define custom methods for local instance of MongoDB here	
 	 */
-	public static createUser(customer:ICustomer): Promise<any> {
-		const repo = new CustomerRepository();
+	public createUser(customer:ICustomer): Promise<any> {
+		const repo = new CustomerRepository( this.userDBConn );
 		return new Promise ( (resolve, reject) => {
 			repo.create(customer, (err:any, res:any) => {			
 				if(err) { reject(err);} else { resolve(res);}
@@ -44,8 +44,8 @@ export class CustomerModel extends DefaultModel  {
 		});
 	}	
 
-	static insert(customers:ICustomer[]): Promise<any> {
-		const repo = new CustomerRepository();
+	public insert(customers:ICustomer[]): Promise<any> {
+		const repo = new CustomerRepository( this.userDBConn );
 		return new Promise ( (resolve, reject) => {
 			repo.insertMany( customers, (err:any, res:any) => {			
 				if(err) {reject(err); } else { resolve(res); }
@@ -53,8 +53,8 @@ export class CustomerModel extends DefaultModel  {
 		});
 	}	
 
-	static remove( cond:Object):Promise<any> { 
-		const repo = new CustomerRepository();
+	public remove( cond:Object):Promise<any> { 
+		const repo = new CustomerRepository( this.userDBConn );
 		return new Promise ( (resolve, reject) => {
 			repo.remove( cond, (err:any) => {					
 				if(err) {reject(err); } else { resolve(); }
@@ -62,8 +62,8 @@ export class CustomerModel extends DefaultModel  {
 		});
 	}	
 
-	public static findOne (cond:Object):Promise<any> {
-		const repo = new CustomerRepository();
+	public findOne (cond:Object):Promise<any> {
+		const repo = new CustomerRepository( this.userDBConn );
 		return new Promise ( (resolve, reject) => {
 			repo.findOne ( cond, (err:any, res:any) => {				
 				if(err) {
@@ -75,9 +75,10 @@ export class CustomerModel extends DefaultModel  {
 				}
 			});
 		});
-	}
-	 
+	}	 
 }
+
+export const customerModel:any = new CustomerModel(TCUSTOMER);
 
 
 

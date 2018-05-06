@@ -24,7 +24,8 @@ class ProxyService {
 	/*****
 	 * Ap Event bus: Users DB ReadWrite Native connection ready
 	 */
-	public userDB$:Subject<boolean> = new Subject();
+	public triggerUserDB$:Subject<boolean> = new Subject();
+	public userDBLive$:Subject<boolean> = new Subject();
 
 	/*****
 	 * Ap Event bus: Product DB ReadWrite Native connection ready
@@ -56,14 +57,14 @@ class ProxyService {
 	 * Set state of local MongoDB Instance to live
 	 */
 	public setUserDBLive():void {				
-		this.db$.next(true);
+		this.userDBLive$.next(true);
 	}
 
 	/****
 	 * Set state of local MongoDB Instance to offline
 	 */
 	public setUserDBOffline():void {
-		this.db$.next(false);
+		this.userDBLive$.next(false);
 	}
 
 	/***
@@ -78,8 +79,7 @@ class ProxyService {
 	 * ==> inform subscribers
 	 */
 	public setUserDB(db:any) {	
-		this._userDB=db;		
-		this.userDB$.next(true);
+		this._userDB=db;				
 	}
 	public set userDB( db:any) { this._userDB = db; }
 	public get userDB() { return this._userDB; }	
@@ -90,8 +90,7 @@ class ProxyService {
 	 * ==> inform subscribers
 	 */
 	public setProductDB(db:any) {	
-		this._productDB=db;		
-		this.productDB$.next(true);
+		this._productDB=db;				
 	}
 	public set productDB( db:any) { this._productDB = db; }
 	public get productDB() { return this._productDB; }	

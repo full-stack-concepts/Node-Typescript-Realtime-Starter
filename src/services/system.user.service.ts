@@ -1,9 +1,11 @@
 // #TODO: select fucntions to move to super class as protected functions
 
 import Promise from "bluebird";
+import { Observable} from "rxjs/Observable";
+import { Subscription} from "rxjs/Subscription";
 
 import { UserOperations } from "./user.ops.service";
-import { SystemUserModel } from "../shared/models";
+import { systemUserModel, SystemUserModel } from "../shared/models";
 import { IUser, ISystemUser, IRawThumbnail } from "../shared/interfaces";
 import { TSYSTEMUSER } from "../shared/types";
 
@@ -11,8 +13,6 @@ import { TSYSTEMUSER } from "../shared/types";
  * Services
  */
 import { proxyService } from "./proxy.service";
-import { serviceManager } from "../services";
-
 
 import  {
 	SET_SYSTEM_ADMIN_ACCOUNT,
@@ -45,7 +45,12 @@ export class SystemUserService extends UserOperations {
 	private password:string=SYSTEM_ADMIN_PASSWORD;
 	private userEmail:string=SYSTEM_ADMIN_EMAIL;
 	private firstName:string = SYSTEM_ADMIN_FIRST_NAME;
-	private lastName:string = SYSTEM_ADMIN_LAST_NAME;
+	private lastName:string = SYSTEM_ADMIN_LAST_NAME;	
+
+	/***
+	 * Ops state
+	 */
+	private live:boolean=false;
 
 	/***
 	 * Services
@@ -71,6 +76,13 @@ export class SystemUserService extends UserOperations {
 			return this.createSystemUser() 
 			.then( () => Promise.resolve() );
 		});		
+
+		/****
+		 * Subscriber: wait until Bootstrap Signals UserDB is live
+		 */
+		proxyService.userDBLive$.subscribe( (state:boolean) => this.live = state );
+	
+
 	}		
 
 	private insertDefaultSystemUser(){
@@ -185,6 +197,15 @@ export class SystemUserService extends UserOperations {
 
 		return u;
 	}
+
+	private waitUntilLive() {
+		return new Promise ( (resolve, reject) => {			
+			const source$:Observable<number> = Observable.interval(35).take(100);
+			const sub$:Subscription = source$.subscribe(		
+				x => { if(this.live) { sub$.unsubscribe(); resolve(); } }
+			);
+		});
+	}
 		
 
 	/***
@@ -199,35 +220,39 @@ export class SystemUserService extends UserOperations {
 		 */
 		if(!SET_SYSTEM_ADMIN_ACCOUNT) return Promise.resolve();			
 
-		// process thick: test data
-		return Promise.join<any>(
-			this.testUserEmail(this.userEmail),
-			this.testPassword(this.password),
-			this.testFirstName({ 
-				value: this.firstName,
-				required:true,
-				minLength:null,
-				maxLength:20
-			}),
-			this.testLastName({
-				value:this.lastName,
-				required:true,
-				minLength:null,
-				maxLength:50
-			})			
+		// process thick: wait until DB Users is Live
+		return this.waitUntilLive()
 
-		// process thick: test for user
-		).spread( (
-			isEmail:boolean, 
-			isPassword:boolean, 
-			hasFirstName:boolean, 
-			hasLastName:boolean
-		) => { 			
-			return this.findUser( PERSON_SUBTYPE_SYSTEM_USER, this.userEmail); 
-		})		
+		// process thick: 
+		.then( () => {
+			return Promise.join<any>(
+				this.testUserEmail(this.userEmail),
+				this.testPassword(this.password),
+				this.testFirstName({ 
+					value: this.firstName,
+					required:true,
+					minLength:null,
+					maxLength:20
+				}),
+				this.testLastName({
+					value:this.lastName,
+					required:true,
+					minLength:null,
+					maxLength:50
+				})			
 
-		// process thick: return to caller with user or create new system user
-		
+			// process thick: test for user
+			).spread( (
+				isEmail:boolean, 
+				isPassword:boolean, 
+				hasFirstName:boolean, 
+				hasLastName:boolean
+			) => { 			
+				return this.findUser( PERSON_SUBTYPE_SYSTEM_USER, this.userEmail); 
+			})		
+		})
+
+		// process thick: return to caller with user or create new system user		
 		.then( (u:any) => {				
 			if(u) {
 				return Promise.resolve(u);
@@ -242,12 +267,13 @@ export class SystemUserService extends UserOperations {
 		
 		/***
 		 * Critical error: call process exit
-		 */
+		 */		
 		.catch( (err:any) => {
 			console.error("*** Criticial error: Sytem User from environmental settings file could not be generated. Please select your settings.");
 			console.error("*** Crititical error: ", err );			
 			process.exit(1);
 		});
+		
 	}
 }
 

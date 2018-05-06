@@ -22,6 +22,7 @@ import {
 } from "../shared/types";
 
 import { 
+	userModel, clientModel, customerModel,
 	UserModel, ClientModel, CustomerModel 
 } from "../shared/models";
 
@@ -111,7 +112,7 @@ class UserService {
 	 */
 	private findUserByEmail():Promise<IUser> {		
 		let query = { 'core.email': this.gmail };		
-		return UserModel.remoteFindOneOnly(query, 'users')	
+		return userModel.remoteFindOneOnly(query, 'users')	
 		.then(  (user:IUser) => { return Promise.resolve(user); })
 		.catch( (err:any)    => { return Promise.reject(err); })	
 	}	
@@ -307,15 +308,15 @@ class UserService {
 	private insertNewUser(user:any):Promise<IAUserCreated> { 
 	
 		if(this.hostType === 1) {
-			return UserModel.createUser(user)
-			.then( res => Promise.resolve({  userCreated:true, result:res }) )
-			.catch( err => Promise.reject({ userCreated:false, err: err }) );
+			return userModel.createUser(user)
+			.then( (res:any) => Promise.resolve({  userCreated:true, result:res }) )
+			.catch( (err:any) => Promise.reject({ userCreated:false, err: err }) );
 		}
 
 		if(this.hostType===2) {
-			return UserModel.remoteCreateUser( user, 'users' )
-			.then( res => Promise.resolve({ userCreated:true }) )
-			.catch( err => Promise.reject({ userCreated:false, err: err }) );
+			return userModel.remoteCreateUser( user, 'users' )
+			.then( (res:any) => Promise.resolve({ userCreated:true }) )
+			.catch( (err:any) => Promise.reject({ userCreated:false, err: err }) );
 		}			
 	}
 
@@ -339,7 +340,7 @@ class UserService {
 		if(this.hostType===2) {
 			let userID:string = user._id;
 			let _user:any = this.cloneAndRemoveDatabaseID( user);
-			return UserModel.remoteUpdateEntireUserObject( 'users', user._id, _user)
+			return userModel.remoteUpdateEntireUserObject( 'users', user._id, _user)
 			.then( res => Promise.resolve(user))
 			.catch( err => Promise.reject(err));
 		}

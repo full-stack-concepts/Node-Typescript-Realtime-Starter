@@ -5,10 +5,15 @@ import { proxyService } from "../../services";
 import { Observable, Subscription} from "rxjs";
 Promise.promisifyAll(mongoose);
 
-/****
- * 
- */
-const myGlobal:any = global;
+import {
+    IPerson, ISystemUser, IUser, IClient, ICustomer
+} from "../interfaces";
+
+import { systemUserSchema} from "../schemas/systemuser.schema";
+import { userPrototype, userSchema } from "../schemas/user.schema";
+import { clientSchema} from "../schemas/client.schema";
+import { customerSchema } from "../schemas/customer.schema";
+
 
 export let ObjectId = mongoose.Schema.Types.ObjectId;
 export let Mixed = mongoose.Schema.Types.Mixed;
@@ -26,12 +31,24 @@ export interface IWrite<T> {
     delete: (_id: string, callback: (error: any, result: any) => void) => void;
 }
 
-export interface IManagement<T> {   
+export interface IReadWriteModels<T> {   
+
+    createSystemUserModel:  ( connection: mongoose.Model<mongoose.Document>, callback: () => void) => void;
+    createUserModel: ( connection: mongoose.Model<mongoose.Document>, callback: () => void) => void;
+    createClientModel:  ( connection: mongoose.Model<mongoose.Document>, callback: () => void) => void;
+    createCustomerModel:  ( connection: mongoose.Model<mongoose.Document>, callback: () => void) => void;
+}
+
+export interface IReadModels<T> {
+
 }
 
 export interface IBulk<T> {
     insertMany: (items: T[], callback: ( error:any, result: any) => void ) => void;
     remove: (cond:Object, callback: ( error:any) => void ) => void;
+}
+
+export interface IProperties<T> {   
 }
 
 /****
@@ -60,58 +77,56 @@ export class MReadOnlyRespositoryBase<T extends mongoose.Document> implements IR
     find(cond?: Object, fields?: Object, options?: Object, callback?: (err: any, res: T[]) => void): any {
         return this._model.find(cond, options, callback);
     }   
-
 }
-
-interface IProperties<T> {
-    _userDB:any;
-}
-
 
 /****
  * Repository Class for RedWrite Models
  */
 export class RepositoryBase<T extends mongoose.Document>    
-    implements IProperties<T>, IRead<T>, IWrite<T>, IManagement<T>, IBulk<T>  {    
+    implements IProperties<T>, IRead<T>, IWrite<T>, IReadWriteModels<T>, IBulk<T>  {    
 
-    private _model: mongoose.Model<mongoose.Document>;
+    private _model: mongoose.Model<mongoose.Document>;   
 
-    _userDB:any;
+    constructor(     
 
-    _productDB:any;
+        // Schema Identifier    
+        schemaIdentifier:string,
+         
+        // Native Model Connection    
+        conn:mongoose.Model<mongoose.Document>
+    ) {        
+      
 
-    constructor(schemaModel: mongoose.Model<mongoose.Document>, schemaIdentifier:string) {        
-        console.log("*** Incoming Identifier: ", schemaIdentifier)
-        this._model = schemaModel;      
+        switch(schemaIdentifier) {
+            case 'SystemUser':  
+                this.createSystemUserModel(conn); 
+            break;
+            case 'User': 
+                this.createUserModel(conn); 
+            break;            
+            case 'Client': 
+                this.createClientModel(conn);        
+            break;
+            case 'Customer':
+                this.createCustomerModel(conn);               
+            break;
+        }        
+    }
 
-        /****
-         *
-         */
-        const source$:Observable<number> = Observable.interval(75).take(100);
-        const sub$:Subscription = source$.subscribe(
-            (i:number) => {
+    createSystemUserModel( connection:any):void{
+         this._model = connection.model('SystemUser', systemUserSchema, 'systemusers', true);
+    }
 
-                if(myGlobal.userDB) {
-                    this._userDB = myGlobal.userDB;
-                    myGlobal.userDB=null;
-                }
+    createUserModel(connection:any):void {
+         this._model = connection.model('User', userSchema, 'users', true);
+    }
 
-                if(myGlobal.productDB) {
-                    this._productDB = myGlobal.productDB;
-                    myGlobal.productDB=null;
-                }
+    createClientModel(connection:any):void {
+         this._model = connection.model('Client', clientSchema, 'clients', true);
+    }
 
-                const uID:string = schemaIdentifier;
-                if(this._userDB) {
-                    if(uID === 'systemUser' || uID === 'user' || uID === 'client' || uID === 'customer') {
-                        this._model = schemaModel;      
-                    }
-                }
-
-
-            }
-        ) 
-
+    createCustomerModel(connection:any):void {
+         this._model = connection.model('Customer', customerSchema, 'customers', true);
     }
 
     create(item: T, callback: (error: any, result: T) => void) {

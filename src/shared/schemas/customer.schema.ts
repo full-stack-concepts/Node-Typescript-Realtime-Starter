@@ -45,4 +45,4 @@ schema.pre('save', (next) => {
 	next();
 });
 
-export const customerSchema = mongoose.model<ICustomer>('Customer', schema, 'customers', true);
+export const customerSchema:Schema = schema;

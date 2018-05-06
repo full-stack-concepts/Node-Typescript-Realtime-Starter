@@ -75,5 +75,4 @@ schema.pre('save', (next) => {
 	next();
 });
 
-export const systemUserSchema = mongoose.model<ISystemUser>('SystemUser', schema, 'systemusers', true);
-
+export const systemUserSchema:Schema = schema;

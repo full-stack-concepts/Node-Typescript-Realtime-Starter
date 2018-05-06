@@ -1,7 +1,9 @@
 import Promise from "bluebird";
+import mongoose from "mongoose";
 
 import { DefaultModel } from "./default.model";
 import { RepositoryBase,  IClient, IListOptions } from "../interfaces";
+import { TCLIENT } from "../types";
 import { clientSchema } from "../schemas";
 import { objectKeysLength, stringify, RemoteQueryBuilder } from "../../util";
 
@@ -11,11 +13,10 @@ import { objectKeysLength, stringify, RemoteQueryBuilder } from "../../util";
  */
 class ClientRepository extends RepositoryBase<IClient> {
 	
-	constructor() {
-		super(clientSchema, 'client');
+	constructor(connection:mongoose.Model<mongoose.Document>) {
+		super( 'Client', connection );
 	}
 }
-
 
 export class ClientModel extends DefaultModel  {
 
@@ -34,8 +35,8 @@ export class ClientModel extends DefaultModel  {
 	/****
 	 * Define custom methods for local instance of MongoDB here	
 	 */
-	public static createUser(client:IClient): Promise<any> {
-		const repo = new ClientRepository();
+	public createUser(client:IClient): Promise<any> {
+		const repo = new ClientRepository( this.userDBConn );
 		return new Promise ( (resolve, reject) => {
 			repo.create(client, (err:any, res:any) => {			
 				if(err) { reject(err);} else { resolve(res);}
@@ -43,8 +44,8 @@ export class ClientModel extends DefaultModel  {
 		});
 	}	
 
-	static insert(clients:IClient[]): Promise<any> {
-		const repo = new ClientRepository();
+	public insert(clients:IClient[]): Promise<any> {
+		const repo = new ClientRepository( this.userDBConn );
 		return new Promise ( (resolve, reject) => {
 			repo.insertMany( clients, (err:any, res:any) => {			
 				if(err) {reject(err); } else { resolve(res); }
@@ -52,8 +53,8 @@ export class ClientModel extends DefaultModel  {
 		});
 	}	
 
-	static remove( cond:Object):Promise<any> { 
-		const repo = new ClientRepository();
+	public remove( cond:Object):Promise<any> { 
+		const repo = new ClientRepository( this.userDBConn );
 		return new Promise ( (resolve, reject) => {
 			repo.remove( cond, (err:any) => {					
 				if(err) {reject(err); } else { resolve(); }
@@ -61,8 +62,8 @@ export class ClientModel extends DefaultModel  {
 		});
 	}	
 
-	public static findOne (cond:Object):Promise<any> {
-		const repo = new ClientRepository();
+	public findOne (cond:Object):Promise<any> {
+		const repo = new ClientRepository( this.userDBConn );
 		return new Promise ( (resolve, reject) => {
 			repo.findOne ( cond, (err:any, res:any) => {				
 				if(err) {
@@ -74,9 +75,10 @@ export class ClientModel extends DefaultModel  {
 				}
 			});
 		});
-	}
-	 
+	}	 
 }
+
+export const clientModel:any = new ClientModel(TCLIENT);
 
 
 

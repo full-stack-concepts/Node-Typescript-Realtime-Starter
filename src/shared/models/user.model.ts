@@ -1,6 +1,8 @@
 import Promise from "bluebird";
+import mongoose from "mongoose";
 
 import { DefaultModel} from "./default.model";
+import { TUSER } from "../types";
 import { RepositoryBase,  IUser, IListOptions } from "../interfaces";
 import { userSchema } from "../schemas";
 import { objectKeysLength, stringify, RemoteQueryBuilder } from "../../util";
@@ -12,8 +14,8 @@ import { objectKeysLength, stringify, RemoteQueryBuilder } from "../../util";
  */
 class UserRepository extends RepositoryBase<IUser> {
 	
-	constructor() {
-		super(userSchema, 'user');
+	constructor(connection:mongoose.Model<mongoose.Document>) {
+		super('User', connection);
 	}
 }
 
@@ -34,8 +36,8 @@ export class UserModel extends DefaultModel  {
 	/****
 	 * Define custom methods for local onstance of MongoDB here	
 	 */
-	public static createUser(user:IUser): Promise<any> {
-		const repo = new UserRepository();
+	public createUser(user:IUser): Promise<any> {
+		const repo = new UserRepository( this.userDBConn );
 		return new Promise ( (resolve, reject) => {
 			repo.create(user, (err:any, res:any) => {			
 				if(err) { reject(err);} else { resolve(res);}
@@ -43,8 +45,8 @@ export class UserModel extends DefaultModel  {
 		});
 	}	
 
-	public static insert(users:IUser[]): Promise<any> {
-		const repo = new UserRepository();
+	public insert(users:IUser[]): Promise<any> {
+		const repo = new UserRepository( this.userDBConn );
 		return new Promise ( (resolve, reject) => {
 			repo.insertMany( users, (err:any, res:any) => {			
 				if(err) {reject(err); } else { resolve(res); }
@@ -52,8 +54,8 @@ export class UserModel extends DefaultModel  {
 		});
 	}	
 
-	public static remove( cond:Object):Promise<any> { 
-		const repo = new UserRepository();
+	public  remove( cond:Object):Promise<any> { 
+		const repo = new UserRepository( this.userDBConn );
 		return new Promise ( (resolve, reject) => {
 			repo.remove( cond, (err:any) => {						
 				if(err) {reject(err); } else { resolve(); }
@@ -61,8 +63,8 @@ export class UserModel extends DefaultModel  {
 		});
 	}	
 
-	public static findOne (cond:Object):Promise<any> {
-		const repo = new UserRepository();
+	public findOne (cond:Object):Promise<any> {
+		const repo = new UserRepository( this.userDBConn );
 		return new Promise ( (resolve, reject) => {
 			repo.findOne ( cond, (err:any, res:any) => {					
 				if(err) {
@@ -75,6 +77,7 @@ export class UserModel extends DefaultModel  {
 			});
 		});
 	}
-
 }
+
+export const userModel = new UserModel(TUSER);
 

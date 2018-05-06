@@ -151,7 +151,7 @@ export class DBAdminService implements IndexSignature {
 		/****
 		 * Subscriber: Mongoose Native Connection
 		 */			
-		this.proxyService.userDB$.subscribe( (state:boolean) => {
+		this.proxyService.userDBLive$.subscribe( (state:boolean) => {
 			if(proxyService.userDB) this.db = proxyService.userDB;		
 		});	
 	}

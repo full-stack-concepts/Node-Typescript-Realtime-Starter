@@ -115,20 +115,7 @@ export class BootstrapController {
 		finally {
 			if(err) { this.err(err); } else { return Promise.resolve();}
 		}
-	}
-
-	/***
-	 *
-	 */
-	private async setDatabasesLive() {
-		let err;
-		try {
-			proxyService.setUserDBLive();
-		} catch(e) {err=e;}
-		finally {
-			if(err) {this.err(err); } else { return Promise.resolve(); }
-		}
-	}
+	}	
 
 	init():void {
 
@@ -144,8 +131,7 @@ export class BootstrapController {
 		// process thick: 
 		.then( () => this.systemUser() )
 
-		// process thick:
-		.then( () => this.setDatabasesLive() )
+		
 
 		// process thick: 
 		.then( () => console.log("==> Bootstrap Sequence finished") )

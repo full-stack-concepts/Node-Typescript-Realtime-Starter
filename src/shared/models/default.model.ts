@@ -16,34 +16,35 @@ export class DefaultModel {
 	 * Native Connections
 	 * inejected into Repository classes
 	 */
-	protected userDB:any;
-	protected productDB:any;
+	userDBConn:any;
+	productDBConn:any;
 
 	constructor() {
 		this.configureSubscribers();		
 	}
 
-	protected configureSubscribers() {
-
-		console.log("***** CONFIGURE LISTENERS DEFAULT MODEL ")
+	protected configureSubscribers() {		
 
 		/***
 		 * Subsriber: get UserDB native connection
 		 */		
-		proxyService.userDB$.subscribe( (state:boolean) => {	
-			if(proxyService.userDB) this.userDB = proxyService.userDB;
+		proxyService.userDBLive$.first().subscribe( (state:boolean) => {	
+			if(proxyService.userDB) {
+				this.userDBConn = proxyService.userDB;
+				console.log("==> UserDB Connectnio has arrived")
+			}
 		});
 
 		/***
 		 * Subsriber: get Product DB native connection
 		 */		
 		proxyService.productDB$.subscribe( (state:boolean) => {	
-			if(proxyService.productDB) this.productDB = proxyService.productDB;
+			if(proxyService.productDB) this.productDBConn = proxyService.productDB;
 		});
 	}
 
 	//** MLAB: Create user 
-	public static remoteCreateUser(_data:any, collection:string) {		
+	public remoteCreateUser(_data:any, collection:string) {		
 		return new Promise( (resolve, reject) => {			 
 			if( _data && objectKeysLength (_data) === 0 ) reject(' Invalid Data');					
 			let data = stringify(_data);			
@@ -56,7 +57,7 @@ export class DefaultModel {
 	}
 
 	//** MLAB: Update entire User object
-	public static remoteUpdateEntireUserObject( collection:string, id:string, data:any) {
+	public remoteUpdateEntireUserObject( collection:string, id:string, data:any) {
 		return new Promise( (resolve, reject) => {
 			if( data && objectKeysLength (data) === 0 ) reject(' Invalid Data');			
 			let rURL = RemoteQueryBuilder.updateSingleDocument(collection, id );	
@@ -68,7 +69,7 @@ export class DefaultModel {
 	}
 
 	// MLAB: Insert many users
-	public static mlab_insert(collection:string,  data:any, ) {
+	public mlab_insert(collection:string,  data:any, ) {
 		return new Promise( (resolve, reject) => {
 			let rURL = RemoteQueryBuilder.buildCollectionURL( collection.toString() );					
 			fetch(rURL, { method: 'POST', body: JSON.stringify(data), headers:headers })
@@ -80,7 +81,7 @@ export class DefaultModel {
 	}
 
 	//** MLAB find single user
-	public static remoteFindOneOnly(query:Object, collection:string) {
+	public remoteFindOneOnly(query:Object, collection:string) {
 		return new Promise( (resolve, reject) => {
 			query = stringify( query);
 			let rURL = RemoteQueryBuilder.findOneRemoteURL(collection, query);
@@ -93,7 +94,7 @@ export class DefaultModel {
 	}
 
 	//** MLAB Delete collection
-	public static mlab_deleteCollection(collection:string) {
+	public mlab_deleteCollection(collection:string) {
 		return new Promise ( (resolve, reject) => {
 			let rURL:string = RemoteQueryBuilder.buildCollectionURL(collection.toString());			
 			console.log(rURL)

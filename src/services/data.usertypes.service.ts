@@ -13,9 +13,9 @@ import {
 } from "../shared/interfaces";
 
 import { 
-	UserModel, 
-	ClientModel, 
-	CustomerModel
+	userModel, UserModel, 
+	clientModel, ClientModel, 
+	customerModel, CustomerModel
 } from "../shared/models";
 
 import {
@@ -72,7 +72,7 @@ export class UserTypes {
 		console.log(usersCollection)
 
 		// process thick: empty collection
-		return  UserModel.remove({})
+		return  userModel.remove({})
 
 		// process thick: create admin(s), poweruser(s), autthor(s), user(s)
 		.then( () => {
@@ -83,7 +83,7 @@ export class UserTypes {
 						key:any = keys[0];
 					let collection:IUser[]= _collection[key];					
 
-					UserModel.insert( collection );
+					userModel.insert( collection );
 				})
 			)
 			// process thick: return to caller
@@ -102,8 +102,8 @@ export class UserTypes {
 
 		let collection:IClient[]= this.getSubCollection(data, cName)		
 		return (
-			ClientModel.remove({})
-			.then( () => ClientModel.insert( collection ) )
+			clientModel.remove({})
+			.then( () => clientModel.insert( collection ) )
 			.then( () => Promise.resolve())
 			.catch( (err:any) => Promise.reject(err))
 		);
@@ -115,8 +115,8 @@ export class UserTypes {
 	private static processGeneratedCustomers( data:any, cName:string ) {
 		let collection:ICustomer[]= this.getSubCollection(data, cName)		
 		return ( 
-			CustomerModel.remove({})
-			.then( () => CustomerModel.insert( collection ) )
+			customerModel.remove({})
+			.then( () => customerModel.insert( collection ) )
 			.then( () => Promise.resolve())
 			.catch( (err:any) => Promise.reject(err))
 		)
@@ -161,7 +161,7 @@ export class UserTypes {
 	private static storeUsersRemote( usersCollection:any ) {
 
 		// process thick: delete collection
-		return UserModel.mlab_deleteCollection( DB_USERS_COLLECTION_NAME  )
+		return userModel.mlab_deleteCollection( DB_USERS_COLLECTION_NAME  )
 
 		// process thick: insert users per category
 		.then( () => {
@@ -171,7 +171,7 @@ export class UserTypes {
 						key:any = keys[0];
 					let collection:IUser[]= _collection[key];						
 					return (
-						UserModel.mlab_insert( 
+						userModel.mlab_insert( 
 							DB_USERS_COLLECTION_NAME,  
 							collection 
 						) 
@@ -194,8 +194,8 @@ export class UserTypes {
 
 		let collection:IClient[]= this.getSubCollection(data, cName)		
 		return (
-			ClientModel.mlab_deleteCollection( DB_CLIENTS_COLLECTION_NAME  )
-			.then( () => UserModel.mlab_insert( DB_CLIENTS_COLLECTION_NAME, collection ) ) 
+			clientModel.mlab_deleteCollection( DB_CLIENTS_COLLECTION_NAME  )
+			.then( () => userModel.mlab_insert( DB_CLIENTS_COLLECTION_NAME, collection ) ) 
 			.then( (res:any) => { console.log(res); Promise.resolve(res) })
 			.catch( (err:any) => Promise.reject(err))
 		);
@@ -206,8 +206,8 @@ export class UserTypes {
 
 		let collection:ICustomer[]= this.getSubCollection(data, cName)		
 		return (
-			CustomerModel.mlab_deleteCollection( DB_CUSTOMERS_COLLECTION_NAME  )
-			.then( () => CustomerModel.mlab_insert( DB_CUSTOMERS_COLLECTION_NAME, collection ) ) 
+			customerModel.mlab_deleteCollection( DB_CUSTOMERS_COLLECTION_NAME  )
+			.then( () => customerModel.mlab_insert( DB_CUSTOMERS_COLLECTION_NAME, collection ) ) 
 			.then( (res:any) => { console.log(res); Promise.resolve(res) })
 			.catch( (err:any) => Promise.reject(err))
 		);

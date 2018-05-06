@@ -30,10 +30,10 @@ import { IDatabasePriority} from "../shared/interfaces";
  * Import all User SubTyoe Models 
  */
 import { 
-	SystemUserModel,  
-	UserModel,
-	ClientModel,  
-	CustomerModel 
+	systemUserModel, SystemUserModel,  
+	userModel, UserModel,
+	clientModel, ClientModel,  
+	customerModel, CustomerModel 
 } from "../shared/models";
 
 interface IModelSetting {
@@ -68,13 +68,13 @@ class DBModelService {
 	private configurePersonModels() {
 
 		this.models.push({
-			model: SystemUserModel, 
+			model: systemUserModel, 
 			type: PERSON_SUBTYPE_SYSTEM_USER, 
 			collection: DB_SYSTEM_USERS_COLLECTION_NAME 
 		})
 		
 		this.models.push({ 
-			model: UserModel, 
+			model: userModel, 
 			type: PERSON_SUBTYPE_USER, 
 			collection: DB_USERS_COLLECTION_NAME 
 		});

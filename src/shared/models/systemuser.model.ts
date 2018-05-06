@@ -1,8 +1,10 @@
 import Promise from "bluebird";
 import mongoose from "mongoose";
+
 import { proxyService} from "../../services";
 import { DefaultModel} from "./default.model";
 import { RepositoryBase,  ISystemUser, IListOptions } from "../interfaces";
+import { TSYSTEMUSER } from "../types";
 import { systemUserSchema } from "../schemas";
 import { objectKeysLength, stringify, RemoteQueryBuilder } from "../../util";
 
@@ -14,8 +16,8 @@ import { objectKeysLength, stringify, RemoteQueryBuilder } from "../../util";
 
 class SystemUserRepository extends RepositoryBase<ISystemUser> {
 	
-	constructor() {
-		super(systemUserSchema, 'systemUser');
+	constructor(connection:mongoose.Model<mongoose.Document>) {
+		super( 'SystemUser', connection);
 	}
 }
 
@@ -24,7 +26,7 @@ class SystemUserRepository extends RepositoryBase<ISystemUser> {
  */
 export class SystemUserModel extends DefaultModel  {
 
-	private _systemUserModel: ISystemUser;	
+	private _systemUserModel: ISystemUser;
 
 	constructor(systemUserModel: ISystemUser) {
 
@@ -33,14 +35,14 @@ export class SystemUserModel extends DefaultModel  {
 		 */
 		super();
 
-		this._systemUserModel = systemUserModel;
-	}	
+		this._systemUserModel = systemUserModel;		
+	}			
 
 	/****
 	 * Define custom methods for local onstance of MongoDB here	
 	 */
-	public static createUser(user:ISystemUser): Promise<any> {
-		let repo = new SystemUserRepository();
+	public createUser(user:ISystemUser): Promise<any> {			
+		const repo = new SystemUserRepository( this.userDBConn );		
 		return new Promise ( (resolve, reject) => {
 			repo.create(user, (err:any, res:any) => {			
 				if(err) { reject(err);} else { resolve(res);}
@@ -48,8 +50,8 @@ export class SystemUserModel extends DefaultModel  {
 		});
 	}	
 	
-	public static insert(users:ISystemUser[]): Promise<any> {
-		let repo = new SystemUserRepository();
+	public insert(users:ISystemUser[]): Promise<any> {
+		let repo = new SystemUserRepository( this.userDBConn );
 		return new Promise ( (resolve, reject) => {
 			repo.insertMany( users, (err:any, res:any) => {			
 				if(err) {reject(err); } else { resolve(res); }
@@ -57,8 +59,8 @@ export class SystemUserModel extends DefaultModel  {
 		});
 	}	
 
-	public static remove( cond:Object):Promise<any> { 
-		let repo = new SystemUserRepository();
+	public remove( cond:Object):Promise<any> { 
+		let repo = new SystemUserRepository( this.userDBConn );
 		return new Promise ( (resolve, reject) => {
 			repo.remove( cond, (err:any) => {						
 				if(err) {reject(err); } else { resolve(); }
@@ -66,8 +68,11 @@ export class SystemUserModel extends DefaultModel  {
 		});
 	}  	
 
-	public static findOne (cond:Object):Promise<any> {
-		let repo = new SystemUserRepository();
+	public findOne (cond:Object):Promise<any> {
+
+		console.log("**** Try to fond current SUPER ADMIN")
+		// console.log(this.userDBConn);
+		let repo = new SystemUserRepository( this.userDBConn );
 		return new Promise ( (resolve, reject) => {
 			repo.findOne ( cond, (err:any, res:any) => {					
 				if(err) {
@@ -80,6 +85,8 @@ export class SystemUserModel extends DefaultModel  {
 			});
 		});
 	}
-
 }
+
+export const systemUserModel = new SystemUserModel(TSYSTEMUSER);
+
 

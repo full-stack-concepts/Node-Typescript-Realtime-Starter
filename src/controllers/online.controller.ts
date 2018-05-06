@@ -81,7 +81,11 @@ class OnlineController {
 			 * Monitor onLinemodule initialization 
 			 * and stop executing on critical error*/	
 			Observable.merge(
-				...this.onlineControllers.map( (c:DefaultOnlineController) => c.init$()))
+				...this.onlineControllers.map( 
+					(c:DefaultOnlineController) => 
+						c.init$()
+					)
+			)
 			.subscribe({
 				complete() {},
 				error(error:any) {
@@ -95,8 +99,11 @@ class OnlineController {
 			 * update registered online controlelrs on change events in socket store		
 			 */		
 			this.IO_Observable = Observable.merge(
-				...this.onlineControllers.map( (c:DefaultOnlineController)=> c.updateIO$(this.io))
-			);
+				...this.onlineControllers.map( 
+					(c:DefaultOnlineController) => 
+						c.updateIO$(this.io)
+					)
+				);
 
 		} catch (e) {err=e;} 
 

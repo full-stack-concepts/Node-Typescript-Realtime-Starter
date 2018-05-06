@@ -101,7 +101,7 @@ export class UserOperations {
 		 * Subscriber: when proxyService flags that localDB is connected
 		 * we want to fetch dbInstance so we can create roles for system user accounts
 		 */		
-		proxyService.userDB$.subscribe( (state:boolean) => {		
+		proxyService.userDBLive$.subscribe( (state:boolean) => {		
 			if(proxyService.userDB) this.db = proxyService.userDB;						
 		});		
 	}

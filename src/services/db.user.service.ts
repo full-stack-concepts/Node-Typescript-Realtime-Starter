@@ -132,6 +132,11 @@ export class DBUserService {
 			 */
 		 	proxyService.setUserDB(db);					
 
+		 	/****
+		 	 * Propagate DB is live
+		 	 */
+		 	proxyService.setUserDBLive();
+
 			/****
 			 * Listen for connection errors
 			 */

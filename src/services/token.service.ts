@@ -7,7 +7,7 @@ Promise.promisifyAll(fs);
 Promise.promisifyAll(mongoose);
 
 import { IUser} from "../shared/interfaces";
-import { UserModel } from "../shared/models"
+import { userModel, UserModel } from "../shared/models"
 import { deepCloneObject } from "../util";
 
 /****
@@ -139,7 +139,7 @@ export class WebToken {
 	static getUser(account:any):Promise<IUser> {	
 
 		let query:string = `{ 'accounts.${account.providerID}':'${account.value}' }`;	
-		return UserModel.remoteFindOneOnly(query, 'users')
+		return userModel.remoteFindOneOnly(query, 'users')
 		.then(  (user:IUser) => { return Promise.resolve(user); })
 		.catch( (err:any) => Promise.reject(err) );
 	}
