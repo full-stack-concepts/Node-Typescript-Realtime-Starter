@@ -14,7 +14,10 @@ const _TSYSTEMUSER:ISystemUser = <ISystemUser | any> {
 		type: null		
 	},
 
-	password:null,
+	password: {
+		value: null, 
+		method: null
+	},
 
 	logins:[],
 

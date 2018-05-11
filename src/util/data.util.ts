@@ -64,7 +64,7 @@ const fakeUserSecurity = (user:IUser|IClient|ICustomer):IUser|IClient|ICustomer 
 	 /***
 	  * Set user password
 	  */
-	 user.password = generatePassword().toString();
+	 user.password.value = generatePassword().toString();
 
 	 return user;
 }

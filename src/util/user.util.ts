@@ -2,18 +2,24 @@ import randomNumber from "random-number";
 import moment from "moment-timezone";
 import Promise from "bluebird";
 
-const bcrypt = Promise.promisifyAll(require("bcrypt"));
-
 import { 
     TIME_ZONE, 
     DATE_FORMAT,
     TIME_FORMAT,
-    MAX_LENGTH_USER_LOGINS_EVENTS,
-    USER_PASSWORD_SALT_ROUNDS
+    MAX_LENGTH_USER_LOGINS_EVENTS,   
+    RANDOMIZE_PASSWORD_ENCRYPTION 
 } from "./secrets";
 
-import { deepCloneObject, cloneArray } from "../util";
-import { IUser, IClient, ICustomer, ILoginTracker } from "../shared/interfaces";
+import { deepCloneObject, cloneArray, 
+    encryptWithInitializationVector,
+    decryptWithInitializationVector,
+    encryptWithCrypto,
+    decryptWithCrypto,
+    encryptWithBcrypt,
+    decryptWithBcrypt
+} from "../util";
+
+import { IUser, IClient, ICustomer, ILoginTracker, IEncryption } from "../shared/interfaces";
 
 interface IName  {
     givenName:string,
@@ -21,19 +27,79 @@ interface IName  {
     familyName:string
 }
 
-export const encryptPassword = ( password:string):Promise<string> => {
 
-    return bcrypt.genSalt(USER_PASSWORD_SALT_ROUNDS)
-    .then( (salt:string) => bcrypt.hash( password, salt ))
-    .then( (hash:string) => Promise.resolve( hash ))
-    .catch( (err:any) => Promise.reject( err ));    
+
+// #TODO: promisify crypto methods
+export const encryptPassword = (password:string) => {
+
+    let method:number = this.__pickPasswordEncryptionMethod();
+    let err:any;
+    let hash:string;  
+
+    /****
+     * Default to BCrypt is randomizer is disabled
+     */
+    if(!RANDOMIZE_PASSWORD_ENCRYPTION)
+        method = 3;    
+
+    //Method 1: Crypt with Initialization Vector
+    if(method===1) {
+        return encryptWithInitializationVector(password) 
+        .then( (hash:string) => Promise.resolve({method, hash}) )
+        .catch( (err:any) => Promise.reject(err));        
+    }
+
+    // Method 2: Crypto  
+    else if(method === 2) {
+        return encryptWithCrypto(password)
+        .then((hash:string) => Promise.resolve({method, hash}))
+        .catch( (err:any) => Promise.reject(err));        
+    }
+
+    // Method 3: Bcrypt/
+    else if(method === 3) {         
+        return encryptWithBcrypt(password)
+        .then( (hash:string) => Promise.resolve({method, hash}) )
+        .catch( (err:any) => Promise.reject(err))    
+    }   
 }
 
-export const comparePassword = ( password:string, hash:string):Promise<boolean> => {
+export const decryptPassword = ({method, hash, data}:IEncryption) => {
 
-    return bcrypt.compare(password, hash)
-    .then( (valid:boolean) => Promise.resolve(valid))
-    .catch( (err:any) => Promise.reject( err));
+    let err:any;
+    let pw:string; 
+
+    //Method 1: Decrypt with Initialization Vector
+    if(method===1) {
+        return decryptWithInitializationVector(hash)
+        .then( (password:string) => Promise.resolve({method, data:password}) )
+        .catch( (err:any) => Promise.reject(err));         
+    }
+
+    // Method 2: Crypto  
+    else if(method === 2) {
+        return decryptWithCrypto(hash)
+        .then( (password:string) => Promise.resolve({method, data:password}) )
+        .catch( (err:any) => Promise.reject(err))           
+    }
+
+    // Method 3: Bcrypt
+    else if(method === 3) {    
+        return decryptWithBcrypt(data, hash)
+        .then( (state:boolean) => Promise.resolve({ method, data: state}) )
+        .catch( (err:any) => Promise.reject(err));     
+    }
+}
+
+export const __pickPasswordEncryptionMethod = ():number => {
+    return randomInt(1,3);
+}
+
+/****
+ * Only usable for password encryption methods 1 and 2
+ */
+export const comparePassword = (_pwd:string, pwd:string):boolean => {
+    return (_pwd === pwd);
 }
 
 /*****
@@ -54,7 +120,7 @@ export const sliceMe = (obj:any, prop:string, pos:number) => {
 }
 
 export const randomInt = (min:number, max:number):number => {
-    return randomNumber({min:1001, max:8999, integer:true});
+    return randomNumber({min:min, max:max, integer:true});
 }
 
 export const constructUserCredentials = (user:IUser, done:Function):any => {   

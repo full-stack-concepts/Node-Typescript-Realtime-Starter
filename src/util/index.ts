@@ -35,8 +35,18 @@ export {
 	updateUserForAuthenticationProvider,
 	authenticationTracker,
 	encryptPassword,
-	comparePassword
+	decryptPassword,	
+
 } from "./user.util";
+
+export {
+	encryptWithInitializationVector,
+	decryptWithInitializationVector,
+	encryptWithCrypto,
+	decryptWithCrypto,
+	encryptWithBcrypt,
+	decryptWithBcrypt
+} from "./encryption.util";
 
 export {
 	getCertificate,
@@ -54,16 +64,6 @@ export {
 	publicDirectoryManager,
 	privateDirectoryManager
 } from "./infrastructure.util";
-
-export {
-	grabEmailFromFacebookProfile,
-	extractFacebookProfile
-} from "./user.facebook.util";
-
-export {
-	grabEmailFromGoogleProfile,
-	extractGoogleProfile	
-} from "./user.google.util";
 
 export {
 	FormValidation

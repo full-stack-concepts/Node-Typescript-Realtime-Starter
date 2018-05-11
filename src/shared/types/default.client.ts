@@ -16,7 +16,10 @@ export const TCLIENT:IClient = <IClient | any> {
 		type: null				
 	},
 
-	password:null,
+	password: {
+		value: null, 
+		method: null
+	},
 
 	accounts: {
 		googleID: null

@@ -14,7 +14,10 @@ export const TUSER:IUser = <IUser | any> {
 		type: null		
 	},
 
-	password:null,
+	password: {
+		value: null, 
+		method: null
+	},
 
 	logins:[],
 

@@ -5,7 +5,7 @@ import passwordGenerator from "generate-password";
 import { 
 	USE_DEFAULT_USER_PASSWORD,
 	DEFAULT_PASSWORD_USER,
-	PASSWORD_MIN_LENGTTH
+	PASSWORD_MIN_LENGTH
 } from "./secrets";
 
 
@@ -214,7 +214,7 @@ export const generatePassword = ():string => {
 		return DEFAULT_PASSWORD_USER;
 	} else {		
 		return passwordGenerator.generate({
-			length: PASSWORD_MIN_LENGTTH,
+			length: PASSWORD_MIN_LENGTH,
 			numbers:true
 		});
 	}

@@ -21,7 +21,11 @@ export interface IPerson extends Document  {
 		type?:string
 	},
 
-	password:string,
+	password: {
+		value: string,
+		method: string,
+		secret?: string
+	}
 
 	logins: ILoginTracker[],
 

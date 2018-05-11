@@ -6,7 +6,7 @@ import { Subscription} from "rxjs/Subscription";
 
 import { UserOperations } from "./user.ops.service";
 import { systemUserModel, SystemUserModel } from "../shared/models";
-import { IUser, ISystemUser, IRawThumbnail } from "../shared/interfaces";
+import { IUser, ISystemUser, IRawThumbnail, IEncryption } from "../shared/interfaces";
 import { TSYSTEMUSER } from "../shared/types";
 
 /***
@@ -80,8 +80,7 @@ export class SystemUserService extends UserOperations {
 		/****
 		 * Subscriber: wait until Bootstrap Signals UserDB is live
 		 */
-		proxyService.userDBLive$.subscribe( (state:boolean) => this.live = state );
-	
+		proxyService.userDBLive$.subscribe( (state:boolean) => this.live = state );	
 
 	}		
 
@@ -93,7 +92,36 @@ export class SystemUserService extends UserOperations {
 		return this.encryptPassword(this.password)
 
 		// process thick: set core and security features
-		.then( (hash:string) => this.configureDefaultUserProfile(u, this.firstName, "", this.lastName, this.userEmail, hash, 1))
+		.then( ({hash, method}:IEncryption) => this.configureDefaultUserProfile(
+
+				// default user object
+				u, 
+
+				// furstname
+				this.firstName, 
+
+				// middle name
+				"", 
+
+				// last name
+				this.lastName, 
+
+				// primary email address
+				this.userEmail, 
+				
+				// encrypted password
+				hash, 
+				
+				// encryption method
+				method, 
+				
+				// assigned user role
+				1
+			)
+		)
+
+		// process thick: hash method number value
+		.then( (u:ISystemUser) => this.hashMethod(u) )
 
 		// process thick: set default priviliges for System Admin Account
 		.then( (u:ISystemUser) => this.setDefaultPriviliges(u) )	
@@ -103,12 +131,11 @@ export class SystemUserService extends UserOperations {
 
 		// process thick: create user directory && fetch user image
 		.then( (u:ISystemUser) => {
-
-			console.log(u);
+		
 			// set user ID for further processing		
 			this.userID = u._id;		
 
-			return Promise.join<any>( 
+			return Promise.join<any>(
 
 				/***
 				 * User Thumbnail Image
@@ -127,17 +154,17 @@ export class SystemUserService extends UserOperations {
 		.then( (settings:any) => this.evalThumbnailObjectThenSetPath(settings))
 
 		// proces thick: store user image
-		.then( ({ user, thumbnail}) => storeUserImage( thumbnail, user.core.userName) )	
+		.then( ({ user, thumbnail}:any) => storeUserImage( thumbnail, user.core.userName) )	
 
 		// process thick: return to caller
-		.then( (res) => Promise.resolve() )
+		.then( (res:any) => Promise.resolve() )
 
 		// catch error
 		.catch( (err:any) => Promise.reject(err) );
 	}	
 
 	// #TODO: split this function per subtype
-	private setDefaultPriviliges(u:ISystemUser):ISystemUser{	
+	private setDefaultPriviliges(u:ISystemUser):ISystemUser{		
 
 		/***
 		 * Collection roles: System users

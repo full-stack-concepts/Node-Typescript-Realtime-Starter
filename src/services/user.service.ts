@@ -21,6 +21,8 @@ import {
 	TUSER, TCLIENT, TCUSTOMER,TI_RAW_THUMBNAIL
 } from "../shared/types";
 
+import { UserOperations } from "./user.ops.service";
+
 import { 
 	userModel, clientModel, customerModel,
 	UserModel, ClientModel, CustomerModel 
@@ -35,12 +37,8 @@ import {
 /*****
  * Provider functions
  */
-import {
-	grabEmailFromFacebookProfile,
-	extractFacebookProfile,
-	grabEmailFromGoogleProfile,
-	extractGoogleProfile,
-	updateUserForAuthenticationProvider	,
+import {	
+	updateUserForAuthenticationProvider,
 	authenticationTracker
 } from "../util";
 
@@ -48,7 +46,8 @@ import {
 	DB_HOSTS_PRIORITY, 
 	DB_CLIENTS_COLLECTION_NAME,
 	DB_USERS_COLLECTION_NAME,
-	DB_CUSTOMERS_COLLECTION_NAME
+	DB_CUSTOMERS_COLLECTION_NAME,
+	PERSON_SUBTYPE_USER
 } from "../util/secrets";
 
 interface IModelSetting {
@@ -80,32 +79,17 @@ interface IUserActions {
 }
 
 
-class UserService {
-
-	/****
-	 * DB Host Type
-	 */
-	private hostType:number;
-
-	/****
-	 * DBModelService Service
-	 */
-	private hostsService:any = dbModelService;
+class UserService extends UserOperations {
 
 	private user:IUser;	
-	private gmail:string;
-
-	private models:IModelSetting[];
+	private gmail:string;	
 
 	constructor() {
+		super();
 		this.configureSubscribers();
 	}	
 
-	private configureSubscribers():void {
-		this.hostsService.models$.subscribe( (models:IModelSetting[]) => {		
-			this.models = models;
-		});
-	}
+	private configureSubscribers():void {}
 	
 	/***
 	 * Find third party authenticated user by email
@@ -140,7 +124,7 @@ class UserService {
 		 * process thick: grab email from Google profile
 		 * => use this to find sub suer item
 		 */		
-		return grabEmailFromGoogleProfile(profile)
+		return this.grabEmailFromGoogleProfile(profile)
 
 		/****
 		 * process thick: test for account type 
@@ -152,11 +136,10 @@ class UserService {
 
 
 		// process thick: create new user or return 
-		.then( (person:IUser|IClient|ICustomer|undefined) => {		
-		
+		.then( (person:IUser|IClient|ICustomer|undefined) => {			
 			if(!person) {					
 				// process thick: build user object
-				return extractGoogleProfile(profile)
+				return this.extractGoogleProfile(profile)
 				// process thick: build user object
 				.then( (user:IUser) => this.newUser(user) );  
 			} else {							
@@ -170,155 +153,14 @@ class UserService {
 		})	
 
 		.catch( (err:any) => {
-			Promise.reject(err);
+			Promise.reject(err);		
 		});	
-	}
-
-	/*****
-	 * Set DB host Type
-	 * (1) local mongo db instance
-	 * (2) MLAB
-	 */
-	private testForDatabaseHosts():Promise<number> {
-
-		let host:IDatabasePriority = DB_HOSTS_PRIORITY[0];
-		return Promise.resolve( this.hostType = host.type );		
-	}
-
-	private userEmailQuery(email:string) {
-		return { 'core.email': email  };
-	}
-
-	private testForAccountType( email:string) {	
-
-		let query:any = this.userEmailQuery(email);
-		let hostType:number = this.hostType;
-
-		hostType =1;
-
-		// process thick: query all <Person> Subtype collections 
-		return Promise.map( this.models, (setting:IModelSetting) => {
-
-			// Query local MongoDB				
-			if(hostType === 1) {									
-				return setting.model.findOne (query)
-				.then( (res:any) => { return { [setting.type] : res }; })
-				.catch( (err:any) => '<errorNumber2>' );	
-			}
-
-			// Query MLAB MongoDB			
-			if(hostType === 2) {
-				return setting.model.remoteFindOneOnly( query, setting.collection)
-				.then( (res:any) => { return { [setting.type] : res }; })
-				.catch( (err:any) => '<errorNumber3>' );					
-			}	
-		})		
-	
-		// process thick: evaluate query results 
-		.then( (results:any) => {					
-
-			return Promise.map( results, ( result:any) => {
-				let subType:string = Object.keys(result)[0];	
-				if(result[subType]) {
-					let person:any = result[subType];				
-					person.core['type'] = subType;					
-					return Promise.resolve(person);
-				} else {
-					return Promise.resolve();
-				}
-			})			
-			.then( (items:any) => {
-
-				let person:IUser|IClient|ICustomer;
-				items.forEach( (item:IUser|IClient|ICustomer, index: number | string) => {
-					if(item) person = item;
-				});				
-				return Promise.resolve( person );
-			})
-		})
-
-		// process thick: return to caller
-		.then( (person:IUser|IClient|ICustomer) => Promise.resolve(person))		
-
-		// error handler
-		.catch( (err:any) => {		
-			return Promise.reject(err);
-		});		
-	}	
+	}		
 
 	private getDefaultThumbnail():IRawThumbnail {
 		let rawThumbnail:IRawThumbnail = deepCloneObject(TI_RAW_THUMBNAIL);
     	return rawThumbnail;   	
-	}
-
-	private fetchUserImage( user:IUser | IClient | ICustomer ) {
-
-		let err:any;
-		let url:string = user.profile.images.externalThumbnailUrl;		
-
-		/****
-		 * If provider profile has no imageURL we assign default user image
-		 */
-		if(!url || (url && typeof(url) != 'string')) {
-			let rawThumbnail:IRawThumbnail = this.getDefaultThumbnail();    				
-    		return Promise.resolve(rawThumbnail);  
-		}
-
-		let rawThumbnail:IRawThumbnail = deepCloneObject(TI_RAW_THUMBNAIL);
-
-		return fetch(url)
-		.then( res => res.buffer())
-    	.then( buffer => {
-
-    		// get image type: extension and mime
-    		try {
-
-    			let imageType:IFileType = fileType(buffer);    
-    			let userName:string = user.core.userName;
-    			let extension:string = imageType.ext;    			
-
-    			rawThumbnail = {
-    				defaultImage: false,
-    				buffer:buffer,
-    				extension: extension,
-    				mime: imageType.mime,
-    				fileName: `${userName}.${extension}`
-    			};
-    		} 
-
-    		catch(e) {  
-    			err = e;  
-    		}
-
-    		finally {
-
-    			/*****
-    			 * Error: URL to user profile image expired or is faulty
-    			 * reset default raw thumnail obejct so user get unixsex default user thumbnail
-    			 */
-    			if(err) {    				    		
-    				rawThumbnail = this.getDefaultThumbnail();    				
-    			}     		
-    			return Promise.resolve(rawThumbnail);    			
-    		}  	
-    	})    	   
-		.catch( err => Promise.reject( this.getDefaultThumbnail()) );
-	}
-
-	private insertNewUser(user:any):Promise<IAUserCreated> { 
-	
-		if(this.hostType === 1) {
-			return userModel.createUser(user)
-			.then( (res:any) => Promise.resolve({  userCreated:true, result:res }) )
-			.catch( (err:any) => Promise.reject({ userCreated:false, err: err }) );
-		}
-
-		if(this.hostType===2) {
-			return userModel.remoteCreateUser( user, 'users' )
-			.then( (res:any) => Promise.resolve({ userCreated:true }) )
-			.catch( (err:any) => Promise.reject({ userCreated:false, err: err }) );
-		}			
-	}
+	}		
 
 	private updateUser (user:any) {
 
@@ -398,8 +240,6 @@ class UserService {
 		});	
 	}
 
-
-
 	/*****	
 	 * (1) Fetch user thumbnail
 	 * (2) Create public infrastructure for this user
@@ -446,14 +286,14 @@ class UserService {
 					user:user, 
 					thumbnail:thumbnail
 				});
-			}				
+			}					
 
 		// process thick: execute tasks (3, 4)					 
 		}).then( (result:any) => {
 
 			return Promise.join<any>(
 				storeUserImage( result.thumbnail, result.user.core.userName),
-				this.insertNewUser(result.user)
+				this.insertUser( PERSON_SUBTYPE_USER, result.user)
 			).spread( (imgStored:any, userDatabaseEntry:IAUserCreated) => {				
 
 				/****
@@ -483,7 +323,7 @@ class UserService {
 		 * process thick: grab email from facebook profile
 		 * => use this to find sub suer item
 		 */		
-		return grabEmailFromFacebookProfile(fProfile)
+		return this.grabEmailFromFacebookProfile(fProfile)
 
 		/****
 		 * process thick: test for account type
@@ -497,7 +337,7 @@ class UserService {
 		.then( (person:IUser|IClient|ICustomer|undefined) => {		
 			if(!person) {							
 				// process thick: build user object
-				return extractFacebookProfile(fProfile)
+				return this.extractFacebookProfile(fProfile)
 				// process thick: build user object
 				.then( (user:IUser) => this.newUser(user) );  
 			} else {			

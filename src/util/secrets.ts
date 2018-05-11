@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import fs from "fs";
 import moment from "moment-timezone";
+import randomString from "random-string";
 
 /****
  * Import interfaces and types for database host priorities array
@@ -67,6 +68,29 @@ export const DATE_FORMAT = String(process.env["DATE_FORMAT"]);
  * Time format
  */
 export const TIME_FORMAT = String(process.env["TIME_FORMAT"]);
+
+/**
+ * Security
+ */
+ export const RANDOMIZE_PASSWORD_ENCRYPTION = process.env["RANDOMIZE_PASSWORD_ENCRYPTION"] == 'true';
+ export const CRYPTO_HASH_ALGORITHM= process.env["CRYPTO_HASH_ALGORITHM"];
+
+ const cryptoKey:string = randomString({
+ 	length: 32,
+  	numeric: true,
+  	letters: true,
+  	special: false,
+  	exclude: ['a', 'b', '1']
+});
+
+export const CRYPTO_IV_ENCRYPTION_KEY = cryptoKey;
+export const CRYPTO_IV_VECTOR_LENGTH= Number(process.env["CRYPTO_IV_VECTOR_LENGTH"]);
+
+
+ if(!CRYPTO_HASH_ALGORITHM || (CRYPTO_HASH_ALGORITHM && !isString(CRYPTO_HASH_ALGORITHM))) {
+ 	console.error("APP SECURITY: No password algorithm has been defined for CRYPTO Module.");
+	process.exit(1);
+ }
 
 /**
  * DB NAMES (!)
@@ -448,16 +472,22 @@ if( !isString(DEFAULT_PASSWORD_SYSTEM_USER) || !isString(DEFAULT_PASSWORD_USER))
 	process.exit(1);
 }
 
+if(isNaN(USER_PASSWORD_SALT_ROUNDS) || !Number.isInteger(USER_PASSWORD_SALT_ROUNDS)) {
+	console.error(`Security: Please set BCrypt salt rounds as an integer.`);
+	process.exit(1);
+}
+
 /*****
  * Password Policies
  */
-export const PASSWORD_MIN_LENGTTH = Number(process.env["PASSWORD_MIN_LENGTTH"]);
+export const PASSWORD_MIN_LENGTH = Number(process.env["PASSWORD_MIN_LENGTH"]);
+export const PASSWORD_MAX_LENGTH = Number(process.env["PASSWORD_MAX_LENGTH"]);
 export const PASSWORD_HAS_UPPERCASE = process.env["PASSWORD_HAS_UPPERCASE"] == 'true';
 export const PASSWORD_HAS_LOWERCASE = process.env["PASSWORD_HAS_LOWERCASE"] == 'true';
 export const PASSWORD_HAS_NUMBER = process.env["PASSWORD_HAS_SPECIAL_CHAR"] == 'true';
 export const PASSWORD_HAS_SPECIAL_CHAR = process.env["PASSWORD_HAS_SPECIAL_CHAR"] == 'true';
 
-if( !Number.isInteger(PASSWORD_MIN_LENGTTH)) {
+if( !Number.isInteger(PASSWORD_MIN_LENGTH)) {
 	console.error(`Password Policy: Please set PASSWORD_MINIMUM_LENGTTH as an integer with a minimum value of 1`);
 	process.exit(1);
 }
@@ -469,6 +499,12 @@ export const PERSON_SUBTYPE_SYSTEM_USER = process.env["PERSON_SUBTYPE_SYSTEM_USE
 export const PERSON_SUBTYPE_USER = process.env["PERSON_SUBTYPE_USER"];
 export const PERSON_SUBTYPE_CLIENT = process.env["PERSON_SUBTYPE_CLIENT"];
 export const PERSON_SUBTYPE_CUSTOMER = process.env["PERSON_SUBTYPE_CUSTOMER"];
+
+export const PERSON_SUBTYPES:string[] = [
+	PERSON_SUBTYPE_USER,
+	PERSON_SUBTYPE_CLIENT,
+	PERSON_SUBTYPE_CUSTOMER
+];
 
 export const USE_PERSON_SUBTYPE_USER = process.env["USE_PERSON_SUBTYPE_USER"] == 'true';
 export const USE_PERSON_SUBTYPE_CLIENT = process.env["USE_PERSON_SUBTYPE_CLIENT"] == 'true';

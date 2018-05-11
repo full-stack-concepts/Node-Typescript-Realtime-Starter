@@ -7,7 +7,9 @@ import fileType from "file-type";
 const uuidv1 = require("uuid/v1");
 
 import {
-	DB_HOSTS_PRIORITY
+	DB_HOSTS_PRIORITY,
+	PERSON_SUBTYPES,
+	PERSON_SUBTYPE_SYSTEM_USER
 } from "../util/secrets";
 
 import { dbModelService } from "./db.model.service";
@@ -15,21 +17,26 @@ import { proxyService } from "./proxy.service";
 
 import {
 	encryptPassword,
+	encryptWithInitializationVector,
 	FormValidation,
 	constructUserCredentials,
 	constructProfileFullName,
 	capitalizeString,
 	deepCloneObject,
 	pathToDefaultUserThumbnail,
-	pathToUserThumbnail
+	pathToUserThumbnail,
+	constructProfileSortName,
+	isEmail,
+  	isURL
 } from "../util";
 
 import {
-	IPerson, IUser, ISystemUser, IClient, ICustomer, IDatabasePriority, IRawThumbnail
+	IPerson, IUser, ISystemUser, IClient, ICustomer, IDatabasePriority, IRawThumbnail, IEncryption
 } from "../shared/interfaces"; 
 
 import {
-	TI_RAW_THUMBNAIL
+	TI_RAW_THUMBNAIL,
+	TUSER
 } from "../shared/types";
 
 interface IModelSetting {
@@ -49,7 +56,7 @@ export class UserOperations {
 	 * DB Host Type
 	 * decided where MongoDB operatoins are performed
 	 */
-	private hostType:number;
+	protected hostType:number;
 
 	/****
 	 * All Database models
@@ -84,7 +91,7 @@ export class UserOperations {
 	 * (1) local mongo db instance
 	 * (2) MLAB
 	 */
-	private testForDatabaseHosts():Promise<number> {
+	protected testForDatabaseHosts():Promise<number> {
 
 		let host:IDatabasePriority = DB_HOSTS_PRIORITY[0];
 		return Promise.resolve( this.hostType = host.type );		
@@ -105,6 +112,71 @@ export class UserOperations {
 			if(proxyService.userDB) this.db = proxyService.userDB;						
 		});		
 	}
+
+	private _userEmailQuery(email:string) {
+		return { 'core.email': email  };
+	}	
+
+	/****
+	 * @email:string
+	 */
+	protected testForAccountType( email:string) {	
+		
+		let query:any = this._userEmailQuery(email);
+		let hostType:number = this.hostType;
+
+		hostType =1;
+
+		console.log("*** Start test for Current User: ", email, hostType)
+		console.log(" Models ", this.models.length);
+		console.log(" Subtypes: ", PERSON_SUBTYPES)
+
+		// process thick: query all <Person> Subtype collections 
+		
+		return Promise.map( PERSON_SUBTYPES, ( personType:string) => {
+
+			console.log( personType)
+
+			return this.findUser( personType, email) 
+				.then( (res:any) => { return { [personType]: res}; })
+				.catch( (err:any) => '<errorNumber2>' );				
+		})		
+	
+		// process thick: evaluate query results 
+		.then( (results:any) => {	
+
+			console.log(results);				
+		
+			return Promise.map( results, ( result:any) => {
+				let subType:string = Object.keys(result)[0];	
+				if(result[subType]) {
+					let person:any = result[subType];				
+					person.core['type'] = subType;					
+					return Promise.resolve(person);
+				} else {
+					return Promise.resolve();
+				}
+			})			
+			.then( (items:any) => {
+
+				let person:IUser|IClient|ICustomer;
+				items.forEach( (item:IUser|IClient|ICustomer, index: number | string) => {
+					if(item) person = item;
+				});				
+				return Promise.resolve( person );
+			})
+			
+		})
+
+		// process thick: return to caller
+		// .then( (person:IUser|IClient|ICustomer) => Promise.resolve(person))		
+
+		// error handler
+		.catch( (err:any) => {		
+			return Promise.reject(err);
+		});		
+		
+	}	
 
 	private  testString(str:string, required?:boolean, minLength?:number, maxLength?:number):Promise<boolean> {
 
@@ -139,6 +211,19 @@ export class UserOperations {
 	/***
 	 *
 	 */
+	protected hashMethod(u:any) {		
+		let method = u.password.method;
+		return encryptWithInitializationVector(method)
+		.then( (hash:string) => {	
+			u.password.method = hash;		
+			return Promise.resolve(u);
+		})		
+		.catch( (err:any) => Promise.reject(err) );
+	}
+
+	/***
+	 *
+	 */
 	protected testPassword(pw:string):Promise<boolean> {
 		let v:boolean;
 		v = FormValidation.testPassword(pw);	
@@ -168,9 +253,12 @@ export class UserOperations {
 	/***
 	 *
 	 */
-	protected encryptPassword(pw:string):Promise<string>  {
+	protected encryptPassword(pw:string)  {
 		return encryptPassword(pw)
-		.then( (hash:any) => Promise.resolve(hash.toString()) )
+
+
+		
+		.then( ({hash, method}:any) => Promise.resolve( { hash, method }) )
 		.catch( (err:any) => Promise.resolve('<errorNumber5>'))
 	}
 
@@ -184,18 +272,23 @@ export class UserOperations {
 		lastName:string,
 		email:string,
 		hash:string,
+		method:number,
 		role:number
 	) {
 
 		let err:any;
 		return new Promise( (resolve, reject) => {
-			try {			
-
-				u.password = hash;
+			try {		
+				
 				u.core.identifier = uuidv1();    
 				u.core.email = email
 				u.core.role = role;
-				
+
+				/****
+				 * Security
+				 */
+				u.password.value = hash;
+				u.password.method = method;				
 	        	u.security.accountType = role;           
 	        	u.security.isAccountVerified = true; 
 	        	u.security.isPasswordEncrypted = true;	        
@@ -428,7 +521,281 @@ export class UserOperations {
 	/***
 	 * DB Role: Manage Current Operatons
 	 */	
+
+
+	/******
+	 * Google Functions
+	 */
+	protected grabEmailFromGoogleProfile(profile:any):Promise<string> {        	  
+
+	    let email:string, err:any
+	    try { email = profile.emails[0].value;} 
+	    catch(e) {err = e;  }
+	    finally {       	       
+	        if(err) {
+	            return Promise.reject('errorGoogle1000');
+	        } else {
+	            return Promise.resolve(email);
+	        }
+	    }
+	}
+
+	/****
+	 * Create User Profile from Google Authentication Response
+	 */
+	protected extractGoogleProfile(profile:any) {
+
+		let newUser:IUser = deepCloneObject(TUSER),
+			p:any = deepCloneObject(profile),
+			errType:number;
+
+	    /****
+	     * Test if Profile contains essential params
+	     */
+	    if( !p.hasOwnProperty('id') || (p.id && typeof p.id != 'string') )
+
+	    // invalid Google Profile
+	    {
+	        errType = 1031; 
+
+	    } else {
+
+	        // create 'personal' identifier, a UUID timestamp
+	        newUser.core.identifier = uuidv1();
+
+	        // configure security and account Type
+	        newUser.security.accountType = 5;           
+	        newUser.security.isAccountVerified = true; 
+	        newUser.core.role = 5;
+
+	        // update user configuration
+	        newUser.configuration.isGoogleUser = true;
+	        newUser.profile.social.facebook = p.url || "";
+
+	        // set public facebook ID
+	        newUser.accounts.googleID = p.id;
+
+	        // set raw profile
+	        newUser.profileRaw = p._raw;
+
+	        /***
+	         * Set user password
+	         */
+	         newUser.password.value = "";
+	         newUser.security.isPasswordEncrypted = false; 
+	    }   
+
+		/****
+		 * Test if google user is a person and not a business
+		 */
+		if( p._json 
+			&& p._json.objectType 
+			&& p._json.objectType.length 
+			&& typeof p._json.objectType === 'string'
+		) {
+			newUser.security.accountType = 1;
+		} else {
+			errType = 1030; // user has to a natural person
+		}		
+
+		/****
+		 * Test for rhumbnail or image
+		 */
+		if (p.photos && p.photos.length) {
+		   newUser.profile.images.externalThumbnailUrl = p.photos[0].value;
+	       newUser.configuration.hasExternalThumbnailUrl = true;
+		}  	
+
+		/****
+		 * test for given and family name and email address  	
+		 */
+		if(p.name) {
+			newUser.profile.personalia.givenName = capitalizeString(p.name.givenName) || "";
+			newUser.profile.personalia.familyName = capitalizeString(p.name.familyName) || "";  			
+		} else {
+			errType = 1032; // user remains nameless
+		}  		
+		if(p.emails && p.emails.length) {
+			newUser.core.email = p.emails[0].value;
+		} else {
+			errType = 1033; // no email account was provided
+		}  	
+
+		/****  	
+		 * gender
+		 */	
+		if(p._json && p._json.gender && typeof p._json.gender === 'string') {
+			if(p._json.gender === 'male') { newUser.profile.gender = 1; } 
+			else if(p._json.gender === 'female') { newUser.profile.gender = 2; } 
+			else { newUser.profile.gender = 0; }
+		} else {
+			newUser.profile.gender = 0;
+		}
+
+		/****
+		 * Google Plus user
+		 */
+		if(p._json && p._json.url && p._json.url.length && typeof p._json.url === 'string') {
+			newUser.profile.social.googleplus = p._json.url;
+	        newUser.configuration.isGooglePlusUser = true;
+		}  		
+
+		/****
+		 * Verified Google Account
+		 */
+		if(p._json && p._json.verified && p._json.verified.length && typeof p._json.verified === 'boolean' ) {
+			newUser.security.isAccountVerified = p._json.verified;
+		}
+
+	    /****
+	     * format display names 
+	     */     
+	    newUser.profile.displayNames.fullName = constructProfileFullName(p.name);
+	    newUser.profile.displayNames.sortName = constructProfileSortName(p.name);
+
+	      /****
+	     * user credentials: userName && url 
+	     */
+	    constructUserCredentials( newUser, (credentials:any) => {
+	        newUser.core.userName = credentials.userName;
+	        newUser.core.url = credentials.url;  
+	    }); 
+
+		return new Promise( (resolve, reject) => {			
+			(errType) ? reject(errType): resolve(newUser);		
+		});
+	}
+
+	/*****
+	 * Facebook functions
+	 */
+	protected grabEmailFromFacebookProfile (fProfile:any):Promise<string | number> {	
+		let email:string = fProfile.emails[0].value;		
+		if(email && isEmail(email) ) {
+			return Promise.resolve(email)
+		} else {
+			return Promise.reject('<errorNumber1>');			
+		}	
+	}	
+
+	protected extractFacebookProfile(profile:any) {
+
+		// console.log(profile)
+
+		let newUser:IUser = deepCloneObject(TUSER),
+			p:any = deepCloneObject(profile),
+			errType:number;
+
+		console.log("*** url test")
+		console.log(profile.profileUrl)
+		console.log(isURL(profile.profileUrl))
+		
+
+		/****
+		 * Test if FB Profile contains essential params
+		 */
+		if( !p.hasOwnProperty('id') || (p.id && typeof p.id != 'string') 
+			|| (!p.profileUrl || (p.profileUrl && !isURL(p.profileUrl) ) )
+
+		// invalid FB Profile
+		) {
+			errType = 1040; 
+
+		} else {
+
+			// create 'personal' identifier, a UUID timestamp
+			newUser.core.identifier = uuidv1();
+
+			// configure security and account Type
+			newUser.security.accountType = 5;			
+			newUser.security.isAccountVerified = true;
+			newUser.core.role = 5;
+
+			// update user configuration
+			newUser.configuration.isFacebookUser = true;
+			newUser.profile.social.facebook = p.profileUrl;
+
+			// set public facebook ID
+			newUser.accounts.facebookID = p.id;
+
+			// set raw profile
+			newUser.profileRaw = p._raw;
+
+			/***
+		  	 * Set user password
+			 */
+			 newUser.password.value = "";
+			 newUser.security.isPasswordEncrypted = false; 
+		}	
+
+		/****
+		 * Test for thumbnail or image  
+		 */
+			if (p.photos && p.photos.length) {
+			newUser.profile.images.externalThumbnailUrl = p.photos[0].value;    	
+			newUser.configuration.hasExternalThumbnailUrl = true;
+			}
+
+			/****
+			 * test for given and family name 
+			 */
+			if(p.name) {
+
+				// given name
+				if( p.name.hasOwnProperty('givenName')) 
+					newUser.profile.personalia.givenName = capitalizeString(p.name.givenName) || "";
+				
+				// middle name
+				if( p.name.hasOwnProperty('middleName')) 
+				newUser.profile.personalia.middleName = capitalizeString(p.name.middleName) || "";  		
+			
+			// family Name
+			if( p.name.hasOwnProperty('familyName'))
+					newUser.profile.personalia.familyName = capitalizeString(p.name.familyName) || "";  		
+
+			} else {
+				errType = 1042; // invalid name object
+			} 
+
+			/****
+			 * Test for email address
+			 */
+			if(p.emails && p.emails.length) {
+				newUser.core.email = p.emails[0].value;
+			} else {
+				errType = 1043; // no email account was provided
+			}  	
+
+			/****  	
+			 * gender
+			 */	
+			newUser.profile.gender = 0;
+
+		/****
+		 * format display names 
+		 */ 	
+		newUser.profile.displayNames.fullName = constructProfileFullName(p.name);
+		newUser.profile.displayNames.sortName = constructProfileSortName(p.name);
+		
+		/****
+		 * user credentials: userName && url 
+		 */
+		constructUserCredentials( newUser, (credentials:any) => {
+			newUser.core.userName = credentials.userName;
+			newUser.core.url = credentials.url;  
+		});	
+
+		console.log("*** Profile Error ", errType)
+
+
+		return new Promise( (resolve, reject) => {				
+			// console.log(newUser);
+			(errType) ? reject(errType): resolve(newUser);		
+		});	
+	}
 }
+
+
 
 
 

@@ -14,7 +14,10 @@ export const TCUSTOMER:ICustomer = <ICustomer | any>{
 		type: null				
 	},
 
-	password:null,
+	password: {
+		value: null, 
+		method: null
+	},
 
 	accounts: {
 		googleID: null

@@ -3,6 +3,11 @@ import { Schema } from "mongoose";
 import { IUser, ILoginTracker } from "../interfaces";
 import { deepCloneObject} from "../../util";
 
+import {
+	PASSWORD_MIN_LENGTH,
+	PASSWORD_MAX_LENGTH
+} from "../../util/secrets";
+
 
 /******
  * Default User Object, used to prototype
@@ -22,10 +27,9 @@ export const userPrototype = {
 	},
 
 	password:  { 
-		type: String, 
-		required: false, 
-		match: /(?=.*[a-zA-Z])(?=.*[0-9]+).*/,
-		minlength:12
+		value: { type: String, required: false, match: /(?=.*[a-zA-Z])(?=.*[0-9]+).*/, minlength:PASSWORD_MIN_LENGTH, maxlength: PASSWORD_MAX_LENGTH },
+		method: { type: String, required: false},
+		secret: { type:String, required:false}
 	},
 
 	logins: { type: Array, required: false }, 

@@ -12,7 +12,9 @@ import {
 
 import {
 	privateDirectoryManager,
-	publicDirectoryManager   
+	publicDirectoryManager,
+	encryptPassword,
+	decryptPassword
 } from "../util";
 
 /****
@@ -21,6 +23,20 @@ import {
  */
 import { DefaultModel } from "../shared/models";
 
+/*****
+* #TODO: create test for password generation
+*/
+/*
+const pw:string="12345678"
+encryptPassword(pw)
+.then( (hash:any) => {	
+	hash.data = pw; // for bcrypt method
+	console.log(hash);
+	return decryptPassword(hash)
+})
+.then( (pw:any) => console.log("*** FInal result: ", pw))
+.catch( (err:any) => console.error(err))
+*/
 
 export class BootstrapController {
 

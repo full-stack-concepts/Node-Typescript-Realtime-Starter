@@ -70,7 +70,7 @@ export class SystemUserModel extends DefaultModel  {
 
 	public findOne (cond:Object):Promise<any> {
 
-		console.log("**** Try to fond current SUPER ADMIN")
+		console.log("**** Try to find: ", cond)
 		// console.log(this.userDBConn);
 		let repo = new SystemUserRepository( this.userDBConn );
 		return new Promise ( (resolve, reject) => {

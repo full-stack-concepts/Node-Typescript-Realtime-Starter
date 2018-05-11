@@ -3,7 +3,8 @@
 import urlRegex from "url-regex";
 
 import {
-	PASSWORD_MIN_LENGTTH,
+	PASSWORD_MIN_LENGTH,
+	PASSWORD_MAX_LENGTH,
 	PASSWORD_HAS_UPPERCASE,
 	PASSWORD_HAS_LOWERCASE,
 	PASSWORD_HAS_NUMBER,
@@ -43,8 +44,15 @@ export class FormValidation {
 		/*****
 		 * password string has required minlength
 		 */
-		const hasRequiredMinLength:boolean = (pw.length >= PASSWORD_MIN_LENGTTH);	
-		(PASSWORD_MIN_LENGTTH)?tests.push(hasRequiredMinLength):null;	
+		const hasRequiredMinLength:boolean = (pw.length >= PASSWORD_MIN_LENGTH);	
+		(PASSWORD_MIN_LENGTH)?tests.push(hasRequiredMinLength):null;	
+
+		/*****
+		 * Password does not exceed max length
+		 */
+		const doesNotExceedMaxLength:boolean = (pw.length <= PASSWORD_MAX_LENGTH);	
+		(PASSWORD_MIN_LENGTH)?tests.push(doesNotExceedMaxLength):null;	
+
 	
 		return tests.every( (v:boolean) => v === true )			
 		

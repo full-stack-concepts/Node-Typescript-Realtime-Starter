@@ -80,13 +80,13 @@ class DBModelService {
 		});
 				
 		this.models.push({ 
-			model: ClientModel, 
+			model: clientModel, 
 			type: PERSON_SUBTYPE_CLIENT, 
 			collection: DB_CLIENTS_COLLECTION_NAME 
 		});
 				
 		this.models.push({ 
-			model: CustomerModel, 
+			model: customerModel, 
 			type: PERSON_SUBTYPE_CUSTOMER, 
 			collection: DB_CUSTOMERS_COLLECTION_NAME 
 		});		

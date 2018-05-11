@@ -42,3 +42,7 @@ export {
 export {
 	IRawThumbnail
 } from "./rawthumbnail.image.interface";
+
+export {
+	IEncryption
+} from "./encryption.interface";
