@@ -11,6 +11,8 @@ import {
     USER_PASSWORD_SALT_ROUNDS,
 } from "./secrets";
 
+import { IEncryption } from "../shared/interfaces";
+
 const isString = (str:string):boolean => {
     return (!str || str && typeof str === 'string');
 } 
@@ -19,7 +21,7 @@ const isString = (str:string):boolean => {
  * Method 1: Crypto with Initialization Vector
  * More info: http://vancelucas.com/blog/stronger-encryption-and-decryption-in-node-js/
  */
-export const encryptWithInitializationVector = (data:string) => { 
+export const encryptWithInitializationVector = (data:string):Promise<string> => { 
 
     if(!isString(data) ) data = String(data.toString());
 
@@ -31,7 +33,7 @@ export const encryptWithInitializationVector = (data:string) => {
   
 }
 
-export const decryptWithInitializationVector = (hash:string) => {
+export const decryptWithInitializationVector = (hash:string):Promise<string> => {
 
     let textParts:any = hash.split(':');
     let iv:any= new Buffer(textParts.shift(), 'hex');
@@ -48,7 +50,7 @@ export const decryptWithInitializationVector = (hash:string) => {
 /*****
  * Method 2: Crypto
  */
-export const encryptWithCrypto = (data:any) => {
+export const encryptWithCrypto = (data:any):Promise<string> => {
 
     const cipher = crypto.createCipher('aes-256-cbc', CRYPTO_IV_ENCRYPTION_KEY);
     let  crypted = cipher.update(data, 'utf-8', 'hex');
@@ -57,7 +59,7 @@ export const encryptWithCrypto = (data:any) => {
 
 }
 
-export const decryptWithCrypto  = (data:any) => {
+export const decryptWithCrypto  = (data:any):Promise<string> => {
 
     const decipher:any = crypto.createDecipher('aes-256-cbc', CRYPTO_IV_ENCRYPTION_KEY);
     var decrypted:any = decipher.update(data, 'hex', 'utf-8');
@@ -69,19 +71,16 @@ export const decryptWithCrypto  = (data:any) => {
 /*****
  * Method 3: Bcrypt
  */
-export const encryptWithBcrypt = ( password:string) => {  
+export const encryptWithBcrypt = ( password:string):Promise<string> => {  
    
-    return bcrypt.genSalt(USER_PASSWORD_SALT_ROUNDS)
-    .then( (salt:string) => bcrypt.hash( password, salt ))
-    .then( (hash:string) => { console.log("** hash: ", hash); return Promise.resolve( hash ) })
-    .catch( (err:any) => Promise.reject( err ));    
+    const salt:any = bcrypt.genSalt(USER_PASSWORD_SALT_ROUNDS);
+    const hash:any = bcrypt.hash( password, salt );
+    return Promise.resolve( hash ); 
 
 }
 
-export const decryptWithBcrypt = ( str:string, hash:string) => {
+export const decryptWithBcrypt = ( str:string, hash:string):Promise<boolean> => {
 
-    return bcrypt.compare( str, hash)
-    .then( (valid:boolean) => Promise.resolve(valid))
-    .catch( (err:any) => Promise.reject( err));
-
+    const valid = bcrypt.compare( str, hash);
+    return Promise.resolve(valid);
 }

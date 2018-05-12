@@ -27,8 +27,6 @@ interface IName  {
     familyName:string
 }
 
-
-
 // #TODO: promisify crypto methods
 export const encryptPassword = (password:string) => {
 
@@ -40,7 +38,7 @@ export const encryptPassword = (password:string) => {
      * Default to BCrypt is randomizer is disabled
      */
     if(!RANDOMIZE_PASSWORD_ENCRYPTION)
-        method = 3;    
+        method = 3;       
 
     //Method 1: Crypt with Initialization Vector
     if(method===1) {

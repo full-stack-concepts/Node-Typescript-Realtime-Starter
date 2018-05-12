@@ -92,7 +92,7 @@ export class SystemUserService extends UserOperations {
 		return this.encryptPassword(this.password)
 
 		// process thick: set core and security features
-		.then( ({hash, method}:IEncryption) => this.configureDefaultUserProfile(
+		.then( ({hash, method}:any) => this.configureDefaultUserProfile(
 
 				// default user object
 				u, 

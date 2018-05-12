@@ -7,10 +7,12 @@ import * as debug from 'debug';
 import dotenv from 'dotenv';
 import  path from 'path';
 import fs from 'fs';
-import * as Promise from 'bluebird';
+import * as Bluebird from 'bluebird';
 
 // interfaces
 import { ServerOptions, ProcessEnv } from './shared/interfaces/';
+
+// declare global { export interface Promise<T> extends Bluebird<T> {} }
 
 /****
  * App Services
