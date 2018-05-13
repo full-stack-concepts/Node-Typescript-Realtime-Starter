@@ -2,16 +2,15 @@ import Promise from "bluebird";
 import mongoose from "mongoose";
 
 import { DefaultModel } from "./default.model";
-import { RepositoryBase, ICustomer, IListOptions } from "../interfaces";
+import { ICustomer } from "../interfaces";
+import { ReadWriteRepositoryBase } from "../../engines";
 import { TCUSTOMER } from "../types";
-import { customerSchema } from "../schemas";
-import { objectKeysLength, stringify, RemoteQueryBuilder } from "../../util";
 
 /***
  * Local Repository that contains all methods for 
  * local instance of MongoDB
  */
-class CustomerRepository extends RepositoryBase<ICustomer> {
+class CustomerRepository extends ReadWriteRepositoryBase<ICustomer> {
 	
 	constructor(connection:mongoose.Model<mongoose.Document>) {
 		super( 'Customer', connection );

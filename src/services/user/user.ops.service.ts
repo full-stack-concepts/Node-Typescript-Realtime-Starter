@@ -10,10 +10,10 @@ import {
 	DB_HOSTS_PRIORITY,
 	PERSON_SUBTYPES,
 	PERSON_SUBTYPE_SYSTEM_USER
-} from "../util/secrets";
+} from "../../util/secrets";
 
-import { dbModelService } from "./db.model.service";
-import { proxyService } from "./proxy.service";
+import { dbModelService } from "./../db/db.model.service";
+import { proxyService } from "./../state/proxy.service";
 
 import {
 	encryptPassword,
@@ -28,16 +28,16 @@ import {
 	constructProfileSortName,
 	isEmail,
   	isURL
-} from "../util";
+} from "../../util";
 
 import {
 	IPerson, IUser, ISystemUser, IClient, ICustomer, IDatabasePriority, IRawThumbnail, IEncryption
-} from "../shared/interfaces"; 
+} from "../../shared/interfaces"; 
 
 import {
 	TI_RAW_THUMBNAIL,
 	TUSER
-} from "../shared/types";
+} from "../../shared/types";
 
 interface IModelSetting {
 	model:any,
@@ -59,9 +59,14 @@ export class UserOperations {
 	protected hostType:number;
 
 	/****
-	 * All Database models
+	 * All PERSON READ models
 	 */
-	protected models:IModelSetting[];
+	protected readModels:IModelSetting[];
+
+	/****
+	 * All PERSON WRITE models
+	 */
+	protected writeModels:IModelSetting[];
 
 	/****
 	 * Data Model Service
@@ -102,7 +107,8 @@ export class UserOperations {
 	 */
 	private configureMySubscribers():void {
 
-		this.dbModelService.models$.subscribe( (models:IModelSetting[]) => this.models = models );
+		this.dbModelService.readModels$.subscribe( (models:IModelSetting[]) => this.readModels = models );
+		this.dbModelService.writeModels$.subscribe( (models:IModelSetting[]) => this.writeModels = models );
 
 		/****
 		 * Subscriber: when proxyService flags that localDB is connected
@@ -128,7 +134,7 @@ export class UserOperations {
 		hostType =1;
 
 		console.log("*** Start test for Current User: ", email, hostType)
-		console.log(" Models ", this.models.length);
+		console.log(" Models ", this.readModels.length);
 		console.log(" Subtypes: ", PERSON_SUBTYPES)
 
 		// process thick: query all <Person> Subtype collections 
@@ -200,7 +206,7 @@ export class UserOperations {
 	/***
 	 * 
 	 */
-	protected testUserEmail(email:string):Promise<boolean> {	
+	protected testUserEmail(email:string):Promise<boolean> {
 		let v:boolean;
 		v=FormValidation.isEmail(email);
 		return new Promise ( (resolve, reject) => {
@@ -212,13 +218,10 @@ export class UserOperations {
 	 *
 	 */
 	protected hashMethod(u:any) {		
-		let method = u.password.method;
-		return encryptWithInitializationVector(method)
-		.then( (hash:string) => {	
-			u.password.method = hash;		
-			return Promise.resolve(u);
-		})		
-		.catch( (err:any) => Promise.reject(err) );
+		let method = u.password.method;		
+		const hash:string = encryptWithInitializationVector(method);
+		u.password.method = hash;		
+		return Promise.resolve(u);		
 	}
 
 	/***
@@ -254,10 +257,8 @@ export class UserOperations {
 	 *
 	 */
 	protected encryptPassword(pw:string)  {
-		return encryptPassword(pw)
-
-
 		
+		return encryptPassword(pw)		
 		.then( ({hash, method}:any) => Promise.resolve( { hash, method }) )
 		.catch( (err:any) => Promise.resolve('<errorNumber5>'))
 	}
@@ -275,6 +276,9 @@ export class UserOperations {
 		method:number,
 		role:number
 	) {
+
+		console.log(hash)
+		console.log(method)
 
 		let err:any;
 		return new Promise( (resolve, reject) => {
@@ -320,6 +324,8 @@ export class UserOperations {
         			u.core.userName = credentials.userName;
        				u.core.url = credentials.url;  
     			});
+
+    			console.log(u)
 			}
 			catch(e) { err = e; }
 			finally { if(err) {reject('<errorNumber6>');} else { resolve(u); } }		
@@ -409,13 +415,28 @@ export class UserOperations {
 		.catch( err => Promise.reject( this._getDefaultThumbnail()) );
 	}
 
-	private _getModelSetting(userType:string):IModelSetting{
+	// _getModelSetting
 
-		const setting:IModelSetting = this.models.find( (setting:IModelSetting) => {
+	/***
+	 * Get READ MODEL
+	 */
+	private _getReadModel(userType:string):IModelSetting{
+
+		const model:IModelSetting = this.readModels.find( (setting:IModelSetting) => {
 			return (setting.type === userType);
 		});
+		return model;	
+	}
 
-		return setting;	
+	/***
+	 * GET WRITE MODEL
+	 */
+	private _getWriteModel(userType:string):IModelSetting{
+
+		const model:IModelSetting = this.writeModels.find( (setting:IModelSetting) => {
+			return (setting.type === userType);
+		});
+		return model;	
 	}
 
 	/***
@@ -431,7 +452,7 @@ export class UserOperations {
 		/****
 		 * Find Model Setting for this User Type
 		 */
-		const setting:IModelSetting = this._getModelSetting(userType);
+		const setting:IModelSetting = this._getReadModel(userType);
 
 		/****
 		 * Define user subtype model
@@ -483,7 +504,7 @@ export class UserOperations {
 		/****
 		 * Find Model Setting for this User Type
 		 */
-		const setting:IModelSetting = this._getModelSetting(userType);
+		const setting:IModelSetting = this._getWriteModel(userType);
 
 		/****
 		 * Define user subtype model

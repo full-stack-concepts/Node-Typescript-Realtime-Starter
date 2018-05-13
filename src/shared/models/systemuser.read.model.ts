@@ -3,15 +3,14 @@ import mongoose from "mongoose";
 
 import { DefaultModel} from "./default.model";
 import { ISystemUser } from "../interfaces";
-import { ReadWriteRepositoryBase } from "../../engines";
+import { ReadRepositoryBase } from "../../engines";
 import { TSYSTEMUSER } from "../types";
 
 /***
  * Local Repository that contains all methods for 
  * local instance of MongoDB
  */
-
-class SystemUserRepository extends ReadWriteRepositoryBase<ISystemUser> {
+class SystemUserReadRepository extends ReadRepositoryBase<ISystemUser> {
 	
 	constructor(connection:mongoose.Model<mongoose.Document>) {
 		super( 'SystemUser', connection);
@@ -21,7 +20,7 @@ class SystemUserRepository extends ReadWriteRepositoryBase<ISystemUser> {
 /*****
  * Model extends Default Model which provides support for external MpngoDB Providers
  */
-export class SystemUserModel extends DefaultModel  {
+export class SystemUserReadModel extends DefaultModel  {
 
 	private _systemUserModel: ISystemUser;
 
@@ -38,38 +37,20 @@ export class SystemUserModel extends DefaultModel  {
 	/****
 	 * Define custom methods for local onstance of MongoDB here	
 	 */
-	public createUser(user:ISystemUser): Promise<any> {			
-		const repo = new SystemUserRepository( this.userDBConn );		
+	public find(query:any, fields?:any, options?:any):Promise<any> {
+		const repo = new SystemUserReadRepository( this.userDBConn );
 		return new Promise ( (resolve, reject) => {
-			repo.create(user, (err:any, res:any) => {			
-				if(err) { reject(err);} else { resolve(res);}
+			repo.find(query, fields, options, (err:any, result:any) => {
+				(err)? resolve(result):reject(err);
 			});
 		});
 	}	
-	
-	public insert(users:ISystemUser[]): Promise<any> {
-		let repo = new SystemUserRepository( this.userDBConn );
-		return new Promise ( (resolve, reject) => {
-			repo.insertMany( users, (err:any, res:any) => {			
-				if(err) {reject(err); } else { resolve(res); }
-			});
-		});
-	}	
-
-	public remove( cond:Object):Promise<any> { 
-		let repo = new SystemUserRepository( this.userDBConn );
-		return new Promise ( (resolve, reject) => {
-			repo.remove( cond, (err:any) => {						
-				if(err) {reject(err); } else { resolve(); }
-			});
-		});
-	}  	
 
 	public findOne (cond:Object):Promise<any> {
 
 		console.log("**** Try to find: ", cond)
 		// console.log(this.userDBConn);
-		let repo = new SystemUserRepository( this.userDBConn );
+		let repo = new SystemUserReadRepository( this.userDBConn );
 		return new Promise ( (resolve, reject) => {
 			repo.findOne ( cond, (err:any, res:any) => {					
 				if(err) {
@@ -84,6 +65,6 @@ export class SystemUserModel extends DefaultModel  {
 	}
 }
 
-export const systemUserModel = new SystemUserModel(TSYSTEMUSER);
+export const systemUserReadModel = new SystemUserReadModel(TSYSTEMUSER);
 
 

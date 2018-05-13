@@ -133,6 +133,54 @@ if(SET_SYSTEM_ADMIN_ACCOUNT) {
 }
 
 /***
+ * LOCAL MONGODB SERVER
+ */
+export const USE_LOCAL_MONGODB_SERVER = process.env["USE_LOCAL_MONGODB_SERVER"] == 'true';
+export const DB_CONFIG_HOST = process.env["DB_CONFIG_HOST"];
+export const DB_CONFIG_PORT = process.env["DB_CONFIG_PORT"];
+export const DB_CONFIG_USER = process.env["DB_CONFIG_USER"];
+export const DB_CONFIG_PASSWORD = process.env["DB_CONFIG_PASSWORD"];
+export const DB_CONFIG_DATABASE = process.env["DB_CONFIG_DATABASE"];
+export const DB_MAX_POOL_SIZE = process.env["DB_MAX_POOL_SIZE"];
+export const DB_MAX_POOL_SIZE_ADMIN_CONN=process.env["DB_MAX_POOL_SIZE_ADMIN_CONN"];
+
+if( typeof USE_LOCAL_MONGODB_SERVER === 'boolean' ) {	
+	
+
+	if(!DB_CONFIG_HOST || (DB_CONFIG_HOST && typeof DB_CONFIG_HOST!='string')) {
+		console.error("Local Database: Please specify DB <host> name in your environemntal file (.env or .prod)! ");
+		process.exit(1);
+	}
+
+	const port:number = parseInt(DB_CONFIG_PORT);
+	if(!Number.isInteger(port) || Number.isInteger(port) && port<=0) {
+		console.error("Local Database: Please specify DB <port> in your environemntal file (.env or .prod)! ");
+		process.exit(1);
+	}
+
+	if(!DB_CONFIG_USER || (DB_CONFIG_USER && typeof DB_CONFIG_USER!='string')) {
+		console.error("Local Database: Please specify DB <user> in your environemntal file (.env or .prod)! ");
+		process.exit(1);
+	}
+
+	if(!DB_CONFIG_PASSWORD || (DB_CONFIG_PASSWORD && typeof DB_CONFIG_PASSWORD!='string')) {
+		console.error("Local Database: Please specify DB <password> in your environemntal file (.env or .prod)! ");
+		process.exit(1);
+	}
+
+	if(!DB_CONFIG_PASSWORD || (DB_CONFIG_DATABASE && typeof DB_CONFIG_DATABASE!='string')) {
+		console.error("Local Database: Please specify DB <name> in your environemntal file (.env or .prod)! ");
+		process.exit(1);
+	}
+
+	const poolSize:number = parseInt(DB_MAX_POOL_SIZE);
+	if(!Number.isInteger(poolSize) || Number.isInteger(poolSize) && poolSize<=0) {
+		console.error("Local Database: Please specify <PoolSize> in your environemntal file (.env or .prod)! ");
+		process.exit(1);
+	}
+}
+
+/***
  * Ssytem DB Accounts
  */
 export const SYSTEM_DB_USERS_ADMIN_USER = process.env["SYSTEM_DB_USERS_ADMIN_USER"];
@@ -149,31 +197,42 @@ export const DB_SYSTEM_USERS:any= [
 	{
 		user: SYSTEM_ADMIN_USER, 
 		password: SYSTEM_ADMIN_PASSWORD,
+		host: DB_CONFIG_HOST,		
 		db: 'admin', 
+		port: DB_CONFIG_PORT,
 		type: 1 
 	},
 	{ 
 		user: SYSTEM_DB_USERS_ADMIN_USER, 
 		password: SYSTEM_DB_USERS_ADMIN_PASSWORD,
+		host: DB_CONFIG_HOST,		
 		db: DB_USERS_DATABASE_NAME, 
+		port: DB_CONFIG_PORT,
 		type: 2
 	},
+
 	{ 
 		user: SYSTEM_DB_USERS_READONLY_USER, 
 		password: SYSTEM_DB_USERS_READONLY_PASSWORD,
+		host: DB_CONFIG_HOST,		
 		db: DB_USERS_DATABASE_NAME, 
+		port: DB_CONFIG_PORT,
 		type: 3 
 	},
 	{ 
 		user: SYSTEM_DB_PRODUCTS_ADMIN_USER, 
 		password: SYSTEM_DB_PRODUCTS_ADMIN_PASSWORD,
+		host: DB_CONFIG_HOST,		
 		db :DB_PRODUCT_DATABASE_NAME, 
+		port: DB_CONFIG_PORT,
 		type: 2 
 	},
 	{ 
 		user: SYSTEM_DB_PRODUCTS_READONLY_USER, 
 		password: SYSTEM_DB_PRODUCTS_READONLY_PASSWORD,
+		host: DB_CONFIG_HOST,		
 		db: DB_USERS_DATABASE_NAME, 
+		port: DB_CONFIG_PORT,
 		type: 3
 	}
 ];	
@@ -330,56 +389,6 @@ export const PATH_TO_DEV_CERTIFICATE:string = process.env["PATH_TO_DEV_CERTIFICA
 export const PATH_TO_PROD_PRIVATE_KEY:string = process.env["PATH_TO_PROD_PRIVATE_KEY"];
 export const PATH_TO_PROD_CERTIFICATE:string = process.env["PATH_TO_PROD_CERTIFICATE"];
 
-/***
- * LOCAL MONGODB SERVER
- */
-export const USE_LOCAL_MONGODB_SERVER = process.env["USE_LOCAL_MONGODB_SERVER"] == 'true';
-export const DB_CONFIG_HOST = process.env["DB_CONFIG_HOST"];
-export const DB_CONFIG_PORT = process.env["DB_CONFIG_PORT"];
-export const DB_CONFIG_USER = process.env["DB_CONFIG_USER"];
-export const DB_CONFIG_PASSWORD = process.env["DB_CONFIG_PASSWORD"];
-export const DB_CONFIG_DATABASE = process.env["DB_CONFIG_DATABASE"];
-export const DB_MAX_POOL_SIZE = process.env["DB_MAX_POOL_SIZE"];
-export const DB_MAX_POOL_SIZE_ADMIN_CONN=process.env["DB_MAX_POOL_SIZE_ADMIN_CONN"];
-
-
-
-
-if( typeof USE_LOCAL_MONGODB_SERVER === 'boolean' ) {	
-	
-
-	if(!DB_CONFIG_HOST || (DB_CONFIG_HOST && typeof DB_CONFIG_HOST!='string')) {
-		console.error("Local Database: Please specify DB <host> name in your environemntal file (.env or .prod)! ");
-		process.exit(1);
-	}
-
-	const port:number = parseInt(DB_CONFIG_PORT);
-	if(!Number.isInteger(port) || Number.isInteger(port) && port<=0) {
-		console.error("Local Database: Please specify DB <port> in your environemntal file (.env or .prod)! ");
-		process.exit(1);
-	}
-
-	if(!DB_CONFIG_USER || (DB_CONFIG_USER && typeof DB_CONFIG_USER!='string')) {
-		console.error("Local Database: Please specify DB <user> in your environemntal file (.env or .prod)! ");
-		process.exit(1);
-	}
-
-	if(!DB_CONFIG_PASSWORD || (DB_CONFIG_PASSWORD && typeof DB_CONFIG_PASSWORD!='string')) {
-		console.error("Local Database: Please specify DB <password> in your environemntal file (.env or .prod)! ");
-		process.exit(1);
-	}
-
-	if(!DB_CONFIG_PASSWORD || (DB_CONFIG_DATABASE && typeof DB_CONFIG_DATABASE!='string')) {
-		console.error("Local Database: Please specify DB <name> in your environemntal file (.env or .prod)! ");
-		process.exit(1);
-	}
-
-	const poolSize:number = parseInt(DB_MAX_POOL_SIZE);
-	if(!Number.isInteger(poolSize) || Number.isInteger(poolSize) && poolSize<=0) {
-		console.error("Local Database: Please specify <PoolSize> in your environemntal file (.env or .prod)! ");
-		process.exit(1);
-	}
-}
 
 /***
  * MLAB Configuration

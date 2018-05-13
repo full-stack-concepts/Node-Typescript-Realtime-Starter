@@ -6,12 +6,12 @@ import fetch from "node-fetch";
 import faker from "faker";
 import Promise from "bluebird";
 import chain from 'lodash/chain';
-import { IUser, IClient, ICustomer } from "../shared/interfaces";
-import { UserModel, ClientModel, CustomerModel} from "../shared/models";
-import { RemoteQueryBuilder } from "../util";
-import { IListOptions} from "../shared/interfaces";
+import { IUser, IClient, ICustomer } from "../..//shared/interfaces";
+import { UserModel, ClientModel, CustomerModel} from "../../shared/models";
+import { RemoteQueryBuilder } from "../../util";
+import { IListOptions} from "../../shared/interfaces";
 
-import { get} from "../util";
+import { get} from "../../util";
 import { DataStore } from "./data.store.service";
 import { UserTypes } from "./data.usertypes.service";
 
@@ -35,7 +35,7 @@ import {
 	DB_POPULATION_LOCALE,
 	DB_POPULATE_DEFAULT_CLIENTS,
 	DB_POPULATE_DEFAULT_CUSTOMERS
-} from "../util/secrets";
+} from "../../util/secrets";
 
 /***
  * Default Faker language locale
@@ -52,7 +52,7 @@ import {
 	createPowerUser,
 	createAuthor,
 	createUser
-} from "../util";
+} from "../../util";
 
 /***
  * Import SuperAdminCredentials
@@ -62,7 +62,7 @@ import {
 	SUPERADMIN_LAST_NAME,
 	SUPERADMIN_EMAIL,
 	SUPERADMIN_PASSWORD
-} from "../util/secrets";
+} from "../../util/secrets";
 
 interface IDataType {
 	type:string,

@@ -5,14 +5,14 @@ import { Observable} from "rxjs/Observable";
 import { Subscription} from "rxjs/Subscription";
 
 import { UserOperations } from "./user.ops.service";
-import { systemUserModel, SystemUserModel } from "../shared/models";
-import { IUser, ISystemUser, IRawThumbnail, IEncryption } from "../shared/interfaces";
-import { TSYSTEMUSER } from "../shared/types";
+import { systemUserReadModel, SystemUserModel } from "../../shared/models";
+import { IUser, ISystemUser, IRawThumbnail, IEncryption } from "../../shared/interfaces";
+import { TSYSTEMUSER } from "../../shared/types";
 
 /***
  * Services
  */
-import { proxyService } from "./proxy.service";
+import { proxyService } from "../state/proxy.service";
 
 import  {
 	SET_SYSTEM_ADMIN_ACCOUNT,
@@ -21,7 +21,7 @@ import  {
 	SYSTEM_ADMIN_EMAIL,
 	SYSTEM_ADMIN_PASSWORD,
 	PERSON_SUBTYPE_SYSTEM_USER
-} from "../util/secrets";
+} from "../../util/secrets";
 
 /****
  * Import Environmental settings for user Sub Types
@@ -30,14 +30,14 @@ import {
 	USE_PERSON_SUBTYPE_USER,
 	USE_PERSON_SUBTYPE_CLIENT,
 	USE_PERSON_SUBTYPE_CUSTOMER
-} from "../util/secrets";
+} from "../../util/secrets";
 
 import {
 	encryptPassword,
 	FormValidation,
 	createPrivateUserDirectory,
 	storeUserImage
-} from "../util";
+} from "../../util";
 
 export class SystemUserService extends UserOperations {
 
@@ -88,6 +88,8 @@ export class SystemUserService extends UserOperations {
 
 		const u:ISystemUser = TSYSTEMUSER;
 
+		console.log("*** Inserting password ", this.password)
+
 		// process thick: encrypt password
 		return this.encryptPassword(this.password)
 
@@ -118,10 +120,7 @@ export class SystemUserService extends UserOperations {
 				// assigned user role
 				1
 			)
-		)
-
-		// process thick: hash method number value
-		.then( (u:ISystemUser) => this.hashMethod(u) )
+		)	
 
 		// process thick: set default priviliges for System Admin Account
 		.then( (u:ISystemUser) => this.setDefaultPriviliges(u) )	
@@ -223,7 +222,7 @@ export class SystemUserService extends UserOperations {
 		}			
 
 		return u;
-	}
+	}	
 
 	private waitUntilLive() {
 		return new Promise ( (resolve, reject) => {			
@@ -232,8 +231,7 @@ export class SystemUserService extends UserOperations {
 				x => { if(this.live) { sub$.unsubscribe(); resolve(); } }
 			);
 		});
-	}
-		
+	}	
 
 	/***
 	 * Create SystemUser From fron enviromental settings file (.env or .prod)

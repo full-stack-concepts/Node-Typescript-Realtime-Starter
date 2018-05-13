@@ -1,14 +1,6 @@
-import { 
-	proxyService	
-} from "../services";
-
-import {
-	configureDatabases
-} from "../services/db.admin.service";
-
-import {
-	testForSystemUser
-} from "../services/system.user.service";
+import { proxyService, connectToUserDatabase, connectToProductDatabase } from "../services";
+import { configureDatabases } from "../services/db/db.admin.service";
+import { testForSystemUser } from "../services/user/system.user.service";
 
 import {
 	privateDirectoryManager,
@@ -44,15 +36,7 @@ export class BootstrapController {
 		this.configureSubscribers();
 	}
 
-	private configureSubscribers():void {
-
-		/*****
-		 * Database sequence has finalized
-		 */
-		 proxyService.dbReady$.subscribe( (state:boolean) => {
-		 	// trigger next action
-		 	console.log(" ==> Its time for the next Bootstrap action")
-		 });
+	private configureSubscribers():void {		
 	}
 
 	private err(err:any) {
@@ -76,7 +60,7 @@ export class BootstrapController {
 	/****
 	 * Configure Databases sequence 
 	 * (1) configure MongoDB Client
-	 * (2) evaluate existiing datbases
+	 * (2) evaluate existing datbases
 	 * (3) evaluate pre-defined user roles
 	 * (4) evaluate pre-defined db users
 	 * (5) publish db connections to default DB Model
@@ -87,15 +71,18 @@ export class BootstrapController {
 	 *		(d) CustomerModel		-  readWrite native connection
 	 */
 	private async configureDatabases():Promise<void> {		
-		// proxyService.configureMongoDBClient();		
+		
 		let err:any;
 		try {
 			const $dbConfig = await configureDatabases();
 		}
 		catch(e) { err=e;}
 		finally {
-			if(err) {
-			 	this.err(err); } else { return Promise.resolve(); }
+			if(err) { 
+				this.err(err); 
+			} else { 
+				return Promise.resolve(); 
+			}
 		}
 	}
 
@@ -114,7 +101,10 @@ export class BootstrapController {
 		catch(e) { err=e;}
 		finally {
 			if(err) {
-			 	this.err(err); } else { return Promise.resolve(); }
+			 	this.err(err); 
+			 } else { 
+			 	return Promise.resolve(); 
+			}
 		}
 	}
 
@@ -133,26 +123,46 @@ export class BootstrapController {
 		}
 	}	
 
-	init():void {
+	async init() {
 
-		// process thick: create databases
-		this.initDefaultDatabaseModel()
+		/***
+		 * Init Default DB Model
+		 */
+		await this.initDefaultDatabaseModel();
+
+		/***
+		 * Configure application databases
+		 * (1) Test for predefined db users
+		 * (2) Test assigned roles per db user
+		 * (3) Test if predefined collections exist (#TODO)
+		 * (4) Perform test operations (#TODO)
+		 */		
+		await this.configureDatabases();
+
+		/***
+		 * Configure infrastructure
+		 * (1) Public Directories
+		 * (2) Private Directories
+		 * (3) Local Store Directories
+		 */
+		 await this.configureInfrastructure();
+
+		/***
+		 * Connect To User DB
+		 */
+		await connectToUserDatabase();
+
+		/***
+		 * Connect to Product DB
+		 */ 
+		await connectToProductDatabase();		
 
 		// process thick: 
-		this.configureDatabases()
+		await this.systemUser();		
 
-		// process thick:
-		.then( () => this.configureInfrastructure() )
+		console.log("==> Bootstrap Sequence finished")
 
-		// process thick: 
-		.then( () => this.systemUser() )
-
-		
-
-		// process thick: 
-		.then( () => console.log("==> Bootstrap Sequence finished") )
-
-		.catch( (err:any) => this.err(err) );
+		return Promise.resolve();
 
 	}
 }

@@ -3,16 +3,14 @@ import mongoose from "mongoose";
 
 import { DefaultModel} from "./default.model";
 import { TUSER } from "../types";
-import { RepositoryBase,  IUser, IListOptions } from "../interfaces";
-import { userSchema } from "../schemas";
-import { objectKeysLength, stringify, RemoteQueryBuilder } from "../../util";
-
+import { IUser } from "../interfaces";
+import { ReadWriteRepositoryBase } from "../../engines";
 
 /***
  * Local Repository that contains all methods for 
  * local instance of MongoDB
  */
-class UserRepository extends RepositoryBase<IUser> {
+class UserRepository extends ReadWriteRepositoryBase<IUser> {
 	
 	constructor(connection:mongoose.Model<mongoose.Document>) {
 		super('User', connection);

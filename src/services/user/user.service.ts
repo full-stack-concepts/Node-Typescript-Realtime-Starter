@@ -5,8 +5,7 @@ import fetch from "node-fetch";
 import fileType from "file-type";
 
 import { Subscription } from "rxjs/subscription";
-import { serviceManager } from "./services.manager";
-import { dbModelService } from "./db.model.service";
+import { serviceManager } from "../services.manager";
 
 const join = Promise.join;
 Promise.promisifyAll(fs);
@@ -15,24 +14,24 @@ const uuidv1 = require("uuid/v1");
 
 import { 
 	IUser, IClient, ICustomer, IGoogleUser, IDatabasePriority, IRawThumbnail, ILoginTracker
-} from "../shared/interfaces";
+} from "../../shared/interfaces";
 
 import { 
 	TUSER, TCLIENT, TCUSTOMER,TI_RAW_THUMBNAIL
-} from "../shared/types";
+} from "../../shared/types";
 
 import { UserOperations } from "./user.ops.service";
 
 import { 
 	userModel, clientModel, customerModel,
 	UserModel, ClientModel, CustomerModel 
-} from "../shared/models";
+} from "../../shared/models";
 
 import { 
 	deepCloneObject, cloneArray, capitalizeString, createUserSubDirectories, constructUserCredentials,
 	constructProfileFullName,constructProfileSortName, createPublicUserDirectory, isEmail, isURL,
 	pathToDefaultUserThumbnail, pathToUserThumbnail, storeUserImage, validateInfrastructure, validateUserIntegrity
-} from "../util";
+} from "../../util";
 
 /*****
  * Provider functions
@@ -40,7 +39,7 @@ import {
 import {	
 	updateUserForAuthenticationProvider,
 	authenticationTracker
-} from "../util";
+} from "../../util";
 
 import {
 	DB_HOSTS_PRIORITY, 
@@ -48,7 +47,7 @@ import {
 	DB_USERS_COLLECTION_NAME,
 	DB_CUSTOMERS_COLLECTION_NAME,
 	PERSON_SUBTYPE_USER
-} from "../util/secrets";
+} from "../../util/secrets";
 
 interface IModelSetting {
 	model:any,
@@ -79,7 +78,7 @@ interface IUserActions {
 }
 
 
-class UserService extends UserOperations {
+export class UserService extends UserOperations {
 
 	private user:IUser;	
 	private gmail:string;	

@@ -17,7 +17,7 @@ import {
 	FACEBOOK_CALLBACK_URL
 } from '../../util/secrets';
 
-import { u } from "../../services/user.service";
+import { u } from "../../services";
 import { IUser} from "../interfaces";
 
 /******

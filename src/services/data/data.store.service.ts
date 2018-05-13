@@ -10,15 +10,15 @@ import {
 	IUser, 
 	IClient, 
 	ICustomer
-} from "../shared/interfaces";
+} from "../../shared/interfaces";
 
 import {
 	POPULATE_LOCAL_DATASTORE
-} from "../util/secrets";
+} from "../../util/secrets";
 
 import {
 	getPathToDataStore
-} from "../util";
+} from "../../util";
 
 interface IData {
 	users?: {

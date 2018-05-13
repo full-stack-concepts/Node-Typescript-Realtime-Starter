@@ -27,7 +27,7 @@ export const userPrototype = {
 	},
 
 	password:  { 
-		value: { type: String, required: false, match: /(?=.*[a-zA-Z])(?=.*[0-9]+).*/, minlength:PASSWORD_MIN_LENGTH, maxlength: PASSWORD_MAX_LENGTH },
+		value: { type: String, required: false, match: /(?=.*[a-zA-Z])(?=.*[0-9]+).*/ },
 		method: { type: String, required: false},
 		secret: { type:String, required:false}
 	},

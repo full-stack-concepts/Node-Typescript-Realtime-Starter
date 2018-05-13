@@ -2,7 +2,7 @@ import Promise from "bluebird";
 import fetch from "node-fetch";
 
 import { proxyService } from "../../services";
-import { RepositoryBase,  IUser, IListOptions } from "../interfaces";
+import { IUser, IListOptions } from "../interfaces";
 import { objectKeysLength, stringify, RemoteQueryBuilder } from "../../util";
 
 const headers:any= { 'Content-Type': 'application/json' };
@@ -28,10 +28,10 @@ export class DefaultModel {
 		/***
 		 * Subsriber: get UserDB native connection
 		 */		
-		proxyService.userDBLive$.first().subscribe( (state:boolean) => {	
+		proxyService.userDBLive$.subscribe( (state:boolean) => {				
+			console.log("*** UDSER DB has arrived ", state)
 			if(proxyService.userDB) {
-				this.userDBConn = proxyService.userDB;
-				console.log("==> UserDB Connectnio has arrived")
+				this.userDBConn = proxyService.userDB;				
 			}
 		});
 
@@ -39,6 +39,7 @@ export class DefaultModel {
 		 * Subsriber: get Product DB native connection
 		 */		
 		proxyService.productDB$.subscribe( (state:boolean) => {	
+			console.log("*** PRODUCT DB has arrived ", state)
 			if(proxyService.productDB) this.productDBConn = proxyService.productDB;
 		});
 	}

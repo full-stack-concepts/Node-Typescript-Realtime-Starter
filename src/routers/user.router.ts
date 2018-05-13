@@ -12,7 +12,7 @@ import {
 	allowOrigin
 } from '../util/middleware.util';
 
-import { WebToken } from "./../services/token.service";
+import { WebToken } from "./../services";
 import { IUser } from "../shared/interfaces";
 import { 
 	STORE_WEBTOKEN_AS_COOKIE,

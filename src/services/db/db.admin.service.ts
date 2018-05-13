@@ -37,11 +37,11 @@ import {
 	USE_PERSON_SUBTYPE_CLIENT,
 	USE_PERSON_SUBTYPE_CUSTOMER
 
-} from "../util/secrets";
+} from "../../util/secrets";
 
-import { ISystemUser, IConnection } from "../shared/interfaces";
-import { proxyService } from "../services";
-import { SystemUserModel } from "../shared/models";
+import { ISystemUser, IConnection } from "../../shared/interfaces";
+import { proxyService } from "../../services";
+import { SystemUserModel } from "../../shared/models";
 
 /****
  * Default Connection Settings Object
@@ -161,6 +161,8 @@ export class DBAdminService implements IndexSignature {
 	 */
 	private connect() {
 
+		console.log("*** (2) Connect  with MongoDB Client ")
+
 		/****
 		 * Connection String
 		 */
@@ -202,11 +204,44 @@ export class DBAdminService implements IndexSignature {
 	 */
 	private listDatabases() {
 
-		return this.adminDB.listDatabases() 
-		.then( (list:any) => {
-			console.log(list)
-			return Promise.resolve(list);
-		})
+		return this.client.db('admin').admin().listDatabases()
+		.then( (list:any) => Promise.resolve(list) )
+		.catch( (err:any) => Promise.reject(err) );		
+	}
+
+	/****
+	 * Evaluate existance of Pre-defined Databases
+	 */
+	private evalDatabases(dbList:any) {
+
+		const missingDatabases:string[] =  this.requiredDatabases.map( ( dbName:string) => {			
+			if(!dbList.databases.find( (entry:any) => entry.name === dbName ) ) { return dbName; } 
+		});		
+
+		let err:boolean =  missingDatabases.every( (v:string) => v != null );		
+		
+		if(err) {
+			console.error("CRITICAL ERROR: ensure that you have created all databases before running this application: USERS and PRODUCTS.");
+			process.exit(1);
+		} else {
+			Promise.resolve();
+		}
+	}
+
+	/****
+	 * Drop Pre-defined database users
+	 */
+	private dropAllUsers() {
+		return Promise.map( this.requiredDatabases, (dbName:string) => {			
+			return this.client.db(dbName).command({
+				dropAllUsersFromDatabase: 1,
+				writeConcern: {
+					w: "majority", 
+					wtimeout: 5000
+				}
+			});			
+		})		
+		.then( (result:any) => 	Promise.resolve() )	
 		.catch( (err:any) => Promise.reject(err) );
 	}
 
@@ -229,6 +264,9 @@ export class DBAdminService implements IndexSignature {
 		 * Test Per Dabase if required account exists
 		 */
 		.then( ( allUsers:any) => {	
+
+			console.log("==> Current Defined Users ")
+			console.log(allUsers[2].products)
 
 			let i:number=0;
 			return Promise.map( REQUIRED_USERS_PER_DATABASE,  ({ accounts, dbName}:any) => {
@@ -321,6 +359,9 @@ export class DBAdminService implements IndexSignature {
 	 * DB ReadWrite Account: usd for Mongoose Model
 	 */
 	private createDatabaseAdmin({user, password, db}:any) {
+
+		console.log( "(3) ** Create DB Admin ")
+		console.log(user, password, db)
 	
 		const _db:any = this.client.db(db);
 		return _db.command({
@@ -358,7 +399,7 @@ export class DBAdminService implements IndexSignature {
 			showBuiltinRoles: false
 		}
 
-		return this.adminDB.command({rolesInfo:1, showBuiltinRoles:1})	
+		return this.adminDB.command({rolesInfo:1, showBuiltinRoles:1})
 		.then( (roles:any) => Promise.resolve(roles) )
 		.catch( (err:any) => Promise.reject(err) );
 	}
@@ -439,10 +480,21 @@ export class DBAdminService implements IndexSignature {
 	/****
 	 * Configure Databases with MongoDB Client
 	 */
-	public configureMongoDBClient() {		
+	public configureMongoDBClient() {	
+
+		console.log("(1) Start MongoDB Client")	
 
 		// process thick: connect
-		return this.connect()		
+		return this.connect()	
+
+		// process thick: List Databases
+		.then( () => this.listDatabases() )
+
+		// process thick: exit if a production db does not exist
+		.then( (dbList:any) => this.evalDatabases(dbList))
+
+		// process thick: drop users from production databases to prevent doublures
+		.then( () => this.dropAllUsers() )
 		
 		// process thick: set Admin DB
 		.then( () => this.selectAdminDB() )
@@ -451,9 +503,6 @@ export class DBAdminService implements IndexSignature {
 
 			return Promise.join<any>(
 
-				//List Databases/
-				this.listDatabases(),
-
 				//  Current DB Roles
 				this.getCurrentDBRoles(),
 
@@ -461,12 +510,12 @@ export class DBAdminService implements IndexSignature {
 				this.analysePreDefinedDatabaseUsers()			
 			)
 			.spread ( (
-				dbList:any, 
+				// dbList:any, 
 				dbRoles:any, 			
 				dbUsersList:any				
 			) => {
 				
-				this.dbList = dbList;
+				// this.dbList = dbList;
 				this.dbRoles = dbRoles;															
 
 				// push all required users omtp single array
@@ -477,7 +526,10 @@ export class DBAdminService implements IndexSignature {
 					const list:any = dbUsersList[counter][firstKey];				
 					list.forEach( (entry:any) => requiredUsers.push(entry));					
 					counter++;
-				})			
+				});
+
+				console.log(" (2) DB REDQUIRED USERS ")
+				console.log(requiredUsers)			
 				
 				return Promise.map( requiredUsers, (account:any) => {
 					let ac:number=account.type;									
@@ -491,12 +543,7 @@ export class DBAdminService implements IndexSignature {
 		})		
 		
 		// process thick: eval roles
-		.then( () => this.evalRoles() )		
-
-		.then( () => proxyService.connectToUsersDatabase() )
-
-		// process thick: trigger BootstrapController that DBs have been configured
-		.then( () => proxyService.dbReady$.next(true) )
+		.then( () => this.evalRoles() )					
 
 		// process thick: clsoe conenction
 		.then( () => this.closeConnection() )

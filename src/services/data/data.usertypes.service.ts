@@ -10,13 +10,13 @@ import {
 	IUser, 
 	IClient, 
 	ICustomer 
-} from "../shared/interfaces";
+} from "../../shared/interfaces";
 
 import { 
 	userModel, UserModel, 
 	clientModel, ClientModel, 
 	customerModel, CustomerModel
-} from "../shared/models";
+} from "../../shared/models";
 
 import {
 	POPULATE_LOCAL_DATABASE,
@@ -24,7 +24,7 @@ import {
 	DB_USERS_COLLECTION_NAME,
 	DB_CLIENTS_COLLECTION_NAME,
 	DB_CUSTOMERS_COLLECTION_NAME 
-	} from "../util/secrets";
+	} from "../../util/secrets";
 
 export class UserTypes {
 

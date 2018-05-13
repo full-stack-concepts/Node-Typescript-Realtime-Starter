@@ -32,60 +32,58 @@ export const encryptPassword = (password:string) => {
 
     let method:number = this.__pickPasswordEncryptionMethod();
     let err:any;
-    let hash:string;  
+    let hash:Buffer|string;  
 
     /****
      * Default to BCrypt is randomizer is disabled
      */
     if(!RANDOMIZE_PASSWORD_ENCRYPTION)
-        method = 3;       
+        method = 3;   
 
+    method=3;    
+    console.log("==> (1) Encrypt password ", method, String(password))
+
+    
     //Method 1: Crypt with Initialization Vector
     if(method===1) {
-        return encryptWithInitializationVector(password) 
-        .then( (hash:string) => Promise.resolve({method, hash}) )
-        .catch( (err:any) => Promise.reject(err));        
+        hash = encryptWithInitializationVector(password);     
+        return Promise.resolve({method, hash}) 
     }
 
     // Method 2: Crypto  
-    else if(method === 2) {
-        return encryptWithCrypto(password)
-        .then((hash:string) => Promise.resolve({method, hash}))
-        .catch( (err:any) => Promise.reject(err));        
-    }
+    if(method === 2) {
+        hash = encryptWithCrypto(password);
+        return Promise.resolve({method, hash}) 
+    }   
 
     // Method 3: Bcrypt/
-    else if(method === 3) {         
+    if(method === 3) {
         return encryptWithBcrypt(password)
-        .then( (hash:string) => Promise.resolve({method, hash}) )
-        .catch( (err:any) => Promise.reject(err))    
-    }   
+        .then( (hash) => Promise.resolve({method, hash}) )
+    }       
 }
 
 export const decryptPassword = ({method, hash, data}:IEncryption) => {
 
     let err:any;
-    let pw:string; 
+    let pw:Buffer|string; 
 
     //Method 1: Decrypt with Initialization Vector
     if(method===1) {
-        return decryptWithInitializationVector(hash)
-        .then( (password:string) => Promise.resolve({method, data:password}) )
-        .catch( (err:any) => Promise.reject(err));         
+        pw = decryptWithInitializationVector(hash)
+        return Promise.resolve({method, data:pw});
     }
 
     // Method 2: Crypto  
     else if(method === 2) {
-        return decryptWithCrypto(hash)
-        .then( (password:string) => Promise.resolve({method, data:password}) )
-        .catch( (err:any) => Promise.reject(err))           
+        pw = decryptWithCrypto(hash)
+        return Promise.resolve({method, data:pw});
     }
 
     // Method 3: Bcrypt
     else if(method === 3) {    
-        return decryptWithBcrypt(data, hash)
-        .then( (state:boolean) => Promise.resolve({ method, data: state}) )
-        .catch( (err:any) => Promise.reject(err));     
+        decryptWithBcrypt(data, hash)
+        .then( (state:boolean) => Promise.resolve({ method, data: state}) );    
     }
 }
 

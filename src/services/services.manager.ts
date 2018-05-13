@@ -6,10 +6,10 @@ import { ServiceContainer } from "../shared/lib";
 /***
  * Import Database Services
  */
-import { DBAdminService } from "./db.admin.service";
-import { DBUserService } from "./db.user.service";
-import { DBProductService } from "./db.product.service";
-import { SystemUserService } from "./system.user.service";
+import { DBAdminService } from "./db/db.admin.service";
+import { DBUserService } from "./db/db.user.service";
+import { DBProductService } from "./db/db.product.service";
+import { SystemUserService } from "./user/system.user.service";
 
 class ServiceManager {
 

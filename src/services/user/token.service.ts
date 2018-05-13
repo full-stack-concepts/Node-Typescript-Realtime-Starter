@@ -6,15 +6,15 @@ import mongoose from "mongoose";
 Promise.promisifyAll(fs);
 Promise.promisifyAll(mongoose);
 
-import { IUser} from "../shared/interfaces";
-import { userModel, UserModel } from "../shared/models"
-import { deepCloneObject } from "../util";
+import { IUser} from "../../shared/interfaces";
+import { userModel, UserModel } from "../../shared/models"
+import { deepCloneObject } from "../../util";
 
 /****
  * Security JWT TOKEN
  */
 import jwt from "jsonwebtoken";
-import { readPrivateKeyForTokenAuthentication } from "../util";
+import { readPrivateKeyForTokenAuthentication } from "../../util";
 
 /***
  * Store private key on constant
