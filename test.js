@@ -1,3 +1,18 @@
+const https = require("https");
+const querystring = require("querystring");
+
+const postData = var  querystring.stringify({
+    firstName: "John",
+    lastName: "Doe",
+    email:"johndoe@gmail.com",
+    password:"Aabvb@3459083453098_____"
+});
+
+
+
+
+
+
 
 /*
 'use strict';
@@ -45,6 +60,8 @@ console.log(pw)
 
 */
 
+/*
+
 var crypto = require("crypto")
 
 function encrypt(key, data) {
@@ -71,3 +88,5 @@ var encryptedText = encrypt(key, text);
 console.log("Encrypted Text: " + encryptedText);
 var decryptedText = decrypt(key, encryptedText);
 console.log("Decrypted Text: " + decryptedText);
+
+*/

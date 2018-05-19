@@ -451,8 +451,8 @@ export const DEFAULT_USER_THUMBNAIL = process.env["DEFAULT_USER_THUMBNAIL"];
 export const MAX_LENGTH_USER_LOGINS_EVENTS = Number(process.env["MAX_LENGTH_USER_LOGINS_EVENTS"]);
 export const MAX_LENGTH_USER_DEVICES_ARRAY = Number(process.env["MAX_LENGTH_USER_DEVICES_ARRAY"]);
 export const USE_DEFAULT_USER_PASSWORD = process.env["USE_DEFAULT_USER_PASSWORD"] == 'true';
-export const DEFAULT_PASSWORD_SYSTEM_USER = process.env["DEFAULT_PASSWORD_SYSTEM_USER"] || "";
-export const DEFAULT_PASSWORD_USER =  process.env["DEFAULT_PASSWORD_USER"] || "";
+export const DEFAULT_PASSWORD_SYSTEM_USER = process.env["DEFAULT_PASSWORD_SYSTEM_USER"];
+export const DEFAULT_PASSWORD_USER =  process.env["DEFAULT_PASSWORD_USER"];
 export const USER_PASSWORD_SALT_ROUNDS = Number(process.env["USER_PASSWORD_SALT_ROUNDS"]);
 
 // #TODO: extend with file load test
@@ -510,6 +510,7 @@ export const PERSON_SUBTYPE_CLIENT = process.env["PERSON_SUBTYPE_CLIENT"];
 export const PERSON_SUBTYPE_CUSTOMER = process.env["PERSON_SUBTYPE_CUSTOMER"];
 
 export const PERSON_SUBTYPES:string[] = [
+	PERSON_SUBTYPE_SYSTEM_USER,
 	PERSON_SUBTYPE_USER,
 	PERSON_SUBTYPE_CLIENT,
 	PERSON_SUBTYPE_CUSTOMER
@@ -651,6 +652,35 @@ export const FACEBOOK_CALLBACK_URL = process.env["FACEBOOK_CALLBACK_URL"];
 
 if(ENABLE_FACEBOOK_AUTHENTICATION) {
 
+}
+
+/***
+ * Local Authentication
+ */
+export const ENABLE_LOCAL_AUTHENTICATION = process.env["ENABLE_LOCAL_AUTHENTICATION"] == 'true';
+export const LOCAL_AUTH_REQUIRE_PASSWORD_CONFIRMATION = process.env["LOCAL_AUTH_REQUIRE_PASSWORD_CONFIRMATION"] == 'true';
+export const LOCAL_AUTH_REQUIRE_MIDDLE_NAME = process.env["LOCAL_AUTH_REQUIRE_MIDDLE_NAME"] == 'true';
+export const LOCAL_AUTH_FORM_MAX_LENGTH_FIRST_NAME = parseInt(process.env["LOCAL_AUTH_FORM_MAX_LENGTH_FIRST_NAME"]);
+export const LOCAL_AUTH_FORM_MAX_LENGTH_MIDDLE_NAME = parseInt(process.env["LOCAL_AUTH_FORM_MAX_LENGTH_MIDDLE_NAME"]);
+export const LOCAL_AUTH_FORM_MAX_LENGTH_LAST_NAME = parseInt(process.env["LOCAL_AUTH_FORM_MAX_LENGTH_LAST_NAME"]);
+
+export const LOCAL_AUTH_CONFIG = {
+	enable: ENABLE_LOCAL_AUTHENTICATION,
+	requirePasswordConfirmation: LOCAL_AUTH_REQUIRE_PASSWORD_CONFIRMATION,
+	requireMiddleName: LOCAL_AUTH_REQUIRE_MIDDLE_NAME,
+	validation: {
+		maxLengthFirstName: LOCAL_AUTH_FORM_MAX_LENGTH_FIRST_NAME,
+		maxLengthMiddleName: LOCAL_AUTH_FORM_MAX_LENGTH_MIDDLE_NAME,
+		maxLengthLastName: LOCAL_AUTH_FORM_MAX_LENGTH_LAST_NAME
+	}
+}
+
+if(	!Number.isInteger(LOCAL_AUTH_FORM_MAX_LENGTH_FIRST_NAME) || 
+	!Number.isInteger(LOCAL_AUTH_FORM_MAX_LENGTH_MIDDLE_NAME) ||
+	!Number.isInteger(LOCAL_AUTH_FORM_MAX_LENGTH_LAST_NAME) 
+) {
+	console.error("Local user Authentication: please check your validation settings for user application form ");
+	process.exit(1);
 }
   
 /***

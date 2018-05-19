@@ -9,9 +9,13 @@ export { proxyService } from "./state/proxy.service";
 /***
  * User Services
  */
-export { testForSystemUser, SystemUserService } from "./user/system.user.service";
+export { testForSystemUser, createSystemUser, systemUserService, SystemUserService } from "./user/system.user.service";
 export { UserOperations } from "./user/user.ops.service";
-export { UserService, u } from "./user/user.service";
+export { userService, UserService } from "./user/user.service";
+export { googleUserService, GoogleUserService } from "./user/user.google.service";
+export { facebookUserService, FaceBookUserService} from "./user/user.facebook.service";
+export { clientService, ClientService } from "./user/client.service";
+export { customerService, CustomerService } from "./user/customer.service";
 export { WebToken } from "./user/token.service";
 
 /***

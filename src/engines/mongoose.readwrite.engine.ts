@@ -13,7 +13,7 @@ import { Schema } from "mongoose";
  * Person SubType Mongoose Schemas
  */
 import { systemUserSchema } from "../shared/schemas/systemuser.schema";
-import { userPrototype, userSchema } from "../shared/schemas/user.schema";
+import { userSchema } from "../shared/schemas/user.schema";
 import { clientSchema} from "../shared/schemas/client.schema";
 import { customerSchema } from "../shared/schemas/customer.schema";
 
@@ -38,7 +38,7 @@ export 	class ReadWriteRepositoryBase<T extends mongoose.Document>
          
         // Native Model Connection    
         conn:mongoose.Model<mongoose.Document>
-    ) {              
+    ) {                    
 
         switch(schemaIdentifier) {
             case 'SystemUser':  
@@ -47,7 +47,7 @@ export 	class ReadWriteRepositoryBase<T extends mongoose.Document>
             case 'User': 
                 this.createUserModel(conn); 
             break;            
-            case 'Client': 
+            case 'Client':             
                 this.createClientModel(conn);        
             break;
             case 'Customer':
@@ -68,7 +68,7 @@ export 	class ReadWriteRepositoryBase<T extends mongoose.Document>
     }
 
     createClientModel(connection:any):void {
-         this._model = connection.model('Client', clientSchema, 'clients', true);
+        this._model = connection.model('Client', clientSchema, 'clients', true);
     }
 
     createCustomerModel(connection:any):void {

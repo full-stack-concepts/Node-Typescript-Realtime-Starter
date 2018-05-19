@@ -123,19 +123,19 @@ class DBModelService {
 			collection: DB_SYSTEM_USERS_COLLECTION_NAME 
 		})
 		
-		this.readModels.push({ 
+		this.writeModels.push({ 
 			model: userModel, 
 			type: PERSON_SUBTYPE_USER, 
 			collection: DB_USERS_COLLECTION_NAME 
 		});
 				
-		this.readModels.push({ 
+		this.writeModels.push({ 
 			model: clientModel, 
 			type: PERSON_SUBTYPE_CLIENT, 
 			collection: DB_CLIENTS_COLLECTION_NAME 
 		});
 				
-		this.readModels.push({ 
+		this.writeModels.push({ 
 			model: customerModel, 
 			type: PERSON_SUBTYPE_CUSTOMER, 
 			collection: DB_CUSTOMERS_COLLECTION_NAME 

@@ -43,6 +43,13 @@ class ProxyService {
 	public connectUsersDatabase$:Subject<boolean> = new Subject();
 
 
+	/***
+	 * User Action Controller
+	 */
+	public _uaController:Function;
+	public uaController$:Subject<boolean> = new Subject();
+
+
 	public systemUser$:Subject<boolean> = new Subject();	
 	
 	/****
@@ -56,13 +63,11 @@ class ProxyService {
 	/****
 	 * Set state of local MongoDB Instance to live
 	 */
-	public setUserDBLive():void {	
-		console.log("** Flag USERS DB To Live")			
+	public setUserDBLive():void {		
 		this.userDBLive$.next(true);
 	}
 
-	public setProductDBLive():void {	
-		console.log("** Flag PRODUCTS DB To Live")			
+	public setProductDBLive():void {		
 		this.productDBLive$.next(true);
 	}
 
@@ -116,6 +121,20 @@ class ProxyService {
 	 */
 	public connectToUsersDatabase():void {
 		this.connectUsersDatabase$.next(true);
+	}
+
+	/***
+	 * Proxy User Action controller
+	 * @uaController:Function
+	 */
+	public setUAController(uaController:Function):Promise<void> { 		
+		this._uaController = uaController; 
+		this.uaController$.next(true);
+		return Promise.resolve();
+	}
+
+	public get uaCOntroller() {
+		return this._uaController;
 	}
 	
 }

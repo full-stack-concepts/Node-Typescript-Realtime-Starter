@@ -1,17 +1,33 @@
 import mongoose from "mongoose";
 import { Schema } from "mongoose";
 import { ICustomer } from "../interfaces";
-import { userPrototype } from "../schemas";
 
-/*****
- * Create default <customer> object
- */
-const customer = Object.assign(userPrototype);
+import {
+	coreSchema,
+	passwordSchema,
+	loginsSchema,
+	securitySchema,
+	configurationSchema,	
+	accountsSchema,
+	profileSchema,
+	devicesSchema,
+	priviligesSchema,
+	companySchema
+} from "./children";
 
-/****
- * Extend Mongoose <customer> object: payment Methods
+/******
+ * System customer Schema
  */
-customer.customerPaymentMethods =  {
+export const customer = {
+	core: coreSchema,
+	password:  passwordSchema,
+	logins: loginsSchema,
+	security: securitySchema,
+	configuration: configurationSchema,
+	accounts: accountsSchema,
+	profile: profileSchema,
+	devices: devicesSchema,
+	priviliges: priviligesSchema,
 
 	/*****
 	 * Preferred paymet method
@@ -24,15 +40,13 @@ customer.customerPaymentMethods =  {
 	/*****
 	 * Payment Methods
 	 */
-	paymentMethods: { type: Array, required: false }
-
-}
-
+	customerPaymentMethods: { type: Array, required: false }
+	
+};
 
 /*****
  * Create <customer> Schema
  */
-
 const schema:Schema = new Schema( customer );
 
 schema.pre('save', (next) => {

@@ -1,7 +1,9 @@
-import path from "path";
 import express from "express";
 import {Router, Request, Response, NextFunction} from "express";
 import passport from "passport";
+
+import { DefaultRouter } from "./default.router";
+import { logout } from "./middlewares";
 
 /***
  * Import Niddleware functions
@@ -12,31 +14,33 @@ import {
 	allowOrigin
 } from '../util/middleware.util';
 
-import { WebToken } from "./../services";
-import { IUser } from "../shared/interfaces";
-import { 
-	STORE_WEBTOKEN_AS_COOKIE,
-	WEBTOKEN_COOKIE,
-	SEND_TOKEN_RESPONSE
-} from "../util/secrets";
+/***
+ * Import Actions
+ */
+import {
+	REGISTER_NEW_USER,
+	LOGIN_USER,
+	CREATE_WEBTOKEN
+} from "../controllers/actions";
 
-class UserRouter { 
+import { IUser, ILoginRequest } from "../shared/interfaces";
+import { LOCAL_AUTH_CONFIG, STORE_WEBTOKEN_AS_COOKIE, WEBTOKEN_COOKIE, SEND_TOKEN_RESPONSE } from "../util/secrets";
+import { IUserApplication } from "../shared/interfaces";
+
+class UserRouter extends DefaultRouter { 
 
 	// ref tot Express instance
     public express: express.Application;
-    public router:Router;
+    public router:Router; 
 
-	constructor() {	    
-	  
-	    this.router = express.Router();  
-
-	    this.staticRoutes
+	constructor() {	   
+		super(); 		  
+	    this.router = express.Router();  	   
 	    this.middleware();
         this.setRoutes();    
-	}
+	}	
 
-	private staticRoutes():void {
-	}
+	private staticRoutes():void {}
 
 	private middleware():void {
 
@@ -53,10 +57,27 @@ class UserRouter {
 		/*****
          * Client Authentication Routes
          */ 
+       
+       	// enable local authentication
+        if(LOCAL_AUTH_CONFIG.enable) { 
 
-        this.router.post('/login', this.postLogin);       
+        	// new user aplpication
+			this.router.post('/register', (req:Request, res:Response, next:NextFunction) => 
+				this.newUser (req, res, next)
+			);        
+
+			// user login
+			this.router.post('/login', (req:Request, res:Response, next:NextFunction) => 
+				this.loginUser(req, res, next)
+			);
+
+			// user logout
+			this.router.post('/logout', logout );		
+		}	      
      
-        // Google authorization url
+        /****
+         * Google authorization url
+         */
         this.router.get( '/auth/google',  (req:Request, res:Response, next:NextFunction) => 
         	{	
 				if (req.query.return) {
@@ -73,40 +94,13 @@ class UserRouter {
 		 * Google OAuth 2 callback url. Use this url to configure your OAuth client 
 		 * in the Google Developers console
 		 */
-		this.router.get( 
-			'/auth/google/callback', 
-			passport.authenticate('google'),   
-			
-  			(req:Request, res:Response, next:NextFunction) => {            
-
-  				// passport has serialized user and formatted as req.user
-                // we retreieve it and encrypt account types inside web token
-                let user = req.user;  
-
-                WebToken.create( user.accounts, ( err:any, token:string) => {
-
-                	console.log(err, token)               
-                                            
-                    if(!err) {       
-
-                    	// store webtoken as cookie
-                    	if(STORE_WEBTOKEN_AS_COOKIE) {
-                    		res.cookie(WEBTOKEN_COOKIE, token);
-                    	}                    	
-
-                    	// store token in session to enable real-time authenticaion
-                    	res.locals.token = token;       
-
-                    	// send token with json response
-                    	(SEND_TOKEN_RESPONSE)?res.json({token:token}):res.json({})
-
-                    }                                     
-
-                });    		                           
-  			}
+		this.router.get( '/auth/google/callback', passport.authenticate('google'),   			
+  			(req:Request, res:Response, next:NextFunction) => this.sendTokenResponse(req, res, next)  			
 		);  
 
-		// Facebook authorization url
+		/***
+		 * Facebook authorization url
+		 */
 		this.router.get( '/auth/facebook',  (req:Request, res:Response, next:NextFunction) => 
         	{	
 				if (req.query.return) {
@@ -123,46 +117,56 @@ class UserRouter {
 		 * Google OAuth 2 callback url. Use this url to configure your OAuth client 
 		 * in the Google Developers console
 		 */
-		this.router.get( 
-			'/auth/facebook/callback', 
-			passport.authenticate('facebook'),   
-			
-  			(req:Request, res:Response, next:NextFunction) => {            
-
-  				// passport has serialized user and formatted as req.user
-                // we retreieve it and encrypt account types inside web token
-                let user = req.user;  
-
-                WebToken.create( user.accounts, ( err:any, token:string) => {
-
-                	console.log(err, token)               
-                                            
-                    if(!err) {       
-
-                    	// store webtoken as cookie
-                    	if(STORE_WEBTOKEN_AS_COOKIE) {
-                    		res.cookie(WEBTOKEN_COOKIE, token);
-                    	}                    	
-
-                    	// store token in session to enable real-time authenticaion
-                    	res.locals.token = token;       
-
-                    	// send token with json response
-                    	(SEND_TOKEN_RESPONSE)?res.json({token:token}):res.json({})
-
-                    }                                     
-
-                });    	
-  			}
+		this.router.get( '/auth/facebook/callback', passport.authenticate('facebook'),   			
+  			(req:Request, res:Response, next:NextFunction) => this.sendTokenResponse(req, res, next)  		
 		);  
 	}
 
-	private postLogin( req:Request, res:Response, next:NextFunction) {
+	private newUser(req:Request, res:Response, next:NextFunction) {
+	
+		const application:IUserApplication = req.body;	
+
+		this.uaController[REGISTER_NEW_USER](application)			
+	  	.then( (token:string) => {
 		
-	}
+			// store webtoken as cookie
+        	(STORE_WEBTOKEN_AS_COOKIE)?	res.cookie(WEBTOKEN_COOKIE, token):null;        
+
+        	// store token in session to enable real-time authenticaion
+        	res.locals.token = token;       
+
+        	// send token with json response
+        	res.json({token:token});
+
+		})
+		.catch( (err:any) => console.error(err) );				
+	}	
+
+    /****
+     *
+     */
+	private loginUser( req: Request, res: Response, next: NextFunction) {        
+		let loginRequest:ILoginRequest = req.body;
+		this.uaController[LOGIN_USER](loginRequest)			
+		.then( (token:string) => {
+		
+			// store webtoken as cookie
+        	if(STORE_WEBTOKEN_AS_COOKIE) {
+        		res.cookie(WEBTOKEN_COOKIE, token);
+        	}                    	
+
+        	// store token in session to enable real-time authenticaion
+        	res.locals.token = token;       
+
+        	// send token with json response
+        	res.json({token:token});
+
+		})
+		.catch( (err:any) => console.error(err) );		
+	}	
 }
 
 // Create Public Router and Export it 
 const userRouter = new UserRouter();
-const router = userRouter.router;
+const router:Router = userRouter.router;
 export default router;

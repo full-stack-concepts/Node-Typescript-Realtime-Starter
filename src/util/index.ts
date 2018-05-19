@@ -27,13 +27,12 @@ export {
 } from "./data.util";
 
 export {
-	constructUserCredentials,
+	constructUserCredentials, constructClientCredentials, constructCustomerCredentials,
 	constructProfileFullName,
 	constructProfileSortName,
 	validateInfrastructure, 
 	validateUserIntegrity,
 	updateUserForAuthenticationProvider,
-	authenticationTracker,
 	encryptPassword,
 	decryptPassword,	
 

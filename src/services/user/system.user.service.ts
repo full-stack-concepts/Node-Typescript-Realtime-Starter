@@ -3,16 +3,19 @@
 import Promise from "bluebird";
 import { Observable} from "rxjs/Observable";
 import { Subscription} from "rxjs/Subscription";
+const uuidv1 = require("uuid/v1");
+
 
 import { UserOperations } from "./user.ops.service";
 import { systemUserReadModel, SystemUserModel } from "../../shared/models";
-import { IUser, ISystemUser, IRawThumbnail, IEncryption } from "../../shared/interfaces";
+import { IUser, ISystemUser, IRawThumbnail, IEncryption, ILoginRequest, ILoginTracker } from "../../shared/interfaces";
 import { TSYSTEMUSER } from "../../shared/types";
 
 /***
  * Services
  */
 import { proxyService } from "../state/proxy.service";
+import { WebToken } from "./token.service";
 
 import  {
 	SET_SYSTEM_ADMIN_ACCOUNT,
@@ -33,10 +36,16 @@ import {
 } from "../../util/secrets";
 
 import {
+	cloneArray,
 	encryptPassword,
+	decryptPassword,
 	FormValidation,
 	createPrivateUserDirectory,
-	storeUserImage
+	storeUserImage,
+	capitalizeString,
+	constructProfileFullName,
+	constructProfileSortName,
+	constructUserCredentials
 } from "../../util";
 
 export class SystemUserService extends UserOperations {
@@ -82,13 +91,76 @@ export class SystemUserService extends UserOperations {
 		 */
 		proxyService.userDBLive$.subscribe( (state:boolean) => this.live = state );	
 
+	}	
+
+	/***
+	 * User Core && Security settings
+	 */		
+	private configureDefaultUserProfile(
+		u:any, 
+		firstName:string,
+		middleName:string,
+		lastName:string,
+		email:string,
+		hash:string,
+		method:number,
+		role:number
+	) {	
+
+		let err:any;
+		return new Promise( (resolve, reject) => {
+			try {		
+				
+				u.core.identifier = uuidv1();    
+				u.core.email = email
+				u.core.role = role;
+
+				/****
+				 * Security
+				 */
+				u.password.value = hash;
+				u.password.method = method;				
+	        	u.security.accountType = role;           
+	        	u.security.isAccountVerified = true; 
+	        	u.security.isPasswordEncrypted = true;	        
+	        	
+
+	        	/***
+	        	 * User Profile
+	        	 */	
+				u.profile.personalia.givenName = capitalizeString(firstName);				
+				u.profile.personalia.familyName = capitalizeString(lastName);  	
+
+	        	u.profile.displayNames.fullName = constructProfileFullName({
+	        		givenName:firstName,
+	        		middleName:middleName,
+	        		familyName:lastName
+	        	});
+	        	
+
+	        	u.profile.displayNames.sortName = constructProfileFullName({
+	        		givenName:firstName,
+	        		middleName:middleName,
+	        		familyName:lastName
+	        	});	        	
+
+	        	/****
+     			 * User credentials: userName && url 
+     			 */
+     			constructUserCredentials( u, (credentials:any) => {
+        			u.core.userName = credentials.userName;
+       				u.core.url = credentials.url;  
+    			});    		
+			}
+			catch(e) { err = e; }
+			finally { if(err) {reject('<errorNumber6>');} else { resolve(u); } }		
+
+		});		
 	}		
 
 	private insertDefaultSystemUser(){
 
-		const u:ISystemUser = TSYSTEMUSER;
-
-		console.log("*** Inserting password ", this.password)
+		const u:ISystemUser = TSYSTEMUSER;	
 
 		// process thick: encrypt password
 		return this.encryptPassword(this.password)
@@ -234,11 +306,46 @@ export class SystemUserService extends UserOperations {
 	}	
 
 	/***
+	 * Test Account Type 
+	 * Expected type value : 5
+	 */
+	private testAccountType(user:ISystemUser) {
+		if(user.core.role != 1 || user.security.accountType != 1) {
+			return Promise.resolve(user);
+		} else {
+			return Promise.reject("<errorNumber>");
+		}
+	}
+
+
+	/***
+	 * 
+	 */
+	private validatePassword(user:ISystemUser, {method, hash, data}:IEncryption):Promise<ISystemUser> {
+		return decryptPassword(method, hash, data)
+		.then( () => Promise.resolve(user) )
+		.catch( () => Promise.reject('errorNumber10'));
+	}
+
+	/***
+	 *
+	 */
+	private addLogin(user:ISystemUser):ISystemUser {
+
+		let login:ILoginTracker = this.authenticationTracker();
+		let _logins:ILoginTracker[]=[];
+		
+		if( user.logins && Array.isArray(user.logins)) _logins = cloneArray(user.logins);						
+		_logins.push(login);
+		user.logins=_logins;
+		
+		return user;
+	}
+
+	/***
 	 * Create SystemUser From fron enviromental settings file (.env or .prod)
 	 */
-	private createSystemUser() {
-
-		console.log("*** Create System User")
+	public createSystemUser() {
 	
 		/***
 		 * Return if this operation is not required
@@ -297,17 +404,78 @@ export class SystemUserService extends UserOperations {
 			console.error("*** Criticial error: Sytem User from environmental settings file could not be generated. Please select your settings.");
 			console.error("*** Crititical error: ", err );			
 			process.exit(1);
-		});
-		
+		});		
+	}
+
+	public loginSystemUser(login:ILoginRequest) {
+
+		// process thick: validate email
+		return this.testUserEmail(login.email)
+
+		// process thick:
+		.then( () => this.testPassword(login.password))
+
+		// process thick: test for account
+		.then( () => this.findUser( PERSON_SUBTYPE_SYSTEM_USER, login.email) )
+
+		// process thick: validate password
+		.then( (user:ISystemUser) => {				
+			let decrypt:IEncryption = {hash: user.password.value, method: user.password.method,  data:login.password };					
+			return this.validatePassword(user, decrypt);
+		})
+
+		// process thick:
+		.then( (user:ISystemUser) => {
+			user = this.addLogin(user);
+			return Promise.resolve(user);
+		})
+
+		// process thick: save user object
+		.then( (user:ISystemUser) => this.updateUser (user) )
+
+		// process thick: create authenticatoin token
+		.then( (user:ISystemUser) =>  WebToken.createWebToken( user.accounts) )
+
+		// process thick: return to caller so webtoken can be created
+		.then( ( token:string) => Promise.resolve(token) ) 
+
+		.catch( (err:any) => Promise.reject(err) );	
 	}
 }
 
 /****
+ * Public Interface for User Actions Controller
+ */
+class ActionService {
+
+	public loginSystemUser( login:ILoginRequest ) {
+		let instance:any = new SystemUserService();
+		return instance.loginSystemUser(login)
+			.then( (token:string) => Promise.resolve(token) )
+			.catch( (err:any) => Promise.reject(err) );
+	}
+
+}
+
+export const systemUserService:any = new ActionService();
+
+
+/****
  * Export for Bootstrap Controller
+ * @testForSystemUser
  */
 export const testForSystemUser = () => {
 	const instance:any = new SystemUserService();
 	return instance.createSystemUser()
 	.then( () => Promise.resolve() )
 	.catch( (err:any) => Promise.reject(err) );	
+}
+
+/****
+ * Export for Bootstrap Controller
+ */
+export const createSystemUser = () => {
+	const instance:any = new SystemUserService();
+	return instance.createSystemUser()
+	.then( () => Promise.resolve() );	
 }

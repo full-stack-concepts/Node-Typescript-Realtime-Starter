@@ -2,8 +2,7 @@ import { IClient } from  "../interfaces";
 import { TCOMPANY } from "./default.company";
 
 export const TCLIENT:IClient = <IClient | any> {
-
-	user: () => {},
+	
 	client: () => {},
 
 	core: {

@@ -6,7 +6,7 @@ import { Schema } from "mongoose";
  * Person SubType Mongoose Schemas
  */
 import { systemUserSchema } from "../shared/schemas/systemuser.schema";
-import { userPrototype, userSchema } from "../shared/schemas/user.schema";
+import { userSchema } from "../shared/schemas/user.schema";
 import { clientSchema} from "../shared/schemas/client.schema";
 import { customerSchema } from "../shared/schemas/customer.schema";
 

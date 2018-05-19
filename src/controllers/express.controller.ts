@@ -19,7 +19,10 @@ import {
 /***
  * Router Controllers
  */
+import SystemUserRouter from "../routers/systemuser.router";
 import UserRouter from '../routers/user.router';
+import ClientRouter from '../routers/client.router';
+import CustomerRouter from '../routers/customer.router';
 
 import { shouldCompress } from '../util/middleware.util'; 
 
@@ -29,7 +32,7 @@ class ExpressController {
     public express: express.Application;
 
     constructor() {   
-
+        
         // create router app with express
         this.express  = express();
         this.initPassPort();
@@ -92,10 +95,26 @@ class ExpressController {
             this.express.use( express.static ( PRIVATE_DATA_DIR ) );              
         }
 
+         /***
+         * System User API
+         */
+        this.express.use('/api/systemuser', SystemUserRouter);
+
         /***
          * User API
          */
         this.express.use('/api/user', UserRouter);
+
+        /***
+         * Client API
+         */
+        this.express.use('/api/client', ClientRouter);
+
+
+        /***
+         * Customer API
+         */
+        this.express.use('/api/customer', CustomerRouter);
 
     }
 }

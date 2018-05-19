@@ -1,6 +1,7 @@
 import { proxyService, connectToUserDatabase, connectToProductDatabase } from "../services";
 import { configureDatabases } from "../services/db/db.admin.service";
-import { testForSystemUser } from "../services/user/system.user.service";
+import { testForSystemUser, createSystemUser } from "../services/user/system.user.service";
+import { UAController } from "./user.action.controller";
 
 import {
 	privateDirectoryManager,
@@ -16,7 +17,7 @@ import {
 import { DefaultModel } from "../shared/models";
 
 /*****
-* #TODO: create test for password generation
+* create test for password generation
 */
 /*
 const pw:string="12345678"
@@ -107,7 +108,7 @@ export class BootstrapController {
 			}
 		}
 	}
-
+ 
 	/***
 	 * Test if Super Admin system User
 	 * Clone of MongoDB SuperAdmin, injected into <systemusers> collection
@@ -126,43 +127,61 @@ export class BootstrapController {
 	async init() {
 
 		/***
-		 * Init Default DB Model
+		 * Test build of User Action Controller Proxy
 		 */
-		await this.initDefaultDatabaseModel();
+		const uaController:any = await UAController.build();	
 
-		/***
-		 * Configure application databases
-		 * (1) Test for predefined db users
-		 * (2) Test assigned roles per db user
-		 * (3) Test if predefined collections exist (#TODO)
-		 * (4) Perform test operations (#TODO)
-		 */		
-		await this.configureDatabases();
+		try {
 
-		/***
-		 * Configure infrastructure
-		 * (1) Public Directories
-		 * (2) Private Directories
-		 * (3) Local Store Directories
-		 */
-		 await this.configureInfrastructure();
+			/***
+			 * Propagate uaController
+			 */
+			await proxyService.setUAController(uaController);
 
-		/***
-		 * Connect To User DB
-		 */
-		await connectToUserDatabase();
+			/***
+			 * Init Default DB Model
+			 */
+			await this.initDefaultDatabaseModel();
 
-		/***
-		 * Connect to Product DB
-		 */ 
-		await connectToProductDatabase();		
+			/***
+			 * Configure application databases
+			 * (1) Test for predefined db users
+			 * (2) Test assigned roles per db user
+			 * (3) Test if predefined collections exist (#TODO)
+			 * (4) Perform test operations (#TODO)
+			 */		
+			await this.configureDatabases();
 
-		// process thick: 
-		await this.systemUser();		
+			/***
+			 * Configure infrastructure
+			 * (1) Public Directories
+			 * (2) Private Directories
+			 * (3) Local Store Directories
+			 */
+			await this.configureInfrastructure();
 
-		console.log("==> Bootstrap Sequence finished")
+			/***
+			 * Connect To User DB
+			 */
+			await connectToUserDatabase();
 
-		return Promise.resolve();
+			/***
+			 * Connect to Product DB
+			 */ 
+			await connectToProductDatabase();		
+
+			// process thick: 
+			await createSystemUser();		
+
+			console.log("==> Bootstrap Sequence finished")
+
+			return Promise.resolve();
+
+		}
+
+		catch(e) {
+			this.err(e);
+		}
 
 	}
 }

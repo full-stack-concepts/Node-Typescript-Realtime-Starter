@@ -6,17 +6,34 @@ import fetch from "node-fetch";
 import fileType from "file-type";
 const uuidv1 = require("uuid/v1");
 
+import moment from "moment-timezone";
+
 import {
 	DB_HOSTS_PRIORITY,
 	PERSON_SUBTYPES,
-	PERSON_SUBTYPE_SYSTEM_USER
+	PERSON_SUBTYPE_SYSTEM_USER,
+	PERSON_SUBTYPE_USER,
+	PERSON_SUBTYPE_CLIENT,
+	PERSON_SUBTYPE_CUSTOMER,
+	TIME_ZONE, 
+    DATE_FORMAT,
+    TIME_FORMAT,
+    MAX_LENGTH_USER_LOGINS_EVENTS,   
 } from "../../util/secrets";
 
+import { 
+	userModel, clientModel, customerModel,
+	UserModel, ClientModel, CustomerModel 
+} from "../../shared/models";
+
+
 import { dbModelService } from "./../db/db.model.service";
-import { proxyService } from "./../state/proxy.service";
+import { proxyService } from "./../state/proxy.service"; 
 
 import {
+	cloneArray,
 	encryptPassword,
+	decryptPassword,
 	encryptWithInitializationVector,
 	FormValidation,
 	constructUserCredentials,
@@ -27,11 +44,16 @@ import {
 	pathToUserThumbnail,
 	constructProfileSortName,
 	isEmail,
-  	isURL
+  	isURL,
+  	validateInfrastructure,
+  	validateUserIntegrity,  	
+  	updateUserForAuthenticationProvider,
+  	createPublicUserDirectory,
+  	storeUserImage
 } from "../../util";
 
 import {
-	IPerson, IUser, ISystemUser, IClient, ICustomer, IDatabasePriority, IRawThumbnail, IEncryption
+	IPerson, IUser, ISystemUser, IClient, ICustomer, IDatabasePriority, IRawThumbnail, IEncryption, ILoginTracker
 } from "../../shared/interfaces"; 
 
 import {
@@ -51,6 +73,11 @@ interface IFileType {
 }
 
 export class UserOperations {
+
+	/***
+	 * User Actions Controller
+	 */
+	protected uaController:any;
 
 	/****
 	 * DB Host Type
@@ -77,6 +104,8 @@ export class UserOperations {
 	 * Local DB instance
 	 */
 	protected db:any;
+
+	protected user:IUser;
 
 	constructor() {
 
@@ -111,6 +140,13 @@ export class UserOperations {
 		this.dbModelService.writeModels$.subscribe( (models:IModelSetting[]) => this.writeModels = models );
 
 		/****
+		 * Listen to incoming instance of UA Controller
+		 */
+        proxyService.uaController$.subscribe( (state:boolean) => {        	       	        	
+        	if(proxyService._uaController) this.uaController = proxyService._uaController;           
+        });    
+
+		/****
 		 * Subscriber: when proxyService flags that localDB is connected
 		 * we want to fetch dbInstance so we can create roles for system user accounts
 		 */		
@@ -131,27 +167,19 @@ export class UserOperations {
 		let query:any = this._userEmailQuery(email);
 		let hostType:number = this.hostType;
 
-		hostType =1;
+		// only support localDB for now
+		hostType =1;	
 
-		console.log("*** Start test for Current User: ", email, hostType)
-		console.log(" Models ", this.readModels.length);
-		console.log(" Subtypes: ", PERSON_SUBTYPES)
-
-		// process thick: query all <Person> Subtype collections 
-		
-		return Promise.map( PERSON_SUBTYPES, ( personType:string) => {
-
-			console.log( personType)
+		// process thick: query all <Person> Subtype collections 		
+		return Promise.map( PERSON_SUBTYPES, ( personType:string) => {	
 
 			return this.findUser( personType, email) 
 				.then( (res:any) => { return { [personType]: res}; })
-				.catch( (err:any) => '<errorNumber2>' );				
+				.catch( (err:any) => '<errorNumber2>');				
 		})		
 	
 		// process thick: evaluate query results 
 		.then( (results:any) => {	
-
-			console.log(results);				
 		
 			return Promise.map( results, ( result:any) => {
 				let subType:string = Object.keys(result)[0];	
@@ -165,8 +193,8 @@ export class UserOperations {
 			})			
 			.then( (items:any) => {
 
-				let person:IUser|IClient|ICustomer;
-				items.forEach( (item:IUser|IClient|ICustomer, index: number | string) => {
+				let person:ISystemUser|IUser|IClient|ICustomer;
+				items.forEach( (item:ISystemUser|IUser|IClient|ICustomer, index: number | string) => {
 					if(item) person = item;
 				});				
 				return Promise.resolve( person );
@@ -183,6 +211,13 @@ export class UserOperations {
 		});		
 		
 	}	
+
+	protected cloneAndRemoveDatabaseID(_user:IUser|IClient|ICustomer) {			
+
+		let user:IUser|IClient|ICustomer = deepCloneObject(_user);
+		if(user && user["_id"] ) delete user._id;		
+		return user;
+	}
 
 	private  testString(str:string, required?:boolean, minLength?:number, maxLength?:number):Promise<boolean> {
 
@@ -233,6 +268,31 @@ export class UserOperations {
 		return new Promise ( (resolve, reject) => {
 			(v)?resolve(true):reject('<errorNumber2>');
 		});		
+	}	
+
+	/****
+     * Authenticatoin Tracker
+     */
+	protected authenticationTracker():ILoginTracker { 
+
+	    let ts:number = Math.round(+new Date());
+	    let date:Date = new Date(ts);
+	    let login:ILoginTracker;
+	    let err:any;
+	  
+	    try {
+	        login = {
+	            timestamp: ts,
+	            date: moment(date).tz( TIME_ZONE ).toString(),
+	            formattedDate:  moment(date).tz( TIME_ZONE ).format( DATE_FORMAT ),
+	            formattedTime: moment(date).tz( TIME_ZONE ).format( TIME_FORMAT )
+	        };   
+	    }
+	    catch(e) { err =e; }
+	    finally {	      
+	        if(err) throw new Error('errorNumberAuthenticationTracker');
+	        if(!err) return login;
+	    }  
 	}
 
 	/***
@@ -263,80 +323,223 @@ export class UserOperations {
 		.catch( (err:any) => Promise.resolve('<errorNumber5>'))
 	}
 
-	/***
-	 * User Core && Security settings
-	 */		
-	protected configureDefaultUserProfile(
-		u:any, 
-		firstName:string,
-		middleName:string,
-		lastName:string,
-		email:string,
-		hash:string,
-		method:number,
-		role:number
-	) {
+	protected serializeUser(user:any):string {		
+		return JSON.stringify(user);		
+	}
 
-		console.log(hash)
-		console.log(method)
-
-		let err:any;
-		return new Promise( (resolve, reject) => {
-			try {		
-				
-				u.core.identifier = uuidv1();    
-				u.core.email = email
-				u.core.role = role;
-
-				/****
-				 * Security
-				 */
-				u.password.value = hash;
-				u.password.method = method;				
-	        	u.security.accountType = role;           
-	        	u.security.isAccountVerified = true; 
-	        	u.security.isPasswordEncrypted = true;	        
-	        	
-
-	        	/***
-	        	 * User Profile
-	        	 */	
-				u.profile.personalia.givenName = capitalizeString(firstName);				
-				u.profile.personalia.familyName = capitalizeString(lastName);  	
-
-	        	u.profile.displayNames.fullName = constructProfileFullName({
-	        		givenName:firstName,
-	        		middleName:middleName,
-	        		familyName:lastName
-	        	});
-	        	
-
-	        	u.profile.displayNames.sortName = constructProfileFullName({
-	        		givenName:firstName,
-	        		middleName:middleName,
-	        		familyName:lastName
-	        	});	        	
-
-	        	/****
-     			 * User credentials: userName && url 
-     			 */
-     			constructUserCredentials( u, (credentials:any) => {
-        			u.core.userName = credentials.userName;
-       				u.core.url = credentials.url;  
-    			});
-
-    			console.log(u)
-			}
-			catch(e) { err = e; }
-			finally { if(err) {reject('<errorNumber6>');} else { resolve(u); } }		
-
-		});		
+	public deSerializeUser(userStr:string, done:any):IUser|IClient|ICustomer {	
+		return JSON.parse(userStr);	
 	}	
 
-	private _getDefaultThumbnail():IRawThumbnail {
+	protected _getDefaultThumbnail():IRawThumbnail {
 		let rawThumbnail:IRawThumbnail = deepCloneObject(TI_RAW_THUMBNAIL);
     	return rawThumbnail;   	
 	}
+
+	/*****
+	 *
+	 */
+	protected newClient(client:IClient):Promise<any> {
+
+		// process thick: execute tasks (1, 2)					  
+		return Promise.join<any>(
+			this.fetchUserImage(client),
+			createPublicUserDirectory (client.core.userName),	
+			this.authenticationTracker()		
+		).spread( (thumbnail:IRawThumbnail, userDirectory:any, login:ILoginTracker) => {				
+
+			// ** Error: User Directories could not be created
+			if(!userDirectory.dirCreated) {
+				return Promise.reject('<errorNumber4>');
+			} else {
+
+				// Process image: assign default url to thumbnail property of user object
+				if(thumbnail.defaultImage) {				
+		 			client.profile.images.thumbnail = pathToDefaultUserThumbnail();
+
+				// Process image: assing user specific thumnail url
+				} else {
+					client.profile.images.thumbnail = pathToUserThumbnail(thumbnail, client.core.userName);
+				}
+ 
+				// update user configuration
+				client.configuration.isThumbnailSet = true;
+
+				let logins:ILoginTracker[];
+				if( client.logins && Array.isArray(client.logins)) {
+					logins = cloneArray(client.logins);
+				} else {
+					logins = [];
+				}							
+				logins.push(login);
+				client.logins=logins;		
+
+				return Promise.resolve({ 
+					client:client, 
+					thumbnail:thumbnail
+				});
+			}	
+
+		// process thick: execute tasks (3, 4)					 
+		}).then( (result:any) => {			
+
+			return Promise.join<any>(
+				storeUserImage( result.thumbnail, result.client.core.userName),
+				this.insertUser( PERSON_SUBTYPE_CLIENT, result.client)
+			).spread( (imgStored:any, user:IUser|IClient|ICustomer) => {	
+
+				/****
+				 * Return user -> next step is generation of webtoken for client application
+				 */						
+				return Promise.resolve(client);
+			})
+			.catch( err => Promise.reject(err) );
+		})
+
+		// process thick: return to caller
+		.then ( (client:IClient) => Promise.resolve(client) )	
+		.catch( (err:any) => {		
+			Promise.reject(err) 
+		});		 
+	}		
+
+	/*****
+	 *
+	 */
+	protected newCustomer(customer:ICustomer):Promise<any> {
+
+		// process thick: execute tasks (1, 2)					  
+		return Promise.join<any>(
+			this.fetchUserImage(customer),
+			createPublicUserDirectory (customer.core.userName),	
+			this.authenticationTracker()		
+		).spread( (thumbnail:IRawThumbnail, userDirectory:any, login:ILoginTracker) => {				
+
+			// ** Error: User Directories could not be created
+			if(!userDirectory.dirCreated) {
+				return Promise.reject('<errorNumber4>');
+			} else {
+
+				// Process image: assign default url to thumbnail property of user object
+				if(thumbnail.defaultImage) {				
+		 			customer.profile.images.thumbnail = pathToDefaultUserThumbnail();
+
+				// Process image: assing user specific thumnail url
+				} else {
+					customer.profile.images.thumbnail = pathToUserThumbnail(thumbnail, customer.core.userName);
+				}
+ 
+				// update user configuration
+				customer.configuration.isThumbnailSet = true;
+
+				let logins:ILoginTracker[];
+				if( customer.logins && Array.isArray(customer.logins)) {
+					logins = cloneArray(customer.logins);
+				} else {
+					logins = [];
+				}							
+				logins.push(login);
+				customer.logins=logins;		
+
+				return Promise.resolve({ 
+					customer:customer, 
+					thumbnail:thumbnail
+				});
+			}	
+
+		// process thick: execute tasks (3, 4)					 
+		}).then( (result:any) => {			
+
+			return Promise.join<any>(
+				storeUserImage( result.thumbnail, result.customer.core.userName),
+				this.insertUser( PERSON_SUBTYPE_CUSTOMER, result.customer)
+			).spread( (imgStored:any, customer:IUser|IClient|ICustomer) => {	
+
+				/****
+				 * Return user -> next step is generation of webtoken for client application
+				 */						
+				return Promise.resolve(customer);
+			})
+			.catch( err => Promise.reject(err) );
+		})
+
+		// process thick: return to caller
+		.then ( (customer:ICustomer) => Promise.resolve(customer) )	
+		.catch( (err:any) => {		
+			Promise.reject(err) 
+		});		 
+	}		
+
+	/*****	
+	 * (1) Fetch user thumbnail
+	 * (2) Create public infrastructure for this user
+	 * (3) Create authentication time object
+	 * (4) Insert new user
+	 * (5) Store Thumbnail
+	 */
+	protected newUser( user:IUser):Promise<any> { 	
+ 
+		// process thick: execute tasks (1, 2)					  
+		return Promise.join<any>(
+			this.fetchUserImage( user),
+			createPublicUserDirectory (user.core.userName),	
+			this.authenticationTracker()		
+		).spread( (thumbnail:IRawThumbnail, userDirectory:any, login:ILoginTracker) => {				
+
+			// ** Error: User Directories could not be created
+			if(!userDirectory.dirCreated) {
+				return Promise.reject('<errorNumber4>');
+			} else {
+
+				// Process image: assign default url to thumbnail property of user object
+				if(thumbnail.defaultImage) {				
+		 			user.profile.images.thumbnail = pathToDefaultUserThumbnail();
+
+				// Process image: assing user specific thumnail url
+				} else {
+					user.profile.images.thumbnail = pathToUserThumbnail(thumbnail, user.core.userName);
+				}
+ 
+				// update user configuration
+				user.configuration.isThumbnailSet = true;
+
+				let logins:ILoginTracker[];
+				if( user.logins && Array.isArray(user.logins)) {
+					logins = cloneArray(user.logins);
+				} else {
+					logins = [];
+				}							
+				logins.push(login);
+				user.logins=logins;		
+
+				return Promise.resolve({ 
+					user:user, 
+					thumbnail:thumbnail
+				});
+			}					
+
+		// process thick: execute tasks (3, 4)					 
+		}).then( (result:any) => {			
+
+			return Promise.join<any>(
+				storeUserImage( result.thumbnail, result.user.core.userName),
+				this.insertUser( PERSON_SUBTYPE_USER, result.user)
+			).spread( (imgStored:any, user:IUser|IClient|ICustomer) => {	
+
+				/****
+				 * Return user -> next step is generation of webtoken for client application
+				 */						
+				return Promise.resolve(user);
+			})
+			.catch( err => Promise.reject(err) );
+		})
+
+		// process thick: return to caller
+		.then ( (user:IUser) => Promise.resolve(user) )	
+		.catch( (err:any) => {		
+			Promise.reject(err) 
+		});		 
+	}	
 
 	/****
 	 *
@@ -367,7 +570,7 @@ export class UserOperations {
 		let url:string = user.profile.images.externalThumbnailUrl;		
 
 		/****
-		 * If provider profile has no imageURL we assign default user image
+		 * If provider profile OR new user has no imageURL we assign default user image
 		 */
 		if(!url || (url && typeof(url) != 'string')) {
 			let rawThumbnail:IRawThumbnail = this._getDefaultThumbnail();    				
@@ -424,7 +627,7 @@ export class UserOperations {
 
 		const model:IModelSetting = this.readModels.find( (setting:IModelSetting) => {
 			return (setting.type === userType);
-		});
+		});	
 		return model;	
 	}
 
@@ -452,17 +655,17 @@ export class UserOperations {
 		/****
 		 * Find Model Setting for this User Type
 		 */
-		const setting:IModelSetting = this._getReadModel(userType);
+		const setting:IModelSetting = this._getReadModel(userType);	
 
 		/****
 		 * Define user subtype model
 		 */
-		const model:any = setting.model;
+		const model:any = setting.model;	
 
 		/****
 		 * Define Collection
 		 */
-		const collection:string = setting.collection;
+		const collection:string = setting.collection;	
 
 		/***
 		 * Define query
@@ -475,9 +678,8 @@ export class UserOperations {
 		if(hostType === 1) {				
 			return model.findOne( query )
 			.then( (u:any) => { return Promise.resolve(u); })
-			.catch( (err:any) => {
-				console.log(err);
-				console.log('<errorNumberX>'); 
+			.catch( (err:any) => {		
+				console.error('<errorNumberX>'); 
 			});				
 		}	
 
@@ -495,26 +697,26 @@ export class UserOperations {
 	 * Create New User per model
 	 */
 	protected insertUser( userType:string, user:IPerson|ISystemUser|IUser|IClient|ICustomer) {
-
+	
 		/****
 		 * Degine HostType
 		 */
-		const hostType:number = this.hostType;
+		const hostType:number = this.hostType;		
 
 		/****
 		 * Find Model Setting for this User Type
 		 */
-		const setting:IModelSetting = this._getWriteModel(userType);
+		const setting:IModelSetting = this._getWriteModel(userType);		
 
 		/****
 		 * Define user subtype model
 		 */
-		const model:any = setting.model;
+		const model:any = setting.model;		
 
 		/****
 		 * Define Collection
 		 */
-		const collection:string = setting.collection;
+		const collection:string = setting.collection;		
 
 		/***
 		 * Local MongoDB instance
@@ -523,10 +725,7 @@ export class UserOperations {
 
 			return model.createUser(user)
 			.then( (res:any) => { return Promise.resolve(res) })
-			.catch( (err:any) => {
-				console.log(err);
-				console.error('<errorNumberX>'); 
-			});				
+			.catch( (err:any) => '<errorNumberX>');				
 		}	
 
 		/***
@@ -535,285 +734,88 @@ export class UserOperations {
 		if(hostType === 2) {			
 			return model.remoteCreateUser( user, collection)
 			.then( (res:any) => { return Promise.resolve(user); })
-			.catch( (err:any) => console.error('<errorNumberXX>') );					
+			.catch( (err:any) => '<errorNumberXX>' );					
 		}
 	}	
-
-	/***
-	 * DB Role: Manage Current Operatons
-	 */	
-
-
-	/******
-	 * Google Functions
-	 */
-	protected grabEmailFromGoogleProfile(profile:any):Promise<string> {        	  
-
-	    let email:string, err:any
-	    try { email = profile.emails[0].value;} 
-	    catch(e) {err = e;  }
-	    finally {       	       
-	        if(err) {
-	            return Promise.reject('errorGoogle1000');
-	        } else {
-	            return Promise.resolve(email);
-	        }
-	    }
-	}
 
 	/****
-	 * Create User Profile from Google Authentication Response
+	 * Tasks
+	 * (1) Validate user directories and resources
+	 * (2) Valdiate user profile for missing actions
+	 * (3) Create authentication time object
+	 * (4) Add auth time to user object
+	 * (5) update user for different Authentication Provider if necessary
+	 * // TODO extend tasks (1), (2)
 	 */
-	protected extractGoogleProfile(profile:any) {
+	protected validateUser( profile:any, user:IUser|IClient|ICustomer) {	
 
-		let newUser:IUser = deepCloneObject(TUSER),
-			p:any = deepCloneObject(profile),
-			errType:number;
+		// process thick: tasks (1) (2) (3)
+		return Promise.join<any>(
+			validateInfrastructure(user),
+			validateUserIntegrity(user),
+			this.authenticationTracker()	
+		)
 
-	    /****
-	     * Test if Profile contains essential params
-	     */
-	    if( !p.hasOwnProperty('id') || (p.id && typeof p.id != 'string') )
+		// process thick: task (4)
+		.spread( (infatructure:boolean, integrity:boolean, login:ILoginTracker) => {	
+					
+			// TODO: put this in new function
+			let logins:ILoginTracker[];
+			if( user.logins && Array.isArray(user.logins)) {				
+				logins = cloneArray(user.logins);		
+			} else {
+				logins = [];
+			}							
+			logins.push(login);
+			user.logins=logins;		
+			return Promise.resolve(user);
+		})		
 
-	    // invalid Google Profile
-	    {
-	        errType = 1031; 
+		
+		// process thick: update user for Authentication Provider
+		.then( (user:IUser|IClient|ICustomer) => updateUserForAuthenticationProvider(profile, user) )	
 
-	    } else {
+		.then( ( user:IUser|IClient|ICustomer) => {
 
-	        // create 'personal' identifier, a UUID timestamp
-	        newUser.core.identifier = uuidv1();
+			return this.updateUser(user) 
+		})
+		
+		// process thick: return to caller so webtoken can be created
+		.then( ( user:IUser|IClient|ICustomer|any) => {					
+			return Promise.resolve(user); 
+		})
 
-	        // configure security and account Type
-	        newUser.security.accountType = 5;           
-	        newUser.security.isAccountVerified = true; 
-	        newUser.core.role = 5;
-
-	        // update user configuration
-	        newUser.configuration.isGoogleUser = true;
-	        newUser.profile.social.facebook = p.url || "";
-
-	        // set public facebook ID
-	        newUser.accounts.googleID = p.id;
-
-	        // set raw profile
-	        newUser.profileRaw = p._raw;
-
-	        /***
-	         * Set user password
-	         */
-	         newUser.password.value = "";
-	         newUser.security.isPasswordEncrypted = false; 
-	    }   
-
-		/****
-		 * Test if google user is a person and not a business
-		 */
-		if( p._json 
-			&& p._json.objectType 
-			&& p._json.objectType.length 
-			&& typeof p._json.objectType === 'string'
-		) {
-			newUser.security.accountType = 1;
-		} else {
-			errType = 1030; // user has to a natural person
-		}		
-
-		/****
-		 * Test for rhumbnail or image
-		 */
-		if (p.photos && p.photos.length) {
-		   newUser.profile.images.externalThumbnailUrl = p.photos[0].value;
-	       newUser.configuration.hasExternalThumbnailUrl = true;
-		}  	
-
-		/****
-		 * test for given and family name and email address  	
-		 */
-		if(p.name) {
-			newUser.profile.personalia.givenName = capitalizeString(p.name.givenName) || "";
-			newUser.profile.personalia.familyName = capitalizeString(p.name.familyName) || "";  			
-		} else {
-			errType = 1032; // user remains nameless
-		}  		
-		if(p.emails && p.emails.length) {
-			newUser.core.email = p.emails[0].value;
-		} else {
-			errType = 1033; // no email account was provided
-		}  	
-
-		/****  	
-		 * gender
-		 */	
-		if(p._json && p._json.gender && typeof p._json.gender === 'string') {
-			if(p._json.gender === 'male') { newUser.profile.gender = 1; } 
-			else if(p._json.gender === 'female') { newUser.profile.gender = 2; } 
-			else { newUser.profile.gender = 0; }
-		} else {
-			newUser.profile.gender = 0;
-		}
-
-		/****
-		 * Google Plus user
-		 */
-		if(p._json && p._json.url && p._json.url.length && typeof p._json.url === 'string') {
-			newUser.profile.social.googleplus = p._json.url;
-	        newUser.configuration.isGooglePlusUser = true;
-		}  		
-
-		/****
-		 * Verified Google Account
-		 */
-		if(p._json && p._json.verified && p._json.verified.length && typeof p._json.verified === 'boolean' ) {
-			newUser.security.isAccountVerified = p._json.verified;
-		}
-
-	    /****
-	     * format display names 
-	     */     
-	    newUser.profile.displayNames.fullName = constructProfileFullName(p.name);
-	    newUser.profile.displayNames.sortName = constructProfileSortName(p.name);
-
-	      /****
-	     * user credentials: userName && url 
-	     */
-	    constructUserCredentials( newUser, (credentials:any) => {
-	        newUser.core.userName = credentials.userName;
-	        newUser.core.url = credentials.url;  
-	    }); 
-
-		return new Promise( (resolve, reject) => {			
-			(errType) ? reject(errType): resolve(newUser);		
-		});
+		.catch( (err:any) => {		
+			Promise.reject(err);
+		});	
 	}
 
-	/*****
-	 * Facebook functions
-	 */
-	protected grabEmailFromFacebookProfile (fProfile:any):Promise<string | number> {	
-		let email:string = fProfile.emails[0].value;		
-		if(email && isEmail(email) ) {
-			return Promise.resolve(email)
-		} else {
-			return Promise.reject('<errorNumber1>');			
-		}	
+	protected updateUser (user:any) {
+
+		/*****
+		 * Update on local mongoDB instance
+		 */
+		if(this.hostType === 1) {	
+			return new Promise ( (resolve, reject) => {
+				user.save( (err:any) => {					
+					if(err) { reject(err); } else { resolve(user); }
+				});
+			});		
+		}
+
+		/*****
+		 * Update on MLAB
+		 * TODO: test this feature
+		 */
+		if(this.hostType===2) {
+			let userID:string = user._id;
+			let _user:any = this.cloneAndRemoveDatabaseID( user);
+			return userModel.remoteUpdateEntireUserObject( 'users', user._id, _user)
+			.then( (res:any) => Promise.resolve(user))
+			.catch( (err:any) => Promise.reject(err));
+		}
 	}	
-
-	protected extractFacebookProfile(profile:any) {
-
-		// console.log(profile)
-
-		let newUser:IUser = deepCloneObject(TUSER),
-			p:any = deepCloneObject(profile),
-			errType:number;
-
-		console.log("*** url test")
-		console.log(profile.profileUrl)
-		console.log(isURL(profile.profileUrl))
-		
-
-		/****
-		 * Test if FB Profile contains essential params
-		 */
-		if( !p.hasOwnProperty('id') || (p.id && typeof p.id != 'string') 
-			|| (!p.profileUrl || (p.profileUrl && !isURL(p.profileUrl) ) )
-
-		// invalid FB Profile
-		) {
-			errType = 1040; 
-
-		} else {
-
-			// create 'personal' identifier, a UUID timestamp
-			newUser.core.identifier = uuidv1();
-
-			// configure security and account Type
-			newUser.security.accountType = 5;			
-			newUser.security.isAccountVerified = true;
-			newUser.core.role = 5;
-
-			// update user configuration
-			newUser.configuration.isFacebookUser = true;
-			newUser.profile.social.facebook = p.profileUrl;
-
-			// set public facebook ID
-			newUser.accounts.facebookID = p.id;
-
-			// set raw profile
-			newUser.profileRaw = p._raw;
-
-			/***
-		  	 * Set user password
-			 */
-			 newUser.password.value = "";
-			 newUser.security.isPasswordEncrypted = false; 
-		}	
-
-		/****
-		 * Test for thumbnail or image  
-		 */
-			if (p.photos && p.photos.length) {
-			newUser.profile.images.externalThumbnailUrl = p.photos[0].value;    	
-			newUser.configuration.hasExternalThumbnailUrl = true;
-			}
-
-			/****
-			 * test for given and family name 
-			 */
-			if(p.name) {
-
-				// given name
-				if( p.name.hasOwnProperty('givenName')) 
-					newUser.profile.personalia.givenName = capitalizeString(p.name.givenName) || "";
-				
-				// middle name
-				if( p.name.hasOwnProperty('middleName')) 
-				newUser.profile.personalia.middleName = capitalizeString(p.name.middleName) || "";  		
-			
-			// family Name
-			if( p.name.hasOwnProperty('familyName'))
-					newUser.profile.personalia.familyName = capitalizeString(p.name.familyName) || "";  		
-
-			} else {
-				errType = 1042; // invalid name object
-			} 
-
-			/****
-			 * Test for email address
-			 */
-			if(p.emails && p.emails.length) {
-				newUser.core.email = p.emails[0].value;
-			} else {
-				errType = 1043; // no email account was provided
-			}  	
-
-			/****  	
-			 * gender
-			 */	
-			newUser.profile.gender = 0;
-
-		/****
-		 * format display names 
-		 */ 	
-		newUser.profile.displayNames.fullName = constructProfileFullName(p.name);
-		newUser.profile.displayNames.sortName = constructProfileSortName(p.name);
-		
-		/****
-		 * user credentials: userName && url 
-		 */
-		constructUserCredentials( newUser, (credentials:any) => {
-			newUser.core.userName = credentials.userName;
-			newUser.core.url = credentials.url;  
-		});	
-
-		console.log("*** Profile Error ", errType)
-
-
-		return new Promise( (resolve, reject) => {				
-			// console.log(newUser);
-			(errType) ? reject(errType): resolve(newUser);		
-		});	
-	}
+	
 }
 
 

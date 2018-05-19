@@ -17,24 +17,17 @@ import {
 	FACEBOOK_CALLBACK_URL
 } from '../../util/secrets';
 
-import { u } from "../../services";
+import { GoogleUserService, FaceBookUserService } from "../../services";
 import { IUser} from "../interfaces";
 
 /******
  * Degine Authentication Strategies
  */
-const LocalStrategy = passportLocal.Strategy;
 const FacebookStrategy = passportFacebook.Strategy;
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 
-/**************************************************************************************************
- *  Configure passport for Local Strategy
- *
- */
-passport.use(new LocalStrategy({ usernameField: "email" }, ( email:string, password:string, done:Function) => {
-	//#TODO Process user authentication
-}));
-
+const google = new GoogleUserService();
+const fb = new FaceBookUserService();
 
 
 /**************************************************************************************************
@@ -52,25 +45,16 @@ passport.use(new GoogleStrategy({
 	callbackURL: GOOGLE_CALLBACK_URL,
 	accessType: 'offline',
 	proxy:true
-}, (accessToken:any, refreshToken:any, profile:any, done:Function) => {	
+}, (accessToken:any, refreshToken:any, profile:any, done:Function) => {		
 
-		u.authenticateGoogleUser({
-			accessToken: accessToken,
-			refreshToken: refreshToken,
-			profile: profile
-		},
-
-		(err:any, user:any) => {		
-
-			/**** 
-			 * After done is exexuted passport passes control back to <UserRouter>
-			 */
-			if(err) {
-				done(err, user );
-			} else {
-				done(null, user );
-			}			
-		});		
+		google.authenticateGoogleUser(
+			accessToken,
+			refreshToken,
+			profile
+		)
+		.then( (user:any) => { return done(null, user);  })
+		.catch( (err:any) => { return done(err); })				
+		
 	}) 
 );  
 
@@ -92,22 +76,9 @@ passport.use( new FacebookStrategy({
   	passReqToCallback: true
 }, (req: any, accessToken:any, refreshToken:any, profile:any, done:any) => {	
 
-	u.authenticateFacebookUser({
-		accessToken: accessToken,		
-		profile: profile
-	},
-
-	(err:any, user:any) => {		
-
-		/**** 
-		 * After done is exexuted passport passes control back to <UserRouter>
-		 */
-		if(err) {
-			done(err, user );
-		} else {
-			done(null, user );
-		}			
-	});		
+	fb.authenticateFacebookUser( accessToken, profile)
+	.then( (user:any) => { return done(null, user);  })
+	.catch( (err:any) => { return done(err); })		
 
 
 }));

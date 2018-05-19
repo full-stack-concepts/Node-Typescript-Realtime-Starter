@@ -3,10 +3,10 @@ import moment from "moment-timezone";
 import Promise from "bluebird";
 
 import { 
-    TIME_ZONE, 
+    TIME_ZONE,
     DATE_FORMAT,
     TIME_FORMAT,
-    MAX_LENGTH_USER_LOGINS_EVENTS,   
+    MAX_LENGTH_USER_LOGINS_EVENTS,
     RANDOMIZE_PASSWORD_ENCRYPTION 
 } from "./secrets";
 
@@ -40,9 +40,8 @@ export const encryptPassword = (password:string) => {
     if(!RANDOMIZE_PASSWORD_ENCRYPTION)
         method = 3;   
 
+    // #TODO: encrypt mehtod with Initialization Vector
     method=3;    
-    console.log("==> (1) Encrypt password ", method, String(password))
-
     
     //Method 1: Crypt with Initialization Vector
     if(method===1) {
@@ -63,27 +62,27 @@ export const encryptPassword = (password:string) => {
     }       
 }
 
-export const decryptPassword = ({method, hash, data}:IEncryption) => {
+export const decryptPassword = (method:number, hash:string, data:string)=> {
 
     let err:any;
     let pw:Buffer|string; 
 
     //Method 1: Decrypt with Initialization Vector
-    if(method===1) {
+    if(method===1) {    
         pw = decryptWithInitializationVector(hash)
-        return Promise.resolve({method, data:pw});
+        return Promise.resolve({method, data:pw});    
     }
 
     // Method 2: Crypto  
-    else if(method === 2) {
+    else if(method === 2) {    
         pw = decryptWithCrypto(hash)
-        return Promise.resolve({method, data:pw});
+        return Promise.resolve({method, data:pw});    
     }
 
     // Method 3: Bcrypt
     else if(method === 3) {    
-        decryptWithBcrypt(data, hash)
-        .then( (state:boolean) => Promise.resolve({ method, data: state}) );    
+        return decryptWithBcrypt(data, hash)
+        .then( (valid:boolean) => (valid)?Promise.resolve():Promise.reject('') ) ;    
     }
 }
 
@@ -133,6 +132,43 @@ export const constructUserCredentials = (user:IUser, done:Function):any => {
     });
 }
 
+const _uPolicy = (user:any) => {
+    return  {
+        'givenName': sliceMe( user.profile.personalia, 'givenName', 4),
+        'familyName': sliceMe( user.profile.personalia, 'familyName', 5),
+        'number': randomInt(1001, 3999)
+    }
+}
+
+const _coreProps = (uPolicy:any) => {
+    return {
+        userName: `${uPolicy.givenName}${uPolicy.familyName}${uPolicy.number}`,
+        url:  `${uPolicy.givenName}_${uPolicy.familyName}_${uPolicy.number}`
+    }
+}
+
+export const constructClientCredentials = (client:IClient, done:Function):any => {   
+    let uPolicy:any = _uPolicy(client),
+        credentials:any = _coreProps(uPolicy);
+    return done(credentials);
+}
+
+export const constructCustomerCredentials = (user:ICustomer, done:Function):any => {   
+
+    let uPolicy:any = {
+        'givenName': sliceMe( user.profile.personalia, 'givenName', 4),
+        'familyName': sliceMe( user.profile.personalia, 'familyName', 5),
+        'number': randomInt(1001, 3999)
+    }
+
+    return done({
+        userName: `${uPolicy.givenName}${uPolicy.familyName}${uPolicy.number}`,
+        url:  `${uPolicy.givenName}_${uPolicy.familyName}_${uPolicy.number}`
+    });
+}
+
+
+
 export const constructProfileFullName = ( {givenName, middleName, familyName }:IName ):string => {
     let n:string = givenName;
     if(middleName) n+= ` ${middleName}`;
@@ -162,32 +198,6 @@ export const validateUserIntegrity = (user:IUser|IClient|ICustomer):Promise<bool
     }
 
     return Promise.resolve(true);
-}
-
-/****
- * Update User profile
- */
-export const authenticationTracker= ():Promise<ILoginTracker> =>  { 
-
-    let ts:number = Math.round(+new Date());
-    let date:Date = new Date(ts);
-    let login:ILoginTracker;
-    let err:any;
-  
-    try {
-        login = {
-            timestamp: ts,
-            date: moment(date).tz( TIME_ZONE ).toString(),
-            formattedDate:  moment(date).tz( TIME_ZONE ).format( DATE_FORMAT ),
-            formattedTime: moment(date).tz( TIME_ZONE ).format( TIME_FORMAT )
-        };   
-    }
-    catch(e) { err =e; }
-    finally {
-        console.log(err, login);
-        if(err) return Promise.reject('errorNumberAuthenticationTracker');
-        if(!err) return Promise.resolve(login);
-    }  
 }
 
 
@@ -246,9 +256,7 @@ export const updateUserForAuthenticationProvider = (
     else if( profile.profileUrl && 
              typeof (profile.profileUrl) === 'string' &&
              profile.profileUrl.includes('facebook') 
-    ) {
-
-        console.log("==> This is an facebook account")
+    ) {    
 
         // test if user is registered as a Facebook User
         if(!user.configuration.isFacebookUser) {

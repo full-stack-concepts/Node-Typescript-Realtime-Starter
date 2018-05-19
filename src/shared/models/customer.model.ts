@@ -34,7 +34,7 @@ export class CustomerModel extends DefaultModel  {
 	/****
 	 * Define custom methods for local instance of MongoDB here	
 	 */
-	public createUser(customer:ICustomer): Promise<any> {
+	public createUser(customer:ICustomer): Promise<any> {	
 		const repo = new CustomerRepository( this.userDBConn );
 		return new Promise ( (resolve, reject) => {
 			repo.create(customer, (err:any, res:any) => {			

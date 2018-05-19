@@ -1,6 +1,8 @@
 // TODO Rewrite this class with JS Proxy
 
 import urlRegex from "url-regex";
+import validator from "validator";
+const v = validator;
 
 import {
 	PASSWORD_MIN_LENGTH,
@@ -8,7 +10,8 @@ import {
 	PASSWORD_HAS_UPPERCASE,
 	PASSWORD_HAS_LOWERCASE,
 	PASSWORD_HAS_NUMBER,
-	PASSWORD_HAS_SPECIAL_CHAR
+	PASSWORD_HAS_SPECIAL_CHAR,
+	LOCAL_AUTH_CONFIG
 } from "./secrets";
 
 export class FormValidation {
@@ -117,7 +120,23 @@ export class FormValidation {
 		if(!n || isNaN(n)) return false;
 		return Number.isInteger(n);
 	}
+
+	public static firstName(str:string) {
+		return (str && v.isLength( str, { min:1, max:LOCAL_AUTH_CONFIG.validation.maxLengthFirstName }));
+	}
+
+	public static middleName(str:string) {
+		return (str && v.isLength( str, { min:1, max:LOCAL_AUTH_CONFIG.validation.maxLengthMiddleName }));
+	}
+
+	public static lastName(str:string) {
+		return (str && v.isLength( str, { min:1, max:LOCAL_AUTH_CONFIG.validation.maxLengthLastName }));
+	}
+
+
 }
+
+
 
 
 

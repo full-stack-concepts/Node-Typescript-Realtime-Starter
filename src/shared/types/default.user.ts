@@ -22,7 +22,9 @@ export const TUSER:IUser = <IUser | any> {
 	logins:[],
 
 	accounts: {
-		googleID: null
+		googleID: null,
+		facebookID: null,
+		localID: null
 	},
 
 	security: {	

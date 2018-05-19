@@ -23,7 +23,7 @@ export interface IPerson extends Document  {
 
 	password: {
 		value: string,
-		method: string,
+		method: number,
 		secret?: string
 	}
 
@@ -50,7 +50,8 @@ export interface IPerson extends Document  {
 
 	accounts?: {
 		googleID: string,
-		facebookID?: string
+		facebookID?: string,
+		localID?:string
 	},
 
 	profile: {

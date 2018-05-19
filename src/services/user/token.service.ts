@@ -105,7 +105,7 @@ export class WebToken {
 	 * (2) Facebook
 	 * (3) Defaut Account
 	 */
-	 static testForAccountType(data:any):Promise<any> {  
+	static testForAccountType(data:any):Promise<any> {  
 
 	 	return new Promise( (resolve, reject) => {
 	 		
@@ -150,20 +150,20 @@ export class WebToken {
 		return _user;
 	}
 
-	static create(accounts:any, done:Function) {
-
-		console.log("Lets create some stuff")
+	static createWebToken(accounts:any):Promise<string> {		
 
 		// process thick: create web token
-		this.createJSONWebToken(accounts)
+		return this.createJSONWebToken(accounts)
 
 		// process thick: verify web token
-		.then( token => this.verifyJSONWebToken(token) )
+		.then( (token:string) => this.verifyJSONWebToken(token) )
 
 		// return token to caller
-		.then( token => done( null, token) )
+		.then( (token:string) => Promise.resolve(token) )
 
 		// error handler
-		.catch( err => done(err) );
+		.catch( err => Promise.reject(err) );
 	}
 }
+
+export const tokenService:any = new WebToken();
