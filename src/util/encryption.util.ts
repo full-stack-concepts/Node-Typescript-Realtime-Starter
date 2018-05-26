@@ -10,8 +10,6 @@ import {
     USER_PASSWORD_SALT_ROUNDS,
 } from "./secrets";
 
-import { IEncryption } from "../shared/interfaces";
-
 const isString = (str:string):boolean => {
     return (!str || str && typeof str === 'string');
 } 
@@ -20,7 +18,7 @@ const isString = (str:string):boolean => {
  * Method 1: Crypto with Initialization Vector
  * More info: http://vancelucas.com/blog/stronger-encryption-and-decryption-in-node-js/
  */
-export const encryptWithInitializationVector = (data:string):string => {   
+export const encryptWithInitializationVector = (data:string) => {   
 
     let err:any;  
     let iv:Buffer;
@@ -28,85 +26,111 @@ export const encryptWithInitializationVector = (data:string):string => {
     let encrypted:Buffer;
     let hash:string;    
 
-    if(!isString(data) ) data = String(data.toString());
-    iv = crypto.randomBytes(16);
-    
-    cipher = crypto.createCipheriv(
-        'aes-256-cbc', 
-        new Buffer(CRYPTO_IV_ENCRYPTION_KEY), 
-    iv);
+    try {
 
-    encrypted = cipher.update(data);
-    encrypted = Buffer.concat([encrypted, cipher.final()]);
-    hash = iv.toString('hex') + ':' + encrypted.toString('hex');  
+        if(!isString(data) ) data = String(data.toString());
+        iv = crypto.randomBytes(16);
+        
+        cipher = crypto.createCipheriv(
+            'aes-256-cbc', 
+            new Buffer(CRYPTO_IV_ENCRYPTION_KEY), 
+        iv);
 
-    return hash;           
+        encrypted = cipher.update(data);
+        encrypted = Buffer.concat([encrypted, cipher.final()]);
+        hash = iv.toString('hex') + ':' + encrypted.toString('hex');  
+    }
+    catch(e) {err=e;}
+    finally {
+         if(err) return Promise.reject(err);
+        if(!err) return Promise.resolve(hash);    
+    } 
 }
 
-export const decryptWithInitializationVector = (hash:string):string | Buffer => {
+export const decryptWithInitializationVector = (hash:string) => {    
 
+    
     let err:any;
     let textParts:string[];
     let iv:Buffer;
     let encryptedText:Buffer;
     let decipher:any;
-    let decrypted:Buffer | string;   
+    let decrypted:string|Buffer;   
 
-    textParts = hash.split(':');
-    iv = new Buffer(textParts.shift(), 'hex');
+    try {
+
+        textParts = hash.split(':');
+        iv = new Buffer(textParts.shift(), 'hex');
+        
+        encryptedText = new Buffer(textParts.join(':'), 'hex');
+        decipher = crypto.createDecipheriv(
+            'aes-256-cbc', 
+            new Buffer(CRYPTO_IV_ENCRYPTION_KEY), 
+        iv);
+
+        decrypted = decipher.update(encryptedText);
+        decrypted = Buffer.concat([decrypted, decipher.final()]);
+    } 
+    catch (e) { err = e; }
+    finally {      
+        if(err) return Promise.reject(err);
+        if(!err) return Promise.resolve(decrypted.toString());    
+    }
     
-    encryptedText = new Buffer(textParts.join(':'), 'hex');
-    decipher = crypto.createDecipheriv(
-        'aes-256-cbc', 
-        new Buffer(CRYPTO_IV_ENCRYPTION_KEY), 
-    iv);
-
-    decrypted = decipher.update(encryptedText);
-    decrypted = Buffer.concat([decrypted, decipher.final()]);
-
-    return decrypted;   
 }
 
 /*****
  * Method 2: Crypto
  */
-export const encryptWithCrypto = (data:any):Buffer|string => {
+export const encryptWithCrypto = (data:any) => {
 
     let err:any;
     let cipher: any;
     let crypted:Buffer|string;
 
-    cipher = crypto.createCipher('aes-256-cbc', CRYPTO_IV_ENCRYPTION_KEY);
-    crypted = cipher.update(data, 'utf-8', 'hex');
-    crypted += cipher.final('hex');
-    return crypted;
+    try {
+        cipher = crypto.createCipher('aes-256-cbc', CRYPTO_IV_ENCRYPTION_KEY);
+        crypted = cipher.update(data, 'utf-8', 'hex');
+        crypted += cipher.final('hex');
+    }
+    catch(e){err=e;}
+    finally {
+        if(err) return Promise.reject(err);
+        if(!err) return Promise.resolve(String(crypted));   
+    }
 }
 
-export const decryptWithCrypto  = (data:any):Buffer|string => {
-
+export const decryptWithCrypto  = (data:any) => {
 
     let err:any;    
     let decipher:any;
-    let decrypted:Buffer|string;
+    let decrypted:string;
 
-    decipher = crypto.createDecipher('aes-256-cbc', CRYPTO_IV_ENCRYPTION_KEY);
-    decrypted = decipher.update(data, 'hex', 'utf-8');
-    decrypted += decipher.final('utf-8');    
-    return decrypted;
+    try {
+
+        decipher = crypto.createDecipher('aes-256-cbc', CRYPTO_IV_ENCRYPTION_KEY);
+        decrypted = decipher.update(data, 'hex', 'utf-8');
+        decrypted += decipher.final('utf-8');                    
+    }
+    catch(e) { err=e;}
+    finally {        
+        if(err) return Promise.reject(err);
+        if(!err) return Promise.resolve(decrypted);    
+    }
 }
 
 /*****
  * Method 3: Bcrypt
  */
-export const encryptWithBcrypt = ( password:string) => {  
-   
+export const encryptWithBcrypt = ( password:string) => {     
+ 
     return bcrypt.genSalt(USER_PASSWORD_SALT_ROUNDS)
     .then( (salt:any) => bcrypt.hash( password, salt ) )
-    .then( (hash:string|Buffer) => Promise.resolve(hash))   
-
+    .then( (hash:string) => Promise.resolve(String(hash)));
 }
 
 export const decryptWithBcrypt = ( str:string, hash:string) => {
     return bcrypt.compare( str, hash)
-    .then( (valid:boolean) => Promise.resolve(valid));
+    .then( (valid:boolean) => Promise.resolve(valid) )
+    .catch( (err:any) => Promise.reject(err));
 }

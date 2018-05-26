@@ -65,60 +65,34 @@ export class CustomerService extends UserOperations {
 		}
 	}
 
-	private customerProfile(form:ICustomerApplication, hash:string, method:number) {
+	private customerProfile(customer:any, form:ICustomerApplication, encrypt:IEncryption) {
+
+		if(customer) return Promise.resolve(customer);
 
 		let newUser:IClient = deepCloneObject(TCUSTOMER);
 
-		/***
-		 * Core
-		 */
-		newUser.core.identifier = uuidv1();
-		newUser.core.email = form.email;
+		// assign default user role for client
+		const userRole:number=15;
 
-		/*** 
-		 * Security and account Type
-		 */
-		newUser.password.value = hash;
-		newUser.password.method = method;				
-		newUser.security.accountType = 15;			
-		newUser.security.isAccountVerified = true;
-		newUser.core.role = 15;
-		newUser.password.value = hash;
-		newUser.security.isPasswordEncrypted = false; 
-		newUser.accounts.localID = form.email;
+		// Profile Core Identifiers		
+		newUser = this.setCoreIdentifiers(newUser, form, userRole);
 
-		// thumbnail
-		newUser.configuration.hasExternalThumbnailUrl = false;
+		// Profile Security And Account
+		newUser = this.setSecurity(newUser, form, userRole, encrypt, false);
 
-		/*** 
-		 * Profile Personalia
-		 */
-		newUser.profile.personalia.givenName = capitalizeString(form.firstName);
-		if(LOCAL_AUTH_CONFIG.requireMiddleName) {
-			newUser.profile.personalia.middleName = capitalizeString(form.middleName);
-		}
-		newUser.profile.personalia.familyName = capitalizeString(form.lastName) || "";  	
+		// Profile Thumbnnail
+		newUser = this.setExternalThumbnail(newUser, false);		
 
-		/****
-		 * format display names 
-		 */ 	
-		let n:any = {
-			givenName:form.firstName, 
-			middleName:form.middleName,
-			familyName:form.lastName
-		}
-		newUser.profile.displayNames.fullName = constructProfileFullName(n);
-		newUser.profile.displayNames.sortName = constructProfileSortName(n);
+		// Profile Personalia
+		newUser = this.setPersonalia(newUser, form);
 
-		/****
-		 * user credentials: userName && url 
-		 */
-		constructClientCredentials( newUser, (credentials:any) => {
-			newUser.core.userName = credentials.userName;
-			newUser.core.url = credentials.url;  
-		});			
+		// Profile display names 	
+		newUser = this.setDisplayNames(newUser, form);
 
-		return Promise.resolve(newUser);
+		// user credentials: userName && url 
+		newUser = this.setCredentials(newUser);	
+
+		return Promise.resolve(newUser);	
 	}
 
 	/***
@@ -135,15 +109,6 @@ export class CustomerService extends UserOperations {
 		return customer;
 	}
 
-	/***
-	 * 
-	 */
-	private validatePassword(customer:ICustomer, {method, hash, data}:IEncryption):Promise<ICustomer> {
-		return decryptPassword(method, hash, data)
-		.then( () => Promise.resolve(customer) )
-		.catch( () => Promise.reject('errorNumber10'));
-	}
-
 	public loginCustomer(login:ILoginRequest) {
 
 		return this.testUserEmail(login.email)
@@ -154,10 +119,7 @@ export class CustomerService extends UserOperations {
 		// process thick: test for account
 		.then( () => this.testForAccountType(login.email))// process thick: validate password
 
-		.then( (customer:ICustomer) => {					
-			let decrypt:IEncryption = {hash: customer.password.value, method: customer.password.method,  data:login.password };			
-			return this.validatePassword(customer, decrypt);
-		})
+		.then( (customer:ICustomer) => 	this.validateUserPassword(customer, login.password) )
 
 		// process thick:
 		.then( (customer:ICustomer) => {			
@@ -193,24 +155,13 @@ export class CustomerService extends UserOperations {
 		/****
 		 * 
 		 */
-		.then( (person:IUser|IClient|ICustomer|undefined) => {	
+		.then( (person:IUser|IClient|ICustomer|undefined) => this.encryptPassword(person, form.password) )
 
-			if(!person) {							
-				
-				// process thick: ancrypt password
-				return this.encryptPassword(form.password)
+		.then( ({customer, encrypt}:any) => this.customerProfile(customer, form, encrypt) )
 
-				// process thick: build user object
-				.then( ({hash, method}:any) => this.customerProfile(form, hash, method) )
-
-				// process thick: build client object
-				.then( (customer:ICustomer) => this.newCustomer(customer) ); 
-				
-			} else {			
-				return Promise.reject('<errorNumber>');
-			}
-		})	
-
+		// process thick: build user object
+		.then( (user:IUser|IClient|ICustomer) => this.newUser(user) )	
+		
 		/*** 
 		 * process thick: create webtoken
 		 */
@@ -219,10 +170,7 @@ export class CustomerService extends UserOperations {
 		// process thick: return to caller so webtoken can be created
 		.then( ( token:string) => Promise.resolve(token) ) 
 
-		.catch( (err:any) => {		
-			Promise.reject(err);
-		});	
-
+		.catch( (err:any) => Promise.reject(err) );	
 	}
 }
 

@@ -1,6 +1,6 @@
 import randomNumber from "random-number";
 import moment from "moment-timezone";
-import Promise from "bluebird";
+
 
 import { 
     TIME_ZONE,
@@ -27,6 +27,10 @@ interface IName  {
     familyName:string
 }
 
+interface encryptPasswordFunction {
+    (passord:string):Promise<{method:number, hash:String|Buffer, data:any}>
+}
+
 // #TODO: promisify crypto methods
 export const encryptPassword = (password:string) => {
 
@@ -41,48 +45,74 @@ export const encryptPassword = (password:string) => {
         method = 3;   
 
     // #TODO: encrypt mehtod with Initialization Vector
-    method=3;    
+    // method=1;    
     
     //Method 1: Crypt with Initialization Vector
-    if(method===1) {
-        hash = encryptWithInitializationVector(password);     
-        return Promise.resolve({method, hash}) 
+    if(method===1) {       
+        return encryptWithInitializationVector(password)
+        .then( (hash:string|Buffer) => Promise.resolve({method:method, hash:hash, data:null}) ) 
+        .catch( (err:any) => Promise.reject("<errorNumber>"))
     }
 
     // Method 2: Crypto  
-    if(method === 2) {
-        hash = encryptWithCrypto(password);
-        return Promise.resolve({method, hash}) 
+    else if(method === 2) {
+        return encryptWithCrypto(password)
+        .then( (hash:string|Buffer) => Promise.resolve({method:method, hash:hash, data:null}) ) 
+        .catch( (err:any) => Promise.reject("<errorNumber>"))
     }   
 
     // Method 3: Bcrypt/
-    if(method === 3) {
+    else if(method === 3) {      
         return encryptWithBcrypt(password)
-        .then( (hash) => Promise.resolve({method, hash}) )
+        .then( (hash:string|Buffer) => Promise.resolve({method:method, hash:hash, data:null}) ) 
+        .catch( (err:any) => Promise.reject("<errorNumber>"))
     }       
 }
 
-export const decryptPassword = (method:number, hash:string, data:string)=> {
-
+export const decryptPassword = ({method, hash, data}:IEncryption)=> {
+    console.log("==> (4) decrypt password ", method, data)
     let err:any;
     let pw:Buffer|string; 
 
     //Method 1: Decrypt with Initialization Vector
     if(method===1) {    
-        pw = decryptWithInitializationVector(hash)
-        return Promise.resolve({method, data:pw});    
+        return decryptWithInitializationVector(String(hash))
+        .then( (decrypted:string) => {  
+            console.log(decrypted, data)        
+            if( decrypted===data) {
+                return Promise.resolve(true)
+            } else {
+                return Promise.reject("<errorNumber>");
+            }
+        })
+        .catch( (err:any) => Promise.reject(err));
     }
 
     // Method 2: Crypto  
     else if(method === 2) {    
-        pw = decryptWithCrypto(hash)
-        return Promise.resolve({method, data:pw});    
+        return decryptWithCrypto(hash)
+        .then( (decrypted:string|Buffer) => {
+            if( decrypted === data) {
+                return Promise.resolve(true)
+            } else {
+                return Promise.reject("<errorNumber>");
+            }
+        })
+        .catch( (err:any) => Promise.reject(err));      
     }
 
     // Method 3: Bcrypt
     else if(method === 3) {    
-        return decryptWithBcrypt(data, hash)
-        .then( (valid:boolean) => (valid)?Promise.resolve():Promise.reject('') ) ;    
+        console.log("==> (5) Decrypt with Crypto ", data)
+        return decryptWithBcrypt(data, String(hash))
+        .then( (valid:any) => {
+            if(valid) {
+                return Promise.resolve(true)
+            } else {
+                return Promise.reject("<errorNumber>");
+            }
+        })
+        .catch( (err:any) => Promise.reject(err) );
     }
 }
 
@@ -90,11 +120,16 @@ export const __pickPasswordEncryptionMethod = ():number => {
     return randomInt(1,3);
 }
 
+export const pickPasswordEncryptionMethod = ():number => {
+    return randomInt(1,3);
+}
+
+
 /****
  * Only usable for password encryption methods 1 and 2
  */
 export const comparePassword = (_pwd:string, pwd:string):boolean => {
-    return (_pwd === pwd);
+    return (String(_pwd) === pwd);
 }
 
 /*****

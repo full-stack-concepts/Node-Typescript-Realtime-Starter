@@ -1,5 +1,5 @@
 export interface IEncryption {
-    method:number,
+    method?:number,
     hash?:string,
     data?:string
 }

@@ -65,62 +65,37 @@ export class ClientService extends UserOperations {
 		}
 	}
 
-	private clientProfile(form:IClientApplication, hash:string, method:number) {
+	private clientProfile(client: any, form:IClientApplication, encrypt:IEncryption) {
 
+		if(client) {
+			return Promise.resolve(client);
+		}
+
+		// clone default client type
 		let newUser:IClient = deepCloneObject(TCLIENT);
 
-		/***
-		 * Core
-		 */
-		newUser.core.identifier = uuidv1();
-		newUser.core.email = form.email;
+		// assign default user role for client
+		const userRole:number=10;
 
-		/*** 
-		 * Security and account Type
-		 */
-		newUser.password.value = hash;
-		newUser.password.method = method;				
-		newUser.security.accountType = 10;			
-		newUser.security.isAccountVerified = true;
-		newUser.core.role = 10;
-		newUser.password.value = hash;
-		newUser.security.isPasswordEncrypted = false; 
-		newUser.accounts.localID = form.email;
+		// Profile Core Identifiers		
+		newUser = this.setCoreIdentifiers(newUser, form, userRole);
 
-		// thumbnail
-		newUser.configuration.hasExternalThumbnailUrl = false;
+		// Profile Security And Account
+		newUser = this.setSecurity(newUser, form, userRole, encrypt, false);
 
-		/*** 
-		 * Profile Personalia
-		 */
-		newUser.profile.personalia.givenName = capitalizeString(form.firstName);
-		if(LOCAL_AUTH_CONFIG.requireMiddleName) {
-			newUser.profile.personalia.middleName = capitalizeString(form.middleName);
-		}
-		newUser.profile.personalia.familyName = capitalizeString(form.lastName) || "";  	
+		// Profile Thumbnnail
+		newUser = this.setExternalThumbnail(newUser, false);		
 
-		/****
-		 * format display names 
-		 */ 	
-		let n:any = {
-			givenName:form.firstName, 
-			middleName:form.middleName,
-			familyName:form.lastName
-		}
-		newUser.profile.displayNames.fullName = constructProfileFullName(n);
-		newUser.profile.displayNames.sortName = constructProfileSortName(n);
+		// Profile Personalia
+		newUser = this.setPersonalia(newUser, form);
 
-		/****
-		 * user credentials: userName && url 
-		 */
-		constructClientCredentials( newUser, (credentials:any) => {
-			newUser.core.userName = credentials.userName;
-			newUser.core.url = credentials.url;  
-		});		
+		// Profile display names 		 */ 	
+		newUser = this.setDisplayNames(newUser, form);
 
+		// user credentials: userName && url 
+		newUser = this.setCredentials(newUser);	
 		return Promise.resolve(newUser);
 	}
-
 
 	/***
 	 * Test Account Type 
@@ -148,15 +123,6 @@ export class ClientService extends UserOperations {
 		return client;
 	}
 
-	/***
-	 * 
-	 */
-	private validatePassword(user:IClient, {method, hash, data}:IEncryption):Promise<IClient> {
-		return decryptPassword(method, hash, data)
-		.then( () => Promise.resolve(user) )
-		.catch( () => Promise.reject('errorNumber10'));
-	}
-
 	public registerClient(form:IClientApplication) {
 
 		/***
@@ -173,23 +139,12 @@ export class ClientService extends UserOperations {
 		/****
 		 * 
 		 */
-		.then( (person:IUser|IClient|ICustomer|undefined) => {	
+		.then( (person:IUser|IClient|ICustomer|undefined) => this.encryptPassword(person, form.password) )
 
-			if(!person) {							
-				
-				// process thick: ancrypt password
-				return this.encryptPassword(form.password)
+		.then( ({client, encrypt}:any) => this.clientProfile(client, form, encrypt) )
 
-				// process thick: build user object
-				.then( ({hash, method}:any) => this.clientProfile(form, hash, method) )
-
-				// process thick: build client object
-				.then( (client:IClient) => this.newClient(client) ); 
-				
-			} else {			
-				return Promise.reject('<errorNumber>');
-			}
-		})	
+		// process thick: build user object
+		.then( (client:IUser|IClient|ICustomer) =>  this.newClient(client) )			
 
 		/*** 
 		 * process thick: create webtoken
@@ -214,10 +169,7 @@ export class ClientService extends UserOperations {
 		// process thick: test for account
 		.then( () => this.testForAccountType(login.email))// process thick: validate password
 
-		.then( (client:IClient) => {					
-			let decrypt:IEncryption = {hash: client.password.value, method: client.password.method,  data:login.password };			
-			return this.validatePassword(client, decrypt);
-		})
+		.then( (client:IClient) => this.validateUserPassword(client, login.password) )
 
 		// process thick:
 		.then( (client:IClient) => {			

@@ -32,6 +32,10 @@ export const firstName = ():string => {
 	return faker.name.firstName();
 }
 
+export const middleName = ():string => {
+	return faker.random.word();
+}
+
 export const lastName = ():string => {
 	return faker.name.lastName();
 }

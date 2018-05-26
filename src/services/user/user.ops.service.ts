@@ -8,6 +8,8 @@ const uuidv1 = require("uuid/v1");
 
 import moment from "moment-timezone";
 
+import { PersonProfile} from "./user.profile.service";
+
 import {
 	DB_HOSTS_PRIORITY,
 	PERSON_SUBTYPES,
@@ -31,10 +33,7 @@ import { dbModelService } from "./../db/db.model.service";
 import { proxyService } from "./../state/proxy.service"; 
 
 import {
-	cloneArray,
-	encryptPassword,
-	decryptPassword,
-	encryptWithInitializationVector,
+	cloneArray,	
 	FormValidation,
 	constructUserCredentials,
 	constructProfileFullName,
@@ -49,7 +48,14 @@ import {
   	validateUserIntegrity,  	
   	updateUserForAuthenticationProvider,
   	createPublicUserDirectory,
-  	storeUserImage
+  	storeUserImage,
+  	pickPasswordEncryptionMethod,
+  	encryptWithInitializationVector,
+	decryptWithInitializationVector,
+	encryptWithCrypto,
+	decryptWithCrypto,
+	encryptWithBcrypt,
+	decryptWithBcrypt
 } from "../../util";
 
 import {
@@ -72,7 +78,7 @@ interface IFileType {
 	mime: string
 }
 
-export class UserOperations {
+export class UserOperations extends PersonProfile {
 
 	/***
 	 * User Actions Controller
@@ -108,6 +114,8 @@ export class UserOperations {
 	protected user:IUser;
 
 	constructor() {
+
+		super();
 
 		/***
 		 * Local Subscribers
@@ -198,13 +206,9 @@ export class UserOperations {
 					if(item) person = item;
 				});				
 				return Promise.resolve( person );
-			})
-			
+			});			
 		})
-
-		// process thick: return to caller
-		// .then( (person:IUser|IClient|ICustomer) => Promise.resolve(person))		
-
+		
 		// error handler
 		.catch( (err:any) => {		
 			return Promise.reject(err);
@@ -247,17 +251,7 @@ export class UserOperations {
 		return new Promise ( (resolve, reject) => {
 			(v)?resolve(true):reject('<errorNumber1>');
 		});
-	}
-
-	/***
-	 *
-	 */
-	protected hashMethod(u:any) {		
-		let method = u.password.method;		
-		const hash:string = encryptWithInitializationVector(method);
-		u.password.method = hash;		
-		return Promise.resolve(u);		
-	}
+	}	
 
 	/***
 	 *
@@ -314,13 +308,100 @@ export class UserOperations {
 	}
 
 	/***
+	 * @user: ISustemUser|IClient|ICustomer|IUser
+	 * @decrypt: {method, hash, data}:IEncryption
+	 */
+	protected validateUserPassword(user:any, password:string) {
+
+		let decrypt:IEncryption = {
+			hash: user.password.value, 
+			method: user.password.method,  
+			data:password 
+		};			
+
+		// Crypto with Initialization Vector
+		if(decrypt.method === 1) {
+			 return decryptWithInitializationVector(String(decrypt.hash))
+	        .then( (decrypted:string) => {  
+	            console.log(decrypted, decrypt.data)        
+	            if( decrypted===decrypt.data) {
+	                return Promise.resolve(user)
+	            } else {
+	                return Promise.reject("<errorNumber>");
+	            }
+	        })
+	        .catch( (err:any) => Promise.reject(err));
+		}
+
+		// Method 2: Crypto  
+	    else if(decrypt.method === 2) {    
+	        return decryptWithCrypto(decrypt.hash)
+	        .then( (decrypted:string|Buffer) => {
+	            if( decrypted === decrypt.data) {
+	                return Promise.resolve(user)
+	            } else {
+	                return Promise.reject("<errorNumber>");
+	            }
+	        })
+	        .catch( (err:any) => Promise.reject(err));      
+	    }
+
+	    // Method 3: Bcrypt
+	    else if(decrypt.method === 3) {    
+	        console.log("==> (5) Decrypt with Crypto ", decrypt.data)
+	        return decryptWithBcrypt(decrypt.data, String(decrypt.hash))
+	        .then( (valid:any) => {
+	            if(valid) {
+	                return Promise.resolve(user)
+	            } else {
+	                return Promise.reject("<errorNumber>");
+	            }
+	        })
+	        .catch( (err:any) => Promise.reject(err) );
+	    }		
+	}	
+
+	/***
 	 *
 	 */
-	protected encryptPassword(pw:string)  {
-		
-		return encryptPassword(pw)		
-		.then( ({hash, method}:any) => Promise.resolve( { hash, method }) )
-		.catch( (err:any) => Promise.resolve('<errorNumber5>'))
+	protected encryptPassword(user:any, pwd:string) {
+
+		let method:number = pickPasswordEncryptionMethod();
+		let encrypt:IEncryption = {};
+
+		if(user) {
+			return Promise.resolve({ user, encrypt });
+		}
+
+		 //Method 1: Crypt with Initialization Vector
+	    if(method===1) {       
+	        return encryptWithInitializationVector(pwd)
+	        .then( (hash:string) => {
+	        	encrypt = {	method, hash, data:pwd };
+	        	return Promise.resolve({ user, encrypt});
+	        }) 
+	        .catch( (err:any) => Promise.reject("<errorNumber>"))
+	    }
+
+	    // Method 2: Crypto  
+	    else if(method === 2) {
+	        return encryptWithCrypto(pwd)
+	        .then( (hash:string) => {
+	        	encrypt = {	method, hash, data:pwd };
+	        	return Promise.resolve({ user, encrypt});
+	        }) 
+	        .catch( (err:any) => Promise.reject("<errorNumber>"))
+	    }   
+
+	    // Method 3: Bcrypt/
+	    else if(method === 3) {      
+	        return encryptWithBcrypt(pwd)
+	        .then( (hash:string) => {
+	        	encrypt = {	method, hash, data:pwd };
+	        	return Promise.resolve({ user, encrypt});
+	        }) 
+	        .catch( (err:any) => Promise.reject("<errorNumber>"))
+	    }       		
 	}
 
 	protected serializeUser(user:any):string {		
@@ -339,7 +420,7 @@ export class UserOperations {
 	/*****
 	 *
 	 */
-	protected newClient(client:IClient):Promise<any> {
+	protected newClient(client:IUser|IClient|ICustomer):Promise<any> {
 
 		// process thick: execute tasks (1, 2)					  
 		return Promise.join<any>(
@@ -477,7 +558,11 @@ export class UserOperations {
 	 * (4) Insert new user
 	 * (5) Store Thumbnail
 	 */
-	protected newUser( user:IUser):Promise<any> { 	
+	protected newUser( user:IUser|IClient|ICustomer):Promise<any> { 	
+
+		if(user) {
+			return Promise.resolve(user);
+		}
  
 		// process thick: execute tasks (1, 2)					  
 		return Promise.join<any>(

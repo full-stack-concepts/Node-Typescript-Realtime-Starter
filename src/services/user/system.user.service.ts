@@ -104,53 +104,39 @@ export class SystemUserService extends UserOperations {
 		email:string,
 		hash:string,
 		method:number,
-		role:number
+		userRole:number
 	) {	
+
+		const form:any = {
+			firstName:firstName,
+			middleName:middleName,
+			lastName:lastName,
+			email:email,
+		}
 
 		let err:any;
 		return new Promise( (resolve, reject) => {
-			try {		
-				
-				u.core.identifier = uuidv1();    
-				u.core.email = email
-				u.core.role = role;
+			try {			
 
-				/****
-				 * Security
-				 */
-				u.password.value = hash;
-				u.password.method = method;				
-	        	u.security.accountType = role;           
-	        	u.security.isAccountVerified = true; 
-	        	u.security.isPasswordEncrypted = true;	        
-	        	
+				let encrypt:IEncryption = { method, hash};
 
-	        	/***
-	        	 * User Profile
-	        	 */	
-				u.profile.personalia.givenName = capitalizeString(firstName);				
-				u.profile.personalia.familyName = capitalizeString(lastName);  	
+				// Profile Core Identifiers		
+				u = this.setCoreIdentifiers(u, form, userRole);
 
-	        	u.profile.displayNames.fullName = constructProfileFullName({
-	        		givenName:firstName,
-	        		middleName:middleName,
-	        		familyName:lastName
-	        	});
-	        	
+				// Profile Security And Account
+				u = this.setSecurity(u, form, userRole, encrypt, true);
 
-	        	u.profile.displayNames.sortName = constructProfileFullName({
-	        		givenName:firstName,
-	        		middleName:middleName,
-	        		familyName:lastName
-	        	});	        	
+				// Profile Thumbnnail
+				u = this.setExternalThumbnail(u, false);		
 
-	        	/****
-     			 * User credentials: userName && url 
-     			 */
-     			constructUserCredentials( u, (credentials:any) => {
-        			u.core.userName = credentials.userName;
-       				u.core.url = credentials.url;  
-    			});    		
+				// Profile Personalia
+				u = this.setPersonalia(u, form);
+
+				// Profile display names 	
+				u = this.setDisplayNames(u, form);
+
+				// user credentials: userName && url 
+				u = this.setCredentials(u);	              	
 			}
 			catch(e) { err = e; }
 			finally { if(err) {reject('<errorNumber6>');} else { resolve(u); } }		
@@ -160,16 +146,18 @@ export class SystemUserService extends UserOperations {
 
 	private insertDefaultSystemUser(){
 
-		const u:ISystemUser = TSYSTEMUSER;	
+		const u:ISystemUser = TSYSTEMUSER;
+
+		return Promise.resolve(u)	
 
 		// process thick: encrypt password
-		return this.encryptPassword(this.password)
+		.then( (u:any) => this.encryptPassword(u, this.password) )
 
 		// process thick: set core and security features
-		.then( ({hash, method}:any) => this.configureDefaultUserProfile(
+		.then( ( {user, encrypt}:any) => this.configureDefaultUserProfile(
 
 				// default user object
-				u, 
+				user, 
 
 				// furstname
 				this.firstName, 
@@ -184,10 +172,10 @@ export class SystemUserService extends UserOperations {
 				this.userEmail, 
 				
 				// encrypted password
-				hash, 
+				encrypt.hash, 
 				
 				// encryption method
-				method, 
+				encrypt.method, 
 				
 				// assigned user role
 				1
@@ -317,16 +305,6 @@ export class SystemUserService extends UserOperations {
 		}
 	}
 
-
-	/***
-	 * 
-	 */
-	private validatePassword(user:ISystemUser, {method, hash, data}:IEncryption):Promise<ISystemUser> {
-		return decryptPassword(method, hash, data)
-		.then( () => Promise.resolve(user) )
-		.catch( () => Promise.reject('errorNumber10'));
-	}
-
 	/***
 	 *
 	 */
@@ -419,10 +397,7 @@ export class SystemUserService extends UserOperations {
 		.then( () => this.findUser( PERSON_SUBTYPE_SYSTEM_USER, login.email) )
 
 		// process thick: validate password
-		.then( (user:ISystemUser) => {				
-			let decrypt:IEncryption = {hash: user.password.value, method: user.password.method,  data:login.password };					
-			return this.validatePassword(user, decrypt);
-		})
+		.then( (user:ISystemUser) => this.validateUserPassword(user, login.password) )
 
 		// process thick:
 		.then( (user:ISystemUser) => {

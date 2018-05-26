@@ -39,7 +39,7 @@ import {
 import { 
 	decryptPassword, FormValidation, deepCloneObject, cloneArray, capitalizeString, createUserSubDirectories, constructUserCredentials,
 	constructProfileFullName,constructProfileSortName, createPublicUserDirectory, isEmail, isURL,
-	pathToDefaultUserThumbnail, pathToUserThumbnail, storeUserImage, validateInfrastructure, validateUserIntegrity
+	pathToDefaultUserThumbnail, pathToUserThumbnail, storeUserImage, validateInfrastructure, validateUserIntegrity	
 } from "../../util";
 
 /*****
@@ -141,58 +141,32 @@ export class UserService extends UserOperations {
 		}
 	}
 
-	private userProfile(form:IUserApplication, hash:string, method:number) {
+	private userProfile(user:any, form:IUserApplication, encrypt:IEncryption) {
+
+		if(user) {
+			return Promise.resolve(user);
+		}
 
 		let newUser:IUser = deepCloneObject(TUSER);
+		const userRole:number=5;
 
-		/***
-		 * Core
-		 */
-		newUser.core.identifier = uuidv1();
-		newUser.core.email = form.email;
+		// Profile Core Identifiers		
+		newUser = this.setCoreIdentifiers(newUser, form, userRole);
 
-		/*** 
-		 * Security and account Type
-		 */
-		newUser.password.value = hash;
-		newUser.password.method = method;				
-		newUser.security.accountType = 5;			
-		newUser.security.isAccountVerified = true;
-		newUser.core.role = 5;
-		newUser.password.value = hash;
-		newUser.security.isPasswordEncrypted = false; 
-		newUser.accounts.localID = form.email;
+		// Profile Security And Account
+		newUser = this.setSecurity(newUser, form, userRole, encrypt, false);
 
-		// thumbnail
-		newUser.configuration.hasExternalThumbnailUrl = false;
+		// Profile Thumbnnail
+		newUser = this.setExternalThumbnail(newUser, false);		
 
-		/*** 
-		 * Profile Personalia
-		 */
-		newUser.profile.personalia.givenName = capitalizeString(form.firstName);
-		if(LOCAL_AUTH_CONFIG.requireMiddleName) {
-			newUser.profile.personalia.middleName = capitalizeString(form.middleName);
-		}
-		newUser.profile.personalia.familyName = capitalizeString(form.lastName) || "";  	
+		// Profile Personalia
+		newUser = this.setPersonalia(newUser, form);
 
-		/****
-		 * format display names 
-		 */ 	
-		let n:any = {
-			givenName:form.firstName, 
-			middleName:form.middleName,
-			familyName:form.lastName
-		}
-		newUser.profile.displayNames.fullName = constructProfileFullName(n);
-		newUser.profile.displayNames.sortName = constructProfileSortName(n);
+		// Profile display names 		 */ 	
+		newUser = this.setDisplayNames(newUser, form);
 
-		/****
-		 * user credentials: userName && url 
-		 */
-		constructUserCredentials( newUser, (credentials:any) => {
-			newUser.core.userName = credentials.userName;
-			newUser.core.url = credentials.url;  
-		});		
+		// user credentials: userName && url 
+		newUser = this.setCredentials(newUser);
 
 		return Promise.resolve(newUser);
 	}	
@@ -207,16 +181,7 @@ export class UserService extends UserOperations {
 		} else {
 			return Promise.reject("<errorNumber>");
 		}
-	}
-
-	/***
-	 * 
-	 */
-	private validatePassword(user:IUser, {method, hash, data}:IEncryption):Promise<IUser> {
-		return decryptPassword(method, hash, data)
-		.then( () => Promise.resolve(user) )
-		.catch( () => Promise.reject('errorNumber10'));
-	}
+	}	
 
 	/***
 	 *
@@ -252,23 +217,12 @@ export class UserService extends UserOperations {
 		/****
 		 * 
 		 */
-		.then( (person:IUser|IClient|ICustomer|undefined) => {	
+		.then( (person:IUser|IClient|ICustomer|undefined) => this.encryptPassword(person, form.password) )
 
-			if(!person) {							
-				
-				// process thick: ancrypt password
-				return this.encryptPassword(form.password)
+		.then( ({user, encrypt}:any) => this.userProfile(user, form, encrypt) )
 
-				// process thick: build user object
-				.then( ({hash, method}:any) => this.userProfile(form, hash, method) )
-
-				// process thick: build user object
-				.then( (user:IUser) => this.newUser(user) ); 
-				
-			} else {			
-				return Promise.reject('<errorNumber>');
-			}
-		})		
+		// process thick: build user object
+		.then( (user:IUser|IClient|ICustomer) => this.newUser(user) )		
 
 		/*** 
 		 * process thick: create webtoken
@@ -298,10 +252,7 @@ export class UserService extends UserOperations {
 		.then( () => this.testForAccountType(login.email))
 
 		// process thick: validate password
-		.then( (user:IUser) => {				
-			let decrypt:IEncryption = {hash: user.password.value, method: user.password.method,  data:login.password };			
-			return this.validatePassword(user, decrypt);
-		})
+		.then( (user:IUser) => this.validateUserPassword(user, login.password) )	
 
 		// process thick:
 		.then( (user:IUser) => {

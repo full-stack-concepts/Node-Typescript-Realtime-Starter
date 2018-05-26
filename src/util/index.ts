@@ -34,8 +34,8 @@ export {
 	validateUserIntegrity,
 	updateUserForAuthenticationProvider,
 	encryptPassword,
-	decryptPassword,	
-
+	decryptPassword,
+	pickPasswordEncryptionMethod
 } from "./user.util";
 
 export {
@@ -44,7 +44,7 @@ export {
 	encryptWithCrypto,
 	decryptWithCrypto,
 	encryptWithBcrypt,
-	decryptWithBcrypt
+	decryptWithBcrypt	
 } from "./encryption.util";
 
 export {
@@ -72,6 +72,7 @@ export {
 	gender,
 	genderPrefix,
 	firstName,
+	middleName,
 	lastName,
 	givenName,
 	jobTitle,

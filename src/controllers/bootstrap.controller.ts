@@ -16,20 +16,7 @@ import {
  */
 import { DefaultModel } from "../shared/models";
 
-/*****
-* create test for password generation
-*/
-/*
-const pw:string="12345678"
-encryptPassword(pw)
-.then( (hash:any) => {	
-	hash.data = pw; // for bcrypt method
-	console.log(hash);
-	return decryptPassword(hash)
-})
-.then( (pw:any) => console.log("*** FInal result: ", pw))
-.catch( (err:any) => console.error(err))
-*/
+import {IEncryption} from "../shared/interfaces"
 
 export class BootstrapController {
 
@@ -141,7 +128,7 @@ export class BootstrapController {
 			/***
 			 * Init Default DB Model
 			 */
-			await this.initDefaultDatabaseModel();
+			// await this.initDefaultDatabaseModel();
 
 			/***
 			 * Configure application databases
@@ -150,7 +137,7 @@ export class BootstrapController {
 			 * (3) Test if predefined collections exist (#TODO)
 			 * (4) Perform test operations (#TODO)
 			 */		
-			await this.configureDatabases();
+			// await this.configureDatabases();
 
 			/***
 			 * Configure infrastructure
@@ -158,20 +145,20 @@ export class BootstrapController {
 			 * (2) Private Directories
 			 * (3) Local Store Directories
 			 */
-			await this.configureInfrastructure();
+			// await this.configureInfrastructure();
 
 			/***
 			 * Connect To User DB
 			 */
-			await connectToUserDatabase();
+			// await connectToUserDatabase();
 
 			/***
 			 * Connect to Product DB
 			 */ 
-			await connectToProductDatabase();		
+			// await connectToProductDatabase();		
 
 			// process thick: 
-			await createSystemUser();		
+			// await createSystemUser();		
 
 			console.log("==> Bootstrap Sequence finished")
 
