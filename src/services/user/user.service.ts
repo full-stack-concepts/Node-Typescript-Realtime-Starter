@@ -37,7 +37,7 @@ import {
 } from "../../shared/models";
 
 import { 
-	decryptPassword, FormValidation, deepCloneObject, cloneArray, capitalizeString, createUserSubDirectories, constructUserCredentials,
+	FormValidation, deepCloneObject, cloneArray, capitalizeString, createUserSubDirectories, constructUserCredentials,
 	constructProfileFullName,constructProfileSortName, createPublicUserDirectory, isEmail, isURL,
 	pathToDefaultUserThumbnail, pathToUserThumbnail, storeUserImage, validateInfrastructure, validateUserIntegrity	
 } from "../../util";

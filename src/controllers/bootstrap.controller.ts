@@ -5,9 +5,7 @@ import { UAController } from "./user.action.controller";
 
 import {
 	privateDirectoryManager,
-	publicDirectoryManager,
-	encryptPassword,
-	decryptPassword
+	publicDirectoryManager	
 } from "../util";
 
 /****

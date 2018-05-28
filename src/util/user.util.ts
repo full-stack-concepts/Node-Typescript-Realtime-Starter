@@ -32,15 +32,13 @@ interface encryptPasswordFunction {
 }
 
 // #TODO: promisify crypto methods
+/*
 export const encryptPassword = (password:string) => {
 
     let method:number = this.__pickPasswordEncryptionMethod();
     let err:any;
     let hash:Buffer|string;  
-
-    /****
-     * Default to BCrypt is randomizer is disabled
-     */
+  
     if(!RANDOMIZE_PASSWORD_ENCRYPTION)
         method = 3;   
 
@@ -68,7 +66,9 @@ export const encryptPassword = (password:string) => {
         .catch( (err:any) => Promise.reject("<errorNumber>"))
     }       
 }
+*/
 
+/*
 export const decryptPassword = ({method, hash, data}:IEncryption)=> {
     console.log("==> (4) decrypt password ", method, data)
     let err:any;
@@ -116,12 +116,20 @@ export const decryptPassword = ({method, hash, data}:IEncryption)=> {
     }
 }
 
+*/
+
 export const __pickPasswordEncryptionMethod = ():number => {
     return randomInt(1,3);
 }
 
 export const pickPasswordEncryptionMethod = ():number => {
-    return randomInt(1,3);
+    let method:number;
+    if( RANDOMIZE_PASSWORD_ENCRYPTION ) {
+        method = 3;
+    } else {
+        method = randomInt(1,3);
+    }
+    return method;
 }
 
 

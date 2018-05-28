@@ -7,7 +7,7 @@ import {
     CRYPTO_HASH_ALGORITHM,
     CRYPTO_IV_ENCRYPTION_KEY,
     CRYPTO_IV_VECTOR_LENGTH,
-    USER_PASSWORD_SALT_ROUNDS,
+    USER_PASSWORD_SALT_ROUNDS,   
 } from "./secrets";
 
 const isString = (str:string):boolean => {

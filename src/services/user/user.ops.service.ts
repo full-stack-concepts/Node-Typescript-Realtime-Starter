@@ -21,6 +21,7 @@ import {
     DATE_FORMAT,
     TIME_FORMAT,
     MAX_LENGTH_USER_LOGINS_EVENTS,   
+    RANDOMIZE_PASSWORD_ENCRYPTION
 } from "../../util/secrets";
 
 import { 
@@ -368,6 +369,9 @@ export class UserOperations extends PersonProfile {
 
 		let method:number = pickPasswordEncryptionMethod();
 		let encrypt:IEncryption = {};
+
+		if(!RANDOMIZE_PASSWORD_ENCRYPTION)
+        	method = 3;   
 
 		if(user) {
 			return Promise.resolve({ user, encrypt });

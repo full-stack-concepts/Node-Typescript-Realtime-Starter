@@ -21,8 +21,11 @@ const isString = (str:string):boolean => {
 	return (!str || str && typeof str === 'string');
 } 
 
-export const ENVIRONMENT = process.env.NODE_ENV;
-const prod = ENVIRONMENT === "production"; // Anything else is treated as 'dev'
+/***
+ * Development Environment
+ */
+export const ENVIRONMENT =process.env["ENVIRONMENT"];
+process.env.NODE_ENV = ENVIRONMENT || "dev";
 
 /***
  * Express server instance runs either in http or https

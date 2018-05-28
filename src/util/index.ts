@@ -32,9 +32,7 @@ export {
 	constructProfileSortName,
 	validateInfrastructure, 
 	validateUserIntegrity,
-	updateUserForAuthenticationProvider,
-	encryptPassword,
-	decryptPassword,
+	updateUserForAuthenticationProvider,	
 	pickPasswordEncryptionMethod
 } from "./user.util";
 

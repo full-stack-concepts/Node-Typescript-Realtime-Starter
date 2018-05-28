@@ -6,7 +6,7 @@ import validator from "validator";
 import { 
 	cloneArray, deepCloneObject, isURL, isEmail, capitalizeString, 
 	constructProfileFullName, constructProfileSortName, constructClientCredentials,
-	FormValidation, decryptPassword
+	FormValidation
 } from "../../util";
 
 import { UserOperations } from "./user.ops.service";

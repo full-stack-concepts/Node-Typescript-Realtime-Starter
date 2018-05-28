@@ -36,9 +36,7 @@ import {
 } from "../../util/secrets";
 
 import {
-	cloneArray,
-	encryptPassword,
-	decryptPassword,
+	cloneArray,	
 	FormValidation,
 	createPrivateUserDirectory,
 	storeUserImage,
