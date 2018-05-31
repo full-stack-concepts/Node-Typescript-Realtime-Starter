@@ -28,6 +28,7 @@
         "test": "jest ./tests/user/ --forceExit --coverage --verbose",
         "unit-encryption-tests": "mocha -r ts-node/register tests/unit/encryption/**/*.spec.ts",
         "unit-env-secrets-tests": "mocha -r ts-node/register tests/unit/secrets/**/*.spec.ts",
+        "unit-infrastructure-tests": "mocha -r ts-node/register tests/unit/infrastructure/**/*.spec.ts",
         "build-ts": "tsc",
         "watch-ts": "tsc -w",
         "tslint": "tslint -c tslint.json -p tsconfig.json",

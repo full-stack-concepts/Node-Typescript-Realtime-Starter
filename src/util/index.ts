@@ -59,7 +59,11 @@ export {
 	pathToUserThumbnail,
 	storeUserImage,
 	publicDirectoryManager,
-	privateDirectoryManager
+	privateDirectoryManager,
+	getRootPath,
+	createDirectory,
+	removeDirectory,
+	fileStatistics
 } from "./infrastructure.util";
 
 export {

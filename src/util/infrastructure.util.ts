@@ -92,6 +92,13 @@ export const readProdConfiguration=() => {
 	return fs.existsSync( path.join( rootPath, ".prod"));
 }
 
+/****
+ * Root path application
+ */
+export const getRootPath = ():string => {
+	return appRoot.path.toString();
+}
+
 /********
  * Create directories and return an ordinany Promise (bootstrapping so we do not neeed bluebird)
  */
@@ -107,6 +114,29 @@ export const createDirectory = ( $dir:string ):Promise<any> => {
 	});
 }
 
+/****
+ * Remove Directory
+ */
+export const removeDirectory = ( $dir:string):Promise<any> => {
+	return new Promise( (resolve, reject) => {
+		fs.remove($dir, (err:any) => {
+			if(err) reject(err);
+			if(!err) resolve();
+		});
+	});
+}
+
+export const fileStatistics = ($pathToFile:string):Promise<any> => {
+	return new Promise( (resolve, reject) => {
+		fs.stat ( $pathToFile)
+		.then( (stats:any) => resolve(stats) )
+		.catch( (err:any) => reject(err) );			
+	});
+}
+
+/****
+ * Path To Local Data Store
+ */
 export const getPathToDataStore = ():string => {
 	return path.join( rootPath, PRIVATE_DATA_DIR );
 }
