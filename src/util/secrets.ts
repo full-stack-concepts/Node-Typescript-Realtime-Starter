@@ -683,9 +683,9 @@ if(	!Number.isInteger(LOCAL_AUTH_FORM_MAX_LENGTH_FIRST_NAME) ||
 /***
  * Definitions for User Authentication Response
  */
-export const STORE_WEBTOKEN_AS_COOKIE = process.env["STORE_WEBTOKEN_AS_COOKIE"] == true;
+export const STORE_WEBTOKEN_AS_COOKIE = process.env["STORE_WEBTOKEN_AS_COOKIE"] == 'true';
 export const WEBTOKEN_COOKIE = process.env["WEBTOKEN_COOKIE"];
-export const SEND_TOKEN_RESPONSE = process.env["SEND_TOKEN_RESPONSE"] == true;
+export const SEND_TOKEN_RESPONSE = process.env["SEND_TOKEN_RESPONSE"] == 'true';
 
 
 if(STORE_WEBTOKEN_AS_COOKIE) {

@@ -63,7 +63,10 @@ export {
 	getRootPath,
 	createDirectory,
 	removeDirectory,
-	fileStatistics
+	fileStatistics,
+	pathToPublicUsersDirectory,
+	pathToPrivateUsersDirectory,
+	writeJSON
 } from "./infrastructure.util";
 
 export {

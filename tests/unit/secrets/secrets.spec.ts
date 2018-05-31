@@ -1,7 +1,7 @@
 import { expect, assert, should } from 'chai';
 import Validator from "validator";
-import isValidPath from "is-valid-path";
-const v:Validator = Validator;
+const isValidPath:any  = require("is-valid-path");
+const v:any = Validator;
 
 
 import {
@@ -9,8 +9,7 @@ import {
 	EXPRESS_SERVER_MODE,
 	SITE_URL,
 	PORT,
-	SITE_NAME,
-	SITE_URL,
+	SITE_NAME,	
 	DB_SYSTEM_USERS,
 	REQUIRED_USERS_PER_DATABASE,
 	PERSON_SUBTYPES,
@@ -75,7 +74,7 @@ import {
 	DB_POPULATE_POWER_USERS,
 	DB_POPULATE_AUTHORS,
 	DB_POPULATE_USERS,
-	DB_POPULATION_LOCALE.
+	DB_POPULATION_LOCALE,
 
 	/***
 	 * DB Collections
@@ -168,34 +167,34 @@ describe("Application", () => {
 		});	
 
 		it("should have all required keys per item", () => {
-			DB_SYSTEM_USERS.forEach(i => expect(i).to.have.all.keys('user', 'password', 'host', 'db', 'port', 'type'));			
+			DB_SYSTEM_USERS.forEach( (i:any) => expect(i).to.have.all.keys('user', 'password', 'host', 'db', 'port', 'type'));			
 		});
 
 		it("should have a property user of string type per item", () => {
-			users.forEach(i => expect(i).to.be.a('string').and.to.exist );
+			users.forEach( (i:any) => expect(i).to.be.a('string').and.to.exist );
 		});
 
 		it("should have a property password of string type", () => {
-			passwords.forEach(i => expect(i).to.be.a('string').and.to.exist );
+			passwords.forEach( (i:any) => expect(i).to.be.a('string').and.to.exist );
 		});
 
 		it("should have a property host of string type", () => {
-			hosts.forEach(i => expect(i).to.be.a('string').and.to.exist );
+			hosts.forEach( (i:any) => expect(i).to.be.a('string').and.to.exist );
 		});
 
 		it("should have a property db of string type", () => {
-			dbs.forEach(i => expect(i).to.be.a('string').and.to.exist );
+			dbs.forEach( (i:any) => expect(i).to.be.a('string').and.to.exist );
 		});	
 
 		it("should have a port that is a number and above 4000", () => {
-			ports.forEach(i => {				
+			ports.forEach( (i:any) => {				
 				expect(Number.isInteger(parseInt(i))).to.equal(true);				
 				expect(parseInt(i)).to.be.above(4000);
 			});
 		})
 
 		it("should have an account type that is an numbert and be greater than 0 and smaller than 4", () => {
-			types.forEach(i=> expect(parseInt(i)).to.be.above(0).and.below(4) );
+			types.forEach( (i:any) => expect(parseInt(i)).to.be.above(0).and.below(4) );
 		});
 
 		it("should have no more than one system user with account type 1", () => {
@@ -205,12 +204,12 @@ describe("Application", () => {
 		});
 
 		it("should have at least one database admin", () => {
-			const _arr:number = types.filter(i => i===2);
+			const _arr:number[] = types.filter(i => i===2);
 			expect(_arr).to.have.length.above(0);
 		});
 
 		it("should have at least one read only user", (done) => {
-			const _arr:number = types.filter(i => i===3);
+			const _arr:number[] = types.filter(i => i===3);
 			expect(_arr).to.have.length.above(0);
 			done();
 		});		
@@ -222,17 +221,17 @@ describe("Application", () => {
 	describe("Required Users Per Database", () => {
 		
 		it("should have these fine keys per entry", () => {			
-			REQUIRED_USERS_PER_DATABASE.forEach(i => expect(i).to.have.all.keys('accounts', 'dbName') );
+			REQUIRED_USERS_PER_DATABASE.forEach( (i:any) => expect(i).to.have.all.keys('accounts', 'dbName') );
 		});
 
 		it("should have one entry for ADMIN database", () => {
-			const _arr = REQUIRED_USERS_PER_DATABASE.filter( i => i.dbName === 'admin');
+			const _arr = REQUIRED_USERS_PER_DATABASE.filter( (i:any) => i.dbName === 'admin');
 			expect(_arr.length===1).to.equal(true);
 		})
 
 		it("should have a RX and R account per database", () => {
-			const _arr = REQUIRED_USERS_PER_DATABASE.filter( i => i.dbName != 'admin');
-			_arr.forEach( i => expect(i.accounts.length).to.equal(2));
+			const _arr = REQUIRED_USERS_PER_DATABASE.filter( (i:any) => i.dbName != 'admin');
+			_arr.forEach( (i:any) => expect(i.accounts.length).to.equal(2));
 		})
 	});
 

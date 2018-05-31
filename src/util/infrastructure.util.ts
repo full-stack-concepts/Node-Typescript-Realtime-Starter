@@ -1,12 +1,14 @@
 import path from "path";
 import fs from "fs-extra";
 import Promise from "bluebird";
+import jsonFile from  "jsonfile";
 
 const mkdirp = require("mkdirp");
 const appRoot = require("app-root-path");
 
 Promise.promisifyAll(fs);
 Promise.promisifyAll(mkdirp);
+Promise.promisifyAll(jsonFile);
 
 /****
  * Import PATH Settings 
@@ -81,15 +83,25 @@ export const readPrivateKeyForTokenAuthentication = ():Buffer => {
 /****
  * Environmental files: development
  */
-export const readDevConfiguration=() => {
-	return fs.existsSync( path.join( rootPath, ".env"));
+export const readDevConfiguration= () => {
+	let $path:string = path.join( rootPath, ".env");
+	return new Promise( (resolve, reject) => {
+		fs.pathExists( $path, (err:any, exists:boolean) => {
+			(err)?reject(err):resolve(exists);
+		});
+	});	
 }
 
 /****
  * Environmental files: production
  */
 export const readProdConfiguration=() => {
-	return fs.existsSync( path.join( rootPath, ".prod"));
+	let $path:string = path.join( rootPath, ".prod");
+	return new Promise( (resolve, reject) => {
+		fs.pathExists( $path, (err:any, exists:boolean) => {
+			(err)?reject(err):resolve(exists);
+		});
+	});	
 }
 
 /****
@@ -126,6 +138,9 @@ export const removeDirectory = ( $dir:string):Promise<any> => {
 	});
 }
 
+/****
+ * File Statistics: test if dir or file exists
+ */
 export const fileStatistics = ($pathToFile:string):Promise<any> => {
 	return new Promise( (resolve, reject) => {
 		fs.stat ( $pathToFile)
@@ -134,6 +149,16 @@ export const fileStatistics = ($pathToFile:string):Promise<any> => {
 	});
 }
 
+/****
+ * JSON file
+ */
+export const writeJSON = ($pathToFile:string, $json:any) => {
+	return jsonFile.writeFile( $pathToFile, $json, (err:any) => {
+		return new Promise( (resolve, reject) => {
+			(err)?reject(err):resolve();
+		});
+	});
+}
 /****
  * Path To Local Data Store
  */
