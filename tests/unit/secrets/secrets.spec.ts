@@ -1,6 +1,6 @@
-const chai = require("chai");
 import { expect, assert, should } from 'chai';
 import Validator from "validator";
+import isValidPath from "is-valid-path";
 const v:Validator = Validator;
 
 
@@ -54,7 +54,41 @@ import {
 	ENABLE_FACEBOOK_AUTHENTICATION,
 	FACEBOOK_ID,
 	FACEBOOK_SECRET,
-	FACEBOOK_CALLBACK_URL
+	FACEBOOK_CALLBACK_URL,
+
+	/***
+	 * Authenticatoni Response
+	 */
+	STORE_WEBTOKEN_AS_COOKIE,
+	WEBTOKEN_COOKIE,
+	SEND_TOKEN_RESPONSE,
+
+	/***
+	 * Data Generator (Faker)
+	 */
+	GENERATE_SAMPLE_DATA,
+	POPULATE_LOCAL_DATASTORE,
+	POPULATE_LOCAL_DATABASE,
+	POPULATE_REMOTE_DATABASE,	
+	DB_POPULATE_TEST_COLLECTIONS,
+	DB_POPULATE_ADMINS,
+	DB_POPULATE_POWER_USERS,
+	DB_POPULATE_AUTHORS,
+	DB_POPULATE_USERS,
+	DB_POPULATION_LOCALE.
+
+	/***
+	 * DB Collections
+	 */
+	DB_CREATE_USERS,
+	DB_SYSTEM_USERS_COLLECTION_NAME,
+	DB_USERS_COLLECTION_NAME,
+	DB_CREATE_CLIENTS,
+	DB_CLIENTS_COLLECTION_NAME,
+	DB_CREATE_CUSTOMERS,
+	DB_CUSTOMERS_COLLECTION_NAME,
+	DB_POPULATE_DEFAULT_CLIENTS,
+	DB_POPULATE_DEFAULT_CUSTOMERS
 
 } from "../../../src/util/secrets";
 
@@ -309,6 +343,23 @@ describe("Application", () => {
 		});
 	});
 
+	/***
+	 * Authentication Response
+	 */
+	describe("Authentication Response", () => {
+
+		it("should instruct app whether WEBTOKEN needs to be stored as a cookie", () => {
+			expect(STORE_WEBTOKEN_AS_COOKIE).to.be.a('boolean');
+		});
+
+		it("should have a string identifier for application WEBTOKEN_COOKIE", () => {
+			expect(WEBTOKEN_COOKIE).to.be.a('string').and.to.exist;
+		});
+
+		it("should instruct app whether JSON response should contain WEBTOKEN", () => {
+			expect(SEND_TOKEN_RESPONSE).to.be.a('boolean');
+		});
+	});
 
 	/****
 	 * Public Directory Infrastructure
@@ -323,12 +374,24 @@ describe("Application", () => {
 			 expect(PUBLIC_ROOT_DIR).to.be.a('string').and.to.exist;
 		});
 
+		it("should have a safe relative path for Public Root Dir", () => {
+			expect(isValidPath(PUBLIC_ROOT_DIR)).to.equal(true);
+		});
+
 		it("should ghave a defined public assets directory", () => {
 			 expect(PUBLIC_ASSETS_DIR).to.be.a('string').and.to.exist;
 		});
 
+		it("should have a safe relative path for Public Assets Dir", () => {
+			expect(isValidPath(PUBLIC_ASSETS_DIR)).to.equal(true);
+		});
+
 		it("should have a defined public images directory", () => {
 			 expect(PUBLIC_IMAGES_DIR).to.be.a('string').and.to.exist;
+		});
+
+		it("should have a safe relative path for Public Images Dir", () => {
+			expect(isValidPath(PUBLIC_IMAGES_DIR)).to.equal(true);
 		});
 
 		it("could have defined public assets subdirectories", () => {
@@ -362,6 +425,10 @@ describe("Application", () => {
 		it("should have a defined private users root directory", () => {
 			 expect(PRIVATE_USERS_DIR).to.be.a('string').and.to.exist;
 		});	
+
+		it("should have a safe relative path for Private Users Dir", () => {
+			expect(isValidPath(PRIVATE_USERS_DIR)).to.equal(true);
+		});
 	});
 
 	/***
@@ -376,9 +443,72 @@ describe("Application", () => {
 		it("should have a defined private data root directory", () => {
 			 expect(PRIVATE_DATA_DIR).to.be.a('string').and.to.exist;
 		});	
+
+		it("should have a safe relative path for Private Data Dir", () => {
+			expect(isValidPath(PRIVATE_DATA_DIR)).to.equal(true);
+		});
+	});
+
+	/***
+	 * Data Generator
+	 */
+	describe("Data Generator", () => {
+
+		it("should instruct app whether to create sample data", () => {
+			expect(GENERATE_SAMPLE_DATA).to.be.a('boolean');
+		});
+
+		it("should instruct app if local datastore must be injected with sample data", () => {
+			expect(POPULATE_LOCAL_DATASTORE).to.be.a('boolean');
+		});
+
+		it("should instruct app if local database naads to be populated with sample data", () => {
+			expect(POPULATE_LOCAL_DATABASE).to.be.a('boolean');
+		});
+
+
+		it("should instruct app if remote database naads to be populated with sample data", () => {
+			expect(POPULATE_REMOTE_DATABASE).to.be.a('boolean');
+		});
+
+		it("should instruct application which collections may contain sample data", () => {
+			 expect(DB_POPULATE_TEST_COLLECTIONS).to.be.an('array');
+			 if(DB_POPULATE_TEST_COLLECTIONS.length) {
+			 	DB_POPULATE_TEST_COLLECTIONS.forEach( i => expect(i).to.be.a('string'));
+			 }
+		});
+
+		it("should specify how many test admins should be created", () => {	
+			 expect(Number.isInteger( DB_POPULATE_ADMINS)).to.equal(true);
+			 expect(DB_POPULATE_ADMINS).to.be.gte(0);
+		});
+
+		it("should specify how many test power users should be created", () => {
+			 expect(Number.isInteger( DB_POPULATE_POWER_USERS)).to.equal(true);
+			 expect(DB_POPULATE_POWER_USERS).to.be.gte(0);
+		});
+
+		it("should specify how many test authors should be created", () => {
+			 expect(Number.isInteger( DB_POPULATE_AUTHORS)).to.equal(true);
+			 expect(DB_POPULATE_AUTHORS).to.be.gte(0);
+		});
+
+		it("should specify how many test users should be created", () => {
+			 expect(Number.isInteger( DB_POPULATE_USERS)).to.equal(true);
+			 expect(DB_POPULATE_USERS).to.be.gte(0);
+		});
+
+		it("should specify timezone for  sample data", () => {			
+			 expect(DB_POPULATION_LOCALE).to.be.a('string');
+		});
 	});
 
 });
+
+
+
+
+
 
 
 

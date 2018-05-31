@@ -530,7 +530,6 @@ export const GENERATE_SAMPLE_DATA = process.env["GENERATE_SAMPLE_DATA"] == 'true
 export const POPULATE_LOCAL_DATASTORE = process.env["POPULATE_LOCAL_DATASTORE"] == 'true';
 export const POPULATE_LOCAL_DATABASE  = process.env["POPULATE_LOCAL_DATABASE"] == 'true';
 export const POPULATE_REMOTE_DATABASE  = process.env["POPULATE_REMOTE_DATABASE"] == 'true';
-export const DB_POPULATE_SAFETY_FIRST = process.env["DB_POPULATE_SAFETY_FIRST"] == 'true';
 export const DB_POPULATE_TEST_COLLECTIONS = process.env["DB_POPULATE_TEST_COLLECTIONS"].split(',');
 export const DB_POPULATE_ADMINS =  Number(process.env["DB_POPULATE_ADMINS"]);
 export const DB_POPULATE_POWER_USERS =  Number(process.env["DB_POPULATE_POWER_USERS"]);
@@ -548,12 +547,7 @@ export const DB_CUSTOMERS_COLLECTION_NAME = process.env["DB_CUSTOMERS_COLLECTION
 export const DB_POPULATE_DEFAULT_CLIENTS= Number(process.env["DB_POPULATE_DEFAULT_CLIENTS"]);
 export const DB_POPULATE_DEFAULT_CUSTOMERS= Number(process.env["DB_POPULATE_DEFAULT_CUSTOMERS"]);
 
-if(GENERATE_SAMPLE_DATA) {
-
-	if(typeof DB_POPULATE_SAFETY_FIRST != 'boolean') {
-		console.error("DB Data Genersator: Please configure boolean DB_POPULATE_SAFETY_FIRST. overwrite existing DB data?");
-		process.exit(1);
-	}
+if(GENERATE_SAMPLE_DATA) {	
 
 	if(!DB_POPULATE_TEST_COLLECTIONS || !Array.isArray(DB_POPULATE_TEST_COLLECTIONS) ) {
 		console.error("DB Data Genersator: Please configure DB_POPULATE_TEST_COLLECTIONS array: specify to test for which DB collections");
@@ -689,9 +683,9 @@ if(	!Number.isInteger(LOCAL_AUTH_FORM_MAX_LENGTH_FIRST_NAME) ||
 /***
  * Definitions for User Authentication Response
  */
-export const STORE_WEBTOKEN_AS_COOKIE = process.env["STORE_WEBTOKEN_AS_COOKIE"];
+export const STORE_WEBTOKEN_AS_COOKIE = process.env["STORE_WEBTOKEN_AS_COOKIE"] == true;
 export const WEBTOKEN_COOKIE = process.env["WEBTOKEN_COOKIE"];
-export const SEND_TOKEN_RESPONSE = process.env["SEND_TOKEN_RESPONSE"];
+export const SEND_TOKEN_RESPONSE = process.env["SEND_TOKEN_RESPONSE"] == true;
 
 
 if(STORE_WEBTOKEN_AS_COOKIE) {

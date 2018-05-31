@@ -161,6 +161,7 @@
         "chalk": "^2.3.2",
         "concurrently": "^3.5.1",
         "cross-env": "^5.1.4",
+        "is-valid-path": "^0.1.1",
         "istanbul": "^0.4.5",
         "jest": "^22.4.0",
         "mocha": "^5.2.0",
