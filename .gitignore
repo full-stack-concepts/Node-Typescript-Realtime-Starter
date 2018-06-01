@@ -19,6 +19,9 @@ public/css/main.css
 # Coverage reports
 coverage
 
+# nyc (istanbul) coverage output
+*.nyc_output
+
 # API keys and secrets
 .env
 

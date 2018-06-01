@@ -19,6 +19,21 @@
             "js"
         ]
     },
+    "nyc": {
+        "check-coverage": false,       
+        "extension": [
+          ".js",
+          ".jsx",
+          ".ts",
+          ".tsx"
+        ],        
+        "reporter": [
+          "html",         
+          "text",
+          "text-summary"
+        ],
+        "report-dir": "./coverage"
+    },
     "scripts": {
         "start": "npm run serve",
         "build": "concurrently -k -n \"npm run delete-dist\" \"npm run build-ts\"",
@@ -26,9 +41,9 @@
         "watch": "cross-env NODE_ENV=dev concurrently -k -p \"[{name}]\" -n \"npm run delete-dist\" \"npm run watch-ts\" \"npm run watch-node\"",
         "watch-node": "nodemon dist/src/server.js",
         "test": "jest ./tests/user/ --forceExit --coverage --verbose",
-        "unit-encryption-tests": "mocha -r ts-node/register tests/unit/encryption/**/*.spec.ts",
+        "unit-encryption-tests": "nyc mocha -r ts-node/register tests/unit/encryption/**/*.spec.ts --timeout=5000",
         "unit-env-secrets-tests": "mocha -r ts-node/register tests/unit/secrets/**/*.spec.ts",
-        "unit-infrastructure-tests": "mocha -r ts-node/register tests/unit/infrastructure/**/*.spec.ts --timeout 5000",
+        "unit-infrastructure-tests": "mocha -r ts-node/register tests/unit/infrastructure/**/*.spec.ts --timeout=5000",
         "unit-usertypes-tests": "mocha -r ts-node/register tests/unit/usertypes/**/*.spec.ts",
         "integration-infrastructure-tests": "mocha -r ts-node/register tests/integration/infrastructure/**/*.spec.ts --timeout 7500",
         "build-ts": "tsc",
@@ -170,6 +185,7 @@
         "mocha": "^5.2.0",
         "node-sass": "^4.7.2",
         "nodemon": "^1.13.0",
+        "nyc": "^12.0.1",
         "puppeteer": "^1.0.0",
         "rimraf": "^2.6.2",
         "shelljs": "^0.8.1",
