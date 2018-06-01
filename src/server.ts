@@ -70,7 +70,7 @@ testForConfiguration();
  * SERVER containers
  */
 let 
-    server:any,
+    httpServer:any,
 	cluster:any,
     env:string=ENVIRONMENT.toString(),
 	options:ServerOptions = {};
@@ -79,7 +79,7 @@ let
 /****
  * For node application with multiple instances
  */
-function setCluster(i:number) {    
+export function setCluster(i:number) {    
     setTimeout ( () => {             
         let worker = cluster.fork();       
     }, i * 5000 );
@@ -89,7 +89,7 @@ function setCluster(i:number) {
 /**
  * Error Handler
  */
-function onError(error: NodeJS.ErrnoException):void {
+export function onError(error: NodeJS.ErrnoException):void {
     if (error.syscall !== 'listen') throw error;
     let bind = (typeof PORT === 'string') ? 'Pipe ' + PORT : 'Port ' + PORT;
     switch(error.code) {
@@ -109,7 +109,7 @@ function onError(error: NodeJS.ErrnoException):void {
 /***
  * SSL Certificates
  */ 
-function getSSL():ServerOptions {
+export function getSSL():ServerOptions {
 
     let options:ServerOptions = { key: null, cert:null };
 
@@ -132,9 +132,9 @@ function getSSL():ServerOptions {
 /****
  * On Listening: called when our express app has inittialzied
  */
-function onListening():void {
+export function onListening():void {
 
-    let addr = server.address();
+    let addr = httpServer.address();
     let bind = (typeof addr === 'string') ? `pipe ${addr}` : `port ${addr.port}`;
     console.error(`Listening on ${bind}`);
 
@@ -142,33 +142,35 @@ function onListening():void {
     * BOOTSTRAP APPLICATION  
     */       
     bootstrapController.init();
+
 }
 
 /***
  * Create server instance
  */
-function createServer():void {
+export const createServer = ():void => { 
 
     /**
      * Create HTTPS server.
      */
     if(EXPRESS_SERVER_MODE==='https') {        
         let options:ServerOptions = getSSL();
-        server = https.createServer(options, App);
+        httpServer = https.createServer(options, App);
 
     /**
      * Create HTTP server.
      */
     } else if(EXPRESS_SERVER_MODE==='http') {       
-        server = http.createServer(App);
+        httpServer = http.createServer(App);
     }
 
     /**
      * Listen on provided port, on all network interfaces.
      */
-    server.listen(PORT);
-    server.on('error', onError);
-    server.on('listening', onListening); 
+    httpServer.listen(PORT);
+    httpServer.on('error', onError);
+    httpServer.on('listening', onListening); 
+
 }
 
 
@@ -177,8 +179,9 @@ function createServer():void {
  * Bootstap Application: Development Environment
  */
 if(env=='dev') { 
-
-	createServer();
+    console.log("*** testing Mode")
+    if(!process.env.TESTING)
+	   createServer();
 
 /**
  * Bootstap Application: Production Environment

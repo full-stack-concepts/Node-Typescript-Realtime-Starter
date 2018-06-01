@@ -49,7 +49,7 @@ describe( "Private Directories Manager", () => {
 		catch(e) { err =e; }
 		finally {
 			if(!err && !DO_NOT_OVERWRITE_PRIVATE_DIRECTORIES) {
-				await deleteFolderRecursive(_path);
+				await deleteFolderRecursive($rootDir);
 			}
 		}
 	});

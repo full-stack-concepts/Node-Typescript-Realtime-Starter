@@ -20,17 +20,17 @@
         ]
     },
     "nyc": {
-        "check-coverage": false,       
+        "check-coverage": false,
         "extension": [
-          ".js",
-          ".jsx",
-          ".ts",
-          ".tsx"
-        ],        
+            ".js",
+            ".jsx",
+            ".ts",
+            ".tsx"
+        ],
         "reporter": [
-          "html",         
-          "text",
-          "text-summary"
+            "html",
+            "text",
+            "text-summary"
         ],
         "report-dir": "./coverage"
     },
@@ -46,6 +46,7 @@
         "unit-infrastructure-tests": "mocha -r ts-node/register tests/unit/infrastructure/**/*.spec.ts --timeout=5000",
         "unit-usertypes-tests": "mocha -r ts-node/register tests/unit/usertypes/**/*.spec.ts",
         "integration-infrastructure-tests": "mocha -r ts-node/register tests/integration/infrastructure/**/*.spec.ts --timeout 7500",
+        "integration-user-tests": "mocha -r ts-node/register tests/integration/user/**/*.spec.ts --timeout 7500",
         "build-ts": "tsc",
         "watch-ts": "tsc -w",
         "tslint": "tslint -c tslint.json -p tsconfig.json",
