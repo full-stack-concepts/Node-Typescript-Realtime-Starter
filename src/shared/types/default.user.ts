@@ -38,7 +38,7 @@ export const TUSER:IUser = <IUser | any> {
 		isAddressSet: false,
 		isGooglePlusUser: false,
 		isGoogleUser: false,
-		isFacebbokuser: false,
+		isFacebookUser: false,
 	},
 
 	profile: {	

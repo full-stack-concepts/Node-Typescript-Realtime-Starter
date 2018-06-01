@@ -100,7 +100,7 @@ describe("Infrastructure", () => {
 			 */
 			$fileName = `${word().replace(/\s+/g, '_')}.json`;	
 			$jsonDir = word().replace(/\s+/g, '_');	
-			$pathToJsonFile =  path.join(rootPath, $jsonDir, $fileName);
+			$pathToJsonFile =  path.join(rootPath, $fileName);
 			$json =  {
 				"user": {
 					"givenName": "John",
@@ -136,7 +136,7 @@ describe("Infrastructure", () => {
 		});
 
 		it("should have a function that writes JSON to file", async() => {
-
+			console.log($pathToJsonFile)
 			let err:any;
 			try { await writeJSON( $pathToJsonFile, $json ); }
 			catch(e) { err = e;}
@@ -146,11 +146,11 @@ describe("Infrastructure", () => {
 
 		/***
 		 * Cleasn up after making messy stuff
-		 */
+		 */		
 		after( async () => {
 			await removeDirectory($pathToJsonFile);
-			await removeDirectory($jsonDir);
-		});
+			await removeDirectory($pathToJsonFile);
+		});	
 		
 	});
 
@@ -164,14 +164,14 @@ describe("Infrastructure", () => {
 
 			if(EXPRESS_SERVER_MODE === "https") {
 				let privateKey:Buffer = getCertificate(PATH_TO_DEV_CERTIFICATE);
-				expect(privateKey.toString()).to.be.a('string').and.to.exist;
+				expect(privateKey).to.be.instanceOf(Buffer);
 			}
 		});
 
 		it("should have private certificate in development mode", () => {
 			if(EXPRESS_SERVER_MODE === "https") {
 				let key:Buffer = getCertificate(PATH_TO_DEV_CERTIFICATE);
-				expect(key.toString()).to.be.a('string').and.to.exist;
+				expect(key).to.be.instanceOf(Buffer);
 			}
 		});		
 	});

@@ -21,7 +21,9 @@ export const TCLIENT:IClient = <IClient | any> {
 	},
 
 	accounts: {
-		googleID: null
+		googleID: null,
+		facebookID: null,
+		localID: null
 	},
 
 	security: {	
@@ -34,14 +36,15 @@ export const TCLIENT:IClient = <IClient | any> {
 		isThumbnailSet: false,		
 		isAddressSet: false,
 		isGooglePlusUser: false,
-		isFacebbokuser: false,
+		isGoogleUser: false,
+		isFacebookUser: false,
 	},
 
 	profile: {	
 
 		personalia: {
 			givenName: null,
-			insertion: null,
+			middleName: null,
 			familyName:  null
 		},	
 

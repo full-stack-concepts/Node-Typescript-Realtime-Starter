@@ -20,7 +20,9 @@ export const TCUSTOMER:ICustomer = <ICustomer | any>{
 	},
 
 	accounts: {
-		googleID: null
+		googleID: null,
+		facebookID: null,
+		localID: null
 	},
 
 	security: {	
@@ -33,7 +35,8 @@ export const TCUSTOMER:ICustomer = <ICustomer | any>{
 		isThumbnailSet: false,		
 		isAddressSet: false,
 		isGooglePlusUser: false,
-		isFacebbokuser: false,
+		isGoogleUser: false,
+		isFacebookUser: false,
 	},
 
 	profile: {	

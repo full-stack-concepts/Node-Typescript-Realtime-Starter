@@ -86,7 +86,7 @@ export const readPrivateKeyForTokenAuthentication = ():Buffer => {
 export const readDevConfiguration= () => {
 	let $path:string = path.join( rootPath, ".env");
 	return new Promise( (resolve, reject) => {
-		fs.pathExists( $path, (err:any, exists:boolean) => {
+		fs.pathExists( $path, (err:any, exists:boolean) => {			
 			(err)?reject(err):resolve(exists);
 		});
 	});	
@@ -153,7 +153,7 @@ export const fileStatistics = ($pathToFile:string):Promise<any> => {
  * JSON file
  */
 export const writeJSON = ($pathToFile:string, $json:any) => {
-	return jsonFile.writeFile( $pathToFile, $json, (err:any) => {
+	return jsonFile.writeFile( $pathToFile, $json, (err:any) => {	
 		return new Promise( (resolve, reject) => {
 			(err)?reject(err):resolve();
 		});
