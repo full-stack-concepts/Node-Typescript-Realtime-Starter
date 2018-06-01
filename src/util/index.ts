@@ -66,7 +66,8 @@ export {
 	fileStatistics,
 	pathToPublicUsersDirectory,
 	pathToPrivateUsersDirectory,
-	writeJSON
+	writeJSON,
+	deleteFolderRecursive
 } from "./infrastructure.util";
 
 export {

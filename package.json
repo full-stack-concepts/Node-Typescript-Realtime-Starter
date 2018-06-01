@@ -30,6 +30,7 @@
         "unit-env-secrets-tests": "mocha -r ts-node/register tests/unit/secrets/**/*.spec.ts",
         "unit-infrastructure-tests": "mocha -r ts-node/register tests/unit/infrastructure/**/*.spec.ts --timeout 5000",
         "unit-usertypes-tests": "mocha -r ts-node/register tests/unit/usertypes/**/*.spec.ts",
+        "integration-infrastructure-tests": "mocha -r ts-node/register tests/integration/infrastructure/**/*.spec.ts --timeout 7500",
         "build-ts": "tsc",
         "watch-ts": "tsc -w",
         "tslint": "tslint -c tslint.json -p tsconfig.json",

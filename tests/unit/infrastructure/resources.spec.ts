@@ -66,12 +66,12 @@ describe("Infrastructure", () => {
 	describe("Environment", () => {
 
 		it("should have a definition file for dev environment", async () => {			
-			let exists:boolean  = await readDevConfiguration();		
+			let exists:Object  = await readDevConfiguration();		
 			expect(exists).to.equal(true);
 		});
 
 		it("should have a definition file for prod environment", async () => {			
-			let exists:boolean  = await readProdConfiguration();		
+			let exists:Object  = await readProdConfiguration();		
 			expect(exists).to.equal(true);
 		});	
 

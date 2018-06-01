@@ -2,6 +2,7 @@ import path from "path";
 import fs from "fs-extra";
 import Promise from "bluebird";
 import jsonFile from  "jsonfile";
+const isValidPath:any = require("is-valid-path");
 
 const mkdirp = require("mkdirp");
 const appRoot = require("app-root-path");
@@ -116,7 +117,7 @@ export const getRootPath = ():string => {
  */
 export const createDirectory = ( $dir:string ):Promise<any> => {
 	return new Promise ( (resolve, reject) => {		
-		fs.stat ( $dir, ( err:any, stats:any) => {
+		fs.stat ( $dir, ( err:any, stats:any) => {			
 			if(err) {
 				mkdirp ( $dir, (err:any) => { (err) ? reject(err):resolve(true); })
 			} else { 
@@ -127,7 +128,7 @@ export const createDirectory = ( $dir:string ):Promise<any> => {
 }
 
 /****
- * Remove Directory
+ * Remove Empty Directory
  */
 export const removeDirectory = ( $dir:string):Promise<any> => {
 	return new Promise( (resolve, reject) => {
@@ -137,6 +138,41 @@ export const removeDirectory = ( $dir:string):Promise<any> => {
 		});
 	});
 }
+
+/****
+ * Remove Directory including all children
+ */
+export const deleteFolderRecursive = (path:string) => {
+
+	return new Promise( (resolve, reject) => {
+
+		// test if we are dealing with a calid path
+		if(!isValidPath(path)) return Promise.reject(true);
+
+		if( fs.existsSync(path) ) {
+
+	    	fs.readdirSync(path).forEach( (file:string,index:number) => {	      		
+	      		const curPath:string = `${path}/${file}`;
+
+	      		// Delete subfolder      	
+	      		if(fs.lstatSync(curPath).isDirectory()) { 
+	        		deleteFolderRecursive(curPath);
+	        	// Delete file        
+	      		} else { 
+	        		fs.unlinkSync(curPath);
+	      		}
+	    	});
+	    
+	    	fs.rmdirSync(path);
+
+	    	// return to caller
+	    	resolve();
+
+	  	} else {
+	  		resolve();
+	  	}
+	});
+};
 
 /****
  * File Statistics: test if dir or file exists
@@ -173,17 +209,18 @@ export const createPrivateDataStore = () => {
 
 	if(!CREATE_DATASTORE) return;
 
-	const $private:string = path.join( rootPath, PRIVATE_DATA_DIR),
+	const $storeDirectory:string = path.join( rootPath, PRIVATE_ROOT_DIR, PRIVATE_DATA_DIR),
 		  $dirs = ['1','2','3'];
 
 	// process thick: create private directory
-	return createDirectory( $private )
+	return createDirectory( $storeDirectory )
 
 	// process thick: create three sub directories
 	.then( () => {
 		return Promise.map( $dirs, (dir:string) => {
-			let $dir:string = path.join( $private, dir.toString() );
-			createDirectory( $dir );
+			let $dir:string = path.join( $storeDirectory, dir.toString() );
+			console.log($dir);
+			return createDirectory( $dir );
 		})		
 	})
 

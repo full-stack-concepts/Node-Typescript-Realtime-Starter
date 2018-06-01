@@ -369,6 +369,7 @@ if(subUsersDirs && !Array.isArray(subUsersDirs)) {
 /***
  * Private Directory Management
  */
+export const DO_NOT_OVERWRITE_PRIVATE_DIRECTORIES = process.env["DO_NOT_OVERWRITE_PRIVATE_DIRECTORIES"] == 'true';
 export const CREATE_DATASTORE = process.env["CREATE_DATASTORE"] == 'true';
 export const PRIVATE_ROOT_DIR = process.env["PRIVATE_ROOT_DIR"] || './private/';
 export const PRIVATE_USERS_DIR = process.env["PRIVATE_USERS_DIR"] || './users/';
