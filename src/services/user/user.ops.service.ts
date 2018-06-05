@@ -192,11 +192,11 @@ export class UserOperations extends PersonProfile {
 		
 			return Promise.map( results, ( result:any) => {
 				let subType:string = Object.keys(result)[0];	
-				if(result[subType]) {
+				if(result[subType]) {					
 					let person:any = result[subType];				
 					person.core['type'] = subType;					
 					return Promise.resolve(person);
-				} else {
+				} else {				
 					return Promise.resolve();
 				}
 			})			
@@ -205,7 +205,7 @@ export class UserOperations extends PersonProfile {
 				let person:ISystemUser|IUser|IClient|ICustomer;
 				items.forEach( (item:ISystemUser|IUser|IClient|ICustomer, index: number | string) => {
 					if(item) person = item;
-				});				
+				});						
 				return Promise.resolve( person );
 			});			
 		})
@@ -562,11 +562,7 @@ export class UserOperations extends PersonProfile {
 	 * (4) Insert new user
 	 * (5) Store Thumbnail
 	 */
-	protected newUser( user:IUser|IClient|ICustomer):Promise<any> { 	
-
-		if(user) {
-			return Promise.resolve(user);
-		}
+	protected newUser( user:IUser|IClient|ICustomer):Promise<any> { 			
  
 		// process thick: execute tasks (1, 2)					  
 		return Promise.join<any>(

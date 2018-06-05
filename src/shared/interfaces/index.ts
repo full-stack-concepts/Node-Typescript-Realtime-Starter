@@ -27,9 +27,15 @@ export { ISystemUser } from "./systemuser.interface";
 /***
  * IPerson interfaces: User
  */
+export { IUser } from "./user.interface";
 export { IUserApplication } from "./user/user.application.interface";
 export { ILoginRequest } from "./user/user.login.interface";
-export { IUser } from "./user.interface";
+export { ILogout} from "./user/user.logout.interface";
+export { IFindUser } from "./user/user.find.interface";
+export { IDeleteUser } from "./user/user.delete.interface";
+export { UserTokenObject } from "./user/user.tokenobject.interface";
+export { IUserDefinitions} from "./user/user.definitions.interface";
+
 export {
 	IUserJob,
 	IUserAddress,
@@ -66,3 +72,8 @@ export {
 export {
 	IEncryption
 } from "./encryption.interface";
+
+/***
+ * Tests
+ */
+export { IResponse } from "./tests/response.interface";

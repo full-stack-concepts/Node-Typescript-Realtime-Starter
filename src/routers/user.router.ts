@@ -18,12 +18,14 @@ import {
  * Import Actions
  */
 import {
+	CREATE_WEBTOKEN,
 	REGISTER_NEW_USER,
-	LOGIN_USER,
-	CREATE_WEBTOKEN
+	LOGIN_USER,	
+	FIND_USER,
+	DELETE_USER
 } from "../controllers/actions";
 
-import { IUser, ILoginRequest } from "../shared/interfaces";
+import { IUser, ILoginRequest, IFindUser, IDeleteUser } from "../shared/interfaces";
 import { LOCAL_AUTH_CONFIG, STORE_WEBTOKEN_AS_COOKIE, WEBTOKEN_COOKIE, SEND_TOKEN_RESPONSE } from "../util/secrets";
 import { IUserApplication } from "../shared/interfaces";
 
@@ -59,10 +61,10 @@ class UserRouter extends DefaultRouter {
          */ 
        
        	// enable local authentication
-        if(LOCAL_AUTH_CONFIG.enable) { 
+        if(LOCAL_AUTH_CONFIG.enable) {         	
 
         	// new user aplpication
-			this.router.post('/register', (req:Request, res:Response, next:NextFunction) => 
+			this.router.post('/register', (req:Request, res:Response, next:NextFunction) => 				
 				this.newUser (req, res, next)
 			);        
 
@@ -73,6 +75,16 @@ class UserRouter extends DefaultRouter {
 
 			// user logout
 			this.router.post('/logout', logout );		
+
+			// find user 
+			this.router.post('/findone', (req:Request, res:Response, next:NextFunction) => 
+				this.findOne(req, res, next)
+			);
+
+			// delete user
+			this.router.post('/delete', (req:Request, res:Response, next:NextFunction) => 
+				this.deleteSingleUser(req, res, next)
+			)
 		}	      
      
         /****
@@ -126,6 +138,8 @@ class UserRouter extends DefaultRouter {
 	
 		const application:IUserApplication = req.body;	
 
+		console.log("Incoming request ", req.body)
+
 		this.uaController[REGISTER_NEW_USER](application)			
 	  	.then( (token:string) => {
 		
@@ -136,7 +150,7 @@ class UserRouter extends DefaultRouter {
         	res.locals.token = token;       
 
         	// send token with json response
-        	res.json({token:token});
+        	res.status(200).json({token:token});
 
 		})
 		.catch( (err:any) => console.error(err) );				
@@ -159,11 +173,36 @@ class UserRouter extends DefaultRouter {
         	res.locals.token = token;       
 
         	// send token with json response
-        	res.json({token:token});
+        	res.status(200).json({token:token});
 
 		})
 		.catch( (err:any) => console.error(err) );		
 	}	
+
+	/****
+	 *
+	 */
+	private findOne(req: Request, res: Response, next: NextFunction) {
+		let findRequest:IFindUser = req.body;
+		this.uaController[FIND_USER](findRequest)			
+		.then( (user:IUser) => {
+
+        	// send user 
+        	res.status(200).json({user});
+		})
+		.catch( (err:any) => console.error(err) );		
+	}
+
+	/****
+	 *
+	 */
+	private deleteSingleUser(req: Request, res: Response, next: NextFunction) {
+		let deleteRequest:IDeleteUser = req.body;
+		this.uaController[DELETE_USER](deleteRequest)			
+		.then( (user:IUser) => res.status(200).json({isUserDeleted:true}) )
+		.catch( (err:any) => console.error(err) );		
+
+	}
 }
 
 // Create Public Router and Export it 

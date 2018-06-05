@@ -26,9 +26,8 @@ export class UAController  {
 					 		googleUserService[property] ||
 					 		clientService[property] ||
 					 		customerService[property] ||
-					 		systemUserService[property] 					 
-
-				}
+					 		systemUserService[property] 
+					 }
 			});		
 
 		} catch(e) {

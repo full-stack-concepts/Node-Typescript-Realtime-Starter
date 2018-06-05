@@ -79,7 +79,7 @@ let
 /****
  * For node application with multiple instances
  */
-export function setCluster(i:number) {    
+function setCluster(i:number) {    
     setTimeout ( () => {             
         let worker = cluster.fork();       
     }, i * 5000 );
@@ -89,7 +89,7 @@ export function setCluster(i:number) {
 /**
  * Error Handler
  */
-export function onError(error: NodeJS.ErrnoException):void {
+function onError(error: NodeJS.ErrnoException):void {
     if (error.syscall !== 'listen') throw error;
     let bind = (typeof PORT === 'string') ? 'Pipe ' + PORT : 'Port ' + PORT;
     switch(error.code) {
@@ -109,7 +109,7 @@ export function onError(error: NodeJS.ErrnoException):void {
 /***
  * SSL Certificates
  */ 
-export function getSSL():ServerOptions {
+function getSSL():ServerOptions {
 
     let options:ServerOptions = { key: null, cert:null };
 
@@ -132,7 +132,7 @@ export function getSSL():ServerOptions {
 /****
  * On Listening: called when our express app has inittialzied
  */
-export function onListening():void {
+function onListening():void {
 
     let addr = httpServer.address();
     let bind = (typeof addr === 'string') ? `pipe ${addr}` : `port ${addr.port}`;
@@ -146,118 +146,134 @@ export function onListening():void {
 }
 
 /***
+ * Test Server: http protocol only
+ */
+export const createTestServer = ():Promise<any> => { 
+
+    const httpServer:any = http.createServer(App);
+    const server:any = httpServer.listen(PORT);
+
+    return Promise.resolve({
+        httpServer,
+        server
+    });
+
+}
+
+/***
  * Create server instance
  */
-export const createServer = ():void => { 
+export const createServer = ():Promise<any> => { 
 
     /**
-     * Create HTTPS server.
+     * Bootstap Application: Development Environment
      */
-    if(EXPRESS_SERVER_MODE==='https') {        
-        let options:ServerOptions = getSSL();
-        httpServer = https.createServer(options, App);
+    if(env=='dev') { 
+
+        /**
+         * Create HTTPS server.
+         */
+        if(EXPRESS_SERVER_MODE==='https') {        
+            let options:ServerOptions = getSSL();
+            httpServer = https.createServer(options, App);
+
+        /**
+         * Create HTTP server.
+         */
+        } else if(EXPRESS_SERVER_MODE==='http') {       
+            httpServer = http.createServer(App);
+        }
+
+        /**
+         * Listen on provided port, on all network interfaces.
+         */
+        let server = httpServer.listen(PORT);
+        httpServer.on('error', onError);
+        httpServer.on('listening', onListening); 
+
+        return Promise.resolve(server);
 
     /**
-     * Create HTTP server.
+     * Bootstap Application: Production Environment
+     * Do not use this option until release 1.0 => REDIS Caching
      */
-    } else if(EXPRESS_SERVER_MODE==='http') {       
-        httpServer = http.createServer(App);
-    }
+    } else if(env=='prod') {
 
-    /**
-     * Listen on provided port, on all network interfaces.
-     */
-    httpServer.listen(PORT);
-    httpServer.on('error', onError);
-    httpServer.on('listening', onListening); 
+        let workerRestartCounter:number = 0;
 
+        /* Handle multi-core systems with cluster */
+        cluster = require('cluster');
+
+        if(cluster.isMaster) {
+
+            // Count the machine's CPUs
+            let cpuCount:number = require('os').cpus().length;
+
+            // Create a worker for each CPU   
+            // limited until release 2.0    
+
+            let limiterCPU:number = 1;
+            for (var i = 0; i < limiterCPU; i += 1) {
+                setCluster(i);                   
+            };
+
+            // Listen for dying workers: Replace the dead worker
+            cluster.on('exit', function(deadWorker:any, code:any, signal:any) {   
+
+                 // Restart the worker
+                if(workerRestartCounter < 3 ) {
+                    
+                    var worker = cluster.fork();
+
+                     workerRestartCounter++;
+
+                    /* Note the process IDs
+                     * And assign worker PID (Process ID) to global so it can be processed
+                     * in any shared queue (for instance images)
+                     */
+                    var newPID = worker.process.pid;
+                    var oldPID = deadWorker.process.pid;                         
+                    myGlobal.workerID = worker.process.pid;     
+
+                    // #TODO: Log error
+                    console.error("App worker " + deadWorker.process.pid + " died. New worker "+worker.process.pid +" is launched.");            
+                    process.exit(1);
+
+                } else {
+                    // 
+                    console.error("TCAA Application has crashed. Please check application error log.");            
+                }                     
+                            
+            });  
+
+             /* Log stack trace on worker dead */
+            process.on('uncaughtException', (err) => {
+                let d:string = (new Date).toUTCString();
+                let message:string = `S{d} - uncaughtException ${err.message}`;
+                let stack = err.stack;
+                // #TODO : log error          
+            });
+
+        /***
+         * Cluster is current worker
+         */
+        } else {        
+
+            /**
+             * ALIAS WORKER 
+             */
+            myGlobal.workerID = cluster.worker.id;
+
+            /**
+             * Creatse New Server
+             */
+            createServer();
+        } 
+    } 
 }
 
 
 
-/**
- * Bootstap Application: Development Environment
- */
-if(env=='dev') { 
-    console.log("*** testing Mode")
-    if(!process.env.TESTING)
-	   createServer();
 
-/**
- * Bootstap Application: Production Environment
- * Do not use this option until release 1.0 => REDIS Caching
- */
-} else if(env=='prod') {
 
-    let workerRestartCounter:number = 0;
-
-    /* Handle multi-core systems with cluster */
-    cluster = require('cluster');
-
-    if(cluster.isMaster) {
-
-        // Count the machine's CPUs
-        let cpuCount:number = require('os').cpus().length;
-
-        // Create a worker for each CPU   
-        // limited until release 2.0    
-
-        let limiterCPU:number = 1;
-        for (var i = 0; i < limiterCPU; i += 1) {
-            setCluster(i);                   
-        };
-
-        // Listen for dying workers: Replace the dead worker
-        cluster.on('exit', function(deadWorker:any, code:any, signal:any) {   
-
-             // Restart the worker
-            if(workerRestartCounter < 3 ) {
-                
-                var worker = cluster.fork();
-
-                 workerRestartCounter++;
-
-                /* Note the process IDs
-                 * And assign worker PID (Process ID) to global so it can be processed
-                 * in any shared queue (for instance images)
-                 */
-                var newPID = worker.process.pid;
-                var oldPID = deadWorker.process.pid;                         
-                myGlobal.workerID = worker.process.pid;     
-
-                // #TODO: Log error
-                console.error("App worker " + deadWorker.process.pid + " died. New worker "+worker.process.pid +" is launched.");            
-                process.exit(1);
-
-            } else {
-                // 
-                console.error("TCAA Application has crashed. Please check application error log.");            
-            }                     
-                        
-        });  
-
-         /* Log stack trace on worker dead */
-        process.on('uncaughtException', (err) => {
-            let d:string = (new Date).toUTCString();
-            let message:string = `S{d} - uncaughtException ${err.message}`;
-            let stack = err.stack;
-            // #TODO : log error          
-        });
-
-    /***
-     * Cluster is current worker
-     */
-    } else {        
-
-        /**
-         * ALIAS WORKER 
-         */
-        myGlobal.workerID = cluster.worker.id;
-
-        /**
-         * Creatse New Server
-         */
-        createServer();
-    } 
-} 
 

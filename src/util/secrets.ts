@@ -55,7 +55,7 @@ export const SITE_NAME = process.env["SITE_URL"];
 /**
  * DEFAULT SITE URL
  */
-export const SITE_URL = `${EXPRESS_SERVER_MODE}://${SITE_NAME}:${PORT}/`;
+export const SITE_URL = `${EXPRESS_SERVER_MODE}://${SITE_NAME}:${PORT}`;
 
 /**
  * Timezone
@@ -499,6 +499,9 @@ export const PASSWORD_HAS_UPPERCASE = process.env["PASSWORD_HAS_UPPERCASE"] == '
 export const PASSWORD_HAS_LOWERCASE = process.env["PASSWORD_HAS_LOWERCASE"] == 'true';
 export const PASSWORD_HAS_NUMBER = process.env["PASSWORD_HAS_SPECIAL_CHAR"] == 'true';
 export const PASSWORD_HAS_SPECIAL_CHAR = process.env["PASSWORD_HAS_SPECIAL_CHAR"] == 'true';
+export const DEFAULT_TEST_PASSWORD = process.env["DEFAULT_TEST_PASSWORD"];
+
+console.log(DEFAULT_TEST_PASSWORD)
 
 if( !Number.isInteger(PASSWORD_MIN_LENGTH)) {
 	console.error(`Password Policy: Please set PASSWORD_MINIMUM_LENGTTH as an integer with a minimum value of 1`);

@@ -23,7 +23,7 @@ import {
 } from "../../controllers/actions";
 
 import { 
-	IUser, IClient, ICustomer, IGoogleUser, ILoginRequest, IDatabasePriority, IRawThumbnail, ILoginTracker, IUserApplication, IEncryption
+	IUser, IClient, ICustomer, IGoogleUser, ILoginRequest, IDatabasePriority, IRawThumbnail, ILoginTracker, IUserApplication, IEncryption, IFindUser, IDeleteUser
 } from "../../shared/interfaces";
 
 import { 
@@ -168,6 +168,8 @@ export class UserService extends UserOperations {
 		// user credentials: userName && url 
 		newUser = this.setCredentials(newUser);
 
+		console.log(newUser)
+
 		return Promise.resolve(newUser);
 	}	
 
@@ -201,7 +203,7 @@ export class UserService extends UserOperations {
 	/****
 	 * 
 	 */
-	public registerUser(form:IUserApplication) {		
+	public registerUser(form:IUserApplication) {	
 
 		/***
 		 * Validate application Form
@@ -272,6 +274,63 @@ export class UserService extends UserOperations {
 		.catch( (err:any) => Promise.reject(err) );	
 
 	}	
+
+	/***
+	 * Find user by ID
+	 * @email:string
+	 * @url:string
+	 * @identifier: uuid-string
+	 */
+	public findSingleUser(request:IFindUser) {
+
+		// loop through find object and return first key with value
+		type key = keyof IFindUser;
+		let keys:string[] = Object.keys(request);
+		let ID:string;
+		let field:string;
+		
+		keys.forEach( (key:any) => {			
+			if(request[key]) {
+				field = `core.${key}`;
+				ID= request[key];
+			}
+		});
+		if(!field || !ID) return Promise.reject('<errorNumber>');
+
+		return userModel.findOne({ [field]:[ID]})
+		.then( (user:IUser) => {
+			delete user._id;
+			return Promise.resolve( user ) 
+		})
+		.catch( (err:any) => Promise.reject(err));
+	}
+
+	/***
+	 * Delete user By ID
+	 * @emal:string
+	 * @url:string
+	 * @identifier:string
+	 */
+	public deleteSingleUser(request:IFindUser) {
+		
+		type key = keyof IFindUser;
+		let keys:string[] = Object.keys(request);
+		let ID:string;
+		let field:string;
+
+		keys.forEach( (key:any) => {			
+			if(request[key]) {
+				field = `core.${key}`;
+				ID = request[key];
+			}
+		});
+		if(!field || !ID) return Promise.reject('<errorNumber>');
+
+		return userModel.remove({ [field]:[ID]})
+		.then( () => Promise.resolve() )
+		.catch( (err:any) => Promise.reject(err));
+
+	}
 }
 
 /****
@@ -290,6 +349,20 @@ class ActionService {
 		let instance:any = new UserService();
 		return instance.loginUser(login)
 			.then( (token:string) => Promise.resolve(token) )
+			.catch( (err:any) => Promise.reject(err) );
+	}
+
+	public findSingleUser( find:IFindUser ) {
+		let instance:any = new UserService();
+		return instance.findSingleUser(find)
+			.then( (user:IUser) => Promise.resolve(user) )
+			.catch( (err:any) => Promise.reject(err) );
+	}
+
+	public deleteSingleUser( find:IDeleteUser ) {
+		let instance:any = new UserService();
+		return instance.deleteSingleUser(find)
+			.then( () => Promise.resolve() )
 			.catch( (err:any) => Promise.reject(err) );
 	}
 }

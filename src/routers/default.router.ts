@@ -62,7 +62,7 @@ export class DefaultRouter {
         	res.locals.token = token;   
 
         	// send token with json response
-			res.json({token:token});    
+			res.status(200).json({token:token});    
         })
         .catch( (err:any) => console.error(err) );		
 

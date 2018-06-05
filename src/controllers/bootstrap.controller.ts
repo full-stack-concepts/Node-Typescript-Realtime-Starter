@@ -126,7 +126,7 @@ export class BootstrapController {
 			/***
 			 * Init Default DB Model
 			 */
-			// await this.initDefaultDatabaseModel();
+			await this.initDefaultDatabaseModel();
 
 			/***
 			 * Configure application databases
@@ -135,7 +135,7 @@ export class BootstrapController {
 			 * (3) Test if predefined collections exist (#TODO)
 			 * (4) Perform test operations (#TODO)
 			 */		
-			// await this.configureDatabases();
+			await this.configureDatabases();
 
 			/***
 			 * Configure infrastructure
@@ -143,12 +143,12 @@ export class BootstrapController {
 			 * (2) Private Directories
 			 * (3) Local Store Directories
 			 */
-			// await this.configureInfrastructure();
+			await this.configureInfrastructure();
 
 			/***
 			 * Connect To User DB
 			 */
-			// await connectToUserDatabase();
+			await connectToUserDatabase();
 
 			/***
 			 * Connect to Product DB
