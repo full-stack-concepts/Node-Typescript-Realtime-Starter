@@ -244,9 +244,9 @@ describe("User Routes", () => {
 	/****
 	 * Terminate Express Server
 	 */
-	after( (done) => {		
+	after( () => {		
 		_server.close();
-		done();
+		process.exit();
 	});
 });
 
