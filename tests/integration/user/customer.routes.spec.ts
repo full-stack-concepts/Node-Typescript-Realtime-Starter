@@ -117,78 +117,79 @@ describe("Customer Routes", () => {
 			expect(decoded.accounts).to.have.property('localID').and.to.equal(application.email);			
 		});
 
-		/****
-		 * 
-		 */
-		describe("POST /logout", () => {
+	});
 
-			let result:IResponse;
-			let body:UserTokenObject;
+	/****
+	 * 
+	 */
+	describe("POST /logout", () => {
 
-			before( async () => {
-				const url:string = `${defaultURI}/api/customer/logout`;	
-				result = await methods.post(url, logout);	
-				body = JSON.parse(result.body);	
-			});
+		let result:IResponse;
+		let body:UserTokenObject;
 
-			it("should respond with a 200 status",  () => expect(result.response).to.have.status(200) );
-
-			it("should return a JSON Object", () => expect(v.isJSON(result.body)).to.equal(true) );
-
-			it("should return a JSON object with <isLoggedOut> property", () => expect(body).to.have.property('isLoggedOut').and.to.be.true );
-
+		before( async () => {
+			const url:string = `${defaultURI}/api/customer/logout`;	
+			result = await methods.post(url, logout);	
+			body = JSON.parse(result.body);	
 		});
 
-		/****
-		 * FIND CUSTOMER
-		 */
-		describe("POST /findOne", () => {
+		it("should respond with a 200 status",  () => expect(result.response).to.have.status(200) );
 
-			let result:IResponse;
-			let body:any;
-			let customer:ICustomer;
+		it("should return a JSON Object", () => expect(v.isJSON(result.body)).to.equal(true) );
 
-			before( async () => {
-				const url:string = `${defaultURI}/api/customer/findone`;	
-				result = await methods.post(url, find);
-				body = JSON.parse(result.body);
-				customer = body.customer;			
-			});	
+		it("should return a JSON object with <isLoggedOut> property", () => expect(body).to.have.property('isLoggedOut').and.to.be.true );
 
-			it("should respond with a 200 status",  () => expect(result.response).to.have.status(200) );
-			it("should return a JSON Object", () => expect(v.isJSON(result.body)).to.equal(true) );
-			it("should return a client with an email identifier", () => {
-				expect(customer.core.email).to.be.a('string').and.exist;
-				expect(v.isEmail(customer.core.email)).to.equal(true);
-			});
-			it("should return a client with an url identifier", () => expect(customer.core.url).to.be.a('string').and.exist );
-			it("should return an client with infractructure identifier", () => {
-				expect(customer.core.identifier).to.be.a('string').and.exist;		
-				expect(v.isUUID(customer.core.identifier)).to.equal(true);
-			});
+	});
 
+	/****
+	 * FIND CUSTOMER
+	 */
+	describe("POST /findOne", () => {
+
+		let result:IResponse;
+		let body:any;
+		let customer:ICustomer;
+
+		before( async () => {
+			const url:string = `${defaultURI}/api/customer/findone`;	
+			result = await methods.post(url, find);
+			body = JSON.parse(result.body);
+			customer = body.customer;			
+		});	
+
+		it("should respond with a 200 status",  () => expect(result.response).to.have.status(200) );
+		it("should return a JSON Object", () => expect(v.isJSON(result.body)).to.equal(true) );
+		it("should return a client with an email identifier", () => {
+			expect(customer.core.email).to.be.a('string').and.exist;
+			expect(v.isEmail(customer.core.email)).to.equal(true);
 		});
-
-		/****
-		 * Delete Customer
-		 */
-		describe("POST /delete", () => {
-
-			let result:IResponse;
-			let body:any;	
-
-			before( async () => {
-				const url:string = `${defaultURI}/api/customer/delete`;	
-				result = await methods.post(url, deleteObj);		
-				body = JSON.parse(result.body);			
-			});
-
-			it("should respond with a 200 status",  () => expect(result.response).to.have.status(200) );
-			it("should return a JSON Object", () => expect(v.isJSON(result.body)).to.equal(true) );
-			it("should return a JSON object with <isClientDeleted> property", () => expect(body).to.have.property('isCustomerDeleted').and.to.be.true );
+		it("should return a client with an url identifier", () => expect(customer.core.url).to.be.a('string').and.exist );
+		it("should return an client with infractructure identifier", () => {
+			expect(customer.core.identifier).to.be.a('string').and.exist;		
+			expect(v.isUUID(customer.core.identifier)).to.equal(true);
 		});
 
 	});
+
+	/****
+	 * Delete Customer
+	 */
+	describe("POST /delete", () => {
+
+		let result:IResponse;
+		let body:any;	
+
+		before( async () => {
+			const url:string = `${defaultURI}/api/customer/delete`;	
+			result = await methods.post(url, deleteObj);		
+			body = JSON.parse(result.body);			
+		});
+
+		it("should respond with a 200 status",  () => expect(result.response).to.have.status(200) );
+		it("should return a JSON Object", () => expect(v.isJSON(result.body)).to.equal(true) );
+		it("should return a JSON object with <isClientDeleted> property", () => expect(body).to.have.property('isCustomerDeleted').and.to.be.true );
+	});
+
 
 	/****
 	 * Terminate Express Server

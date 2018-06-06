@@ -164,7 +164,7 @@ export class CustomerService extends UserOperations {
 		.then( ({customer, encrypt}:any) => this.customerProfile(customer, form, encrypt) )
 
 		// process thick: build user object
-		.then( (user:IUser|IClient|ICustomer) => this.newCustomer(user) )	
+		.then( (user:ICustomer) => this.newCustomer(user) )	
 		
 		/*** 
 		 * process thick: create webtoken
