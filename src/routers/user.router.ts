@@ -199,7 +199,7 @@ class UserRouter extends DefaultRouter {
 	private deleteSingleUser(req: Request, res: Response, next: NextFunction) {
 		let deleteRequest:IDeleteUser = req.body;
 		this.uaController[DELETE_USER](deleteRequest)			
-		.then( (user:IUser) => res.status(200).json({isUserDeleted:true}) )
+		.then( () => res.status(200).json({isUserDeleted:true}) )
 		.catch( (err:any) => console.error(err) );		
 
 	}

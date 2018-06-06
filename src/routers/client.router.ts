@@ -18,13 +18,15 @@ import {
  */
 import {
 	REGISTER_NEW_CLIENT,
-	LOGIN_CLIENT,
+	LOGIN_CLIENT,		
+	FIND_CLIENT,
+	DELETE_CLIENT,
 	CREATE_WEBTOKEN
 } from "../controllers/actions";
 
-import { IUser, ILoginRequest } from "../shared/interfaces";
+import { IClient, ILoginRequest } from "../shared/interfaces";
 import { LOCAL_AUTH_CONFIG, STORE_WEBTOKEN_AS_COOKIE, WEBTOKEN_COOKIE, SEND_TOKEN_RESPONSE } from "../util/secrets";
-import { IClientApplication } from "../shared/interfaces";
+import { IClientApplication, IFindUser, IDeleteUser } from "../shared/interfaces";
 
 export class ClientRouter extends DefaultRouter{ 
 
@@ -73,7 +75,17 @@ export class ClientRouter extends DefaultRouter{
 			);
 
 			// user logout
-			this.router.post('/logout', logout );		
+			this.router.post('/logout', logout );	
+
+			// find client
+			this.router.post('/findone', (req:Request, res:Response, next:NextFunction) => 
+				this.findSingleClient(req, res, next)
+			);	
+
+			// delete client
+			this.router.post('/delete', (req:Request, res:Response, next:NextFunction) => 
+				this.deleteSingleClient(req, res, next)
+			)
 		}	
 	}  
 
@@ -94,7 +106,7 @@ export class ClientRouter extends DefaultRouter{
         	res.locals.token = token;       
 
         	// send token with json response
-        	res.json({token:token});
+        	res.status(200).json({token:token});        	
 
 		})
 		.catch( (err:any) => console.error(err) );				
@@ -118,12 +130,32 @@ export class ClientRouter extends DefaultRouter{
         	res.locals.token = token;       
 
         	// send token with json response
-        	res.json({token:token});
+        	res.status(200).json({token:token});
 
 		})
 		.catch( (err:any) => console.error(err) );	
-
 	}	
+
+	/****
+	 *
+	 */
+	private findSingleClient(req: Request, res: Response, next: NextFunction) {
+		let findRequest:IFindUser = req.body;
+		this.uaController[FIND_CLIENT](findRequest)			
+		.then( (client:IClient) => res.status(200).json({client}) )
+		.catch( (err:any) => console.error(err) );		
+	}
+
+	/****
+	 *
+	 */
+	private deleteSingleClient(req: Request, res: Response, next: NextFunction) {
+		let deleteRequest:IDeleteUser = req.body;
+		this.uaController[DELETE_CLIENT](deleteRequest)			
+		.then( () => res.status(200).json({isClientDeleted:true}) )
+		.catch( (err:any) => console.error(err) );		
+
+	}
 }
 
 // Create Public Router and Export it 

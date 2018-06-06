@@ -1,6 +1,7 @@
 import querystring from "querystring";
 import { expect, assert } from "chai";
 import * as chai from "chai";
+import chaiHttp from "chai-http";
 import request from "request";
 import validator from "validator";
 
@@ -15,6 +16,8 @@ import { RequestMethods } from "../helpers/request.methods";
 import { IUser, UserTokenObject, IUserDefinitions, IResponse } from "../../../src/shared/interfaces";
 import { WebToken } from "../../../src/services";
 import { userDefinitions } from "../helpers/user.definitions";
+
+chai.use(chaiHttp);
 
 /****
  * Constants used in multipe route tests
@@ -46,21 +49,17 @@ describe("User Routes", () => {
 		createTestServer()
 		.then( ({httpServer, server}:any) => {
 
-			this.httpServer = httpServer;
-			this.server = server;	
+			_httpServer = httpServer;	
 			_server = server;		
 
-			/*****
-    	 	 * BOOTSTRAP APPLICATION  
-    	     */       
+			// BOOTSTRAP APPLICATION      	           
     		bootstrapController.init();
-
 		});
+
     	/****
     	 * Await bootstap process signals databases are live
     	 */
-		proxyService.userDBLive$.subscribe( (state:boolean) => {
-  			console.log("*** We can start with testing")
+		proxyService.userDBLive$.first().subscribe( (state:boolean) => {  			
   			done();
   		});	
 	});
@@ -86,10 +85,7 @@ describe("User Routes", () => {
 		it("should return a JSON Object", () => {						
 			expect(v.isJSON(r.body)).to.equal(true);			
 		});
-
-		/***
-		 * 
-		 */
+	
 		it("should return a JSON web token", () => {
 
 			let obj:UserTokenObject = JSON.parse(r.body);
@@ -98,10 +94,7 @@ describe("User Routes", () => {
 			let token:string = obj.token;
 			expect(token).to.be.a('string').and.exist;
 		});
-
-		/***
-		 *
-		 */
+	
 		it("should return a JSON web token that can be compiled into a USERID", async () => {
 
 			const obj:UserTokenObject = JSON.parse(r.body);

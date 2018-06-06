@@ -10,7 +10,7 @@ import {
 } from "../../util";
 
 import { UserOperations } from "./user.ops.service";
-import { IUser, IClient, ICustomer, IClientApplication, ILoginRequest, IEncryption, ILoginTracker } from "../../shared/interfaces";
+import { IUser, IClient, ICustomer, IClientApplication, ILoginRequest, IEncryption, ILoginTracker, IFindUser, IDeleteUser } from "../../shared/interfaces";
 import { TCLIENT } from "../../shared/types";
 import { WebToken} from "./token.service";
 
@@ -24,6 +24,10 @@ import {
 import {
 	CREATE_WEBTOKEN
 } from "../../controllers/actions";
+
+import { 
+	clientModel
+} from "../../shared/models";
 
 export class ClientService extends UserOperations {
 
@@ -187,6 +191,62 @@ export class ClientService extends UserOperations {
 		.then( ( token:string) => Promise.resolve(token) ) 
 
 		.catch( (err:any) => Promise.reject(err) );	
+	}
+
+	/***
+	 * Find client by ID
+	 * @email:string
+	 * @url:string
+	 * @identifier: uuid-string
+	 */
+	public findSingleClient(request:IFindUser) {
+
+		// loop through find object and return first key with value
+		type key = keyof IFindUser;
+		let keys:string[] = Object.keys(request);
+		let ID:string;
+		let field:string;
+		
+		keys.forEach( (key:any) => {			
+			if(request[key]) {
+				field = `core.${key}`;
+				ID= request[key];
+			}
+		});
+		if(!field || !ID) return Promise.reject('<errorNumber>');
+
+		return clientModel.findOne({ [field]:[ID]})
+		.then( (client:IClient) => {
+			delete client._id;
+			return Promise.resolve( client ) 
+		})
+		.catch( (err:any) => Promise.reject(err));
+	}
+
+	/***
+	 * Delete user By ID
+	 * @emal:string
+	 * @url:string
+	 * @identifier:string
+	 */
+	public deleteSingleClient(request:IDeleteUser) {
+		
+		type key = keyof IDeleteUser;
+		let keys:string[] = Object.keys(request);
+		let ID:string;
+		let field:string;
+
+		keys.forEach( (key:any) => {			
+			if(request[key]) {
+				field = `core.${key}`;
+				ID = request[key];
+			}
+		});
+		if(!field || !ID) return Promise.reject('<errorNumber>');
+
+		return clientModel.remove({ [field]:[ID]})
+		.then( () => Promise.resolve() )
+		.catch( (err:any) => Promise.reject(err));
 
 	}
 }
@@ -207,6 +267,20 @@ class ActionService {
 		let instance:any = new ClientService();
 		return instance.loginClient(login)
 			.then( (token:string) => Promise.resolve(token) )
+			.catch( (err:any) => Promise.reject(err) );
+	}
+
+	public findSingleClient( find:IFindUser ) {
+		let instance:any = new ClientService();
+		return instance.findSingleClient(find)
+			.then( (client:IClient) => Promise.resolve(client) )
+			.catch( (err:any) => Promise.reject(err) );
+	}
+
+	public deleteSingleClient( request:IDeleteUser ) {
+		let instance:any = new ClientService();
+		return instance.deleteSingleClient(request)
+			.then( () => Promise.resolve() )
 			.catch( (err:any) => Promise.reject(err) );
 	}
 }

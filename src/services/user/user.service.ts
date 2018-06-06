@@ -311,9 +311,9 @@ export class UserService extends UserOperations {
 	 * @url:string
 	 * @identifier:string
 	 */
-	public deleteSingleUser(request:IFindUser) {
+	public deleteSingleUser(request:IDeleteUser) {
 		
-		type key = keyof IFindUser;
+		type key = keyof IDeleteUser;
 		let keys:string[] = Object.keys(request);
 		let ID:string;
 		let field:string;
@@ -359,9 +359,9 @@ class ActionService {
 			.catch( (err:any) => Promise.reject(err) );
 	}
 
-	public deleteSingleUser( find:IDeleteUser ) {
+	public deleteSingleUser( request:IDeleteUser ) {
 		let instance:any = new UserService();
-		return instance.deleteSingleUser(find)
+		return instance.deleteSingleUser(request)
 			.then( () => Promise.resolve() )
 			.catch( (err:any) => Promise.reject(err) );
 	}
