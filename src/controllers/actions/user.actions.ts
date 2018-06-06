@@ -24,7 +24,7 @@ export const DELETE_CLIENT:string = "deleteSingleClient";
  */
 export const REGISTER_NEW_CUSTOMER:string = "registerCustomer";
 export const LOGIN_CUSTOMER:string = "loginCustomer";
-export const FIND_CUSTOMER:string = "findSIngleCustomer";
+export const FIND_CUSTOMER:string = "findSingleCustomer";
 export const DELETE_CUSTOMER:string = "deleteSingleCustomer";
 
 /****

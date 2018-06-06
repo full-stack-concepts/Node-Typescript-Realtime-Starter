@@ -19,12 +19,14 @@ import {
 import {
 	REGISTER_NEW_CUSTOMER,
 	LOGIN_CUSTOMER,
+	FIND_CUSTOMER,
+	DELETE_CUSTOMER,
 	CREATE_WEBTOKEN
 } from "../controllers/actions";
 
-import { IUser, ILoginRequest } from "../shared/interfaces";
+import { ICustomer, ILoginRequest } from "../shared/interfaces";
 import { LOCAL_AUTH_CONFIG, STORE_WEBTOKEN_AS_COOKIE, WEBTOKEN_COOKIE, SEND_TOKEN_RESPONSE } from "../util/secrets";
-import { IUserApplication } from "../shared/interfaces";
+import { IUserApplication, IFindUser, IDeleteUser } from "../shared/interfaces";
 
 interface ICustomerApplication {
 }
@@ -76,7 +78,17 @@ export class CustomerRouter extends DefaultRouter {
 			);
 
 			// user logout
-			this.router.post('/logout', logout );		
+			this.router.post('/logout', logout );	
+
+			// find customer
+			this.router.post('/findone', (req:Request, res:Response, next:NextFunction) =>
+				this.findSingleCustomer(req, res, next)
+			);	
+
+			// delete customer
+			this.router.post('/delete', (req:Request, res:Response, next:NextFunction) => 
+				this.deleteSingleCustomer(req, res, next)
+			)	
 		}	
 	}  
 
@@ -97,7 +109,7 @@ export class CustomerRouter extends DefaultRouter {
         	res.locals.token = token;       
 
         	// send token with json response
-        	res.json({token:token});
+        	res.status(200).json({token:token});
 
 		})
 		.catch( (err:any) => console.error(err) );				
@@ -121,11 +133,31 @@ export class CustomerRouter extends DefaultRouter {
         	res.locals.token = token;       
 
         	// send token with json response
-        	res.json({token:token});
+        	res.status(200).json({token:token});
 
 		})
 		.catch( (err:any) => console.error(err) );	
 	}	
+
+	/****
+	 *
+	 */
+	private findSingleCustomer(req: Request, res: Response, next: NextFunction) {
+		let findRequest:IFindUser = req.body;
+		this.uaController[FIND_CUSTOMER](findRequest)			
+		.then( (customer:ICustomer) => res.status(200).json({customer}) )
+		.catch( (err:any) => console.error(err) );		
+	}
+
+	/****
+	 *
+	 */
+	private deleteSingleCustomer(req: Request, res: Response, next: NextFunction) {
+		let deleteRequest:IDeleteUser = req.body;
+		this.uaController[DELETE_CUSTOMER](deleteRequest)			
+		.then( () => res.status(200).json({isCustomerDeleted:true}) )
+		.catch( (err:any) => console.error(err) );	
+	}
 }
 
 // Create Public Router and Export it 

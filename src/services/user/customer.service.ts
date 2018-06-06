@@ -10,7 +10,7 @@ import {
 } from "../../util";
 
 import { UserOperations } from "./user.ops.service";
-import { IUser, IClient, ICustomer, ICustomerApplication, ILoginRequest, IEncryption, ILoginTracker } from "../../shared/interfaces";
+import { IUser, IClient, ICustomer, ICustomerApplication, ILoginRequest, IEncryption, ILoginTracker, IFindUser, IDeleteUser} from "../../shared/interfaces";
 import { TCUSTOMER } from "../../shared/types";
 import { WebToken} from "./token.service";
 
@@ -24,6 +24,10 @@ import {
 import {
 	CREATE_WEBTOKEN
 } from "../../controllers/actions";
+
+import { 
+	customerModel
+} from "../../shared/models";
 
 export class CustomerService extends UserOperations {
 
@@ -160,7 +164,7 @@ export class CustomerService extends UserOperations {
 		.then( ({customer, encrypt}:any) => this.customerProfile(customer, form, encrypt) )
 
 		// process thick: build user object
-		.then( (user:IUser|IClient|ICustomer) => this.newUser(user) )	
+		.then( (user:IUser|IClient|ICustomer) => this.newCustomer(user) )	
 		
 		/*** 
 		 * process thick: create webtoken
@@ -171,6 +175,63 @@ export class CustomerService extends UserOperations {
 		.then( ( token:string) => Promise.resolve(token) ) 
 
 		.catch( (err:any) => Promise.reject(err) );	
+	}
+
+	/***
+	 * Find client by ID
+	 * @email:string
+	 * @url:string
+	 * @identifier: uuid-string
+	 */
+	public findSingleCustomer(request:IFindUser) {
+
+		// loop through find object and return first key with value
+		type key = keyof IFindUser;
+		let keys:string[] = Object.keys(request);
+		let ID:string;
+		let field:string;
+		
+		keys.forEach( (key:any) => {			
+			if(request[key]) {
+				field = `core.${key}`;
+				ID= request[key];
+			}
+		});
+		if(!field || !ID) return Promise.reject('<errorNumber>');
+
+		return customerModel.findOne({ [field]:[ID]})
+		.then( (customer:ICustomer) => {
+			delete customer._id;
+			return Promise.resolve( customer ) 
+		})
+		.catch( (err:any) => Promise.reject(err));
+	}
+
+	/***
+	 * Delete user By ID
+	 * @emal:string
+	 * @url:string
+	 * @identifier:string
+	 */
+	public deleteSingleCustomer(request:IDeleteUser) {
+		
+		type key = keyof IDeleteUser;
+		let keys:string[] = Object.keys(request);
+		let ID:string;
+		let field:string;
+
+		keys.forEach( (key:any) => {			
+			if(request[key]) {
+				field = `core.${key}`;
+				ID = request[key];
+			}
+		});
+		if(!field || !ID) return Promise.reject('<errorNumber>');
+
+		return customerModel.remove({ [field]:[ID]})
+		.then( () => Promise.resolve() )
+		.catch( (err:any) => Promise.reject(err));
+
 	}
 }
 
@@ -190,6 +251,20 @@ class ActionService {
 		let instance:any = new CustomerService();
 		return instance.loginCustomer(login)
 			.then( (token:string) => Promise.resolve(token) )
+			.catch( (err:any) => Promise.reject(err) );
+	}
+
+	public findSingleCustomer( find:IFindUser ) {
+		let instance:any = new CustomerService();
+		return instance.findSingleCustomer(find)
+			.then( (customer:ICustomer) => Promise.resolve(customer) )
+			.catch( (err:any) => Promise.reject(err) );
+	}
+
+	public deleteSingleCustomer( request:IDeleteUser ) {
+		let instance:any = new CustomerService();
+		return instance.deleteSingleCustomer(request)
+			.then( () => Promise.resolve() )
 			.catch( (err:any) => Promise.reject(err) );
 	}
 }

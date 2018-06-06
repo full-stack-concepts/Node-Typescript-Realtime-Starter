@@ -37,7 +37,7 @@ export class CustomerModel extends DefaultModel  {
 	public createUser(customer:ICustomer): Promise<any> {	
 		const repo = new CustomerRepository( this.userDBConn );
 		return new Promise ( (resolve, reject) => {
-			repo.create(customer, (err:any, res:any) => {			
+			repo.create(customer, (err:any, res:any) => {						
 				if(err) { reject(err);} else { resolve(res);}
 			});
 		});
@@ -46,7 +46,7 @@ export class CustomerModel extends DefaultModel  {
 	public insert(customers:ICustomer[]): Promise<any> {
 		const repo = new CustomerRepository( this.userDBConn );
 		return new Promise ( (resolve, reject) => {
-			repo.insertMany( customers, (err:any, res:any) => {			
+			repo.insertMany( customers, (err:any, res:any) => {				
 				if(err) {reject(err); } else { resolve(res); }
 			});
 		});
