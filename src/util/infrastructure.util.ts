@@ -199,7 +199,7 @@ export const writeJSON = ($pathToFile:string, $json:any) => {
  * Path To Local Data Store
  */
 export const getPathToDataStore = ():string => {
-	return path.join( rootPath, PRIVATE_DATA_DIR );
+	return path.join( rootPath, PRIVATE_ROOT_DIR, PRIVATE_DATA_DIR ); 
 }
 
 /****

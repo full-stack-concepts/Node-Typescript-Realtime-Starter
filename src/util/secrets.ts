@@ -8,7 +8,7 @@ import randomString from "random-string";
  */
 import { TDBP_local, TDBP_mlab} from "../shared/types";
 import { IDatabasePriority } from "../shared/interfaces";
-import { isEmail } from "../util";
+import { isEmail, FormValidation } from "../util";
 
 /****
  * Note: Use equality operator (==) to cast dotenv strings to boolean (your settings file)
@@ -748,4 +748,35 @@ if(EXPRESS_SERVER_MODE=='https') {
 		}
 	}
 }
+
+/***
+ * Password Checks for pre-defined passwords
+ */
+
+const passwordArray:any = [
+	{ identifier: "SYSTEM_ADMIN_PASSWORD", value: SYSTEM_ADMIN_PASSWORD },
+	{ identifier: "SYSTEM_DB_USERS_ADMIN_PASSWORD", value: SYSTEM_DB_USERS_ADMIN_PASSWORD },
+	{ identifier: "SYSTEM_DB_USERS_READONLY_PASSWORD", value: SYSTEM_DB_USERS_READONLY_PASSWORD },
+	{ identifier: "SYSTEM_DB_PRODUCTS_ADMIN_PASSWORD", value: SYSTEM_DB_PRODUCTS_ADMIN_PASSWORD },
+	{ identifier: "SYSTEM_DB_PRODUCTS_READONLY_PASSWORD", value: SYSTEM_DB_PRODUCTS_READONLY_PASSWORD },
+	{ identifier: "DEFAULT_PASSWORD_SYSTEM_USER", value: DEFAULT_PASSWORD_SYSTEM_USER },
+	{ identifier: "DEFAULT_PASSWORD_USER", value: DEFAULT_PASSWORD_USER },
+	{ identifier: "SYSTEM_ADMIN_PASSWORD", value: SYSTEM_ADMIN_PASSWORD },
+	{ identifier: "DEFAULT_TEST_PASSWORD", value: DEFAULT_TEST_PASSWORD },
+	{ identifier: "SUPERADMIN_PASSWORD", value: SUPERADMIN_PASSWORD }
+];
+
+passwordArray.forEach(({identifier, value}:any) => {
+	if(!FormValidation.testPassword(value) ) {
+		console.error(`Test Password: Password ${identifier} does not meet your password policy. Please create a new password for ${identifier}`);
+		process.exit(1);
+	}
+});
+
+
+
+
+
+
+
 

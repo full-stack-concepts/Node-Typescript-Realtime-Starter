@@ -18,11 +18,13 @@ import { ServerOptions, ProcessEnv } from './shared/interfaces/';
  * App Services
  */
 import { serviceManager} from "./services/services.manager";
+import { proxyService } from "./services";
 
 /****
  * Bootstrap Controller
  */
 import { bootstrapController } from "./controllers";
+import { DAController } from "./controllers";
 
 /**
  * EXPRESS APPLICATION CODE
@@ -152,6 +154,12 @@ export const createTestServer = ():Promise<any> => {
 
     const httpServer:any = http.createServer(App);
     const server:any = httpServer.listen(PORT);
+
+    /***
+     * Flag that application runs in test mode
+     * so bootstrap controller can skip steps
+     */
+    proxyService.setTestStatus();
 
     return Promise.resolve({
         httpServer,

@@ -18,46 +18,49 @@ export class FormValidation {
 
 	public static testPassword(pw:string) {			
 
-		let tests:boolean[]=[];
+		let tests:any = [];	
 
 		/*****
 		 * password string has at least one capital
 		 */
 		const hasUpperCase:boolean = /[A-Z]/.test(pw);
-		(PASSWORD_HAS_UPPERCASE)?tests.push(hasUpperCase):null;
+		(PASSWORD_HAS_UPPERCASE)?tests.push({'category': 'hasUpperCase', 'value': hasUpperCase }):null;
 
 		/*****
 		 * password string has at least one lower case character
 		 */
 		const hasLowerCase:boolean = /[a-z]/.test(pw);
-		(PASSWORD_HAS_LOWERCASE)?tests.push(hasLowerCase):null;
+		(PASSWORD_HAS_LOWERCASE)?tests.push({'category': 'hasLowerCase', 'value': hasLowerCase }):null;
 
 		/*****
 		 * password string contains at least one number
 		 */
 		const hasNumbers:boolean = /\d/.test(pw);
-		(PASSWORD_HAS_NUMBER)?tests.push(hasNumbers):null;
+		(PASSWORD_HAS_NUMBER)?tests.push({'category': 'hasNumbers', 'value': hasNumbers}):null;
 
 		/*****
 		 * password string has at least one special character
 		 */
 		const hasSpecialChars:boolean = /[-!$%^&*#@()_+|~=`{}\[\]:";'<>?,.\/]/.test(pw);
-		(PASSWORD_HAS_SPECIAL_CHAR)?tests.push(hasSpecialChars):null;
+		(PASSWORD_HAS_SPECIAL_CHAR)?tests.push({'category': 'hasSpecialChars', 'value': hasSpecialChars}):null;
 
 		/*****
 		 * password string has required minlength
 		 */
 		const hasRequiredMinLength:boolean = (pw.length >= PASSWORD_MIN_LENGTH);	
-		(PASSWORD_MIN_LENGTH)?tests.push(hasRequiredMinLength):null;	
+		(PASSWORD_MIN_LENGTH)?tests.push({'category': 'hasRequiredMinLength', 'value': hasRequiredMinLength}):null;	
 
 		/*****
 		 * Password does not exceed max length
 		 */
 		const doesNotExceedMaxLength:boolean = (pw.length <= PASSWORD_MAX_LENGTH);	
-		(PASSWORD_MIN_LENGTH)?tests.push(doesNotExceedMaxLength):null;	
+		(PASSWORD_MIN_LENGTH)?tests.push({'category': 'doesNotExceedMaxLength', 'value': doesNotExceedMaxLength }):null;	
+		
 
-	
-		return tests.every( (v:boolean) => v === true )			
+		let valid:boolean=true;
+		Object.keys(tests).forEach( (k:string) => { if(!tests[k].value) valid=false;});
+
+		return valid;			
 		
 	}
 

@@ -44,13 +44,32 @@ class ProxyService {
 
 
 	/***
+	 * Test Mode
+	 */
+	public testMode$:Subject<boolean> = new Subject();
+
+	/***
 	 * User Action Controller
 	 */
 	public _uaController:Function;
 	public uaController$:Subject<boolean> = new Subject();
 
+	/***
+	 * Data Action Controller
+	 */
+	public _daController:Function;
+	public daController$:Subject<boolean> = new Subject();
+
 
 	public systemUser$:Subject<boolean> = new Subject();	
+
+	public startDataOperations$:Subject<boolean> = new Subject();	
+
+
+	public startDataOperations() {
+		console.log("*** Start Data operations")
+		this.startDataOperations$.next(true);
+	}
 	
 	/****
 	 * native connections
@@ -135,6 +154,28 @@ class ProxyService {
 
 	public get uaCOntroller() {
 		return this._uaController;
+	}
+
+	/***
+	 * Proxy Data Action controller
+	 * @daController:Function
+	 */
+	public setDAController(daController:Function):Promise<void> { 		
+		this._daController = daController; 
+		console.log("*** ProxyService: signal daController")
+		this.daController$.next(true);
+		return Promise.resolve();
+	}
+
+	public get daCOntroller() {
+		return this._daController;
+	}
+
+	/***
+	 * Propagate Test Mode
+	 */
+	public setTestStatus():void {
+		this.testMode$.next(true); 
 	}
 	
 }

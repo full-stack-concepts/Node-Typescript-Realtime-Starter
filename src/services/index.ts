@@ -21,7 +21,8 @@ export { WebToken } from "./user/token.service";
 /***
  * Data Breeder Services
  */
-export { DataBreeder, populateDatabase } from "./data/data.service";
+export { DataBreeder, dataBreeder } from "./data/data.service";
+export { dataUtilitiesService } from "./data/data.utilities.service";
 export { DataStore } from "./data/data.store.service";
 export { UserTypes } from "./data/data.usertypes.service";
 

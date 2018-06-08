@@ -1,7 +1,13 @@
+import { Observable, Subscription } from "rxjs";
+
+import { UAController, DAController } from "../controllers";;
 import { proxyService, connectToUserDatabase, connectToProductDatabase } from "../services";
 import { configureDatabases } from "../services/db/db.admin.service";
 import { testForSystemUser, createSystemUser } from "../services/user/system.user.service";
-import { UAController } from "./user.action.controller";
+
+import {
+	DATA_GENERATE
+} from "./actions";
 
 import {
 	privateDirectoryManager,
@@ -13,16 +19,58 @@ import {
  * so it can listen to application events
  */
 import { DefaultModel } from "../shared/models";
+import { IEncryption} from "../shared/interfaces"
 
-import {IEncryption} from "../shared/interfaces"
+
 
 export class BootstrapController {
 
+	userDBLive:boolean;
+	productDBLive:boolean;
+	testMode:boolean;
+
+	uaController:Function;
+	daController:Function;
+
 	constructor() {
 		this.configureSubscribers();
+		this.dataGenerator();
 	}
 
-	private configureSubscribers():void {		
+	private configureSubscribers():void {	
+
+		/***
+		 * Server signals that app runs in test mode
+		 */
+		proxyService.testMode$.subscribe( (state:boolean) => this.testMode = state );
+
+		/***
+		 * Data Generation is seperated from application boot sequence
+		 * Wait for UserDB and Product DB are live to start data generaton process
+		 */	
+		proxyService.userDBLive$.subscribe( (state:boolean) => this.userDBLive = state );
+		proxyService.productDBLive$.subscribe( (state:boolean) => this.productDBLive = state );		
+	}
+
+	/***
+	 * Launch Data Generator when
+	 * (1) User Database is live
+	 * (2) Product Dataabse is live
+	 * (3) User Action Controller is loaded
+	 * (4) Data Action Controller is loaded
+	 * (3) Application is not running is test mode
+	 */
+	private dataGenerator() {
+		const source$:Observable<number> = Observable.interval(75);
+		const sub$:Subscription = source$.subscribe(	
+			(x:number)=> { 
+				if(this.testMode || (this.userDBLive && this.productDBLive && this.uaController && this.daController) ) sub$.unsubscribe();
+				if(this.userDBLive && this.productDBLive  && this.uaController && this.daController) {
+					console.log("SIGNAL SIGNAL SIGNAL")
+					proxyService.startDataOperations();
+				}			
+			}
+		);
 	}
 
 	private err(err:any) {
@@ -109,19 +157,30 @@ export class BootstrapController {
 		}
 	}	
 
-	async init() {
-
-		/***
-		 * Test build of User Action Controller Proxy
-		 */
-		const uaController:any = await UAController.build();	
+	async init() {	
 
 		try {
+			
+			/***
+			 * Test build of User Action Controller Proxy
+			 */
+			this.uaController = await UAController.build();			
+
+			/****
+			 * Test build of Data Action Controller Proxy
+			 */
+			this.daController = await DAController.build();
 
 			/***
-			 * Propagate uaController
+			 * Propagate instance of User Action Controller
 			 */
-			await proxyService.setUAController(uaController);
+			await proxyService.setUAController(this.uaController);
+
+			/***
+			 * Propagate insatnce of Data Action Controller
+			 */			
+			console.log("*** Bootstrap COntroller: signal DAController")
+			await proxyService.setDAController(this.daController);
 
 			/***
 			 * Init Default DB Model
@@ -153,10 +212,10 @@ export class BootstrapController {
 			/***
 			 * Connect to Product DB
 			 */ 
-			// await connectToProductDatabase();		
+			await connectToProductDatabase();		
 
 			// process thick: 
-			// await createSystemUser();		
+			await createSystemUser();		
 
 			console.log("==> Bootstrap Sequence finished")
 

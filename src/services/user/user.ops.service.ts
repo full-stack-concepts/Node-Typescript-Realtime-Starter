@@ -79,12 +79,25 @@ interface IFileType {
 	mime: string
 }
 
+/****
+ * Import Data Action Identifgiers
+ */
+import {
+	DATA_CREATE_USER_TYPE,
+	DATA_FORMAT_USER_SUBTYPE	
+} from "../../controllers/actions";
+
 export class UserOperations extends PersonProfile {
 
 	/***
-	 * User Actions Controller
+	 * Instance of User Actions Controller
 	 */
 	protected uaController:any;
+
+	/***
+	 * Instance of Data Actions Controller
+	 */
+	protected daController:any;
 
 	/****
 	 * DB Host Type
@@ -153,7 +166,8 @@ export class UserOperations extends PersonProfile {
 		 */
         proxyService.uaController$.subscribe( (state:boolean) => {        	       	        	
         	if(proxyService._uaController) this.uaController = proxyService._uaController;           
-        });    
+        });  
+
 
 		/****
 		 * Subscriber: when proxyService flags that localDB is connected
@@ -365,13 +379,16 @@ export class UserOperations extends PersonProfile {
 	/***
 	 *
 	 */
-	protected encryptPassword(user:any, pwd:string) {
+	protected encryptPassword(user:any, pwd:string, forceMethod?:number) {
 
 		let method:number = pickPasswordEncryptionMethod();
 		let encrypt:IEncryption = {};
 
 		if(!RANDOMIZE_PASSWORD_ENCRYPTION)
         	method = 3;   
+
+        if(forceMethod)
+        	method = forceMethod;
 
 		if(user) {
 			return Promise.resolve({ user, encrypt });

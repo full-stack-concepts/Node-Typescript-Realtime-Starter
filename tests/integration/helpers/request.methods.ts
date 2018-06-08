@@ -40,10 +40,7 @@ export class RequestMethods {
 	 * POST METHOD
 	 */
 	post(url:string, data:any) {
-
-		console.log("*****************************************")
-		console.log(url, data)
-
+			
 		return new Promise( (resolve, reject) => {
 			 request({
 				method: 'POST',

@@ -90,9 +90,7 @@ export class DBProductService {
 		 *  DB Open Event: forward Native Injection so it can 
 		 * be injected into our Mongoose models 
 		 */
-		db.on('open', () => { 		
-
-			console.log("*** Product DB Conencted and LIVE ")	
+		db.on('open', () => { 				
 
 			/****
 			 * Propagate NativeConnnection

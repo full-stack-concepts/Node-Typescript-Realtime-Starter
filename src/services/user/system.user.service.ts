@@ -50,7 +50,7 @@ export class SystemUserService extends UserOperations {
 
 	private systemUser:ISystemUser;
 	private password:string=SYSTEM_ADMIN_PASSWORD;
-	private userEmail:string=SYSTEM_ADMIN_EMAIL;
+	private userEmail:string= SYSTEM_ADMIN_EMAIL;
 	private firstName:string = SYSTEM_ADMIN_FIRST_NAME;
 	private lastName:string = SYSTEM_ADMIN_LAST_NAME;	
 
@@ -109,7 +109,7 @@ export class SystemUserService extends UserOperations {
 			firstName:firstName,
 			middleName:middleName,
 			lastName:lastName,
-			email:email,
+			email:email.toLowerCase(),
 		}
 
 		let err:any;

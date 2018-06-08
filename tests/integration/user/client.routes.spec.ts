@@ -192,8 +192,7 @@ describe("Client Routes", () => {
 	/****
 	 * Terminate Express Server
 	 */
-	after( (done) => {		
-		_server.close();
-		done();
+	after( () => {		
+		_server.close();		
 	});
 });

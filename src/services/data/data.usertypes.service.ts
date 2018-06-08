@@ -66,10 +66,7 @@ export class UserTypes {
 	 * user: IUser
 	 * }
 	 */
-	private static processGeneratedUsers( usersCollection:any) {
-
-		console.log("==> Add generated users")
-		console.log(usersCollection)
+	private static processGeneratedUsers( usersCollection:any) {	
 
 		// process thick: empty collection
 		return  userModel.remove({})
@@ -81,7 +78,7 @@ export class UserTypes {
 
 					let keys:string[] = Object.keys(_collection),
 						key:any = keys[0];
-					let collection:IUser[]= _collection[key];					
+					let collection:IUser[]= _collection[key];						
 
 					userModel.insert( collection );
 				})

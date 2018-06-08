@@ -195,8 +195,7 @@ describe("Customer Routes", () => {
 	 * Terminate Express Server
 	 */
 	after( () => {		
-		_server.close();
-		process.exit();
+		_server.close();	
 	});
 
 });

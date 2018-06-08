@@ -132,6 +132,9 @@ export class UserService extends UserOperations {
 			if(!FormValidation.testPassword(form.confirmPassword)) tests.push(6);
 			if(form.confirmPassword && form.password != form.confirmPassword) tests.push(7);
 		}	 
+
+		form.email.toLowerCase();
+		
 		const valid = tests.length;
 
 		if(!valid ) {
