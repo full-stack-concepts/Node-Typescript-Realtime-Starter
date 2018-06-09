@@ -28,8 +28,7 @@ export class DefaultModel {
 		/***
 		 * Subsriber: get UserDB native connection
 		 */		
-		proxyService.userDBLive$.subscribe( (state:boolean) => {				
-			console.log("*** UDSER DB has arrived ", state)
+		proxyService.userDBLive$.subscribe( (state:boolean) => {						
 			if(proxyService.userDB) {
 				this.userDBConn = proxyService.userDB;				
 			}
@@ -38,8 +37,7 @@ export class DefaultModel {
 		/***
 		 * Subsriber: get Product DB native connection
 		 */		
-		proxyService.productDB$.subscribe( (state:boolean) => {	
-			console.log("*** PRODUCT DB has arrived ", state)
+		proxyService.productDB$.subscribe( (state:boolean) => {				
 			if(proxyService.productDB) this.productDBConn = proxyService.productDB;
 		});
 	}

@@ -305,6 +305,14 @@ dbAccounts.forEach( ({ value, txt }) => {
 });
 
 /***
+ * REDIS SERVER
+ */
+export const USE_LOCAL_REDIS_SERVER = process.env["USE_LOCAL_REDIS_SERVER"] == 'true';
+export const REDIS_LOCAL_URL = process.env["REDIS_LOCAL_URL"];
+export const REDIS_LOCAL_PORT = parseInt(process.env["REDIS_LOCAL_PORT"]);
+
+
+/***
  * Public Directory Management
  */
 export const SERVE_PUBLIC_RESOURCES = process.env["SERVE_PUBLIC_RESOURCES"] == 'true';

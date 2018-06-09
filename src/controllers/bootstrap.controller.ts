@@ -1,6 +1,6 @@
 import { Observable, Subscription } from "rxjs";
 
-import { UAController, DAController } from "../controllers";;
+import { RedisController, UAController, DAController } from "../controllers";;
 import { proxyService, connectToUserDatabase, connectToProductDatabase } from "../services";
 import { configureDatabases } from "../services/db/db.admin.service";
 import { testForSystemUser, createSystemUser } from "../services/user/system.user.service";
@@ -29,6 +29,7 @@ export class BootstrapController {
 	productDBLive:boolean;
 	testMode:boolean;
 
+	redisClient:Function;
 	uaController:Function;
 	daController:Function;
 
@@ -160,6 +161,11 @@ export class BootstrapController {
 	async init() {	
 
 		try {
+
+			/***
+			 * Await build of Redis Client
+			 */
+			this.redisClient = await RedisController.buildLocal();
 			
 			/***
 			 * Test build of User Action Controller Proxy
@@ -177,7 +183,7 @@ export class BootstrapController {
 			await proxyService.setUAController(this.uaController);
 
 			/***
-			 * Propagate insatnce of Data Action Controller
+			 * Propagate instance of Data Action Controller
 			 */			
 			console.log("*** Bootstrap COntroller: signal DAController")
 			await proxyService.setDAController(this.daController);
