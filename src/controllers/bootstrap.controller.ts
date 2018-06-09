@@ -177,6 +177,11 @@ export class BootstrapController {
 			 */
 			this.daController = await DAController.build();
 
+			/****
+			 * Propagate instance of Redis CLient
+			 */
+			await proxyService.setRedisClient(this.redisClient);
+
 			/***
 			 * Propagate instance of User Action Controller
 			 */

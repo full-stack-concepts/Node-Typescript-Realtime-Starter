@@ -63,11 +63,26 @@ class ProxyService {
 
 	public systemUser$:Subject<boolean> = new Subject();	
 
+	/***
+	 * Local Redis CLient
+	 */
+	private _redisClient:any;
+	public redisClient$:Subject<boolean> = new Subject();	
+
+	public setRedisClient(client:any):void {
+		this._redisClient = client;
+		this.redisClient$.next(true);
+	}
+	public set redisClient( client:any) { this._redisClient = client; }
+	public get redisClient() { return this._redisClient; }	
+
+	/***
+	 * Data Generator
+	 */
 	public startDataOperations$:Subject<boolean> = new Subject();	
 
 
-	public startDataOperations() {
-		console.log("*** Start Data operations")
+	public startDataOperations() {		
 		this.startDataOperations$.next(true);
 	}
 	
