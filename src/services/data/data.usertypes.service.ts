@@ -24,7 +24,8 @@ import {
 	DB_USERS_COLLECTION_NAME,
 	DB_CLIENTS_COLLECTION_NAME,
 	DB_CUSTOMERS_COLLECTION_NAME 
-	} from "../../util/secrets";
+} from "../../util/secrets";
+
 
 export class UserTypes {
 
@@ -125,7 +126,6 @@ export class UserTypes {
 		if( cName === key) { return data[key]; } else { return []; }
 	}
 
-
 	/******
 	 * Stores generated data in local MongoDB instance
 	 */
@@ -150,9 +150,7 @@ export class UserTypes {
 				}
 
 			})
-		)
-
-		
+		)		
 	}
 
 	private static storeUsersRemote( usersCollection:any ) {
@@ -180,7 +178,7 @@ export class UserTypes {
 		})
 
 		// process thick: return to caller
-		.then( (res:any) =>  { console.log(res); Promise.resolve(res) })
+		.then( (res:any) =>  { Promise.resolve(res) })
 
 		// error handling
 		.catch( (err:any) => console.error(err) );	
@@ -193,7 +191,7 @@ export class UserTypes {
 		return (
 			clientModel.mlab_deleteCollection( DB_CLIENTS_COLLECTION_NAME  )
 			.then( () => userModel.mlab_insert( DB_CLIENTS_COLLECTION_NAME, collection ) ) 
-			.then( (res:any) => { console.log(res); Promise.resolve(res) })
+			.then( (res:any) => { Promise.resolve(res) })
 			.catch( (err:any) => Promise.reject(err))
 		);
 
@@ -205,7 +203,7 @@ export class UserTypes {
 		return (
 			customerModel.mlab_deleteCollection( DB_CUSTOMERS_COLLECTION_NAME  )
 			.then( () => customerModel.mlab_insert( DB_CUSTOMERS_COLLECTION_NAME, collection ) ) 
-			.then( (res:any) => { console.log(res); Promise.resolve(res) })
+			.then( (res:any) => { Promise.resolve(res) })
 			.catch( (err:any) => Promise.reject(err))
 		);
 

@@ -338,7 +338,7 @@ export class UserOperations extends PersonProfile {
 		if(decrypt.method === 1) {
 			 return decryptWithInitializationVector(String(decrypt.hash))
 	        .then( (decrypted:string) => {  
-	            console.log(decrypted, decrypt.data)        
+	            // console.log(decrypted, decrypt.data)        
 	            if( decrypted===decrypt.data) {
 	                return Promise.resolve(user)
 	            } else {
@@ -379,7 +379,7 @@ export class UserOperations extends PersonProfile {
 	/***
 	 *
 	 */
-	protected encryptPassword(user:any, pwd:string, forceMethod?:number) {
+	protected encryptPassword(user:any, pwd:string, forceMethod?:number) {	
 
 		let method:number = pickPasswordEncryptionMethod();
 		let encrypt:IEncryption = {};
@@ -388,14 +388,14 @@ export class UserOperations extends PersonProfile {
         	method = 3;   
 
         if(forceMethod)
-        	method = forceMethod;
+        	method = forceMethod;     
 
-		if(user) {
+		if(user && !forceMethod) {
 			return Promise.resolve({ user, encrypt });
 		}
 
 		 //Method 1: Crypt with Initialization Vector
-	    if(method===1) {       
+	    if(method===1) {  	    	
 	        return encryptWithInitializationVector(pwd)
 	        .then( (hash:string) => {
 	        	encrypt = {	method, hash, data:pwd };

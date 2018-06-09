@@ -47,12 +47,28 @@ import {
 	
 } from "../../shared/interfaces";
 
-export class DataUtilitiesService {
+import {
+	encryptWithInitializationVector
+} from "../../util";
+
+/****
+ * Account Type Definitions
+ * Maybe move to secrets?
+ */
+const ACCOUNT_TYPE_SUPERADMIN:number = 1;
+const ACCOUNT_TYPE_ADMIN:number = 2;
+const ACCOUNT_TYPE_POWERUSER:number = 3;
+const ACCOUNT_TYPE_AUTHOR:number = 4;
+const ACCOUNT_TYPE_USER:number = 5;
+const ACCOUNT_TYPE_CLIENT:number = 10;
+const ACCOUNT_TYPE_CUSTOMER:number = 20;
+
+export class DataUtilitiesService  {
 
 	/***
 	 * Data Factory: user security
 	 */
-	public fakeUserSecurity (user:IUser|IClient|ICustomer):IUser|IClient|ICustomer {
+	public fakeUserSecurity (user:any) {
 
 		/*************************************************************************************
 		 * User Security
@@ -76,7 +92,7 @@ export class DataUtilitiesService {
 	/***
 	 * Data Factory: user personalia and identifiers
 	 */
-	public fakeUserPersonalia (user:IUser|IClient|ICustomer):IUser|IClient|ICustomer {
+	public fakeUserPersonalia (user:any) {
 
 		/*************************************************************************************
 		 * Use Core Details And Personalia
@@ -132,7 +148,7 @@ export class DataUtilitiesService {
 	/***
 	 * Data Factory: user address & location
 	 */
-	public fakeUserAddressAndLocation (user:IUser|IClient|ICustomer):IUser|IClient|ICustomer {
+	public fakeUserAddressAndLocation (user:any) {
 
 		/*************************************************************************************
 		 * User Address Details, location (modify as you like)
@@ -194,7 +210,7 @@ export class DataUtilitiesService {
 	/*****************************************************************************************
 	 * Data Factory: device
 	 */
-	public fakeUserDevice ( user:IUser|IClient|ICustomer):IUser|IClient|ICustomer {
+	public fakeUserDevice ( user:any) {
 
 		/*************************************************************************************
 		 * User Device Details
@@ -228,31 +244,150 @@ export class DataUtilitiesService {
 		 return user;
 	}
 
-	public fakeDataFor ( user:any) {
+	/*****************************************************************************************
+	 * Data Factory: company
+	 */
+	public fakeCompany ( u:IClient):IClient {
+
+
+		/*************************************************************************************
+		 * Company Details
+		 * @ name:string
+		 * @ type: string
+		 * @ slogan:string
+		 * @ subSlogan: string
+		 * 
+		 * CLIENTS JOB at Company
+		 * @jobTitle:string 
+		 * @jobType:string
+		 *
+		 * Company Address
+		 * @street:string	
+		 * @houseNumber: string
+		 * @addition:string
+		 * @suffix: string
+		 * @areacode:string
+		 * @city:string
+		 * @county:string,
+		 * @countyCode:string
+		 * @country:string
+		 * @countryCode:string
+		 * @addressLine1:string
+		 * @addressLine2:string
+		 * @addressLine3:string
+		 *
+		 * Company's Communication profile
+		 * @companyPhone:string
+		 * @companyEmail:string
+		 * @companyEmail:string
+		 *
+		 * Company's Social profile
+		 * @facebook: string
+		 * @twitter:string
+		 */
+
+		 let cName:string = u.company.name;
+
+
+		/*** 
+		 * Set client company, its address and job
+		 */
+		u.company.name = companyName().trim().toString();
+		u.company.type = companySuffix().trim().toString();
+		u.company.slogan = companySlogan().trim().toString();
+		u.company.subSlogan = companySubSlogan();
 	
-		/**********************
-		 * User Securiy
-		 */
-		 user = this.fakeUserSecurity( user );
 
-		/**********************
-		 * User Personalia
+		/***
+		 *  Set Job At Company
 		 */
-		 user = this.fakeUserPersonalia( user );	
+		u.company.jobTitle = jobTitle();
+		u.company.jobType = jobType();
 
-		 /**********************
-		 * User Address
+		/***
+		 * Set Company's address
 		 */
-		 user = this.fakeUserAddressAndLocation( user );
+		u.company.address.street = streetName().trim();
+		u.company.address.houseNumber =  houseNumber().toString().trim();
+		u.company.address.suffix  = streetSuffix().trim();
+		u.company.address.addition = "";
+		u.company.address.areacode = zipCode().trim(),
+		u.company.address.city = city().trim();
+		u.company.address.county = county().trim();
+		u.company.address.country = country().trim();
+		u.company.address.countryCode =  countryCode().trim();
+		u.company.address.addressLine1 = addressLine1().trim();
+		u.company.address.addressLine2 = addressLine2().trim();
+		u.company.address.addressLine3 = addressLine3().trim();
 
-		/**********************
-		 * User Device
-		 */
-		 user = this.fakeUserDevice( user );
+		/***
+		 * Set company's Communication profile
+		 */		
+		u.company.communication.companyPhone = phoneNumber().toString();
+		u.company.communication.companyEmail = constructCompanyEmail( cName ).toLowerCase();
+		u.company.communication.companyEmail = constructCompanyWebsite ( cName );
 
-		// console.log("==> populate this user ", user);
+		/***
+		 * Set company's Socialk profile
+		 */	
+		u.company.social.facebook = constructCompanyFacebookAccount( cName );
+		u.company.social.twitter = constructCompanyTwitterAccount( cName );
+
+		return u;
+	}
+
+	private fakeDataForUser ( user:IUser):IUser {
+	
+		// User Securiy
+		user = this.fakeUserSecurity( user );
+
+		//User Personalia 
+		user = this.fakeUserPersonalia( user );	
+
+		// User Address
+		user = this.fakeUserAddressAndLocation( user );
+
+		// User Device
+		user = this.fakeUserDevice( user );	
 
 		return user;
+	}
+
+	private fakeDataForClient ( client:IClient):IClient {
+	
+		// Client Securiy
+		client = this.fakeUserSecurity( client );
+
+		// Client Personalia 
+		client = this.fakeUserPersonalia( client );	
+
+		// Client Address
+		client = this.fakeUserAddressAndLocation( client );
+
+		// Client Company
+		client = this.fakeCompany( client );
+
+		// Client Device
+		client = this.fakeUserDevice( client );	
+
+		return client;
+	}
+
+	private fakeDataForCustomer ( customer:ICustomer):ICustomer {
+	
+		// User Securiy
+		customer = this.fakeUserSecurity( customer );
+
+		//User Personalia 
+		customer = this.fakeUserPersonalia( customer );	
+
+		// User Address
+		customer = this.fakeUserAddressAndLocation( customer );
+
+		// User Device
+		customer = this.fakeUserDevice( customer );	
+
+		return customer;
 	}
 
 	/****
@@ -284,7 +419,7 @@ export class DataUtilitiesService {
 					user=deepCloneObject(TUSER);    			
 					
 					// format user with unique data
-	    			user = this.fakeDataFor(user);
+	    			user = this.fakeDataForUser(user);
 
 	    			// add sub user to collection
 	    			users[x]=user;	    			
@@ -295,7 +430,7 @@ export class DataUtilitiesService {
 					client=deepCloneObject(TCLIENT);    			
 					
 					// format user with unique data
-	    			client = this.fakeDataFor(client);
+	    			client = this.fakeDataForClient(client);
 
 	    			// add sub user to collection
 	    			clients[x]=client;	    			
@@ -306,7 +441,7 @@ export class DataUtilitiesService {
 					customer=deepCloneObject(TCUSTOMER);    			
 					
 					// format with unique data
-	    			customer = this.fakeDataFor(customer);
+	    			customer = this.fakeDataForCustomer(customer);
 
 	    			// add sub user type <customer> to collection
 	    			customers[x]=customer;
@@ -334,165 +469,84 @@ export class DataUtilitiesService {
 		}); 
 	}   
 
-	public formatUserSubType ({ category, amount, data }:any) {	
+	public formatUserSubType ({ category, amount, data }:any) {
+	
 		/****
 		 * Format user Sub Type
 		 */		
 		return new Promise( (resolve, reject) => {
 			switch( category) {
-				case 'superadmin':		resolve( this.createSuperAdmin( category, data ) );		break;
-				case 'admin': 			resolve( this.createAdmin( category, data) ); 			break;
-				case 'poweruser': 		resolve( this.createPowerUser( category, data )); 		break;
-				case 'author': 			resolve( this.createAuthor( category, data) ); 			break;
-				case 'user': 			resolve( this.createUser( category, data ));  			break;			
-				case 'defaultClient':	resolve( this.createDefaultClient( category, data)); 	break;
-				case 'defaultCustomer': resolve( this.createDefaultCustomer( category, data)); 	break;
+				case 'superadmin':		resolve( this.formatSuperAdmin( category, data ) );	break;
+				case 'admin': 			resolve( this.formatAdmin( category, data) ); 			break;
+				case 'poweruser': 		resolve( this.formatPowerUser( category, data )); 		break;
+				case 'author': 			resolve( this.formatAuthor( category, data) ); 			break;
+				case 'user': 			resolve( this.formatUser( category, data ));  			break;			
+				case 'defaultClient':	resolve( this.formatClients( category, data)); 			break;
+				case 'defaultCustomer': resolve( this.formatCustomers( category, data)); 	break;
 			}
 		});		
 	}
 
+	private formatUsers(users:any, accountType:number) {
 
-	public createSuperAdmin ( category:string, users:IUser[] ) {
+		return Promise.all(
+			users.map ( (u:any) => {
 
-		users.forEach ( u => {
-			
-			// set role for this user type
-			u.core.role = u.security.accountType  = 1;
-			// #TODO: set specific access roles and policies for this group
-		});
+				// set role for this user type
+				u.core.role = u.security.accountType = accountType;
 
-		return Promise.resolve({ [category]: users });
+				// encrypt password of fake suer with Crypto Vector Method
+				return encryptWithInitializationVector(u.password.value)
+				.then( (hash:string) => {
+					u.password.value = hash;
+					u.password.method = 1;
+					return Promise.resolve(u);
+				});
+			})
+		)	
+		.then( (users:any) => Promise.resolve(users) );
+	}	
+
+
+	private formatSuperAdmin ( category:string, users:IUser[] ) {
+
+		return this.formatUsers(users, ACCOUNT_TYPE_SUPERADMIN)
+		.then( (users:any) => Promise.resolve({ [category]: users }) );		
 	}
 
-	public createAdmin ( category:string, users:IUser[]) {
+	private formatAdmin ( category:string, users:IUser[]) {
 
-		users.forEach ( u => {
-			// set role for this user type
-			u.core.role = u.security.accountType  = 2;
-			// #TODO: set specific access roles and policies for this group
-		});
-		
-		return Promise.resolve({ [category]: users });
+		return this.formatUsers(users, ACCOUNT_TYPE_ADMIN)
+		.then( (users:any) => Promise.resolve({ [category]: users }) );		
 	}
 
-	public createPowerUser ( category:string, users:IUser[]) {
+	private formatPowerUser ( category:string, users:IUser[]) {
 
-		users.forEach ( u => {
-			// set role for this user type
-			u.core.role = u.security.accountType  = 3;
-			// #TODO: set specific access roles and policies for this group
-		});
-		
-		return Promise.resolve({ [category]: users});
+		return this.formatUsers(users, ACCOUNT_TYPE_POWERUSER)
+		.then( (users:any) => Promise.resolve({ [category]: users }) );		
 	}
 
-	public createAuthor ( category:string, users:IUser[] ) {
+	private formatAuthor ( category:string, users:IUser[] ) {
 
-		users.forEach ( u => {
-			// set role for this user type
-			u.core.role = u.security.accountType  = 4;
-			// #TODO: set specific access roles and policies for this group
-		});
-
-		return Promise.resolve({ [category]: users});
+		return this.formatUsers(users, ACCOUNT_TYPE_AUTHOR)
+		.then( (users:any) => Promise.resolve({ [category]: users }) );		
 	}
 
-	public createUser ( category:string, users:IUser[] ) {
+	private formatUser ( category:string, users:IUser[] ) {
 
-		users.forEach ( u => {
-			// set role for this user type
-			u.core.role = u.security.accountType  = 5;
-			// #TODO: set specific access roles and policies for this group
-		});
-
-		return Promise.resolve({ [category]: users });
+		return this.formatUsers(users, ACCOUNT_TYPE_USER)
+		.then( (users:any) => Promise.resolve({ [category]: users }) );		
 	}
 
-	public createDefaultClient ( category:string, users:IClient[] ) {
-
-		let err:any; 
-
-		try {
-
-			users.forEach ( u => {		
-
-				// set role for this user type, u = client user
-				u.core.role = u.security.accountType  = 10;	 
-
-				/*** 
-				 * Set client company, its address and job
-				 */
-				u.company.name = companyName().trim().toString();
-				u.company.type = companySuffix().trim().toString();
-				u.company.slogan = companySlogan().trim().toString();
-				u.company.subSlogan = companySubSlogan();
-				let cName = u.company.name;
-
-				/***
-				 *  Set Job At Company
-				 */
-				u.company.jobTitle = jobTitle();
-				u.company.jobType = jobType()
-
-				/***
-				 * Set Company's address
-				 */
-				u.company.address.street = streetName().trim();
-				u.company.address.houseNumber =  houseNumber().toString().trim();
-				u.company.address.suffix  = streetSuffix().trim();
-				u.company.address.addition = "";
-				u.company.address.areacode = zipCode().trim(),
-				u.company.address.city = city().trim();
-				u.company.address.county = county().trim();
-				u.company.address.country = country().trim();
-				u.company.address.countryCode =  countryCode().trim();
-				u.company.address.addressLine1 = addressLine1().trim();
-				u.company.address.addressLine2 = addressLine2().trim();
-				u.company.address.addressLine3 = addressLine3().trim();
-
-				/***
-				 * Set company's Communication profile
-				 */		
-				u.company.communication.companyPhone = phoneNumber().toString();
-				u.company.communication.companyEmail = constructCompanyEmail( cName ).toLowerCase();
-				u.company.communication.companyWebsite = constructCompanyWebsite ( cName );
-
-				/***
-				 * Set company's Socialk profile
-				 */	
-				u.company.social.facebook = constructCompanyFacebookAccount( cName );
-				u.company.social.twitter = constructCompanyTwitterAccount( cName );
-			
-			});
-
-		}
-
-		catch(e) {
-			err = e;
-		}
-
-		finally {
-
-			if(err) {
-				// #TODOK log error
-			} else {
-				return Promise.resolve({ [category]: users });
-			}
-		}	
+	private formatClients (category:string, clients:IClient[]) {
+		return this.formatUsers(clients, ACCOUNT_TYPE_CLIENT)
+		.then( (clients:IClient[]) => Promise.resolve({ [category]: clients }) );	
 	}
 
-	public createDefaultCustomer ( category:string, users:ICustomer[] ) {
-
-		users.forEach ( u => {		
-
-			// set role for this user type		
-			u.core.role = u.security.accountType  = 20;
-
-			// #TODO: set specific access roles and policies for this group		
-		});
-		
-		return Promise.resolve({ [category]: users });
-	}
+	private formatCustomers (category:string, customers:ICustomer[]) {
+		return this.formatUsers(customers, ACCOUNT_TYPE_CUSTOMER )
+		.then( (customers:ICustomer[]) => Promise.resolve({ [category]: customers }) );	
+	}		
 }
 
 /****

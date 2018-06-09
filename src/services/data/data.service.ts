@@ -303,8 +303,7 @@ export class DataBreeder {
 		.then( (data:any) => { return this.data = data; } )		
 
 		// process thick: add generated data to local store 		
-		.then( () => this.daController[LOCAL_STORAGE_ADD]( this.data ) )
-		// DataStore.storeDataLocally( this.data ) )
+		.then( () => this.daController[LOCAL_STORAGE_ADD]( this.data ) )	
 	
 		 // process thick: add generated users to local database		 
 		.then( () => UserTypes.storeLocally( this.data) )
