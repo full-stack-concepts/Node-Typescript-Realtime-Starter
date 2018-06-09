@@ -1,5 +1,14 @@
 import { Observable, Subscription } from "rxjs";
+import mongoose from "mongoose";
 
+/****
+ * Mongoose Prototype Service Controller
+ */
+require('./mongoose.controller');
+
+/****
+ * Import Dependencies
+ */
 import { RedisController, UAController, DAController } from "../controllers";;
 import { proxyService, connectToUserDatabase, connectToProductDatabase } from "../services";
 import { configureDatabases } from "../services/db/db.admin.service";
@@ -19,9 +28,7 @@ import {
  * so it can listen to application events
  */
 import { DefaultModel } from "../shared/models";
-import { IEncryption} from "../shared/interfaces"
-
-
+import { IEncryption} from "../shared/interfaces";
 
 export class BootstrapController {
 
