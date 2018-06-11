@@ -233,6 +233,7 @@ export class BootstrapController {
 
 			console.log("==> Bootstrap Sequence finished")
 
+			// #TODO: Move to tests integration-database
 			/*
 			setTimeout( () => {
 				userModel.findOne( { 'core.email': 'addison.ryan@flintstones.org'} )
@@ -240,18 +241,17 @@ export class BootstrapController {
 					console.log("**** Result ", result)
 				})
 			})
-			*/
-
-			/*
+			
 			setTimeout( () => {
 				userModel.find( { 'core.role': 5} )
 				.then( (result:any) => {
 					console.log("**** Result ", result.length)
 				})
 			}, 2000)
-			*/
 			
-			/*
+			
+			
+			
 			setTimeout( () => { 
 				userModel.findAll(  )
 				.then( (result:any) => {
@@ -262,9 +262,9 @@ export class BootstrapController {
 					console.log(err)
 				})
 			}, 2000)
-			*/			
+						
 			
-			/*			
+						
 			setTimeout( () => {
 				userModel.findById( '5b1d82955bcbbb181c7b813a'  )
 				.then( (result:any) => {
@@ -275,8 +275,10 @@ export class BootstrapController {
 					console.log(err)
 				})
 			}, 2000)
-			*/
 
+			*/
+			
+			// #TODO: Move to tests integration-database
 			/*
 			setTimeout( () => {
 				userReadModel.findOne( { 'core.email': 'addison.ryan@flintstones.org'} )
@@ -284,18 +286,14 @@ export class BootstrapController {
 					console.log("**** Result ", result)
 				})
 			})
-			*/			
 
-			/*
 			setTimeout( () => {
 				userReadModel.find( { 'core.role': 5} )
 				.then( (result:any) => {
 					console.log("**** Result ", result.length)
 				})
 			}, 2000)
-			*/			
-
-			/*
+			
 			setTimeout( () => { 
 				userReadModel.findAll(  )
 				.then( (result:any) => {
@@ -306,9 +304,7 @@ export class BootstrapController {
 					console.log(err)
 				})
 			}, 2000)
-			*/
-
-			/*
+			
 			setTimeout( () => {
 				userReadModel.findById( '5b1d82955bcbbb181c7b813a'  )
 				.then( (result:any) => {
@@ -320,10 +316,7 @@ export class BootstrapController {
 				})
 			}, 2000)
 			*/
-		
 			
-
-
 			
 		
 
