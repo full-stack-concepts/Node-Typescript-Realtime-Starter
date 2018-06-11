@@ -778,6 +778,7 @@ export class UserOperations extends PersonProfile {
 		 * Local MongoDB instance
 		 */		
 		if(hostType === 1) {				
+			console.log("*** Try to find System user")
 			return model.findOne( query )
 			.then( (u:any) => { return Promise.resolve(u); })
 			.catch( (err:any) => {		

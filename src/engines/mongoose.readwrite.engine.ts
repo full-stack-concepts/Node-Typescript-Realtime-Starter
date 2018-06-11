@@ -148,6 +148,7 @@ export 	class ReadWriteRepositoryBase<T extends mongoose.Document>
             if(options) args.push(options);
         }
        
+        console.log("==> ReadWrite Engine")
         console.log("(0) Condition: ", condition)
         console.log("(1) Hash Key: ", hashKey)
         console.log("(2) Key: ", key)

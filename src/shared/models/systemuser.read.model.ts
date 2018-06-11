@@ -45,21 +45,15 @@ export class SystemUserReadModel extends DefaultModel  {
 			});
 		});
 	}	
-
-	public findOne (cond:Object):Promise<any> {
-
-		console.log("**** Try to find: ", cond)
-		// console.log(this.userDBConn);
-		let repo = new SystemUserReadRepository( this.userDBConn );
+	
+	public findOne (query:Object):Promise<any> {
+		console.log("** Find System User ", query)
+		const repo = new SystemUserReadRepository( this.userDBConn );
 		return new Promise ( (resolve, reject) => {
-			repo.findOne ( cond, (err:any, res:any) => {					
-				if(err) {
-					reject(err);
-				} else if(!res) {
-					resolve();
-				} else {
-					resolve(res)
-				}
+			repo.findOne ( query, (err:any, res:any) => {					
+				if(err) { reject(err); } 
+				else if(!res) { resolve(); } 
+				else { resolve(res); }
 			});
 		});
 	}

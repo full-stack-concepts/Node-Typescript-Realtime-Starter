@@ -34,26 +34,45 @@ export class UserReadModel extends DefaultModel  {
 	/****
 	 * Define custom methods for local onstance of MongoDB here	
 	 */	
-	public find(query:any, fields?:any, options?:any):Promise<any> {
+	public findAll ( query:Object={}, fields:Object={}, options:Object={}):Promise<any> {
 		const repo = new UserReadRepository( this.userDBConn );
 		return new Promise ( (resolve, reject) => {
-			repo.find(query, fields, options, (err:any, result:any) => {
-				(err)? resolve(result):reject(err);
+			repo.find ( {}, fields, options, (err:any, res:any) => {					
+				if(err) { reject(err);} 
+				else if(!res) {  resolve(); } 
+				else {  resolve(res); }
 			});
 		});
 	}
 
-	public findOne (cond:Object):Promise<any> {
+	public find (query:Object, fields:Object={}, options:Object={} ):Promise<any> {
 		const repo = new UserReadRepository( this.userDBConn );
 		return new Promise ( (resolve, reject) => {
-			repo.findOne ( cond, (err:any, res:any) => {					
-				if(err) {
-					reject(err);
-				} else if(!res) {
-					resolve();
-				} else {
-					resolve(res)
-				}
+			repo.find ( query, fields, options, (err:any, res:any) => {					
+				if(err) {  reject(err); } 
+				else if(!res) { resolve(); } 
+				else { resolve(res); }
+			});
+		});
+	}
+
+	
+	public findOne (query:Object):Promise<any> {
+		const repo = new UserReadRepository( this.userDBConn );
+		return new Promise ( (resolve, reject) => {
+			repo.findOne ( query, (err:any, res:any) => {					
+				if(err) { reject(err); } 
+				else if(!res) { resolve(); } 
+				else { resolve(res); }
+			});
+		});
+	}
+
+	public findById(id:string):Promise<any> {
+		const repo = new UserReadRepository( this.userDBConn );
+		return new Promise ( (resolve, reject) => {
+			repo.findById ( id, (err:any, res:any) => {					
+				if(err) {reject(err); } else { resolve(res); }
 			});
 		});
 	}

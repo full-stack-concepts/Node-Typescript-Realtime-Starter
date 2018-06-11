@@ -16,6 +16,7 @@ import { clientSchema} from "../shared/schemas/client.schema";
 import { customerSchema } from "../shared/schemas/customer.schema";
 
 import { IMongooseModels, IRead } from "./mongoose/interfaces";
+import { toObjectId, testForObjectId } from "./mongoose/helpers";
 
 /***
  *
@@ -31,22 +32,7 @@ export 	class ReadRepositoryBase<T extends mongoose.Document>
 			IMongooseModels<T>, 
 			IRead<T> {
    
-    private _model: mongoose.Model<mongoose.Document>;  
-
-    /***
-     * Mongoose Collection Name
-     */
-    private collectionName:string;
-
-    /***
-     * Mongoose Database Name
-     */
-    private dbName:string;
-
-    /***
-     * Redis hashkey
-     */
-    private hashkey:string; 
+    private _model: mongoose.Model<mongoose.Document>;    
 
     constructor(     
 
@@ -73,9 +59,150 @@ export 	class ReadRepositoryBase<T extends mongoose.Document>
         }        
     }
 
-    collectInfoForRedisHashKey():void {        
-        this.dbName = this._model.db.name;
-        this.collectionName = this._model.collection.collectionName;    
+    /***
+     *
+     */
+    _constructRedisHashKey() {        
+        let dbName:string = this._model.db.name;
+        let collectionName:string = this._model.collection.collectionName;    
+        return {
+            dbName,
+            collectionName,
+            hashKey: `${dbName}-${collectionName}`
+        };
+    }
+
+    /***
+     *
+     */
+    getKey (query:any):string {
+     
+        let key:string;
+        let keys:string[] = Object.keys(query);
+            
+        return (keys[0]) ?
+            keys[0].toString() :
+            'all';       
+    }
+
+    /***
+     *
+     */
+    async cache (condition:any, fields:any, options:any, exec?:Function, callback?:any) {  
+
+        /***
+         * Set to true if Model Mongoose Method searches by ObjectId
+         * @isReadByIdFunction:boolean
+         */
+        let isReadByIdFunction:boolean=false;
+
+        /***
+         * Stores Mongoose Document ObjectID;
+         * @searchID: mongoose.Types.ObjectId
+         */
+        let searchID:mongoose.Types.ObjectId;
+
+        /**
+         * grab dbName and collection Name from Mongoose connection
+         * to construct redis hashkey
+         */
+        const {dbName, collectionName, hashKey}:any = this._constructRedisHashKey();
+
+        /***
+         * Retrieve first property of <condition> object
+         * @key:string|number
+         */
+        let key:string|number = this.getKey(condition);
+
+        /**
+         *  Test condition argument to identify Mongoose ID or Object with nested property
+         */
+        if( testForObjectId(condition) ) 
+            isReadByIdFunction=true;
+
+        /***
+         * Build argyments list depending whether model method is
+         * (1)
+         * (2)
+         */
+        var args:any = [];
+        if(isReadByIdFunction) {
+            searchID = toObjectId(condition);            
+        } else {
+            if(condition) args.push(condition);
+            if(fields) args.push(fields);
+            if(options) args.push(options);
+        }
+       
+        console.log("==> Read Engine")
+        console.log("(0) Condition: ", condition)
+        console.log("(1) Hash Key: ", hashKey)
+        console.log("(2) Key: ", key)
+        console.log("(3) Args ",  args)
+        console.log("(4) isReadByIdFunction ", isReadByIdFunction)
+        console.log("(5) callback ", callback )
+     
+        let result:Document|Document[]; 
+        let cacheValue:any = await client.hget(hashKey, key);
+
+
+        /***
+         * Redis Cache has stored value for this query
+         */
+        if(cacheValue) {           
+
+            // parse cache value to json
+            const doc = JSON.parse(cacheValue);      
+            
+            // return array of Mongoose Documents
+            const result = Array.isArray(doc)
+                ? doc.map(d => new this._model(d))
+                : new this._model(doc);
+
+            return callback(null, result);
+        }       
+    
+        let err:any;     
+
+        try {
+
+            /***
+             * Execute Mongoose model Function
+             */
+            if(!isReadByIdFunction) {
+                result = await exec.apply( this._model, args); 
+            } else {
+               result = await exec.call( this._model, searchID );  
+            }  
+
+            /***
+             * Store result in Redis Cache
+             */
+            client.hset( hashKey, key, JSON.stringify(result) );            
+        } 
+
+        catch (e) {
+            err = e;
+        }
+
+        finally {
+
+            /***
+             * Bind arguments with <apply> method
+             * provides given this value and arguments as
+             * an array or array-like object()
+             */
+            if(err) {
+                return callback.apply(this, [err]);
+
+            /***
+             * Bind arguments with <call> method
+             * provides given this value and arguments individually
+             */
+            } else {                
+                return callback.call(this, null, result);                
+            }
+        }
     }
 
     /***
@@ -109,16 +236,22 @@ export 	class ReadRepositoryBase<T extends mongoose.Document>
     }
 
     findById(_id: string, callback: (error: any, result: T) => void) {
-        this._model.findById(_id, callback);
+        this.cache(_id, null, null, this._model.findById, callback);    
     }
 
+    /*
     findOne(cond: Object, callback: (err: any, res: T) => void): any {
         return this._model.findOne(cond, callback);
     }
+    */
 
-    find(cond?: Object, fields?: Object, options?: Object, callback?: (err: any, res: T[]) => void): any {
-        return this._model.find(cond, options, callback);
-    }   
+    findOne(query:Object, callback?: (err: any, res: T) => void): any {
+        this.cache(query, {}, {}, this._model.findOne, callback);       
+    }
+
+    find(query?: Object, fields?:Object, options?:Object, callback?: (err: any, res: T[]) => void): any {
+        this.cache(query, fields, options, this._model.find, callback);        
+    }  
     
 }
 

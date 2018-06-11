@@ -17,7 +17,7 @@ import {
 	publicDirectoryManager	
 } from "../util";
 
-import { userModel } from "../shared/models";
+import { userModel, userReadModel } from "../shared/models";
 
 /****
  * Init Default DB Model before import bootstrap manager
@@ -263,8 +263,8 @@ export class BootstrapController {
 				})
 			}, 2000)
 			*/			
-
-			/*
+			
+			/*			
 			setTimeout( () => {
 				userModel.findById( '5b1d82955bcbbb181c7b813a'  )
 				.then( (result:any) => {
@@ -276,6 +276,55 @@ export class BootstrapController {
 				})
 			}, 2000)
 			*/
+
+			/*
+			setTimeout( () => {
+				userReadModel.findOne( { 'core.email': 'addison.ryan@flintstones.org'} )
+				.then( (result:any) => {
+					console.log("**** Result ", result)
+				})
+			})
+			*/			
+
+			/*
+			setTimeout( () => {
+				userReadModel.find( { 'core.role': 5} )
+				.then( (result:any) => {
+					console.log("**** Result ", result.length)
+				})
+			}, 2000)
+			*/			
+
+			/*
+			setTimeout( () => { 
+				userReadModel.findAll(  )
+				.then( (result:any) => {
+					console.log("**** Result ", result.length)
+				})
+				.catch( (err:any) => {
+					console.log("***************************************************")
+					console.log(err)
+				})
+			}, 2000)
+			*/
+
+			/*
+			setTimeout( () => {
+				userReadModel.findById( '5b1d82955bcbbb181c7b813a'  )
+				.then( (result:any) => {
+					console.log("**** Result ", result)
+				})
+				.catch( (err:any) => {
+					console.log("***************************************************")
+					console.log(err)
+				})
+			}, 2000)
+			*/
+		
+			
+
+
+			
 		
 
 			return Promise.resolve();
