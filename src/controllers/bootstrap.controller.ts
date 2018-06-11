@@ -1,10 +1,4 @@
 import { Observable, Subscription } from "rxjs";
-import mongoose from "mongoose";
-
-/****
- * Mongoose Prototype Service Controller
- */
-require('./mongoose.controller');
 
 /****
  * Import Dependencies
@@ -22,6 +16,8 @@ import {
 	privateDirectoryManager,
 	publicDirectoryManager	
 } from "../util";
+
+import { userModel } from "../shared/models";
 
 /****
  * Init Default DB Model before import bootstrap manager
@@ -66,7 +62,7 @@ export class BootstrapController {
 	 * (2) Product Dataabse is live
 	 * (3) User Action Controller is loaded
 	 * (4) Data Action Controller is loaded
-	 * (3) Application is not running is test mode
+	 * (5) Application is not running is test mode
 	 */
 	private dataGenerator() {
 		const source$:Observable<number> = Observable.interval(75);
@@ -75,7 +71,7 @@ export class BootstrapController {
 				if(this.testMode || (this.userDBLive && this.productDBLive && this.uaController && this.daController) ) sub$.unsubscribe();
 				if(this.userDBLive && this.productDBLive  && this.uaController && this.daController) {
 					console.log("SIGNAL SIGNAL SIGNAL")
-					proxyService.startDataOperations();
+					// proxyService.startDataOperations();
 				}			
 			}
 		);
@@ -236,6 +232,51 @@ export class BootstrapController {
 			await createSystemUser();		
 
 			console.log("==> Bootstrap Sequence finished")
+
+			/*
+			setTimeout( () => {
+				userModel.findOne( { 'core.email': 'addison.ryan@flintstones.org'} )
+				.then( (result:any) => {
+					console.log("**** Result ", result)
+				})
+			})
+			*/
+
+			/*
+			setTimeout( () => {
+				userModel.find( { 'core.role': 5} )
+				.then( (result:any) => {
+					console.log("**** Result ", result.length)
+				})
+			}, 2000)
+			*/
+			
+			/*
+			setTimeout( () => { 
+				userModel.findAll(  )
+				.then( (result:any) => {
+					console.log("**** Result ", result.length)
+				})
+				.catch( (err:any) => {
+					console.log("***************************************************")
+					console.log(err)
+				})
+			}, 2000)
+			*/			
+
+			/*
+			setTimeout( () => {
+				userModel.findById( '5b1d82955bcbbb181c7b813a'  )
+				.then( (result:any) => {
+					console.log("**** Result ", result)
+				})
+				.catch( (err:any) => {
+					console.log("***************************************************")
+					console.log(err)
+				})
+			}, 2000)
+			*/
+		
 
 			return Promise.resolve();
 

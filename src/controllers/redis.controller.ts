@@ -35,9 +35,13 @@ export class RedisController  {
 			const client:any = redis.createClient(url);		
 
 			/***
-			 * Promisify Redis Client
+			 * Promisify Redis Client methods
 			 */
 			client.get = util.promisify(client.get);
+			client.set = util.promisify(client.set);
+			client.hset = util.promisify(client.hset);
+			client.hget = util.promisify(client.hget);
+
 
 			/****
 			 * eturn Redis CLient to Bootstrap Controller

@@ -15,10 +15,10 @@ export interface IRead<T> {
     /***
      * Finds one document
      */    
-    findOne(cond?: Object, callback?: (err: any, res: T) => void): mongoose.Query<T>;
+    findOne(query: Object, callback?: (err: any, res: T) => mongoose.Document): mongoose.Query<T>;
     
     /***
      * Finds document
      */
-    find(cond: Object, fields: Object, options: Object, callback?: (err: any, res: T[]) => void): mongoose.Query<T[]>;
+    find( query: Object, fields?: Object, options?: Object, callback?: (err: any, res: T[]) => void): mongoose.Query<T[]>;
 }

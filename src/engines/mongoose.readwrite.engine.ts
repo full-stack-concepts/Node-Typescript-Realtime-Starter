@@ -7,7 +7,12 @@
  */
 
 import mongoose from 'mongoose';
-import { Schema } from "mongoose";
+import { Document, Schema } from "mongoose";
+
+/****
+ * Import proxy service
+ */
+import { proxyService } from "../services/";
 
 /****
  * Person SubType Mongoose Schemas
@@ -17,7 +22,19 @@ import { userSchema } from "../shared/schemas/user.schema";
 import { clientSchema} from "../shared/schemas/client.schema";
 import { customerSchema } from "../shared/schemas/customer.schema";
 
-import { IMongooseModels, IRead, IWrite, IBulk } from "./mongoose";
+import { IMongooseModels, IRead, IWrite, IBulk } from "./mongoose/interfaces";
+
+import { toObjectId, testForObjectId } from "./mongoose/helpers";
+
+/***
+ *
+ */
+var client:any;
+
+proxyService.redisClient$.subscribe( (state:boolean) => {          
+    if(proxyService.redisClient) client = proxyService.redisClient;                 
+});
+
 
 export let ObjectId = mongoose.Schema.Types.ObjectId;
 export let Mixed = mongoose.Schema.Types.Mixed;
@@ -38,7 +55,7 @@ export 	class ReadWriteRepositoryBase<T extends mongoose.Document>
          
         // Native Model Connection    
         conn:mongoose.Model<mongoose.Document>
-    ) {                    
+    ) {           
 
         switch(schemaIdentifier) {
             case 'SystemUser':  
@@ -57,37 +74,173 @@ export 	class ReadWriteRepositoryBase<T extends mongoose.Document>
     }
 
     /***
+     *
+     */
+    _constructRedisHashKey() {        
+        let dbName:string = this._model.db.name;
+        let collectionName:string = this._model.collection.collectionName;    
+        return {
+            dbName,
+            collectionName,
+            hashKey: `${dbName}-${collectionName}`
+        };
+    }
+
+    /***
+     *
+     */
+    getKey (query:any):string {
+     
+        let key:string;
+        let keys:string[] = Object.keys(query);
+            
+        return (keys[0]) ?
+            keys[0].toString() :
+            'all';       
+    }
+
+    /***
+     *
+     */
+    async cache (condition:any, fields:any, options:any, exec?:Function, callback?:any) {  
+
+        /***
+         * Set to true if Model Mongoose Method searches by ObjectId
+         * @isReadByIdFunction:boolean
+         */
+        let isReadByIdFunction:boolean=false;
+
+        /***
+         * Stores Mongoose Document ObjectID;
+         * @searchID: mongoose.Types.ObjectId
+         */
+        let searchID:mongoose.Types.ObjectId;
+
+        /**
+         * grab dbName and collection Name from Mongoose connection
+         * to construct redis hashkey
+         */
+        const {dbName, collectionName, hashKey}:any = this._constructRedisHashKey();
+
+        /***
+         * Retrieve first property of <condition> object
+         * @key:string|number
+         */
+        let key:string|number = this.getKey(condition);
+
+        /**
+         *  Test condition argument to identify Mongoose ID or Object with nested property
+         */
+        if( testForObjectId(condition) ) 
+            isReadByIdFunction=true;
+
+        /***
+         * Build argyments list depending whether model method is
+         * (1)
+         * (2)
+         */
+        var args:any = [];
+        if(isReadByIdFunction) {
+            searchID = toObjectId(condition);            
+        } else {
+            if(condition) args.push(condition);
+            if(fields) args.push(fields);
+            if(options) args.push(options);
+        }
+       
+        console.log("(0) Condition: ", condition)
+        console.log("(1) Hash Key: ", hashKey)
+        console.log("(2) Key: ", key)
+        console.log("(3) Args ",  args)
+     
+        let result:Document|Document[]; 
+        let cacheValue:any = await client.hget(hashKey, key);
+
+
+        /***
+         * Redis Cache has stored value for this query
+         */
+        if(cacheValue) {           
+
+            // parse cache value to json
+            const doc = JSON.parse(cacheValue);        
+            
+            // return array of Mongoose Documents
+            const result = Array.isArray(doc)
+                ? doc.map(d => new this._model(d))
+                : new this._model(doc);
+
+            return callback(null, result);
+        }       
+    
+        let err:any;
+     
+
+        try {
+
+            /***
+             * Execute Mongoose model Function
+             */
+            if(!isReadByIdFunction) {
+                result = await exec.apply( this._model, args); 
+            } else {
+               result = await exec.call( this._model, searchID );  
+            }           
+
+            /***
+             * Store result in Redis Cache
+             */
+            client.hset( hashKey, key, JSON.stringify(result) );            
+        } 
+
+        catch (e) {
+            err = e;
+        }
+
+        finally {
+
+            /***
+             * Bind arguments with <apply> method
+             * provides given this value and arguments as
+             * an array or array-like object()
+             */
+            if(err) {
+                return callback.apply(this, [err]);
+
+            /***
+             * Bind arguments with <call> method
+             * provides given this value and arguments individually
+             */
+            } else {                
+                return callback.call(this, null, result);                
+            }
+        }
+    }
+
+    /***
      * Model functions
      */
     createSystemUserModel( connection:any):void{    
-         this._model = connection.model('SystemUser', systemUserSchema, 'systemusers', true);
+         this._model = connection.model('SystemUser', systemUserSchema, 'systemusers', true);        
     }
 
     createUserModel(connection:any):void {
-         this._model = connection.model('User', userSchema, 'users', true);
+        this._model = connection.model('User', userSchema, 'users', true);    
     }
 
     createClientModel(connection:any):void {
-        this._model = connection.model('Client', clientSchema, 'clients', true);
+        this._model = connection.model('Client', clientSchema, 'clients', true);        
     }
 
     createCustomerModel(connection:any):void {
-         this._model = connection.model('Customer', customerSchema, 'customers', true);
-    }    
-
-    private toObjectId(_id: string): mongoose.Types.ObjectId {
-        return mongoose.Types.ObjectId.createFromHexString(_id);
-    } 
+        this._model = connection.model('Customer', customerSchema, 'customers', true);    
+    }      
 
     /***
-     * Mongoose operations
+     * Mongoose Write Operations
      */
-     create(item: T, callback: (error: any, result: T) => void) {     	
+    create(item: T, callback: (error: any, result: T) => void) {     	
         this._model.create(item, callback);
-    }
-
-    retrieve(callback: (error: any, result: T) => void) {
-        this._model.find({}, callback);
     }
 
     update(_id: mongoose.Types.ObjectId, item: T, callback: (error: any, result: any) => void) {
@@ -95,27 +248,38 @@ export 	class ReadWriteRepositoryBase<T extends mongoose.Document>
     }  
 
     delete(_id: string, callback: (error: any, result: any) => void) {
-        this._model.remove({ _id: this.toObjectId(_id) }, (err:any) => callback(err, null));
+        this._model.remove({ _id: toObjectId(_id) }, (err:any) => callback(err, null));
     }
 
+     /***
+     * Mongoose Read Operations
+     */
     findById(_id: string, callback: (error: any, result: T) => void) {
-        this._model.findById(_id, callback);
+        this.cache(_id, null, null, this._model.findById, callback);    
     }
 
-    findOne(cond?: Object, callback?: (err: any, res: T) => void): any {
-        return this._model.findOne(cond, callback);
+    findOne(query:Object, fields:Object={}, options:Object={}, callback?: (err: any, res: T) => void): any {
+        this.cache(query, fields, options, this._model.findOne, callback);       
     }
 
-    find(cond?: Object, fields?: Object, options?: Object, callback?: (err: any, res: T[]) => void): any {
-        return this._model.find(cond, options, callback);
-    }   
+    find(query?: Object, fields?:Object, options?:Object, callback?: (err: any, res: T[]) => void): any {
+        this.cache(query, fields, options, this._model.find, callback);        
+    }  
+
+    retrieve( callback: (error: any, result: T) => void) {
+        this._model.find({}, callback);
+    } 
+
+    /***
+     * Mongoose Bulk operations
+     */
 
     insertMany( items: T[], callback: (error: any, result: T) => void ) {
         return this._model.insertMany( items, { ordered:true}, callback)
     }
 
-    remove(cond:Object, callback: ( error:any) => any ) {
-        return this._model.remove( cond, callback);
+    remove(query:Object, callback: ( error:any) => any ) {
+        return this._model.remove( query, callback);
     }   
 }
 

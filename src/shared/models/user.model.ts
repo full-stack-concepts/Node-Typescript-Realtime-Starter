@@ -52,26 +52,53 @@ export class UserModel extends DefaultModel  {
 		});
 	}	
 
-	public  remove( cond:Object):Promise<any> { 
+	public  remove( query:Object):Promise<any> { 
 		const repo = new UserRepository( this.userDBConn );
 		return new Promise ( (resolve, reject) => {
-			repo.remove( cond, (err:any) => {						
+			repo.remove( query, (err:any) => {						
 				if(err) {reject(err); } else { resolve(); }
 			});
 		});
 	}	
 
-	public findOne (cond:Object):Promise<any> {
+	public findAll ( query:Object={}, fields:Object={}, options:Object={}):Promise<any> {
 		const repo = new UserRepository( this.userDBConn );
 		return new Promise ( (resolve, reject) => {
-			repo.findOne ( cond, (err:any, res:any) => {					
-				if(err) {
-					reject(err);
-				} else if(!res) {
-					resolve();
-				} else {
-					resolve(res)
-				}
+			repo.find ( {}, fields, options, (err:any, res:any) => {					
+				if(err) { reject(err);} 
+				else if(!res) {  resolve(); } 
+				else {  resolve(res); }
+			});
+		});
+	}
+
+	public find (query:Object, fields:Object={}, options:Object={} ):Promise<any> {
+		const repo = new UserRepository( this.userDBConn );
+		return new Promise ( (resolve, reject) => {
+			repo.find ( query, fields, options, (err:any, res:any) => {					
+				if(err) {  reject(err); } 
+				else if(!res) { resolve(); } 
+				else { resolve(res); }
+			});
+		});
+	}
+
+	public findOne (query:Object):Promise<any> {
+		const repo = new UserRepository( this.userDBConn );
+		return new Promise ( (resolve, reject) => {
+			repo.findOne ( query, (err:any, res:any) => {					
+				if(err) { reject(err); } 
+				else if(!res) { resolve(); } 
+				else { resolve(res); }
+			});
+		});
+	}
+
+	public findById(id:string):Promise<any> {
+		const repo = new UserRepository( this.userDBConn );
+		return new Promise ( (resolve, reject) => {
+			repo.findById ( id, (err:any, res:any) => {					
+				if(err) {reject(err); } else { resolve(res); }
 			});
 		});
 	}

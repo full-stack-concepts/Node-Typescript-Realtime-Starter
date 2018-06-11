@@ -3,6 +3,11 @@ import mongoose from 'mongoose';
 import { Schema } from "mongoose";
 
 /****
+ * Import proxy service
+ */
+import { proxyService } from "../services/";
+
+/****
  * Person SubType Mongoose Schemas
  */
 import { systemUserSchema } from "../shared/schemas/systemuser.schema";
@@ -10,15 +15,38 @@ import { userSchema } from "../shared/schemas/user.schema";
 import { clientSchema} from "../shared/schemas/client.schema";
 import { customerSchema } from "../shared/schemas/customer.schema";
 
-import { IMongooseModels, IRead } from "./mongoose";
+import { IMongooseModels, IRead } from "./mongoose/interfaces";
 
+/***
+ *
+ */
+var client:any;
+
+proxyService.redisClient$.subscribe( (state:boolean) => {          
+    if(proxyService.redisClient) client = proxyService.redisClient;                 
+});
 
 export 	class ReadRepositoryBase<T extends mongoose.Document>  
 		implements 
 			IMongooseModels<T>, 
 			IRead<T> {
    
-    private _model: mongoose.Model<mongoose.Document>;   
+    private _model: mongoose.Model<mongoose.Document>;  
+
+    /***
+     * Mongoose Collection Name
+     */
+    private collectionName:string;
+
+    /***
+     * Mongoose Database Name
+     */
+    private dbName:string;
+
+    /***
+     * Redis hashkey
+     */
+    private hashkey:string; 
 
     constructor(     
 
@@ -43,6 +71,11 @@ export 	class ReadRepositoryBase<T extends mongoose.Document>
                 this.createCustomerModel(conn);               
             break;
         }        
+    }
+
+    collectInfoForRedisHashKey():void {        
+        this.dbName = this._model.db.name;
+        this.collectionName = this._model.collection.collectionName;    
     }
 
     /***
@@ -79,7 +112,7 @@ export 	class ReadRepositoryBase<T extends mongoose.Document>
         this._model.findById(_id, callback);
     }
 
-    findOne(cond?: Object, callback?: (err: any, res: T) => void): any {
+    findOne(cond: Object, callback: (err: any, res: T) => void): any {
         return this._model.findOne(cond, callback);
     }
 
