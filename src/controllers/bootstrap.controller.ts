@@ -298,9 +298,7 @@ export class BootstrapController {
 					console.log(err)
 				})
 			}, 2000);	
-			*/
-
-			
+			*/			
 
 			/*
 			setTimeout( () => {
@@ -357,6 +355,8 @@ export class BootstrapController {
 				})
 			}, 2000)
 			*/
+
+			
 
 			return Promise.resolve();
 
