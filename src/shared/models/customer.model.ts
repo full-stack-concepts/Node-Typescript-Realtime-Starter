@@ -1,6 +1,7 @@
 import Promise from "bluebird";
 import mongoose from "mongoose";
 
+import { proxyService } from "../../services";
 import { DefaultModel } from "./default.model";
 import { ICustomer } from "../interfaces";
 import { ReadWriteRepositoryBase } from "../../engines";
@@ -21,7 +22,7 @@ export class CustomerModel extends DefaultModel  {
 
 	private _customerModel: ICustomer;	
 
-	constructor( customerModel: ICustomer) {
+	constructor(customerModel: ICustomer) {
 
 		/****
 		 * Call Parent Constructor
@@ -29,6 +30,11 @@ export class CustomerModel extends DefaultModel  {
 		super();
 
 		this._customerModel = customerModel;
+
+		proxyService.userDBLive$.subscribe( (state:boolean) => {						
+			if(proxyService.userDB) this.userDBConn = proxyService.userDB;				
+			this.repo = new CustomerRepository( this.userDBConn );
+		});		
 	}	
 
 	/****
@@ -41,40 +47,7 @@ export class CustomerModel extends DefaultModel  {
 				if(err) { reject(err);} else { resolve(res);}
 			});
 		});
-	}	
-
-	public insert(customers:ICustomer[]): Promise<any> {
-		const repo = new CustomerRepository( this.userDBConn );
-		return new Promise ( (resolve, reject) => {
-			repo.insertMany( customers, (err:any, res:any) => {				
-				if(err) {reject(err); } else { resolve(res); }
-			});
-		});
-	}	
-
-	public remove( cond:Object):Promise<any> { 
-		const repo = new CustomerRepository( this.userDBConn );
-		return new Promise ( (resolve, reject) => {
-			repo.remove( cond, (err:any) => {					
-				if(err) {reject(err); } else { resolve(); }
-			});
-		});
-	}	
-
-	public findOne (cond:Object):Promise<any> {
-		const repo = new CustomerRepository( this.userDBConn );
-		return new Promise ( (resolve, reject) => {
-			repo.findOne ( cond, (err:any, res:any) => {				
-				if(err) {
-					reject(err);
-				} else if(!res) {
-					resolve();
-				} else {
-					resolve(res)
-				}
-			});
-		});
-	}	 
+	}		
 }
 
 export const customerModel:any = new CustomerModel(TCUSTOMER);

@@ -17,7 +17,7 @@ import {
 	publicDirectoryManager	
 } from "../util";
 
-import { userModel, userReadModel, clientModel, clientReadModel } from "../shared/models";
+import { userModel, userReadModel, clientModel, clientReadModel, customerModel, customerReadModel } from "../shared/models";
 
 /****
  * Init Default DB Model before import bootstrap manager
@@ -454,6 +454,115 @@ export class BootstrapController {
 				})
 			}, 2000)
 			*/
+
+			// #TODO: Move to tests integration-database
+			/*
+			setTimeout( () => {
+				customerModel.findOne( { 'core.email': 'jamie.shanahan@zoho.com'} )
+				.then( (result:any) => {
+					console.log("**** Result ", result)
+				})
+			})			
+			
+			setTimeout( () => {
+				customerModel.find( { 'core.role': 20} )
+				.then( (result:any) => {
+					console.log("**** Result ", result.length)
+				})
+			}, 2000);
+			
+			setTimeout( () => { 
+				customerModel.findAll(  )
+				.then( (result:any) => {
+					console.log("**** Result ", result.length)
+				})
+				.catch( (err:any) => {
+					console.log("***************************************************")
+					console.log(err)
+				})
+			}, 3000)				
+			
+					
+			setTimeout( () => {
+				customerModel.findById( '5b1d82955bcbbb181c7b8122'  )
+				.then( (result:any) => {
+					console.log("**** Result ", result)
+				})
+				.catch( (err:any) => {
+					console.log("***************************************************")
+					console.log(err)
+				})
+			}, 4000)
+
+		
+			setTimeout( () => {
+				customerModel.findOneAndDelete( { 'core.email': 'andreanne.smith@zoho.com' })
+				.then( (result:any) => {
+					console.log("**** Result ", result)
+				})
+			}, 5000)
+		
+
+			setTimeout( () => {
+				console.log("**** Start update ")
+				customerModel.findOneAndUpdate( 
+					{ 'core.email': 'jamie.shanahan@zoho.com' },
+					{ $set: { 'core.url': 'blablabla'}}
+				)
+				.then( (result:any) => {
+					console.log("**** Result OK ")
+				})
+				.catch( (err:any) => {
+					console.log("***************************************************")
+					console.log(err)
+				})
+			}, 6000);		
+
+		
+			setTimeout( () => {
+				console.log("**** Start update ")
+				customerModel.updateMany( 
+					{ 'core.role': 20 },
+					{ $set: { 'security.isAccountVerified': true}}
+				)
+				.then( (result:any) => {
+					console.log("**** Result OK ")
+				})
+				.catch( (err:any) => {
+					console.log("***************************************************")
+					console.log(err)
+				})
+			}, 7000);			
+			*/
+
+			// #TODO: Move to tests integration-database
+			/*
+			setTimeout( () => {
+				customerReadModel.findOne( { 'core.email': 'jamie.shanahan@zoho.com'} )
+				.then( (result:any) => {
+					console.log("**** Result ", result)
+				})
+			})
+
+			setTimeout( () => {
+				customerReadModel.find( { 'core.role': 20} )
+				.then( (result:any) => {
+					console.log("**** Result ", result.length)
+				})
+			}, 1000)
+			
+			setTimeout( () => { 
+				customerReadModel.findAll(  )
+				.then( (result:any) => {
+					console.log("**** Result ", result.length)
+				})
+				.catch( (err:any) => {
+					console.log("***************************************************")
+					console.log(err)
+				})
+			}, 2000)
+			*/
+				
 			
 
 			return Promise.resolve();
