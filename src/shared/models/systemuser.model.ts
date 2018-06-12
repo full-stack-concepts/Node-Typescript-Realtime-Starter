@@ -1,6 +1,7 @@
 import Promise from "bluebird";
 import mongoose from "mongoose";
 
+import { proxyService } from "../../services";
 import { DefaultModel} from "./default.model";
 import { ISystemUser } from "../interfaces";
 import { ReadWriteRepositoryBase } from "../../engines";
@@ -33,6 +34,11 @@ export class SystemUserModel extends DefaultModel  {
 		super();
 
 		this._systemUserModel = systemUserModel;		
+
+		proxyService.userDBLive$.subscribe( (state:boolean) => {						
+			if(proxyService.userDB) this.userDBConn = proxyService.userDB;				
+			this.repo = new SystemUserRepository( this.userDBConn );
+		});		
 	}			
 
 	/****
@@ -46,35 +52,7 @@ export class SystemUserModel extends DefaultModel  {
 			});
 		});
 	}	
-	
-	public insert(users:ISystemUser[]): Promise<any> {
-		let repo = new SystemUserRepository( this.userDBConn );
-		return new Promise ( (resolve, reject) => {
-			repo.insertMany( users, (err:any, res:any) => {			
-				if(err) {reject(err); } else { resolve(res); }
-			});
-		});
-	}	
 
-	public remove( cond:Object):Promise<any> { 
-		let repo = new SystemUserRepository( this.userDBConn );
-		return new Promise ( (resolve, reject) => {
-			repo.remove( cond, (err:any) => {						
-				if(err) {reject(err); } else { resolve(); }
-			});
-		});
-	}  	
-	
-	public findOne (query:Object):Promise<any> {
-		const repo = new SystemUserRepository( this.userDBConn );
-		return new Promise ( (resolve, reject) => {
-			repo.findOne ( query, (err:any, res:any) => {					
-				if(err) { reject(err); } 
-				else if(!res) { resolve(); } 
-				else { resolve(res); }
-			});
-		});
-	}
 }
 
 export const systemUserModel = new SystemUserModel(TSYSTEMUSER);
