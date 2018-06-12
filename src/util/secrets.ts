@@ -311,6 +311,12 @@ export const USE_LOCAL_REDIS_SERVER = process.env["USE_LOCAL_REDIS_SERVER"] == '
 export const REDIS_LOCAL_URL = process.env["REDIS_LOCAL_URL"];
 export const REDIS_LOCAL_PORT = parseInt(process.env["REDIS_LOCAL_PORT"]);
 
+export const REDIS_READ_QUERIES_EXPIRATION_TYPE = process.env["REDIS_READ_QUERIES_EXPIRATION_TYPE"];
+export const REDIS_READ_QUERIES_EXPIRATION_TIME = process.env["REDIS_READ_QUERIES_EXPIRATION_TIME"];
+
+export const REDIS_WRITE_QUERIES_EXPIRATION_TYPE = process.env["REDIS_READ_QUERIES_EXPIRATION_TYPE"];
+export const REDIS_WRITE_QUERIES_EXPIRATION_TIME = process.env["REDIS_READ_QUERIES_EXPIRATION_TIME"];
+
 
 /***
  * Public Directory Management

@@ -10,7 +10,11 @@ import { proxyService } from "../services/";
 /****
  * Redis Settings
  */
-import { USE_LOCAL_REDIS_SERVER } from "../util/secrets";
+import { 
+    USE_LOCAL_REDIS_SERVER,
+    REDIS_READ_QUERIES_EXPIRATION_TYPE,
+    REDIS_READ_QUERIES_EXPIRATION_TIME
+} from "../util/secrets";
 
 /****
  * Person SubType Mongoose Schemas
@@ -208,8 +212,7 @@ export 	class ReadRepositoryBase<T extends mongoose.Document>
                 return callback(null, result);
             }       
         
-            let err:any;
-         
+            let err:any;        
 
             try {
 
@@ -225,7 +228,13 @@ export 	class ReadRepositoryBase<T extends mongoose.Document>
                 /***
                  * Store result in Redis Cache
                  */
-                client.hset( hashKey, key, JSON.stringify(result) );            
+                client.hset( 
+                    hashKey, 
+                    key, 
+                    JSON.stringify(result),  
+                    REDIS_READ_QUERIES_EXPIRATION_TYPE,
+                    REDIS_READ_QUERIES_EXPIRATION_TIME 
+                );
             } 
 
             catch (e) {
