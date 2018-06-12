@@ -240,16 +240,15 @@ export class BootstrapController {
 				.then( (result:any) => {
 					console.log("**** Result ", result)
 				})
-			})
+			})			
 			
 			setTimeout( () => {
 				userModel.find( { 'core.role': 5} )
 				.then( (result:any) => {
 					console.log("**** Result ", result.length)
 				})
-			}, 2000)
-			
-			
+			}, 2000)	
+				
 			
 			
 			setTimeout( () => { 
@@ -261,10 +260,10 @@ export class BootstrapController {
 					console.log("***************************************************")
 					console.log(err)
 				})
-			}, 2000)
-						
+			}, 3000)		
 			
-						
+			
+					
 			setTimeout( () => {
 				userModel.findById( '5b1d82955bcbbb181c7b813a'  )
 				.then( (result:any) => {
@@ -274,9 +273,51 @@ export class BootstrapController {
 					console.log("***************************************************")
 					console.log(err)
 				})
-			}, 2000)
+			}, 4000)
 
+		
+			setTimeout( () => {
+				userModel.findOneAndDelete( { 'core.email': 'lonie.casper@yahoo.com' })
+				.then( (result:any) => {
+					console.log("**** Result ", result)
+				})
+			}, 2000)
+		
+
+			setTimeout( () => {
+				console.log("**** Start update ")
+				userModel.findOneAndUpdate( 
+					{ 'core.email': 'addison.ryan@flintstones.org' },
+					{ $set: { 'core.role': 100}}
+				)
+				.then( (result:any) => {
+					console.log("**** Result OK ")
+				})
+				.catch( (err:any) => {
+					console.log("***************************************************")
+					console.log(err)
+				})
+			}, 2000);	
 			*/
+
+			
+
+			/*
+			setTimeout( () => {
+				console.log("**** Start update ")
+				userModel.updateMany( 
+					{ 'core.role': 5 },
+					{ $set: { 'security.isAccountVerified': true}}
+				)
+				.then( (result:any) => {
+					console.log("**** Result OK ")
+				})
+				.catch( (err:any) => {
+					console.log("***************************************************")
+					console.log(err)
+				})
+			}, 2000);			
+			*/		
 			
 			// #TODO: Move to tests integration-database
 			/*
@@ -316,9 +357,6 @@ export class BootstrapController {
 				})
 			}, 2000)
 			*/
-			
-			
-		
 
 			return Promise.resolve();
 

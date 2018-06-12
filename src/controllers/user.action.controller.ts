@@ -19,7 +19,7 @@ export class UAController  {
 
 			const controller:any = new UAController();
 
-			return new Proxy( controller, {
+			return new Proxy( controller, { 
 				get: await function(target:any, property:any) {
 					console.log("==> REQUEST ", property)
 					 return userService[property] || 

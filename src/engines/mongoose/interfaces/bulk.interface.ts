@@ -1,3 +1,5 @@
+import { ModelPopulateOptions } from "mongoose";
+
 
 export interface IBulk<T> {
 
@@ -10,5 +12,16 @@ export interface IBulk<T> {
      *
      */
     remove: (cond:Object, callback: ( error:any) => void ) => void;
+
+    /***
+     *
+     */
+    populate: ( item:T, options:ModelPopulateOptions|ModelPopulateOptions[], callback: (error:any) => void) => void;
+
+    /***
+     *
+     */
+    updateMany: ( cond:Object,  update:Object, options:Object, callback: (error: any, result: any) => void) => void;
+   
     
 }

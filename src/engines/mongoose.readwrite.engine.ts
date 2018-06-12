@@ -5,9 +5,9 @@
  * (3) switch between storage solutions (redis versus mongodb)
  * (4) switch between localhost/mlab etc
  */
-
+import util from "util";
 import mongoose from 'mongoose';
-import { Document, Schema } from "mongoose";
+import { Document, Schema, ModelPopulateOptions } from "mongoose";
 
 /****
  * Import proxy service
@@ -75,7 +75,7 @@ export 	class ReadWriteRepositoryBase<T extends mongoose.Document>
             case 'Customer':
                 this.createCustomerModel(conn);               
             break;
-        }        
+        }     
     }
 
     /***
@@ -131,7 +131,7 @@ export 	class ReadWriteRepositoryBase<T extends mongoose.Document>
          */
         if(!USE_LOCAL_REDIS_SERVER) {
 
-            console.log("*** Execute Database Query Only ")
+            console.log("*** USE REDIS CACHING ", USE_LOCAL_REDIS_SERVER)
 
             let err:any;
 
@@ -162,10 +162,7 @@ export 	class ReadWriteRepositoryBase<T extends mongoose.Document>
                 return callback.call(this, null, result);               
             }           
         
-        } else {
-
-
-      
+        } else {                 
 
             /**
              * grab dbName and collection Name from Mongoose connection
@@ -304,6 +301,14 @@ export 	class ReadWriteRepositoryBase<T extends mongoose.Document>
         this._model.remove({ _id: toObjectId(_id) }, (err:any) => callback(err, null));
     }
 
+    findOneAndDelete(conditions:Object={}, options:Object={}, callback: (error: any, result: any) => void) {         
+        this._model.findOneAndRemove( conditions, options, (err:any) => callback(err, null));
+    }
+
+    findOneAndUpdate(conditions:Object={}, update:Object={}, options:Object={}, callback: (error: any, result: any) => void) {         
+        this._model.findOneAndUpdate( conditions, update, options, (err:any) => callback(err, null));
+    }   
+
      /***
      * Mongoose Read Operations
      */
@@ -326,13 +331,21 @@ export 	class ReadWriteRepositoryBase<T extends mongoose.Document>
     /***
      * Mongoose Bulk operations
      */
-
     insertMany( items: T[], callback: (error: any, result: T) => void ) {
-        return this._model.insertMany( items, { ordered:true}, callback)
+        this._model.insertMany( items, { ordered:true}, callback)
     }
 
     remove(query:Object, callback: ( error:any) => any ) {
-        return this._model.remove( query, callback);
+        this._model.remove( query, callback);
     }   
+
+    populate(item:T, options:ModelPopulateOptions|ModelPopulateOptions[], callback: ( error:any) => any ) {
+        this._model.populate(item, options, callback)
+    }
+
+    updateMany( query:Object={}, update:Object={}, options:Object={}, callback: (error:any, result:any) => any) {      
+        this._model.updateMany(query, update, callback);
+    }
+  
 }
 

@@ -304,7 +304,7 @@ dbAccounts.forEach( ({ value, txt }) => {
 	}
 });
 
-/***
+/*** 
  * REDIS SERVER
  */
 export const USE_LOCAL_REDIS_SERVER = process.env["USE_LOCAL_REDIS_SERVER"] == 'true';

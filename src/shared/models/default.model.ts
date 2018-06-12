@@ -19,6 +19,11 @@ export class DefaultModel {
 	userDBConn:any;
 	productDBConn:any;
 
+	/****
+	 * Repository
+	 */
+	repo:any;
+
 	constructor() {
 		this.configureSubscribers();		
 	}
@@ -41,6 +46,115 @@ export class DefaultModel {
 			if(proxyService.productDB) this.productDBConn = proxyService.productDB;
 		});
 	}
+
+	/******************************************************************************************
+	 *
+	 * "LOCAL" MONGOOSE METHODS
+	 */
+	
+	 /*** READ OPERATIONS ***/
+
+	public findAll ( query:Object={}, fields:Object={}, options:Object={}):Promise<any> {
+		const repo = this.repo;
+		return new Promise ( (resolve, reject) => {
+			repo.find ( {}, fields, options, (err:any, res:any) => {					
+				if(err) { reject(err);} 
+				else if(!res) {  resolve(); } 
+				else {  resolve(res); }
+			});
+		})
+	}
+
+
+	public find (query:Object, fields:Object={}, options:Object={} ):Promise<any> {
+		const repo = this.repo;
+		return new Promise ( (resolve, reject) => {
+			repo.find ( query, fields, options, (err:any, res:any) => {					
+				if(err) {  reject(err); } 
+				else if(!res) { resolve(); } 
+				else { resolve(res); }
+			});
+		});
+	}
+
+	public findOne (query:Object):Promise<any> {
+		const repo = this.repo;
+		return new Promise ( (resolve, reject) => {
+			repo.findOne ( query, (err:any, res:any) => {					
+				if(err) { reject(err); } 
+				else if(!res) { resolve(); } 
+				else { resolve(res); }
+			});
+		});
+	}
+
+	public findById(id:string):Promise<any> {
+		const repo = this.repo;
+		return new Promise ( (resolve, reject) => {
+			repo.findById ( id, (err:any, res:any) => {					
+				if(err) {reject(err); } else { resolve(res); }
+			});
+		});
+	}
+
+	/*** WRITE OPERATIONS **/
+
+	public insert(users:any): Promise<any> {
+		const repo = this.repo;
+		return new Promise ( (resolve, reject) => {
+			repo.insertMany( users, (err:any, res:any) => {			
+				if(err) {reject(err); } else { resolve(res); }
+			});
+		});
+	}	
+
+	public findOneAndDelete (query:Object, options:Object={} ):Promise<any> {
+		const repo = this.repo;
+		return new Promise ( (resolve, reject) => {
+			repo.findOneAndDelete ( query, options, (err:any, res:any) => {					
+				if(err) {  reject(err); } 
+				if(err) {  reject(err); } 
+				else { resolve(); } 	
+			});
+		});
+	}
+
+	public findOneAndUpdate (query:Object, update:Object={}, options:Object={} ):Promise<any> {	
+		const repo = this.repo;
+		return new Promise ( (resolve, reject) => {
+			repo.findOneAndUpdate ( query, update, options, (err:any, res:any) => {								
+				if(err) {  reject(err); } 
+				else { resolve(); } 			
+			});
+		});
+	}
+
+	/*** Bulk Operations ***/
+
+	public updateMany (query:Object, update:any={}, options:Object={} ):Promise<any> {		
+		const repo = this.repo;
+		return new Promise ( (resolve, reject) => {		
+			repo.updateMany ( query, update, options, (err:any, res:any) => {								
+				console.log(err, res)
+				if(err) {  reject(err); } 
+				else { resolve(); } 			
+			});
+		});
+	}
+
+	public remove( query:Object):Promise<any> { 
+		const repo = this.repo;
+		return new Promise ( (resolve, reject) => {
+			repo.remove( query, (err:any) => {						
+				if(err) {reject(err); } else { resolve(); }
+			});
+		});
+	}		
+
+	/*******************************************************************************************
+	 *
+	 * REMOTE HTTPS METHODS
+	 */
 
 	//** MLAB: Create user 
 	public remoteCreateUser(_data:any, collection:string) {		

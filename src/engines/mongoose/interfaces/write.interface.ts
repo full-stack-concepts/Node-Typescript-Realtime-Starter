@@ -16,4 +16,15 @@ export interface IWrite<T> {
      *
      */
     delete: (_id: string, callback: (error: any, result: any) => void) => void;
+
+    /***
+     *
+     */
+    findOneAndDelete: (conditions:Object,  options: Object, callback: (error: any, result: any) => void) => void;
+
+    /***
+     *
+     */
+    findOneAndUpdate: (conditions:Object, update:Object, options:Object, callback: (error: any, result: any) => void) => void;
+
 }

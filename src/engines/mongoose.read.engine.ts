@@ -187,6 +187,7 @@ export 	class ReadRepositoryBase<T extends mongoose.Document>
             console.log("(1) Hash Key: ", hashKey)
             console.log("(2) Key: ", key)
             console.log("(3) Args ",  args)     
+            console.log("(4) Callback ", callback)
            
             let cacheValue:any = await client.hget(hashKey, key);
 
@@ -194,7 +195,7 @@ export 	class ReadRepositoryBase<T extends mongoose.Document>
             /***
              * Redis Cache has stored value for this query
              */
-            if(cacheValue) {           
+            if(cacheValue) {        
 
                 // parse cache value to json
                 const doc = JSON.parse(cacheValue);        
@@ -270,11 +271,7 @@ export 	class ReadRepositoryBase<T extends mongoose.Document>
 
     createCustomerModel(connection:any):void {
          this._model = connection.model('Customer', customerSchema, 'customers', true);
-    }    
-
-    private toObjectId(_id: string): mongoose.Types.ObjectId {
-        return mongoose.Types.ObjectId.createFromHexString(_id);
-    } 
+    }      
 
     /***
      * Mongoose operations
