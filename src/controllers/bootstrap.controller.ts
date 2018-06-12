@@ -17,7 +17,7 @@ import {
 	publicDirectoryManager	
 } from "../util";
 
-import { userModel, userReadModel } from "../shared/models";
+import { userModel, userReadModel, clientModel, clientReadModel } from "../shared/models";
 
 /****
  * Init Default DB Model before import bootstrap manager
@@ -247,9 +247,7 @@ export class BootstrapController {
 				.then( (result:any) => {
 					console.log("**** Result ", result.length)
 				})
-			}, 2000)	
-				
-			
+			}, 2000)				
 			
 			setTimeout( () => { 
 				userModel.findAll(  )
@@ -260,8 +258,7 @@ export class BootstrapController {
 					console.log("***************************************************")
 					console.log(err)
 				})
-			}, 3000)		
-			
+			}, 3000)				
 			
 					
 			setTimeout( () => {
@@ -356,6 +353,107 @@ export class BootstrapController {
 			}, 2000)
 			*/
 
+			// #TODO: Move to tests integration-database
+			/*
+			setTimeout( () => {
+				clientModel.findOne( { 'core.email': 'golden.nicolas@flintstones.org'} )
+				.then( (result:any) => {
+					console.log("**** Result ", result)
+				})
+			})			
+			
+			setTimeout( () => {
+				clientModel.find( { 'core.role': 10} )
+				.then( (result:any) => {
+					console.log("**** Result ", result.length)
+				})
+			}, 2000)	
+
+
+			setTimeout( () => { 
+				clientModel.findAll(  )
+				.then( (result:any) => {
+					console.log("**** Result ", result.length)
+				})
+				.catch( (err:any) => {
+					console.log("***************************************************")
+					console.log(err)
+				})
+			}, 3000);
+
+			setTimeout( () => {
+				clientModel.findById( '5b1d82955bcbbb181c7b8290'  )
+				.then( (result:any) => {
+					console.log("**** Result ", result)
+				})
+				.catch( (err:any) => {
+					console.log("***************************************************")
+					console.log(err)
+				})
+			}, 4000)	
+
+			setTimeout( () => {
+				console.log("**** Start update ")
+				clientModel.findOneAndUpdate( 
+					{ 'core.email': 'golden.nicolas@flintstones.org' },
+					{ $set: { 'core.url': 'blablabla'}}
+				)
+				.then( (result:any) => {
+					console.log("**** Result OK ")
+				})
+				.catch( (err:any) => {
+					console.log("***************************************************")
+					console.log(err)
+				})
+			}, 5000);			
+
+
+			setTimeout( () => {
+				clientModel.findOneAndDelete( { 'core.email': 'rodger.kub@icloud.com' })
+				.then( (result:any) => {
+					console.log("**** Result ", result)
+				})
+			}, 6000)
+			*/
+
+			// #TODO: Move to tests integration-database
+			/*
+			setTimeout( () => {
+				clientReadModel.findOne( { 'core.email': 'golden.nicolas@flintstones.org'} )
+				.then( (result:any) => {
+					console.log("**** Result ", result)
+				})
+			})
+
+			setTimeout( () => {
+				clientReadModel.find( { 'core.role': 10} )
+				.then( (result:any) => {
+					console.log("**** Result ", result.length)
+				})
+			}, 2000)
+			
+			setTimeout( () => { 
+				clientReadModel.findAll(  )
+				.then( (result:any) => {
+					console.log("**** Result ", result.length)
+				})
+				.catch( (err:any) => {
+					console.log("***************************************************")
+					console.log(err)
+				})
+			}, 2000)
+			
+			setTimeout( () => {
+				clientReadModel.findById( '5b1d82955bcbbb181c7b8290'  )
+				.then( (result:any) => {
+					console.log("**** Result ", result)
+				})
+				.catch( (err:any) => {
+					console.log("***************************************************")
+					console.log(err)
+				})
+			}, 2000)
+			*/
 			
 
 			return Promise.resolve();
