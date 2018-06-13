@@ -333,7 +333,9 @@ dbAccounts.forEach( ({ value, txt }) => {
  */
 export const USE_LOCAL_REDIS_SERVER = process.env["USE_LOCAL_REDIS_SERVER"] == 'true';
 export const REDIS_LOCAL_URL = process.env["REDIS_LOCAL_URL"];
+export const REDIS_LOCAL_HOSTNAME = process.env["REDIS_LOCAL_HOSTNAME"];
 export const REDIS_LOCAL_PORT = parseInt(process.env["REDIS_LOCAL_PORT"]);
+export const REDIS_LOCAL_PASSWORD = process.env["REDIS_LOCAL_PASSWORD"]
 
 export const REDIS_READ_QUERIES_EXPIRATION_TYPE = process.env["REDIS_READ_QUERIES_EXPIRATION_TYPE"];
 export const REDIS_READ_QUERIES_EXPIRATION_TIME = process.env["REDIS_READ_QUERIES_EXPIRATION_TIME"];

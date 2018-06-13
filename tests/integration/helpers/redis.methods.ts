@@ -11,6 +11,7 @@ import {
 	USE_LOCAL_REDIS_SERVER,
 	REDIS_LOCAL_URL,
 	REDIS_LOCAL_PORT,
+	REDIS_LOCAL_PASSWORD,
 	REDIS_READ_QUERIES_EXPIRATION_TYPE,
 	REDIS_READ_QUERIES_EXPIRATION_TIME,
 	REDIS_WRITE_QUERIES_EXPIRATION_TYPE,
@@ -22,6 +23,9 @@ export class RedisController {
 
 	static build() {
 
+		if(!USE_LOCAL_REDIS_SERVER)
+			return null;
+
 		let redisUrl:string = `${REDIS_LOCAL_URL}:${REDIS_LOCAL_PORT}`;
 		let redisClient:any = redis.createClient(redisUrl);
 
@@ -31,6 +35,13 @@ export class RedisController {
 		redisClient.hset = util.promisify(redisClient.hset);
 		redisClient.hget = util.promisify(redisClient.hget);
 
-		return redisClient;
+		redisClient.auth( REDIS_LOCAL_PASSWORD, (err:any) => {
+			if (err) throw err;
+		});
+
+		/****
+		 * return Redis CLient to caller
+		 */	
+		return redisClient;		
 	}
 }

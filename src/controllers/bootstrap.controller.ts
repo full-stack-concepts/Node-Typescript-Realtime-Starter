@@ -31,7 +31,7 @@ export class BootstrapController {
 	productDBLive:boolean;
 	testMode:boolean;
 
-	redisClient:Function;
+	redisClient:any;
 	uaController:Function;
 	daController:Function;
 

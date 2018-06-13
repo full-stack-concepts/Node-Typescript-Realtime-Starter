@@ -5,6 +5,7 @@ import {
 	USE_LOCAL_REDIS_SERVER,
 	REDIS_LOCAL_URL,
 	REDIS_LOCAL_PORT,
+	REDIS_LOCAL_PASSWORD,
 	REDIS_READ_QUERIES_EXPIRATION_TYPE,
 	REDIS_READ_QUERIES_EXPIRATION_TIME,
 	REDIS_WRITE_QUERIES_EXPIRATION_TYPE,
@@ -46,10 +47,14 @@ export class RedisController  {
 			client.hset = util.promisify(client.hset);
 			client.hget = util.promisify(client.hget);
 
+			client.auth( REDIS_LOCAL_PASSWORD, (err:any) => {
+    			if (err) throw err;
+			});
+
 
 			/****
 			 * eturn Redis CLient to Bootstrap Controller
-			 */
+			 */			
 			return Promise.resolve(client);
 
 
