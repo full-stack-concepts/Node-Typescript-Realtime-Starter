@@ -95,7 +95,7 @@ export class UserService extends UserOperations {
 	/***
 	 * Find third party authenticated user by email
 	 */
-	private findUserByEmail():Promise<IUser> {		
+	private findUserByEmail() {		
 		let query = { 'core.email': this.gmail };		
 		return userModel.remoteFindOneOnly(query, 'users')	
 		.then(  (user:IUser) => { return Promise.resolve(user); })

@@ -2,10 +2,6 @@
 import mongoose from 'mongoose';
 import { Schema } from "mongoose";
 
-/****
- * Import proxy service
- */
-import { proxyService } from "../services/";
 
 /****
  * Redis Settings
@@ -27,21 +23,15 @@ import { customerSchema } from "../shared/schemas/customer.schema";
 import { IMongooseModels, IRead } from "./mongoose/interfaces";
 import { toObjectId, testForObjectId } from "./mongoose/helpers";
 
-/***
- *
- */
-var client:any;
-
-proxyService.redisClient$.subscribe( (state:boolean) => {          
-    if(proxyService.redisClient) client = proxyService.redisClient;                 
-});
 
 export 	class ReadRepositoryBase<T extends mongoose.Document>  
 		implements 
 			IMongooseModels<T>, 
 			IRead<T> {
    
-    private _model: mongoose.Model<mongoose.Document>;    
+    private _model: any; // mongoose.Model<mongoose.Document>;    
+
+    private client:any;
 
     constructor(     
 
@@ -49,7 +39,10 @@ export 	class ReadRepositoryBase<T extends mongoose.Document>
         schemaIdentifier:string,
          
         // Native Model Connection    
-        conn:mongoose.Model<mongoose.Document>
+        conn:mongoose.Model<mongoose.Document>,
+
+         // redisClient
+        redisClient:any
     ) {              
 
         switch(schemaIdentifier) {
@@ -66,6 +59,8 @@ export 	class ReadRepositoryBase<T extends mongoose.Document>
                 this.createCustomerModel(conn);               
             break;
         }        
+
+        this.client = redisClient;
     }
 
     /***
@@ -193,7 +188,7 @@ export 	class ReadRepositoryBase<T extends mongoose.Document>
             console.log("(3) Args ",  args)     
             console.log("(4) Callback ", callback)
            
-            let cacheValue:any = await client.hget(hashKey, key);
+            let cacheValue:any = await this.client.hget(hashKey, key);
 
 
             /***
@@ -228,7 +223,7 @@ export 	class ReadRepositoryBase<T extends mongoose.Document>
                 /***
                  * Store result in Redis Cache
                  */
-                client.hset( 
+                this.client.hset( 
                     hashKey, 
                     key, 
                     JSON.stringify(result),  

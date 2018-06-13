@@ -11,10 +11,10 @@ import { TSYSTEMUSER } from "../types";
  * Local Repository that contains all methods for 
  * local instance of MongoDB
  */
-class SystemUserReadRepository extends ReadRepositoryBase<ISystemUser> {
+export class SystemUserReadRepository extends ReadRepositoryBase<ISystemUser> {
 	
-	constructor(connection:mongoose.Model<mongoose.Document>) {
-		super( 'SystemUser', connection);
+	constructor(connection:mongoose.Model<mongoose.Document>, redisClient:any) {
+		super( 'SystemUser', connection, redisClient);
 	}
 }
 
@@ -36,7 +36,7 @@ export class SystemUserReadModel extends DefaultModel  {
 
 		proxyService.userDBLive$.subscribe( (state:boolean) => {						
 			if(proxyService.userDB) this.userDBConn = proxyService.userDB;				
-			this.repo = new SystemUserReadRepository( this.userDBConn );
+			this.repo = new SystemUserReadRepository( this.userDBConn, this.redisClient );
 		});		
 	}				
 

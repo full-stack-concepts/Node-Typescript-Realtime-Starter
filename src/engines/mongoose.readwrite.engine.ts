@@ -9,10 +9,6 @@ import util from "util";
 import mongoose from 'mongoose';
 import { Document, Schema, ModelPopulateOptions } from "mongoose";
 
-/****
- * Import proxy service
- */
-import { proxyService } from "../services/";
 
 /****
  * Redis Settings
@@ -35,15 +31,6 @@ import { IMongooseModels, IRead, IWrite, IBulk } from "./mongoose/interfaces";
 
 import { toObjectId, testForObjectId } from "./mongoose/helpers"; 
 
-/***
- *
- */
-var client:any;
-
-proxyService.redisClient$.subscribe( (state:boolean) => {          
-    if(proxyService.redisClient) client = proxyService.redisClient;                 
-});
-
 
 export let ObjectId = mongoose.Schema.Types.ObjectId;
 export let Mixed = mongoose.Schema.Types.Mixed;
@@ -55,7 +42,9 @@ export 	class ReadWriteRepositoryBase<T extends mongoose.Document>
 			IWrite<T>,  
 			IBulk<T> {
    
-    private _model: mongoose.Model<mongoose.Document>;   
+    private _model: any; // mongoose.Model<mongoose.Document>;   
+
+    private client:any;
 
     constructor(     
 
@@ -63,7 +52,10 @@ export 	class ReadWriteRepositoryBase<T extends mongoose.Document>
         schemaIdentifier:string,
          
         // Native Model Connection    
-        conn:mongoose.Model<mongoose.Document>
+        conn:mongoose.Model<mongoose.Document>,
+
+        // redisClient
+        redisClient:any
     ) {           
 
         switch(schemaIdentifier) {
@@ -80,6 +72,8 @@ export 	class ReadWriteRepositoryBase<T extends mongoose.Document>
                 this.createCustomerModel(conn);               
             break;
         }     
+
+       this.client = redisClient;
     }
 
     /***
@@ -206,7 +200,7 @@ export 	class ReadWriteRepositoryBase<T extends mongoose.Document>
             console.log("(2) Key: ", key)
             console.log("(3) Args ",  args)     
            
-            let cacheValue:any = await client.hget(hashKey, key);
+            let cacheValue:any = await this.client.hget(hashKey, key);
 
 
             /***
@@ -242,7 +236,7 @@ export 	class ReadWriteRepositoryBase<T extends mongoose.Document>
                 /***
                  * Store result in Redis Cache
                  */              
-                client.hset( 
+                this.client.hset( 
                     hashKey, 
                     key, 
                     JSON.stringify(result),  

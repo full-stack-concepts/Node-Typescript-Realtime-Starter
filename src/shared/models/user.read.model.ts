@@ -11,10 +11,10 @@ import { ReadRepositoryBase } from "../../engines";
  * Local Repository that contains all methods for 
  * local instance of MongoDB
  */
-class UserReadRepository extends ReadRepositoryBase<IUser> {
+export class UserReadRepository extends ReadRepositoryBase<IUser> {
 	
-	constructor(connection:mongoose.Model<mongoose.Document>) {
-		super('User', connection);
+	constructor(connection:mongoose.Model<mongoose.Document>, redisClient:any) {
+		super('User', connection, redisClient);
 	}
 }
 
@@ -33,7 +33,7 @@ export class UserReadModel extends DefaultModel  {
 
 		proxyService.userDBLive$.subscribe( (state:boolean) => {						
 			if(proxyService.userDB) this.userDBConn = proxyService.userDB;				
-			this.repo = new UserReadRepository( this.userDBConn );
+			this.repo = new UserReadRepository( this.userDBConn, this.redisClient );
 		});		
 	}	
 

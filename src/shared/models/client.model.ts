@@ -11,10 +11,10 @@ import { TCLIENT } from "../types";
  * Local Repository that contains all methods for 
  * local instance of MongoDB
  */
-class ClientRepository extends ReadWriteRepositoryBase<IClient> {
+export class ClientRepository extends ReadWriteRepositoryBase<IClient> {
 	
-	constructor(connection:mongoose.Model<mongoose.Document>) {
-		super( 'Client', connection );
+	constructor(connection:mongoose.Model<mongoose.Document>, redisClient:any) {
+		super( 'Client', connection, redisClient );
 	}
 }
 
@@ -33,7 +33,7 @@ export class ClientModel extends DefaultModel  {
 
 		proxyService.userDBLive$.subscribe( (state:boolean) => {						
 			if(proxyService.userDB) this.userDBConn = proxyService.userDB;				
-			this.repo = new ClientRepository( this.userDBConn );
+			this.repo = new ClientRepository( this.userDBConn, this.redisClient );
 		});		
 	}	
 
@@ -41,7 +41,7 @@ export class ClientModel extends DefaultModel  {
 	 * Define custom methods for local instance of MongoDB here	
 	 */
 	public createUser(client:IClient): Promise<any> {
-		const repo = new ClientRepository( this.userDBConn );
+		const repo = new ClientRepository( this.userDBConn, this.redisClient );
 		return new Promise ( (resolve, reject) => {
 			repo.create(client, (err:any, res:any) => {			
 				if(err) { reject(err);} else { resolve(res);}

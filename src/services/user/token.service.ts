@@ -136,7 +136,7 @@ export class WebToken {
 	 	});	 	
 	}
 
-	static getUser(account:any):Promise<IUser> {	
+	static getUser(account:any) {	
 
 		let query:string = `{ 'accounts.${account.providerID}':'${account.value}' }`;	
 		return userModel.remoteFindOneOnly(query, 'users')

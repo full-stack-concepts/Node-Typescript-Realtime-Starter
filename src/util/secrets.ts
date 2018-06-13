@@ -241,6 +241,30 @@ export const DB_SYSTEM_USERS:any= [
 ];	
 
 /***
+ * Test Account Users DB
+ */
+export const TEST_ACCOUNT_USER_DB_ADMIN:any = {
+	user: SYSTEM_DB_USERS_ADMIN_USER, 
+	password: SYSTEM_DB_USERS_ADMIN_PASSWORD,
+	host: DB_CONFIG_HOST,		
+	db: DB_USERS_DATABASE_NAME, 
+	port: DB_CONFIG_PORT,
+	type: 2
+}
+
+/***
+ * Test Account Users DB
+ */
+export const TEST_ACCOUNT_PRODUCT_DB_ADMIN:any = {
+	user: SYSTEM_DB_PRODUCTS_ADMIN_USER, 
+	password: SYSTEM_DB_PRODUCTS_ADMIN_PASSWORD,
+	host: DB_CONFIG_HOST,		
+	db :DB_PRODUCT_DATABASE_NAME, 
+	port: DB_CONFIG_PORT,
+	type: 2 
+}
+
+/***
  * Required DB Accounts Admin Database
  */
 export const requiredAccountsAdminDatabase:any = [

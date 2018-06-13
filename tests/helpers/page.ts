@@ -1,5 +1,8 @@
 import puppeteer from "puppeteer";
 
+/****
+ * Set up Jest end-to-end testing
+ */
 interface IndexSignature {
   [key: string]: any;
 }

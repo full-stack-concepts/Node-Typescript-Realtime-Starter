@@ -11,10 +11,10 @@ import { ReadWriteRepositoryBase } from "../../engines";
  * Local Repository that contains all methods for 
  * local instance of MongoDB
  */
-class UserRepository extends ReadWriteRepositoryBase<IUser> {
+export class UserRepository extends ReadWriteRepositoryBase<IUser> {
 	
-	constructor(connection:mongoose.Model<mongoose.Document>) {
-		super('User', connection);
+	constructor(connection:mongoose.Model<mongoose.Document>, redisClient:any) {
+		super('User', connection, redisClient);
 	}
 }
 
@@ -33,7 +33,7 @@ export class UserModel extends DefaultModel  {
 
 		proxyService.userDBLive$.subscribe( (state:boolean) => {						
 			if(proxyService.userDB) this.userDBConn = proxyService.userDB;				
-			this.repo = new UserRepository( this.userDBConn );
+			this.repo = new UserRepository( this.userDBConn, this.redisClient );
 		});		
 	}	
 
@@ -41,7 +41,7 @@ export class UserModel extends DefaultModel  {
 	 * Define custom methods for User Model Only	
 	 */
 	public createUser(user:IUser): Promise<any> {
-		const repo = new UserRepository( this.userDBConn );
+		const repo = new UserRepository( this.userDBConn, this.redisClient );
 		return new Promise ( (resolve, reject) => {
 			repo.create(user, (err:any, res:any) => {			
 				if(err) { reject(err);} else { resolve(res);}

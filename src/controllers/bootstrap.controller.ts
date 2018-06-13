@@ -3,7 +3,7 @@ import { Observable, Subscription } from "rxjs";
 /****
  * Import Dependencies
  */
-import { RedisController, UAController, DAController } from "../controllers";;
+import { RedisController, UAController, DAController } from "../controllers";
 import { proxyService, connectToUserDatabase, connectToProductDatabase } from "../services";
 import { configureDatabases } from "../services/db/db.admin.service";
 import { testForSystemUser, createSystemUser } from "../services/user/system.user.service";
@@ -24,7 +24,6 @@ import { userModel, userReadModel, clientModel, clientReadModel, customerModel, 
  * so it can listen to application events
  */
 import { DefaultModel } from "../shared/models";
-import { IEncryption} from "../shared/interfaces";
 
 export class BootstrapController {
 

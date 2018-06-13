@@ -11,11 +11,10 @@ import { TSYSTEMUSER } from "../types";
  * Local Repository that contains all methods for 
  * local instance of MongoDB
  */
-
-class SystemUserRepository extends ReadWriteRepositoryBase<ISystemUser> {
+export class SystemUserRepository extends ReadWriteRepositoryBase<ISystemUser> {
 	
-	constructor(connection:mongoose.Model<mongoose.Document>) {
-		super( 'SystemUser', connection);
+	constructor(connection:mongoose.Model<mongoose.Document>, redisClient:any) {
+		super( 'SystemUser', connection, redisClient);
 	}
 }
 
@@ -37,7 +36,7 @@ export class SystemUserModel extends DefaultModel  {
 
 		proxyService.userDBLive$.subscribe( (state:boolean) => {						
 			if(proxyService.userDB) this.userDBConn = proxyService.userDB;				
-			this.repo = new SystemUserRepository( this.userDBConn );
+			this.repo = new SystemUserRepository( this.userDBConn, this.redisClient );
 		});		
 	}			
 
@@ -45,7 +44,7 @@ export class SystemUserModel extends DefaultModel  {
 	 * Define custom methods for local onstance of MongoDB here	
 	 */
 	public createUser(user:ISystemUser): Promise<any> {			
-		const repo = new SystemUserRepository( this.userDBConn );		
+		const repo = new SystemUserRepository( this.userDBConn, this.redisClient );		
 		return new Promise ( (resolve, reject) => {
 			repo.create(user, (err:any, res:any) => {			
 				if(err) { reject(err);} else { resolve(res);}
