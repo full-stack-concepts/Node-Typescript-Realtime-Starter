@@ -79,14 +79,7 @@ describe("Database User Read Model Methods", () => {
 			// add to actions config array
 			configActions.push({ type, model, repo:null });
 
-		});
-		
-		// (4) reate respository
-		repository= new ReadRepository('User', connection, redisClient);	
-		
-		// import repository into our test model
-		testModel.repo = repository;	
-
+		});	
 	});
 
 	it("shoud create an intance of ReadRepository", async () => {	

@@ -296,7 +296,7 @@ export class BootstrapController {
 			}, 2000);	
 			*/			
 
-			/*
+			
 			setTimeout( () => {
 				console.log("**** Start update ")
 				userModel.updateMany( 
@@ -311,7 +311,7 @@ export class BootstrapController {
 					console.log(err)
 				})
 			}, 2000);			
-			*/		
+					
 			
 			// #TODO: Move to tests integration-database
 			/*
@@ -516,13 +516,14 @@ export class BootstrapController {
 					console.log(err)
 				})
 			}, 6000);		
-
+			*/
 		
+			/*
 			setTimeout( () => {
 				console.log("**** Start update ")
 				customerModel.updateMany( 
 					{ 'core.role': 20 },
-					{ $set: { 'security.isAccountVerified': true}}
+					{ $set: { 'core.role': 7777}}
 				)
 				.then( (result:any) => {
 					console.log("**** Result OK ")
@@ -533,6 +534,7 @@ export class BootstrapController {
 				})
 			}, 7000);			
 			*/
+			/*
 
 			// #TODO: Move to tests integration-database
 			/*

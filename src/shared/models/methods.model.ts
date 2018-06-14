@@ -116,7 +116,7 @@ export class ModelMethods {
 			repo.updateMany ( query, update, options, (err:any, res:any) => {								
 				console.log(err, res)
 				if(err) {  reject(err); } 
-				else { resolve(); } 			
+				else { resolve(res); } 			
 			});
 		});
 	}

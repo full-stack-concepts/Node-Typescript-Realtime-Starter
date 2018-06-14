@@ -587,7 +587,7 @@ export const ACCOUNT_TYPE_USER:number = parseInt(process.env["ACCOUNT_TYPE_USER"
 export const ACCOUNT_TYPE_CLIENT:number = parseInt(process.env["ACCOUNT_TYPE_CLIENT"]); // 10
 export const ACCOUNT_TYPE_CUSTOMER:number = parseInt(process.env["ACCOUNT_TYPE_CUSTOMER"]); // 20
 
-export const accountTypes:any = [
+export const USER_ROLE_TYPES:any = [
 	{ userType: PERSON_SUBTYPE_SYSTEM_USER, account: ACCOUNT_TYPE_SYSTEM_USER },
 	{ userType: PERSON_SUBTYPE_ADMIN, account: ACCOUNT_TYPE_ADMIN },
 	{ userType: PERSON_SUBTYPE_POWERUSER, account: ACCOUNT_TYPE_POWERUSER },
