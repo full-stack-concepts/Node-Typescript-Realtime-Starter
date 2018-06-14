@@ -782,7 +782,8 @@ export class UserOperations extends PersonProfile {
 			return model.findOne( query )
 			.then( (u:any) => { return Promise.resolve(u); })
 			.catch( (err:any) => {		
-				console.error('<errorNumberX>'); 
+				console.log(err)
+				console.error('<errorNumberX666>'); 
 			});				
 		}	
 

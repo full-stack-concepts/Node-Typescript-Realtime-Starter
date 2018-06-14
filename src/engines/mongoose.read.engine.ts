@@ -9,7 +9,11 @@ import { Schema } from "mongoose";
 import { 
     USE_LOCAL_REDIS_SERVER,
     REDIS_READ_QUERIES_EXPIRATION_TYPE,
-    REDIS_READ_QUERIES_EXPIRATION_TIME
+    REDIS_READ_QUERIES_EXPIRATION_TIME,
+    PERSON_SUBTYPE_SYSTEM_USER,
+    PERSON_SUBTYPE_USER,
+    PERSON_SUBTYPE_CLIENT,
+    PERSON_SUBTYPE_CUSTOMER
 } from "../util/secrets";
 
 /****
@@ -46,16 +50,16 @@ export 	class ReadRepositoryBase<T extends mongoose.Document>
     ) {              
 
         switch(schemaIdentifier) {
-            case 'SystemUser':  
+            case PERSON_SUBTYPE_SYSTEM_USER:  
                 this.createSystemUserModel(conn); 
             break;
-            case 'User': 
+            case PERSON_SUBTYPE_USER: 
                 this.createUserModel(conn); 
             break;            
-            case 'Client': 
+            case PERSON_SUBTYPE_CLIENT: 
                 this.createClientModel(conn);        
             break;
-            case 'Customer':
+            case PERSON_SUBTYPE_CUSTOMER:
                 this.createCustomerModel(conn);               
             break;
         }        

@@ -1,12 +1,21 @@
-import querystring from "querystring";
 import { expect, assert } from "chai";
 import * as chai from "chai";
 import validator from "validator";
-import { deepCloneObject } from "../../../../src/util";
+
+/****
+ * Settings
+ */
+import { 
+	PERSON_SUBTYPE_SYSTEM_USER,
+	PERSON_SUBTYPE_USER,
+	PERSON_SUBTYPE_CLIENT,
+	PERSON_SUBTYPE_CUSTOMER,	
+} from "../../../../src/util/secrets";
 
 // Helpers
 import { 
 	UserTypeMethods, 
+	deepCloneInstance,
 	dbTestEnvironment,
 	RedisController,
 	ReadRepository,
@@ -16,12 +25,10 @@ import {
 import { IUser, IClient, ICustomer} from "../../../../src/shared/interfaces";
 
 /****
- *
+ * Instance of ModelMethods: holds all default Mongoose and MLAB db methods
+ * @testModel:ModelMethods
  */
-import {
-	testModel
-} from "../../../../src/shared/models/methods.model";
-
+import { testModel } from "../../../../src/shared/models/methods.model";
 
 /****
  * Test variables
@@ -32,13 +39,19 @@ var redisClient:any;
 var repository:any;
 const userRole:number = 5;
 
+/****
+ *
+ */
 const readModels:string[] = [
-	'SystemUser',
-	'User',
-	'Client',
-	'Customer'
+	PERSON_SUBTYPE_SYSTEM_USER,
+	PERSON_SUBTYPE_USER,
+	PERSON_SUBTYPE_CLIENT,
+	PERSON_SUBTYPE_CUSTOMER
 ];
 
+/****
+ *
+ */
 var configActions:any = [];
 
 describe("Database User Read Model Methods", () => {
@@ -61,10 +74,7 @@ describe("Database User Read Model Methods", () => {
 		readModels.forEach( (type:string) => {
 
 			// clone testmodel to we can create a repo per readModel
-			let model:any = Object.assign( 
-				Object.create( 
-					Object.getPrototypeOf(testModel)
-			), testModel);					
+			let model:any = deepCloneInstance(testModel);
 
 			// add to actions config array
 			configActions.push({ type, model, repo:null });
@@ -83,10 +93,10 @@ describe("Database User Read Model Methods", () => {
 
 		configActions.forEach( (config:any) => {			
 
-			// create repository
+			// (4) reate respository
 			let testRepo:any = new ReadRepository(config.type, connection, redisClient);	
 			
-			// assign repo
+			// import repository into our test model
 			config.repo = testRepo;
 			config.model.repo = testRepo;
 			
@@ -144,7 +154,7 @@ describe("Database User Read Model Methods", () => {
 					identifier = users[0].core.email;
 
 					// (4) find single user
-					user = await testModel.findOne({ 'core.email':identifier});
+					user = await config.model.findOne({ 'core.email':identifier});
 				}
 
 				catch(e) {  err=e; }
@@ -174,25 +184,31 @@ describe("Database User Read Model Methods", () => {
 
 			let err:any;	
 
-			/***
-			 * Find all documents inside this collection that match condition
-			 */
-			try { 
 
-				users = await testModel.find({ 'core.role':userRole})
-			}
+			return configActions.forEach( async (config:any) => {	
 
-			catch(e) {  err=e; }
 
-			/***
-			 * Assert
-			 */
-			finally {
+				/***
+				 * Find all documents inside this collection that match condition
+				 */
+				try { 
 
-				expect(err).to.be.undefined;
-				expect(users).to.be.an("array");
-				expect(users.length).to.be.gte(0);														
-			}
+					users = await config.model.find({ 'core.role':userRole})
+				}
+
+				catch(e) {  err=e; }
+
+				/***
+				 * Assert
+				 */
+				finally {
+
+					expect(err).to.be.undefined;
+					expect(users).to.be.an("array");
+					expect(users.length).to.be.gte(0);														
+				}
+
+			});
 
 			
 		});

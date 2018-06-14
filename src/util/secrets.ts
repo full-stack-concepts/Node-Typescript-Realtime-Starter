@@ -135,6 +135,7 @@ if(SET_SYSTEM_ADMIN_ACCOUNT) {
 	});
 }
 
+
 /***
  * LOCAL MONGODB SERVER
  */
@@ -551,13 +552,20 @@ if( !Number.isInteger(PASSWORD_MIN_LENGTH)) {
 /*******
  * Person Sub Types
  */
-export const PERSON_SUBTYPE_SYSTEM_USER = process.env["PERSON_SUBTYPE_SYSTEM_USER"];
-export const PERSON_SUBTYPE_USER = process.env["PERSON_SUBTYPE_USER"];
-export const PERSON_SUBTYPE_CLIENT = process.env["PERSON_SUBTYPE_CLIENT"];
-export const PERSON_SUBTYPE_CUSTOMER = process.env["PERSON_SUBTYPE_CUSTOMER"];
+export const PERSON_SUBTYPE_SYSTEM_USER = process.env["PERSON_SUBTYPE_SYSTEM_USER"].toLowerCase();
+export const PERSON_SUBTYPE_ADMIN = process.env["PERSON_SUBTYPE_ADMIN"].toLowerCase();
+export const PERSON_SUBTYPE_POWERUSER = process.env["PERSON_SUBTYPE_POWERUSER"].toLowerCase();
+export const PERSON_SUBTYPE_AUTHOR = process.env["PERSON_SUBTYPE_AUTHOR"].toLowerCase();
+export const PERSON_SUBTYPE_USER = process.env["PERSON_SUBTYPE_USER"].toLowerCase();
+export const PERSON_SUBTYPE_CLIENT = process.env["PERSON_SUBTYPE_CLIENT"].toLowerCase();
+export const PERSON_SUBTYPE_CUSTOMER = process.env["PERSON_SUBTYPE_CUSTOMER"].toLowerCase();
+
 
 export const PERSON_SUBTYPES:string[] = [
 	PERSON_SUBTYPE_SYSTEM_USER,
+	PERSON_SUBTYPE_ADMIN,
+	PERSON_SUBTYPE_POWERUSER,
+	PERSON_SUBTYPE_AUTHOR,
 	PERSON_SUBTYPE_USER,
 	PERSON_SUBTYPE_CLIENT,
 	PERSON_SUBTYPE_CUSTOMER
@@ -566,6 +574,28 @@ export const PERSON_SUBTYPES:string[] = [
 export const USE_PERSON_SUBTYPE_USER = process.env["USE_PERSON_SUBTYPE_USER"] == 'true';
 export const USE_PERSON_SUBTYPE_CLIENT = process.env["USE_PERSON_SUBTYPE_CLIENT"] == 'true';
 export const USE_PERSON_SUBTYPE_CUSTOMER = process.env["USE_PERSON_SUBTYPE_CUSTOMER"] == 'true';
+
+
+/****
+ * Account Types
+ */
+export const ACCOUNT_TYPE_SYSTEM_USER:number = parseInt(process.env["ACCOUNT_TYPE_SYSTEM_USER"]); // 1
+export const ACCOUNT_TYPE_ADMIN:number = parseInt(process.env["ACCOUNT_TYPE_ADMIN"]); // 2
+export const ACCOUNT_TYPE_POWERUSER:number = parseInt(process.env["ACCOUNT_TYPE_POWERUSER"]); // 3
+export const ACCOUNT_TYPE_AUTHOR:number = parseInt(process.env["ACCOUNT_TYPE_AUTHOR"]); // 4
+export const ACCOUNT_TYPE_USER:number = parseInt(process.env["ACCOUNT_TYPE_USER"]); // 5
+export const ACCOUNT_TYPE_CLIENT:number = parseInt(process.env["ACCOUNT_TYPE_CLIENT"]); // 10
+export const ACCOUNT_TYPE_CUSTOMER:number = parseInt(process.env["ACCOUNT_TYPE_CUSTOMER"]); // 20
+
+export const accountTypes:any = [
+	{ userType: PERSON_SUBTYPE_SYSTEM_USER, account: ACCOUNT_TYPE_SYSTEM_USER },
+	{ userType: PERSON_SUBTYPE_ADMIN, account: ACCOUNT_TYPE_ADMIN },
+	{ userType: PERSON_SUBTYPE_POWERUSER, account: ACCOUNT_TYPE_POWERUSER },
+	{ userType: PERSON_SUBTYPE_AUTHOR, account: ACCOUNT_TYPE_AUTHOR },
+	{ userType: PERSON_SUBTYPE_USER, account: ACCOUNT_TYPE_USER },
+	{ userType: PERSON_SUBTYPE_CLIENT, account: ACCOUNT_TYPE_CLIENT },
+	{ userType: PERSON_SUBTYPE_CUSTOMER, account: ACCOUNT_TYPE_CUSTOMER },
+];
 
 /***
  * DB Population

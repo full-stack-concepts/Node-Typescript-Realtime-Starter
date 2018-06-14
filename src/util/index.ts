@@ -1,5 +1,6 @@
 export {
 	deepCloneObject,
+	deepCloneInstance,
 	cloneArray,
 	capitalizeString,
 	objectKeysLength,

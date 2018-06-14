@@ -47,7 +47,8 @@
         "unit-usertypes-tests": "mocha -r ts-node/register tests/unit/usertypes/**/*.spec.ts",
         "integration-infrastructure-tests": "nyc mocha -r ts-node/register tests/integration/infrastructure/**/*.spec.ts --timeout 7500 --exit",
         "integration-db-readmodel-tests": "mocha -r ts-node/register tests/integration/db/readmodels/**/*.spec.ts --timeout 15000 --exit",
-        "integration-user-tests": "nyc mocha -r ts-node/register tests/integration/user/**/*.spec.ts --timeout 60000 --exit",
+        "integration-db-writemodel-tests": "mocha -r ts-node/register tests/integration/db/writemodels/**/*.spec.ts --timeout 15000 --exit",
+      
         "build-ts": "tsc",
         "watch-ts": "tsc -w",
         "tslint": "tslint -c tslint.json -p tsconfig.json",

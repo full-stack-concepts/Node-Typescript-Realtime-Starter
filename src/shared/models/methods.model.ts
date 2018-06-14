@@ -61,7 +61,7 @@ export class ModelMethods {
 	public findOne (query:Object):Promise<any> {
 		const repo = this.repo;
 		return new Promise ( (resolve, reject) => {
-			repo.findOne ( query, (err:any, res:any) => {					
+			repo.findOne ( query, (err:any, res:any) => {								
 				if(err) { reject(err); } 
 				else if(!res) { resolve(); } 
 				else { resolve(res); }
@@ -202,7 +202,6 @@ export class ModelMethods {
 }
 
 /***
- *
+ * Export for Test Environment
  */
-
-export const testModel:ModelMethods = new ModelMethods();
+export const testModel:any = new ModelMethods();

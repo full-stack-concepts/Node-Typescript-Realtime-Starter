@@ -10,13 +10,22 @@ import mongoose from 'mongoose';
 import { Document, Schema, ModelPopulateOptions } from "mongoose";
 
 
-/****
- * Redis Settings
- */
-import { 
-    USE_LOCAL_REDIS_SERVER,
+import {     
+
+    /****
+     * Redis Settings
+     */
+    USE_LOCAL_REDIS_SERVER,    
     REDIS_WRITE_QUERIES_EXPIRATION_TYPE,
-    REDIS_WRITE_QUERIES_EXPIRATION_TIME
+    REDIS_WRITE_QUERIES_EXPIRATION_TIME,
+
+    /****
+     * Model Identifiers
+     */
+    PERSON_SUBTYPE_SYSTEM_USER,
+    PERSON_SUBTYPE_USER,
+    PERSON_SUBTYPE_CLIENT,
+    PERSON_SUBTYPE_CUSTOMER
 } from "../util/secrets";
 
 /****
@@ -59,16 +68,16 @@ export 	class ReadWriteRepositoryBase<T extends mongoose.Document>
     ) {           
 
         switch(schemaIdentifier) {
-            case 'SystemUser':  
+            case PERSON_SUBTYPE_SYSTEM_USER:  
                 this.createSystemUserModel(conn); 
             break;
-            case 'User': 
+            case PERSON_SUBTYPE_USER: 
                 this.createUserModel(conn); 
             break;            
-            case 'Client':             
+            case PERSON_SUBTYPE_CLIENT:             
                 this.createClientModel(conn);        
             break;
-            case 'Customer':
+            case PERSON_SUBTYPE_CUSTOMER:
                 this.createCustomerModel(conn);               
             break;
         }     

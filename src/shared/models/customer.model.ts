@@ -1,6 +1,7 @@
 import Promise from "bluebird";
 import mongoose from "mongoose";
 
+import { PERSON_SUBTYPE_CUSTOMER } from "../../util/secrets";
 import { proxyService } from "../../services";
 import { DefaultModel } from "./default.model";
 import { ICustomer } from "../interfaces";
@@ -14,7 +15,11 @@ import { TCUSTOMER } from "../types";
 export class CustomerRepository extends ReadWriteRepositoryBase<ICustomer> {
 	
 	constructor(connection:mongoose.Model<mongoose.Document>, redisClient:any) {
-		super( 'Customer', connection, redisClient );
+		super( 
+			PERSON_SUBTYPE_CUSTOMER, 
+			connection, 
+			redisClient 
+		);
 	}
 }
 

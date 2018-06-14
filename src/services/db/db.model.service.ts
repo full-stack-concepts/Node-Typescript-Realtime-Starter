@@ -109,6 +109,8 @@ class DBModelService {
 			type: PERSON_SUBTYPE_CUSTOMER, 
 			collection: DB_CUSTOMERS_COLLECTION_NAME 
 		});		
+
+		console.log(this.readModels)
 		
 
 		// broadcast models array
@@ -140,6 +142,8 @@ class DBModelService {
 			type: PERSON_SUBTYPE_CUSTOMER, 
 			collection: DB_CUSTOMERS_COLLECTION_NAME 
 		});		
+
+		console.log(this.writeModels)
 
 		// broadcast models array
 		this.databaseWriteModelsSubject.next(this.writeModels);

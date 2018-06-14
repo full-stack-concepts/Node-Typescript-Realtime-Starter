@@ -1,6 +1,7 @@
 import Promise from "bluebird";
 import mongoose from "mongoose";
 
+import { PERSON_SUBTYPE_SYSTEM_USER } from "../../util/secrets";
 import { proxyService } from "../../services";
 import { DefaultModel} from "./default.model";
 import { ISystemUser } from "../interfaces";
@@ -14,7 +15,11 @@ import { TSYSTEMUSER } from "../types";
 export class SystemUserReadRepository extends ReadRepositoryBase<ISystemUser> {
 	
 	constructor(connection:mongoose.Model<mongoose.Document>, redisClient:any) {
-		super( 'SystemUser', connection, redisClient);
+		super( 
+			PERSON_SUBTYPE_SYSTEM_USER, 
+			connection, 
+			redisClient
+		);
 	}
 }
 
