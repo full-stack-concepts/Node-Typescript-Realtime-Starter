@@ -42,7 +42,7 @@ export class WebToken {
 	/******
 	 * Create JWT Token => merges defaultID, googleID or facebookID
 	 */
-	static createJSONWebToken( userAccounts:any ):Promise<string> {				
+	static createJSONWebToken( userAccounts:any ):Promise<string> {						
 
 		return new Promise( (resolve, reject) => {			
 	    	let token = jwt.sign(	    	
@@ -159,7 +159,9 @@ export class WebToken {
 		.then( (token:string) => this.verifyJSONWebToken(token) )
 
 		// return token to caller
-		.then( (token:string) => Promise.resolve(token) )
+		.then( (token:string) => {			
+			return Promise.resolve(token) 
+		})
 
 		// error handler
 		.catch( err => Promise.reject(err) );

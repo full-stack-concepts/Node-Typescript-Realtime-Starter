@@ -37,6 +37,8 @@ export 	class ReadRepositoryBase<T extends mongoose.Document>
 
     private client:any;
 
+    private schemaIdentifier:string;
+
     constructor(     
 
         // Schema Identifier    
@@ -47,7 +49,9 @@ export 	class ReadRepositoryBase<T extends mongoose.Document>
 
          // redisClient
         redisClient:any
-    ) {              
+    ) {       
+
+        this.schemaIdentifier = schemaIdentifier;   
 
         switch(schemaIdentifier) {
             case PERSON_SUBTYPE_SYSTEM_USER:  
@@ -144,6 +148,8 @@ export 	class ReadRepositoryBase<T extends mongoose.Document>
                     result = await exec.call( this._model, searchID );  
                 }  
 
+                console.log(result)
+
                 return callback.call(this, null, result);  
             }
             catch (e) { err=e;}
@@ -185,13 +191,14 @@ export 	class ReadRepositoryBase<T extends mongoose.Document>
                 if(options) args.push(options);
             }
            
+           /*
             console.log("==> ReadWrite Engine")
             console.log("(0) Condition: ", condition)
             console.log("(1) Hash Key: ", hashKey)
             console.log("(2) Key: ", key)
             console.log("(3) Args ",  args)     
             console.log("(4) Callback ", callback)
-           
+           */
             let cacheValue:any = await this.client.hget(hashKey, key);
 
 
@@ -292,17 +299,19 @@ export 	class ReadRepositoryBase<T extends mongoose.Document>
         this.cache(_id, null, null, this._model.findById, callback);    
     }
 
-    /*
+    
     findOne(cond: Object, callback: (err: any, res: T) => void): any {
         return this._model.findOne(cond, callback);
     }
-    */
+    
 
+    /*
     findOne(query:Object, callback?: (err: any, res: T) => void): any {
         this.cache(query, {}, {}, this._model.findOne, callback);       
     }
+    */
 
-    find(query?: Object, fields?:Object, options?:Object, callback?: (err: any, res: T[]) => void): any {
+    find(query: Object, fields:Object={}, options:Object={}, callback: (err: any, res: T[]) => void): any {
         this.cache(query, fields, options, this._model.find, callback);        
     }  
     

@@ -1,42 +1,3 @@
-/*
-if(category === "users") {						
-					return Promise.map( users, (user:IUser) => {
-						this.encryptPassword(user, user.password.value , 1) 
-						.then( ({user, encrypt}:any) => {
-							// console.log(encrypt)
-							user.password.method = encrypt.method;
-							user.password.value = encrypt.hash;
-							console.log(user)
-							return Promise.resolve(user) 
-						});
-					});		
-				
-				} else if(category === "clients") {
-					return Promise.map( clients, (client:IClient) => {
-						this.encryptPassword( client, client.password.value , 1) 
-						.then( ({user, encrypt}:any) => {
-							console.log(encrypt)
-							user.password.method = encrypt.method;
-							user.password.value = encrypt.hash;
-							return Promise.resolve(user) 
-						});
-					});
-					// resolve(clients); 
-				} else if(category === "customers") {
-					return Promise.map( customers, (customers:ICustomer) => {
-						this.encryptPassword( customer, customer.password.value , 1) 
-						.then( ({user, encrypt}:any) => {
-							// console.log(encrypt)
-							user.password.method = encrypt.method;
-							user.password.value = encrypt.hash;
-							return Promise.resolve(user) 
-						});
-					});
-					// resolve(customers);
-				}
-
-*/
-
 
 import { expect, assert, should } from 'chai';
 import Validator from "validator";
@@ -280,8 +241,8 @@ describe("Application", () => {
 	 */
 	describe("Person Subtypes", () => {	
 
-		it("should have four defined user types", () => {
-			expect(PERSON_SUBTYPES.length).to.equal(4);		
+		it("should have seven defined user types", () => {
+			expect(PERSON_SUBTYPES.length).to.equal(7);		
 		});
 
 		it("should have subtypes defined as strings", () => {

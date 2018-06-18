@@ -163,29 +163,25 @@ export class FaceBookUserService extends UserOperations {
 		 */
 		.then( ( email:string ) => this.testForAccountType( email) )
 
-		// process thick: create new user or return 
-		.then( (person:IUser|IClient|ICustomer|undefined) => {		
-			if(!person) {							
+		// process thick: create new or return exising user
+		.then( (person:IUser|IClient|ICustomer|undefined) => {			
+			if(!person) {					
 				// process thick: build user object
 				return this.extractFacebookProfile(fProfile)
 				// process thick: build user object
 				.then( (user:IUser) => this.newUser(user) );  
-			} else {			
-				return this.validateUser( fProfile, person );		 	
-			}
-		})
-
+			} else {									
+				return this.validateUser( fProfile, person );		  	
+			}			
+		})	
 		/**** 
 		 * process thick: create webtoken
 		 */
-		.then( (user:IUser|IClient|ICustomer) =>  this.uaController[CREATE_WEBTOKEN]( user.accounts) )	
+		.then( (user:IUser|IClient|ICustomer) => Promise.resolve(user) )
 
-		// process thick: return to caller so webtoken can be created
-		.then( (token:string) => Promise.resolve({token}) )
+		.catch( (err:any) => Promise.reject(err));	
 
-		.catch( (err:any) => {		
-			Promise.reject(err);
-		});	
+		
 	}
 }
 

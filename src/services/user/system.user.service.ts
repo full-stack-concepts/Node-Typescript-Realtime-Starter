@@ -22,8 +22,7 @@ import  {
 	SYSTEM_ADMIN_FIRST_NAME,
 	SYSTEM_ADMIN_LAST_NAME,
 	SYSTEM_ADMIN_EMAIL,
-	SYSTEM_ADMIN_PASSWORD,
-	PERSON_SUBTYPE_SYSTEM_USER
+	SYSTEM_ADMIN_PASSWORD	
 } from "../../util/secrets";
 
 /****
@@ -32,7 +31,8 @@ import  {
 import {
 	USE_PERSON_SUBTYPE_USER,
 	USE_PERSON_SUBTYPE_CLIENT,
-	USE_PERSON_SUBTYPE_CUSTOMER
+	USE_PERSON_SUBTYPE_CUSTOMER,
+	PERSON_SUBTYPE_SYSTEM_USER
 } from "../../util/secrets";
 
 import {
@@ -397,14 +397,25 @@ export class SystemUserService extends UserOperations {
 		// process thick: validate password
 		.then( (user:ISystemUser) => this.validateUserPassword(user, login.password) )
 
-		// process thick:
+		// process thick: add login
 		.then( (user:ISystemUser) => {
-			user = this.addLogin(user);
-			return Promise.resolve(user);
-		})
 
-		// process thick: save user object
-		.then( (user:ISystemUser) => this.updateUser (user) )
+			let login:ILoginTracker = this.authenticationTracker();
+			let logins:ILoginTracker[] = this.updateLoginsArray(user, login);
+		
+			return Promise.resolve({user, logins});
+		})		
+
+		// process thick: update user object
+		.then( ({user, logins}:any) => {		
+			return this.updateUser(
+				{ 'core.email': login.email },
+				{ $set: 
+					{'logins': logins}
+				},
+				PERSON_SUBTYPE_SYSTEM_USER
+			);			
+		})
 
 		// process thick: create authenticatoin token
 		.then( (user:ISystemUser) =>  WebToken.createWebToken( user.accounts) )

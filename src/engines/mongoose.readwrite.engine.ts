@@ -316,11 +316,11 @@ export 	class ReadWriteRepositoryBase<T extends mongoose.Document>
     }
 
     findOneAndDelete(conditions:Object={}, options:Object={}, callback: (error: any, result: any) => void) {         
-        this._model.findOneAndRemove( conditions, options, (err:any) => callback(err, null));
+        this._model.findOneAndRemove( conditions, options, (err:any, result:any) => callback(err, result));
     }
 
     findOneAndUpdate(conditions:Object={}, update:Object={}, options:Object={}, callback: (error: any, result: any) => void) {         
-        this._model.findOneAndUpdate( conditions, update, options, (err:any) => callback(err, null));
+        this._model.findOneAndUpdate( conditions, update, options, (err:any, result:any) => callback(err, result));
     }   
 
      /***

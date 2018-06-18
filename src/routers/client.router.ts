@@ -2,16 +2,17 @@ import express from "express";
 import {Router, Request, Response, NextFunction} from "express";
 
 import { DefaultRouter } from "./default.router";
-import { logout } from "./middlewares";
 
 /***
  * Import Niddleware functions
  */
 import { 
-	allowCredentials,
-	allowMethods,
-	allowOrigin
-} from '../util/middleware.util';
+	analyse, 
+	logout, 
+	allowCredentials, 
+	allowMethods, 
+	allowOrigin 
+} from "./middlewares";
 
 /***
  * Import Actions
@@ -58,8 +59,9 @@ export class ClientRouter extends DefaultRouter{
 	private setRoutes():void {
 
 		/*****
-         * Client Authentication Routes
-         */ 
+		 *  Analyse client on root entry
+		 */		
+		this.router.get('/', analyse);   
        
        	// enable local authentication
         if(LOCAL_AUTH_CONFIG.enable) { 

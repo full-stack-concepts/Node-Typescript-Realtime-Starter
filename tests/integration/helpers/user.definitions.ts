@@ -32,7 +32,7 @@ export function userDefinitions():IUserDefinitions {
 	 */
 	const _firstName:string = firstName();
 	const _lastName:string = lastName();
-	const _email:string = constructEmail(_firstName, _lastName);
+	const _email:string = constructEmail(_firstName, _lastName).toLowerCase();
 
 	/***
 	 * Define a password that matches your defined policy 

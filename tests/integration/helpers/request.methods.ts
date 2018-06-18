@@ -4,7 +4,7 @@
 import request from "request";
 
 // Settings/
-import { ENVIRONMENT, EXPRESS_SERVER_MODE, SITE_URL, PORT } from "../../../src/util/secrets";
+import { ENVIRONMENT, EXPRESS_SERVER_MODE, SITE_URL, PORT, USE_LOCAL_REDIS_SERVER } from "../../../src/util/secrets";
 
 import {IResponse} from "../../../src/shared/interfaces";
 
@@ -36,6 +36,17 @@ export class RequestMethods {
 		}
 	}
 
+	/****
+	 * Test Environment
+	 */
+	testEnvironment() {
+		if(EXPRESS_SERVER_MODE==='https' || USE_LOCAL_REDIS_SERVER ) {
+			console.error("TESTING ENV ERROR: Test routes with express in http mode and disable any Redis Server")
+			process.exit(1);
+		}
+	}
+
+
 	/***
 	 * POST METHOD
 	 */
@@ -46,6 +57,7 @@ export class RequestMethods {
 				method: 'POST',
 				uri:url,
 				form:data,
+				gzip:true,
 				headers: {'Content-Type': 'application/json'}
 			},
 			(error:any, response:any, body:string) => {

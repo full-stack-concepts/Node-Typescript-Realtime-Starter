@@ -3,16 +3,17 @@ import {Router, Request, Response, NextFunction} from "express";
 import passport from "passport";
 
 import { DefaultRouter } from "./default.router";
-import { logout } from "./middlewares";
 
 /***
  * Import Niddleware functions
  */
 import { 
-	allowCredentials,
-	allowMethods,
-	allowOrigin
-} from '../util/middleware.util';
+	analyse, 
+	logout, 
+	allowCredentials, 
+	allowMethods, 
+	allowOrigin 
+} from "./middlewares";
 
 /***
  * Import Actions
@@ -28,6 +29,8 @@ import {
 import { IUser, ILoginRequest, IFindUser, IDeleteUser } from "../shared/interfaces";
 import { LOCAL_AUTH_CONFIG, STORE_WEBTOKEN_AS_COOKIE, WEBTOKEN_COOKIE, SEND_TOKEN_RESPONSE } from "../util/secrets";
 import { IUserApplication } from "../shared/interfaces";
+import { HTTPLogger } from "../controllers";
+import { clientDetectionService } from "../services";
 
 class UserRouter extends DefaultRouter { 
 
@@ -52,14 +55,19 @@ class UserRouter extends DefaultRouter {
 
         // type req to any -> origin property unkown on Request
         this.router.use(allowOrigin);     
+        
 	}
 
 	private setRoutes():void {
 
 		/*****
+		 *  Analyse client on root entry
+		 */		
+		this.router.get('/', analyse);       
+
+		/*****
          * Client Authentication Routes
-         */ 
-       
+         */        
        	// enable local authentication
         if(LOCAL_AUTH_CONFIG.enable) {         	
 

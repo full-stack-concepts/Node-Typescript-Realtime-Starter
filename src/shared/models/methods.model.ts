@@ -104,7 +104,7 @@ export class ModelMethods {
 		return new Promise ( (resolve, reject) => {
 			repo.findOneAndUpdate ( query, update, options, (err:any, res:any) => {								
 				if(err) {  reject(err); } 
-				else { resolve(); } 			
+				else { resolve(res); } 			
 			});
 		});
 	}

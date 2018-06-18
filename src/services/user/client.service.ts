@@ -15,7 +15,8 @@ import { TCLIENT } from "../../shared/types";
 import { WebToken} from "./token.service";
 
 import {		
-	LOCAL_AUTH_CONFIG
+	LOCAL_AUTH_CONFIG,
+	PERSON_SUBTYPE_CLIENT
 } from "../../util/secrets";
 
 /***
@@ -176,16 +177,28 @@ export class ClientService extends UserOperations {
 		// process thick: test for account
 		.then( () => this.testForAccountType(login.email))// process thick: validate password
 
-		.then( (client:IClient) => this.validateUserPassword(client, login.password) )
+		.then( (client:IClient) => this.validateUserPassword(client, login.password) )	
 
-		// process thick:
-		.then( (client:IClient) => {			
-			client = this.addLogin(client);
-			return Promise.resolve(client);
+
+		// process thick: create login
+		.then( (client:IClient) => {
+
+			let login:ILoginTracker = this.authenticationTracker();
+			let logins:ILoginTracker[] = this.updateLoginsArray(client, login);
+		
+			return Promise.resolve({client, logins});
 		})
 
-		// process thick: save user object
-		.then( (client:IClient) => this.updateUser (client) )
+		// process thick: update client object
+		.then( ({client, logins}:any) => {	
+			return this.updateUser(
+				{ 'core.email': login.email },
+				{ $set: 
+					{'logins': logins}
+				},
+				PERSON_SUBTYPE_CLIENT
+			);			
+		})	
 
 		// process thick: create authenticatoin token
 		.then( (client:IClient) => WebToken.createWebToken( client.accounts) )	

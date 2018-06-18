@@ -50,7 +50,8 @@ import {
 } from "../../util";
 
 import {		
-	LOCAL_AUTH_CONFIG
+	LOCAL_AUTH_CONFIG,
+	PERSON_SUBTYPE_USER
 } from "../../util/secrets";
 
 interface IModelSetting {
@@ -169,9 +170,7 @@ export class UserService extends UserOperations {
 		newUser = this.setDisplayNames(newUser, form);
 
 		// user credentials: userName && url 
-		newUser = this.setCredentials(newUser);
-
-		console.log(newUser)
+		newUser = this.setCredentials(newUser);		
 
 		return Promise.resolve(newUser);
 	}	
@@ -187,21 +186,7 @@ export class UserService extends UserOperations {
 			return Promise.reject("<errorNumber>");
 		}
 	}	
-
-	/***
-	 *
-	 */
-	private addLogin(user:IUser):IUser {
-
-		let login:ILoginTracker = this.authenticationTracker();
-		let _logins:ILoginTracker[]=[];
-		
-		if( user.logins && Array.isArray(user.logins)) _logins = cloneArray(user.logins);						
-		_logins.push(login);
-		user.logins=_logins;
-		
-		return user;
-	}
+	
 
 	/****
 	 * 
@@ -259,14 +244,25 @@ export class UserService extends UserOperations {
 		// process thick: validate password
 		.then( (user:IUser) => this.validateUserPassword(user, login.password) )	
 
-		// process thick:
+		// process thick: create login
 		.then( (user:IUser) => {
-			user = this.addLogin(user);
-			return Promise.resolve(user);
+
+			let login:ILoginTracker = this.authenticationTracker();
+			let logins:ILoginTracker[] = this.updateLoginsArray(user, login);
+		
+			return Promise.resolve({user, logins});
 		})
 
-		// process thick: save user object
-		.then( (user:IUser) => this.updateUser (user) )
+		// process thick: update user object
+		.then( ({user, logins}:any) => {		
+			return this.updateUser(
+				{ 'core.email': login.email },
+				{ $set: 
+					{'logins': logins}
+				},
+				PERSON_SUBTYPE_USER
+			);			
+		})
 
 		// process thick: create authenticatoin token
 		.then( (user:IUser) =>  WebToken.createWebToken( user.accounts) )

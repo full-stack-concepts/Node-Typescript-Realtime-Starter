@@ -34,3 +34,8 @@ export { dbModelService} from "./db/db.model.service";
 
 export { connectToProductDatabase, DBProductService } from "./db/db.product.service";
 export { connectToUserDatabase, DBUserService } from "./db/db.user.service";
+
+/***
+ * CLient/HTTP Services
+ */
+export { clientDetectionService } from "./http/client.analyzer.service";

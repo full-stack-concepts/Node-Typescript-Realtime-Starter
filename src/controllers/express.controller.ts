@@ -6,14 +6,18 @@ import compression from "compression";
 import helmet from "helmet";
 import logger from "morgan";
 import passport from "passport";
+import morgan from "morgan";
+import { Router, Request, Response, NextFunction} from "express";
 
 // import passport for authentication support
 require("../shared/auth-strategies/passport");
 
 import {
+    ENVIRONMENT,
     PUBLIC_ROOT_DIR,
     PRIVATE_DATA_DIR,
-    CREATE_DATASTORE
+    CREATE_DATASTORE,
+    TIME_ZONE
 } from "../util/secrets";
 
 /***
@@ -24,17 +28,27 @@ import UserRouter from '../routers/user.router';
 import ClientRouter from '../routers/client.router';
 import CustomerRouter from '../routers/customer.router';
 
-import { shouldCompress } from '../util/middleware.util'; 
+/***
+ * Import Niddleware functions
+ */
+import { shouldCompress } from "../routers/middlewares";
+import { loggerController, bootstrapLogger, HTTPLogger, HTTPLoggerStream } from "../controllers";
+
+
+const  env:string=ENVIRONMENT.toString();
+
 
 class ExpressController {
 
     // ref tot Express instance
     public express: express.Application;
+    public router:Router; 
 
     constructor() {   
         
         // create router app with express
         this.express  = express();
+        this.router = express.Router();    
         this.initPassPort();
         this.middleware();
         this.routes();    
@@ -70,15 +84,10 @@ class ExpressController {
         /***
          * Body-parser: Parse incoming request bodies in a middleware before your handlers, available under the req.body property (post requesst).
          * https://www.npmjs.com/package/body-parser
-         */
+         */  
         this.express.use(bodyParser.json());
-        this.express.use(bodyParser.urlencoded({ extended: false }));
-
-        /***
-         * Sample logging engine: Morgan
-         * https://www.npmjs.com/package/morgan
-         */
-        this.express.use(logger('dev'));
+        this.express.use(bodyParser.urlencoded({ extended: false }));     
+        
     }
 
     private routes():void {
@@ -93,7 +102,7 @@ class ExpressController {
          */    
         if(CREATE_DATASTORE) {
             this.express.use( express.static ( PRIVATE_DATA_DIR ) );              
-        }
+        }      
 
          /***
          * System User API
@@ -115,6 +124,10 @@ class ExpressController {
          * Customer API
          */
         this.express.use('/api/customer', CustomerRouter);
+
+
+
+
 
     }
 }

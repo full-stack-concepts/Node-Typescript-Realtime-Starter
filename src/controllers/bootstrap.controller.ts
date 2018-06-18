@@ -296,7 +296,7 @@ export class BootstrapController {
 			}, 2000);	
 			*/			
 
-			
+			/*
 			setTimeout( () => {
 				console.log("**** Start update ")
 				userModel.updateMany( 
@@ -311,6 +311,7 @@ export class BootstrapController {
 					console.log(err)
 				})
 			}, 2000);			
+			*/
 					
 			
 			// #TODO: Move to tests integration-database

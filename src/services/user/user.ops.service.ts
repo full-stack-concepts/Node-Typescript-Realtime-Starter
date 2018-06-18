@@ -13,6 +13,7 @@ import { PersonProfile} from "./user.profile.service";
 import {
 	DB_HOSTS_PRIORITY,
 	PERSON_SUBTYPES,
+	PERSON_SUBTYPE_TO_MODELS,
 	PERSON_SUBTYPE_SYSTEM_USER,
 	PERSON_SUBTYPE_USER,
 	PERSON_SUBTYPE_CLIENT,
@@ -194,20 +195,19 @@ export class UserOperations extends PersonProfile {
 		hostType =1;	
 
 		// process thick: query all <Person> Subtype collections 		
-		return Promise.map( PERSON_SUBTYPES, ( personType:string) => {	
-
+		return Promise.map( PERSON_SUBTYPE_TO_MODELS, ( personType:string) => {	
 			return this.findUser( personType, email) 
 				.then( (res:any) => { return { [personType]: res}; })
 				.catch( (err:any) => '<errorNumber2>');				
 		})		
 	
 		// process thick: evaluate query results 
-		.then( (results:any) => {	
+		.then( (results:any) => {							
 		
 			return Promise.map( results, ( result:any) => {
 				let subType:string = Object.keys(result)[0];	
 				if(result[subType]) {					
-					let person:any = result[subType];				
+					let person:any = result[subType];									
 					person.core['type'] = subType;					
 					return Promise.resolve(person);
 				} else {				
@@ -217,9 +217,13 @@ export class UserOperations extends PersonProfile {
 			.then( (items:any) => {
 
 				let person:ISystemUser|IUser|IClient|ICustomer;
-				items.forEach( (item:ISystemUser|IUser|IClient|ICustomer, index: number | string) => {
-					if(item) person = item;
-				});						
+				for(let i:number=0; i<items.length; i++) {
+					let item:ISystemUser|IUser|IClient|ICustomer = items[i];		
+				
+					if(item && item.core && item.core.email && item.core.email === email) {					
+						person = item;
+					}
+				};						
 				return Promise.resolve( person );
 			});			
 		})
@@ -227,8 +231,7 @@ export class UserOperations extends PersonProfile {
 		// error handler
 		.catch( (err:any) => {		
 			return Promise.reject(err);
-		});		
-		
+		});				
 	}	
 
 	protected cloneAndRemoveDatabaseID(_user:IUser|IClient|ICustomer) {			
@@ -307,6 +310,21 @@ export class UserOperations extends PersonProfile {
 	/***
 	 *
 	 */
+	protected updateLoginsArray(
+		user:ISystemUser|IUser|IClient|ICustomer,
+		login:ILoginTracker
+	):ILoginTracker[] {
+		
+		let _logins:ILoginTracker[]=[];		
+		if( user.logins && Array.isArray(user.logins)) 
+			_logins = cloneArray(user.logins);						
+		_logins.push(login);	
+		return _logins;
+	}
+
+	/***
+	 *
+	 */
 	protected testFirstName({ value, required, minLength, maxLength}:any):Promise<boolean> {		
 		return this.testString(value, required, minLength, maxLength)
 		.then( () => Promise.resolve(true) )
@@ -332,17 +350,16 @@ export class UserOperations extends PersonProfile {
 			hash: user.password.value, 
 			method: user.password.method,  
 			data:password 
-		};			
+		};		
 
 		// Crypto with Initialization Vector
 		if(decrypt.method === 1) {
 			 return decryptWithInitializationVector(String(decrypt.hash))
-	        .then( (decrypted:string) => {  
-	            // console.log(decrypted, decrypt.data)        
+	        .then( (decrypted:string) => {  	           
 	            if( decrypted===decrypt.data) {
 	                return Promise.resolve(user)
 	            } else {
-	                return Promise.reject("<errorNumber>");
+	                return Promise.reject("<errorNumber Vector>");
 	            }
 	        })
 	        .catch( (err:any) => Promise.reject(err));
@@ -355,21 +372,20 @@ export class UserOperations extends PersonProfile {
 	            if( decrypted === decrypt.data) {
 	                return Promise.resolve(user)
 	            } else {
-	                return Promise.reject("<errorNumber>");
+	                return Promise.reject("<errorNumber Crypto>");
 	            }
 	        })
 	        .catch( (err:any) => Promise.reject(err));      
 	    }
 
 	    // Method 3: Bcrypt
-	    else if(decrypt.method === 3) {    
-	        console.log("==> (5) Decrypt with Crypto ", decrypt.data)
+	    else if(decrypt.method === 3) {    	       
 	        return decryptWithBcrypt(decrypt.data, String(decrypt.hash))
 	        .then( (valid:any) => {
 	            if(valid) {
 	                return Promise.resolve(user)
 	            } else {
-	                return Promise.reject("<errorNumber>");
+	                return Promise.reject("<errorNumber Bcypt>");
 	            }
 	        })
 	        .catch( (err:any) => Promise.reject(err) );
@@ -756,7 +772,7 @@ export class UserOperations extends PersonProfile {
 
 		/****
 		 * Find Model Setting for this User Type
-		 */
+		 */	
 		const setting:IModelSetting = this._getReadModel(userType);	
 
 		/****
@@ -777,12 +793,10 @@ export class UserOperations extends PersonProfile {
 		/***
 		 * Local MongoDB instance
 		 */		
-		if(hostType === 1) {				
-			console.log("*** Try to find System user")
+		if(hostType === 1) {							
 			return model.findOne( query )
 			.then( (u:any) => { return Promise.resolve(u); })
-			.catch( (err:any) => {		
-				console.log(err)
+			.catch( (err:any) => {					
 				console.error('<errorNumberX666>'); 
 			});				
 		}	
@@ -851,7 +865,7 @@ export class UserOperations extends PersonProfile {
 	 * (5) update user for different Authentication Provider if necessary
 	 * // TODO extend tasks (1), (2)
 	 */
-	protected validateUser( profile:any, user:IUser|IClient|ICustomer) {	
+	protected validateUser( profile:any, user:IUser|IClient|ICustomer) {		
 
 		// process thick: tasks (1) (2) (3)
 		return Promise.join<any>(
@@ -862,7 +876,7 @@ export class UserOperations extends PersonProfile {
 
 		// process thick: task (4)
 		.spread( (infatructure:boolean, integrity:boolean, login:ILoginTracker) => {	
-					
+			
 			// TODO: put this in new function
 			let logins:ILoginTracker[];
 			if( user.logins && Array.isArray(user.logins)) {				
@@ -871,21 +885,35 @@ export class UserOperations extends PersonProfile {
 				logins = [];
 			}							
 			logins.push(login);
-			user.logins=logins;		
-			return Promise.resolve(user);
+			user.logins=logins;				
+			return Promise.resolve({user, logins});
 		})		
 
 		
 		// process thick: update user for Authentication Provider
-		.then( (user:IUser|IClient|ICustomer) => updateUserForAuthenticationProvider(profile, user) )	
+		.then( ({ user, logins}:any) => {
+			return 	updateUserForAuthenticationProvider(profile, user)	
+					.then( (user:any) => Promise.resolve( {user, logins}))
+		})
 
-		.then( ( user:IUser|IClient|ICustomer) => {
+		.then( ({ user, logins}:any) => {
 
-			return this.updateUser(user) 
+			return this.updateUser(
+				{'core.email': user.core.email },
+				{ 	$set: { 
+						'configuration': user.configuration, 
+						'profile': user.profile,
+						'accounts': user.accounts,
+						'logins': logins
+					}
+				}
+			) 
+			.then( () => Promise.resolve(user))
+			.catch( (err:any) => Promise.reject(err));
 		})
 		
 		// process thick: return to caller so webtoken can be created
-		.then( ( user:IUser|IClient|ICustomer|any) => {					
+		.then( ( user:ISystemUser|IUser|IClient|ICustomer|any) => {				
 			return Promise.resolve(user); 
 		})
 
@@ -894,29 +922,61 @@ export class UserOperations extends PersonProfile {
 		});	
 	}
 
-	protected updateUser (user:any) {
+	/***
+	 * Convert User Subtype to its associated DB Model
+	 */
+	protected convertUserSubTypeToDatabaseModel(subType:string) {
+		return this._getWriteModel(subType).model;		
+	}
+
+	protected updateUser (query:any, update:any, subType?:string) {
 
 		/*****
-		 * Update on local mongoDB instance
+		 * HOST TYPE 1
 		 */
-		if(this.hostType === 1) {	
-			return new Promise ( (resolve, reject) => {
-				user.save( (err:any) => {					
-					if(err) { reject(err); } else { resolve(user); }
-				});
-			});		
-		}
+		if(this.hostType === 1) {		
+
+			/***
+			 * Scenario 1: User subtype is provided
+			 * (1) look up model is subTtype is provided
+			 * (2) then update user
+			 */ 
+			if(subType && typeof(subType) === 'string') {
+				
+				const model:any = this.convertUserSubTypeToDatabaseModel(subType);				
+				
+				return model.findOneAndUpdate (query, update)
+				.then( (res:any) => Promise.resolve(res) )
+				.catch( (err:any) => Promise.reject('<errorNumber Update Host type 1A>') );	
+
+
+			/*****
+			 * Scenario (2) User subtype is unknown (Google or Facebook Authentication)
+		 	 * Loop through user subtype collections 
+		 	 * update user if document is part of this collection
+		 	 */
+			} else {
+
+				return Promise.all( PERSON_SUBTYPE_TO_MODELS.map ( ( subType:string) => {
+
+					const setting:IModelSetting = this._getWriteModel(subType);	
+					const model:any = setting.model;	
+					return model.findOneAndUpdate (query, update)
+					.then( (res:any) => Promise.resolve(res))
+					.catch( (err:any) => Promise.reject('<errorNumber Update Host type 1B >'))	
+				}))
+				.then( () => Promise.resolve() )
+				.catch( (err:any) => Promise.reject(err));
+
+			}
+		}		
 
 		/*****
 		 * Update on MLAB
 		 * TODO: test this feature
 		 */
-		if(this.hostType===2) {
-			let userID:string = user._id;
-			let _user:any = this.cloneAndRemoveDatabaseID( user);
-			return userModel.remoteUpdateEntireUserObject( 'users', user._id, _user)
-			.then( (res:any) => Promise.resolve(user))
-			.catch( (err:any) => Promise.reject(err));
+		else if(this.hostType===2) {
+			
 		}
 	}	
 	

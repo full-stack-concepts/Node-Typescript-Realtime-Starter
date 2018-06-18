@@ -1,13 +1,5 @@
 import Promise from "bluebird";
-import { WebToken } from "./token.service";
 const uuidv1 = require("uuid/v1");
-
-/***
- * Import Actions
- */
-import {
-	CREATE_WEBTOKEN
-} from "../../controllers/actions";
 
 import { 
 	deepCloneObject, isURL, isEmail, capitalizeString, 
@@ -15,6 +7,7 @@ import {
 } from "../../util";
 
 import { UserOperations } from "./user.ops.service";
+import { WebToken } from "./token.service";
 import { IUser, IClient, ICustomer} from "../../shared/interfaces";
 import { TUSER } from "../../shared/types";
 
@@ -27,9 +20,7 @@ export class GoogleUserService extends UserOperations {
 	/******
 	 * Google Functions
 	 */
-	private grabEmailFromGoogleProfile(profile:any):Promise<string> {       
-
-		console.log(profile) 	  
+	private grabEmailFromGoogleProfile(profile:any):Promise<string> {       	
 
 	    let email:string, err:any
 	    try { email = profile.emails[0].value;} 
@@ -204,19 +195,14 @@ export class GoogleUserService extends UserOperations {
 				return this.extractGoogleProfile(profile)
 				// process thick: build user object
 				.then( (user:IUser) => this.newUser(user) );  
-			} else {							
+			} else {									
 				return this.validateUser( profile, person );		  	
 			}			
-		})
-
-	
+		})	
 		/**** 
 		 * process thick: create webtoken
 		 */
-		.then( (user:IUser|IClient|ICustomer) => this.uaController[CREATE_WEBTOKEN]( user.accounts) )	
-
-		// process thick: return to caller so webtoken can be created
-		.then( (token:string) => Promise.resolve({token}) )
+		.then( (user:IUser|IClient|ICustomer) => Promise.resolve(user) )
 
 		.catch( (err:any) => {
 			Promise.reject(err);		

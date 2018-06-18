@@ -35,7 +35,7 @@ interface OSInfo {
 }
 
 
-export class ClientAnalyzer {
+export class ClientAnalyzerService {
 
 	// instance of Mobile Detect module
 	mD:any;
@@ -54,8 +54,7 @@ export class ClientAnalyzer {
 
 	osInfo:OSInfo;
 			
-	constructor(req:Request) {
-		this.mD = new MobileDetect(req.headers['user-agent']);
+	constructor() {		
 	}
 
 	private __getIPAddress(req:Request) {
@@ -115,10 +114,12 @@ export class ClientAnalyzer {
 		return $;
 	}
 
-	private _getClientConfig(req:Request):Promise<any> {
+	private _getClientConfig(req:Request):Promise<any> {	
 
 		var err:any;
 		try {
+
+			this.mD = new MobileDetect(req.headers['user-agent']);
 
 			// test if client is mobile
 			if(this.mD.mobile()) { this.mobile = this.mD.mobile(); }
@@ -152,7 +153,7 @@ export class ClientAnalyzer {
 
 	private _buildResponseObject(osInfo:any) {
 
-		this.osInfo = osInfo;
+		this.osInfo = osInfo;		
 		return {
 			'mobile': this.mobile,
 			'phone': this.phone,
@@ -164,34 +165,29 @@ export class ClientAnalyzer {
 		}		
 	}
 
-	private analyseHeader(req:Request, res:Response, done:Function) {
+	private analyseHeader(req:Request, res:Response) {
 		
 		const keys = settings.analyse.keys;
 		const versionKeys = settings.analyse.versionKeys;
 
-		this._initSequence()
+		return this._initSequence()
 		.then( () => this._getClientConfig(req) )
 		.then( () => this.__getOsInfo( req.headers['user-agent'] ) )
 		.then( (osInfo:any) => this._buildResponseObject(osInfo) )
-		.then( (info:any) => { return done(null, info);	})
-		.catch( (err) => {
-			return done(err);
-		});		
+		.then( (info:any) => Promise.resolve(info) )
+		.catch( (err) => Promise.reject(err) );
+	
 	}			
 
 	/* Public interface */
-	public client(req:Request, res:Response, done:Function) {
-		this.analyseHeader(req, res, (err:any, info:any) => {
-			return done(err, info);
-		});
+	public analyse(req:Request, res:Response) {
+		return this.analyseHeader(req, res) 
+		.then( (info:any) => Promise.resolve(info) )
+		.catch( (err) => Promise.reject(err) );		
 	}
 }
 
-export function analyzeClient( req:Request, res:Response, done:Function) {
-	let instance = new ClientAnalyzer(req);
-	let process = instance.client( req, res, (err:any, info:any) => {			
-		instance = null;
-		return done(err, info);
-	});	
-}
+export const clientDetectionService = new ClientAnalyzerService();
+
+
 

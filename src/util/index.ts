@@ -17,18 +17,6 @@ export {
 	RemoteQueryBuilder
 } from "./mlab.util";
 
-/*
-export {
-	createUserType,	
-	formatUserSubType,
-	createSuperAdmin,
-	createAdmin,
-	createPowerUser,
-	createAuthor,
-	createUser
-} from "./data.util";
-*/
-
 export {
 	constructUserCredentials, constructClientCredentials, constructCustomerCredentials,
 	constructProfileFullName,

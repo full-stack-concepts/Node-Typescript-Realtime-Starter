@@ -7,12 +7,11 @@ import * as debug from 'debug';
 import dotenv from 'dotenv';
 import  path from 'path';
 import fs from 'fs';
-import * as Bluebird from 'bluebird';
 
 // interfaces
 import { ServerOptions, ProcessEnv } from './shared/interfaces/';
 
-// declare global { export interface Promise<T> extends Bluebird<T> {} }
+
 
 /****
  * App Services
@@ -153,7 +152,7 @@ function onListening():void {
 export const createTestServer = ():Promise<any> => { 
 
     const httpServer:any = http.createServer(App);
-    const server:any = httpServer.listen(PORT);
+    const server:any = httpServer.listen(PORT);    
 
     /***
      * Flag that application runs in test mode
@@ -165,119 +164,50 @@ export const createTestServer = ():Promise<any> => {
         httpServer,
         server
     });
-
 }
+
 
 /***
  * Create server instance
  */
 export const createServer = ():Promise<any> => { 
 
-    /**
-     * Bootstap Application: Development Environment
-     */
-    if(env=='dev') { 
-
-        /**
-         * Create HTTPS server.
-         */
-        if(EXPRESS_SERVER_MODE==='https') {        
-            let options:ServerOptions = getSSL();
-            httpServer = https.createServer(options, App);
-
-        /**
-         * Create HTTP server.
-         */
-        } else if(EXPRESS_SERVER_MODE==='http') {       
-            httpServer = http.createServer(App);
-        }
-
-        /**
-         * Listen on provided port, on all network interfaces.
-         */
-        let server = httpServer.listen(PORT);
-        httpServer.on('error', onError);
-        httpServer.on('listening', onListening); 
-
-        return Promise.resolve(server);
+    /* Log stack trace on worker dead */
+    process.on('uncaughtException', (err) => {
+        
+        let d:string = (new Date).toUTCString();
+        let message:string = `S{d} - uncaughtException ${err.message}`;
+        let stack = err.stack;
+        
+        // #TODO : log error  
+        console.log(err)        
+    });
+   
 
     /**
-     * Bootstap Application: Production Environment
-     * Do not use this option until release 1.0 => REDIS Caching
+     * Create HTTPS server.
      */
-    } else if(env=='prod') {
+    if(EXPRESS_SERVER_MODE==='https') {     
 
-        let workerRestartCounter:number = 0;
+        let options:ServerOptions = getSSL();
+        httpServer = https.createServer(options, App);      
 
-        /* Handle multi-core systems with cluster */
-        cluster = require('cluster');
+    /**
+     * Create HTTP server.
+     */
+    } else if(EXPRESS_SERVER_MODE==='http') {       
+        
+       httpServer = http.createServer(App);    
+    }       
 
-        if(cluster.isMaster) {
+    /**
+     * Listen on provided port, on all network interfaces.
+     */
+    let server = httpServer.listen(PORT);
+    httpServer.on('error', onError);
+    httpServer.on('listening', onListening);    
 
-            // Count the machine's CPUs
-            let cpuCount:number = require('os').cpus().length;
-
-            // Create a worker for each CPU   
-            // limited until release 2.0    
-
-            let limiterCPU:number = 1;
-            for (var i = 0; i < limiterCPU; i += 1) {
-                setCluster(i);                   
-            };
-
-            // Listen for dying workers: Replace the dead worker
-            cluster.on('exit', function(deadWorker:any, code:any, signal:any) {   
-
-                 // Restart the worker
-                if(workerRestartCounter < 3 ) {
-                    
-                    var worker = cluster.fork();
-
-                     workerRestartCounter++;
-
-                    /* Note the process IDs
-                     * And assign worker PID (Process ID) to global so it can be processed
-                     * in any shared queue (for instance images)
-                     */
-                    var newPID = worker.process.pid;
-                    var oldPID = deadWorker.process.pid;                         
-                    myGlobal.workerID = worker.process.pid;     
-
-                    // #TODO: Log error
-                    console.error("App worker " + deadWorker.process.pid + " died. New worker "+worker.process.pid +" is launched.");            
-                    process.exit(1);
-
-                } else {
-                    // 
-                    console.error("TCAA Application has crashed. Please check application error log.");            
-                }                     
-                            
-            });  
-
-             /* Log stack trace on worker dead */
-            process.on('uncaughtException', (err) => {
-                let d:string = (new Date).toUTCString();
-                let message:string = `S{d} - uncaughtException ${err.message}`;
-                let stack = err.stack;
-                // #TODO : log error          
-            });
-
-        /***
-         * Cluster is current worker
-         */
-        } else {        
-
-            /**
-             * ALIAS WORKER 
-             */
-            myGlobal.workerID = cluster.worker.id;
-
-            /**
-             * Creatse New Server
-             */
-            createServer();
-        } 
-    } 
+    return Promise.resolve(server);    
 }
 
 

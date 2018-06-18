@@ -571,6 +571,13 @@ export const PERSON_SUBTYPES:string[] = [
 	PERSON_SUBTYPE_CUSTOMER
 ];
 
+export const PERSON_SUBTYPE_TO_MODELS:string[] = [
+	PERSON_SUBTYPE_SYSTEM_USER,
+	PERSON_SUBTYPE_USER,
+	PERSON_SUBTYPE_CLIENT,
+	PERSON_SUBTYPE_CUSTOMER
+];
+
 export const USE_PERSON_SUBTYPE_USER = process.env["USE_PERSON_SUBTYPE_USER"] == 'true';
 export const USE_PERSON_SUBTYPE_CLIENT = process.env["USE_PERSON_SUBTYPE_CLIENT"] == 'true';
 export const USE_PERSON_SUBTYPE_CUSTOMER = process.env["USE_PERSON_SUBTYPE_CUSTOMER"] == 'true';
@@ -836,12 +843,6 @@ const passwordArray:any = [
 	{ identifier: "SUPERADMIN_PASSWORD", value: SUPERADMIN_PASSWORD }
 ];
 
-passwordArray.forEach(({identifier, value}:any) => {
-	if(!FormValidation.testPassword(value) ) {
-		console.error(`Test Password: Password ${identifier} does not meet your password policy. Please create a new password for ${identifier}`);
-		process.exit(1);
-	}
-});
 
 
 

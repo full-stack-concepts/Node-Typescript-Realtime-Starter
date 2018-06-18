@@ -1,10 +1,7 @@
 import {Router, Request, Response, NextFunction} from "express";
-
 import { STORE_WEBTOKEN_AS_COOKIE, WEBTOKEN_COOKIE, SEND_TOKEN_RESPONSE } from "../util/secrets";
+import { WebToken } from "../services";
 
-import {	
-	CREATE_WEBTOKEN	
-} from "../controllers/actions";
 
 /***
  * Import Niddleware functions
@@ -13,7 +10,7 @@ import {
 	allowCredentials, 
 	allowMethods, 
 	allowOrigin
-} from '../util/middleware.util';
+} from './middlewares';
 
 /***
  * Services
@@ -50,7 +47,7 @@ export class DefaultRouter {
 	 	// passport has serialized user and formatted as req.user
         // we retreieve it and encrypt account types inside web token             
 
-        this.uaController[CREATE_WEBTOKEN](req.user)	
+        return WebToken.createWebToken( req.user.accounts) 	
         .then( (token:string) => {
 
         	// store webtoken as cookie

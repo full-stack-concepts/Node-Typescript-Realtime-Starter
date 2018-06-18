@@ -15,7 +15,8 @@ import { TCUSTOMER } from "../../shared/types";
 import { WebToken} from "./token.service";
 
 import {		
-	LOCAL_AUTH_CONFIG
+	LOCAL_AUTH_CONFIG,
+	PERSON_SUBTYPE_CUSTOMER
 } from "../../util/secrets";
 
 /***
@@ -134,8 +135,25 @@ export class CustomerService extends UserOperations {
 			return Promise.resolve(customer);
 		})
 
-		// process thick: save user object
-		.then( (customer:ICustomer) => this.updateUser (customer) )
+		// process thick: create login
+		.then( (customer:ICustomer) => {
+
+			let login:ILoginTracker = this.authenticationTracker();
+			let logins:ILoginTracker[] = this.updateLoginsArray(customer, login);
+		
+			return Promise.resolve({customer, logins});
+		})
+
+		// process thick: update user object
+		.then( ({customer, logins}:any) => {		
+			return this.updateUser(
+				{ 'core.email': login.email },
+				{ $set: 
+					{'logins': logins}
+				},
+				PERSON_SUBTYPE_CUSTOMER
+			);			
+		})		
 
 		// process thick: create authenticatoin token
 		.then( (customer:ICustomer) => WebToken.createWebToken( customer.accounts) )	

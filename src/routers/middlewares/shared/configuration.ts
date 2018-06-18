@@ -4,7 +4,7 @@
 const compression:any = require("compression");
 import { Request, Response, NextFunction } from "express";
 
-import { ENVIRONMENT, PORT, CLIENT_PORT, ADMIN_PORT } from "./secrets";
+import { ENVIRONMENT, PORT, CLIENT_PORT, ADMIN_PORT } from "../../../util/secrets";
 
 export function shouldCompress (req:Request, res:Response) {
   if (req.headers['x-no-compression']) {
