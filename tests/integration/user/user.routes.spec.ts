@@ -48,7 +48,6 @@ describe("User Routes", () => {
 	
 	before( (done) => {
 
-
 		createTestServer()
 		.then( ({httpServer, server}:any) => {
 
@@ -244,15 +243,7 @@ describe("User Routes", () => {
         it("should return a JSON object with <isUserDeleted> property", () => {     
             expect(body).to.have.property('isUserDeleted').and.to.be.true;      
         });
-    });
-
-
-
-
-
-
-
-	
+    });	
 
 	/****
 	 * Terminate Express Server

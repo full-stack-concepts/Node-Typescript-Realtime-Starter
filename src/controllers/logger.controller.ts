@@ -73,7 +73,7 @@ export const entryFormatter = format( (info:any, opts:any) => {
 /****
  * Transport: Application Log
  */
-const applicationLog:any = new transports.File({	
+const applicationLogTransport:any = new transports.File({	
 	level: 'application',	
 	filename: logPaths.$application,	
 	maxsize: 5242880, // 5MB
@@ -83,9 +83,19 @@ const applicationLog:any = new transports.File({
 /****
  * Transport: Access Log
  */
-const accessLog = new transports.File({
+const accessLogTransport = new transports.File({
 	level: 'access',	
 	filename: logPaths.$access,		
+	maxsize: 5242880, // 5MB
+	maxFiles: 3
+});
+
+/****
+ * Transport: Test Log
+ */
+const testLogTransport = new transports.File({
+	level: 'tests',	
+	filename: logPaths.$tests,		
 	maxsize: 5242880, // 5MB
 	maxFiles: 3
 });
@@ -109,7 +119,7 @@ export const bootstrapLogger:any = createLogger({
 	exitOnError: false,	
 
 	transports: [	 
-	 	applicationLog
+	 	applicationLogTransport
 	]
 });
 
@@ -125,7 +135,7 @@ export const HTTPLogger:any = createLogger({
 	levels: customLevels.levels,	
 	
 	format: combine(
-		label({ label: EXPRESS_SERVER_MODE.toUpperCase() }),
+		label({ label: 'HTTP-SERVER' }),
 		stringFormat
 	),	
 
@@ -133,9 +143,33 @@ export const HTTPLogger:any = createLogger({
 	exitOnError: false,	
 
 	transports: [	 
-	 	accessLog
+	 	accessLogTransport
 	]
 });
+
+/****
+ * Tests Logger
+ */
+export const TestLogger:any = createLogger({
+
+	// message level scheme
+	levels: customLevels.levels,	
+	
+	format: combine(		
+		metadata(),
+		timestamp(),
+		entryFormatter(),
+		format.json()	
+	),	
+
+	// winston error handling
+	exitOnError: false,	
+
+	transports: [	 
+	 	testLogTransport
+	]
+});
+
 
 /***
  * Stream for HTTP Access Log

@@ -35,7 +35,11 @@ const defaultURI:string = RequestMethods.defaultURL();
 var methods:any;
 
 beforeEach( async () => {
+
 	methods = await RequestMethods.build();	
+
+	// check settings
+	methods.testEnvironment();
 });
 
 describe("Client Routes", () => {

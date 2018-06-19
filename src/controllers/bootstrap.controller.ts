@@ -269,7 +269,7 @@ export class BootstrapController {
 					console.log("***************************************************")
 					console.log(err)
 				})
-			}, 4000)
+			}, 4000) 
 
 		
 			setTimeout( () => {
@@ -290,7 +290,7 @@ export class BootstrapController {
 					console.log("**** Result OK ")
 				})
 				.catch( (err:any) => {
-					console.log("***************************************************")
+					console.log("***************************************************") 
 					console.log(err)
 				})
 			}, 2000);	

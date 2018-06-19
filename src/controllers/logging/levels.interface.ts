@@ -6,6 +6,7 @@ export interface ICustomLevels {
   		verbose: number, 
   		debug: number, 
   		application: number,
-  		access: number 
+  		access: number,
+  		tests:number
 	}
 };

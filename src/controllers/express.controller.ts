@@ -87,6 +87,8 @@ class ExpressController {
          */  
         this.express.use(bodyParser.json());
         this.express.use(bodyParser.urlencoded({ extended: false }));     
+
+        // TestLogger.tests({level: 'intergration', category: 'user', feature:'routes'})
         
     }
 

@@ -4,6 +4,6 @@
 export { customLevels} from "./logging.levels";
 
 /****
- * Winstyomn Logging Paths
+ * Logging Paths
  */
 export { logPaths } from "./logging.paths";

@@ -55,7 +55,7 @@ export class RedisController  {
 			/****
 			 * eturn Redis CLient to Bootstrap Controller
 			 */			
-			return Promise.resolve(client);
+			return Promise.resolve(client); 
 
 
 		} catch(e) {

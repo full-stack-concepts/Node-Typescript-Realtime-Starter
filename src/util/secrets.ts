@@ -657,6 +657,17 @@ if(GENERATE_SAMPLE_DATA) {
 	});
 }
 
+/****
+ * Collections that we do not want to cache
+ * Use Redis to cache sub document queries and data storage requests
+ */
+export const EXCLUDE_FROM_CACHING_COLLECTIONS:any = [
+	DB_SYSTEM_USERS_COLLECTION_NAME,
+	DB_USERS_COLLECTION_NAME,
+	DB_CLIENTS_COLLECTION_NAME,
+	DB_CUSTOMERS_COLLECTION_NAME
+];
+
 /***
  * Test for faker langiage locale, defaults to en_US
  */

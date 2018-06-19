@@ -10,6 +10,7 @@ export const customLevels:ICustomLevels = {
   		verbose: 3, 
   		debug: 4, 
   		application: 5,
-  		access: 6 
+  		access: 6,
+      tests:7
 	}
 };
