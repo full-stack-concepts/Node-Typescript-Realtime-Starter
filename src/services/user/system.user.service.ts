@@ -46,6 +46,10 @@ import {
 	constructUserCredentials
 } from "../../util";
 
+import {
+	ApplicationLogger
+} from "../../controllers";
+
 export class SystemUserService extends UserOperations {
 
 	private systemUser:ISystemUser;
@@ -370,8 +374,17 @@ export class SystemUserService extends UserOperations {
 		})
 		
 
-		// process thick: return to caller
-		.then( (user:ISystemUser) => Promise.resolve(user) ) 		
+		// process thick: return to caller and log event
+		.then( (user:ISystemUser) => {
+
+			 // log event Express Controller ready
+	        ApplicationLogger.application({
+	            section:'BootstrapController', 
+	            eventID: 1010, 
+	            action: 'System User account has been validated and configured.'
+	        });
+			return Promise.resolve(user) 
+		}) 		
 		
 		/***
 		 * Critical error: call process exit

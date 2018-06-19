@@ -7,6 +7,7 @@ import { DefaultModel} from "./default.model";
 import { TUSER } from "../types";
 import { IUser } from "../interfaces";
 import { ReadRepositoryBase } from "../../engines";
+import { ApplicationLogger } from "../../controllers";
 
 /***
  * Local Repository that contains all methods for 
@@ -37,8 +38,16 @@ export class UserReadModel extends DefaultModel  {
 		this._userModel = userModel;
 
 		proxyService.userDBLive$.subscribe( (state:boolean) => {						
+			
 			if(proxyService.userDB) this.userDBConn = proxyService.userDB;				
 			this.repo = new UserReadRepository( this.userDBConn, this.redisClient );
+
+			// log event 
+	        ApplicationLogger.application({
+	            section:'BootstrapController', 
+	            eventID: 1018, 
+	            action: 'DB User Read Only Model and Repository has initialized.'
+	        });
 		});		
 	}	
 

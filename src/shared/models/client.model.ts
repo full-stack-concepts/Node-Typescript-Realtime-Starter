@@ -7,6 +7,7 @@ import { DefaultModel } from "./default.model";
 import { IClient } from "../interfaces";
 import { ReadWriteRepositoryBase } from "../../engines";
 import { TCLIENT } from "../types";
+import { ApplicationLogger } from "../../controllers";
 
 /***
  * Local Repository that contains all methods for 
@@ -36,9 +37,17 @@ export class ClientModel extends DefaultModel  {
 
 		this._clientModel = clientModel;
 
-		proxyService.userDBLive$.subscribe( (state:boolean) => {						
+		proxyService.userDBLive$.subscribe( (state:boolean) => {				
+
 			if(proxyService.userDB) this.userDBConn = proxyService.userDB;				
 			this.repo = new ClientRepository( this.userDBConn, this.redisClient );
+
+			 // log event 
+	        ApplicationLogger.application({
+	            section:'BootstrapController', 
+	            eventID: 1011, 
+	            action: 'DB Client ReadWrite Model and Repository has initialized.'
+	        });
 		});		
 	}	
 

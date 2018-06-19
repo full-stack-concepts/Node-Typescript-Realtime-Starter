@@ -7,6 +7,7 @@ import { DefaultModel } from "./default.model";
 import { ICustomer } from "../interfaces";
 import { ReadRepositoryBase } from "../../engines";
 import { TCUSTOMER } from "../types";
+import { ApplicationLogger } from "../../controllers";
 
 /***
  * Local Repository that contains all methods for 
@@ -37,8 +38,16 @@ export class CustomerReadModel extends DefaultModel  {
 		this._customerModel = customerModel;
 
 		proxyService.userDBLive$.subscribe( (state:boolean) => {						
+			
 			if(proxyService.userDB) this.userDBConn = proxyService.userDB;				
 			this.repo = new CustomerReadRepository( this.userDBConn, this.redisClient );
+
+			// log event 
+	        ApplicationLogger.application({
+	            section:'BootstrapController', 
+	            eventID: 1014, 
+	            action: 'DB Customer Read Only Model and Repository has initialized.'
+	        });
 		});		
 	}	
 

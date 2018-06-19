@@ -32,7 +32,7 @@ const timestampToString = ():string => {
 
 	let ts:number = Math.round(+new Date());
     let date:Date = new Date(ts);
-    return moment(date).tz( TIME_ZONE ).format('d-M-YYYY HH:mm:ss:ssss').toString();     
+    return moment(date).tz( TIME_ZONE ).format('DD-MM-YYYY HH:mm:ss:ssss').toString();     
 }
 
 const stringFormat = printf ( (info:any) => {
@@ -66,7 +66,6 @@ export const entryFormatter = format( (info:any, opts:any) => {
 	// format metadata
 	info = metaDataFormatter(info);
 	info[MESSAGE] = JSON.stringify(info.message);
-	console.log(info)
 	return info;
 });
 
@@ -103,14 +102,14 @@ const testLogTransport = new transports.File({
 /****
  * Bootstrap Logger
  */
-export const bootstrapLogger:any = createLogger({	
+export const ApplicationLogger:any = createLogger({	
 
 	// message level scheme
 	levels: customLevels.levels,	
 	
 	format: combine(		
 		metadata(),
-		timestamp(),
+		timestamp({ format: 'DD-MM-YYYY HH:mm:ss:ssss' }),
 		entryFormatter(),
 		format.json()	
 	),	
@@ -122,9 +121,6 @@ export const bootstrapLogger:any = createLogger({
 	 	applicationLogTransport
 	]
 });
-
-
-export const loggerController = {};
 
 /****
  * HTTP Logger

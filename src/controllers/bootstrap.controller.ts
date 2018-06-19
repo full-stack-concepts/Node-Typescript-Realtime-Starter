@@ -3,7 +3,7 @@ import { Observable, Subscription } from "rxjs";
 /****
  * Import Dependencies
  */
-import { RedisController, UAController, DAController } from "../controllers";
+import { RedisController, UAController, DAController, ApplicationLogger } from "../controllers";
 import { proxyService, connectToUserDatabase, connectToProductDatabase } from "../services";
 import { configureDatabases } from "../services/db/db.admin.service";
 import { testForSystemUser, createSystemUser } from "../services/user/system.user.service";
@@ -17,13 +17,8 @@ import {
 	publicDirectoryManager	
 } from "../util";
 
-import { userModel, userReadModel, clientModel, clientReadModel, customerModel, customerReadModel } from "../shared/models";
+import { DefaultModel, userModel, userReadModel, clientModel, clientReadModel, customerModel, customerReadModel } from "../shared/models";
 
-/****
- * Init Default DB Model before import bootstrap manager
- * so it can listen to application events
- */
-import { DefaultModel } from "../shared/models";
 
 export class BootstrapController {
 
@@ -56,6 +51,15 @@ export class BootstrapController {
 	}
 
 	/***
+	 * Logger
+	 * Default Event ID for Bootstrap Controller = 1000; 
+	 */
+	private logBootstrapEvent(eventID:number, action:string='') {
+		let section:string = 'BootstrapController';
+		ApplicationLogger.application({section, eventID, action})
+	}
+
+	/***
 	 * Launch Data Generator when
 	 * (1) User Database is live
 	 * (2) Product Dataabse is live
@@ -66,9 +70,12 @@ export class BootstrapController {
 	private dataGenerator() {
 		const source$:Observable<number> = Observable.interval(75);
 		const sub$:Subscription = source$.subscribe(	
-			(x:number)=> { 
+			(x:number)=> { 			
+
 				if(this.testMode || (this.userDBLive && this.productDBLive && this.uaController && this.daController) ) sub$.unsubscribe();
 				if(this.userDBLive && this.productDBLive  && this.uaController && this.daController) {
+					this.logBootstrapEvent(1007, "User Database is live");
+					this.logBootstrapEvent(1008, "Products Database is live");
 					console.log("SIGNAL SIGNAL SIGNAL")
 					// proxyService.startDataOperations();
 				}			
@@ -168,32 +175,37 @@ export class BootstrapController {
 			 * Await build of Redis Client
 			 */
 			this.redisClient = await RedisController.buildLocal();
+			this.logBootstrapEvent( 1000, "RedisController has been build.")
 			
 			/***
 			 * Test build of User Action Controller Proxy
 			 */
-			this.uaController = await UAController.build();			
+			this.uaController = await UAController.build();		
+			this.logBootstrapEvent(1001, "User Action Controller Proxy is ready.")	
 
 			/****
 			 * Test build of Data Action Controller Proxy
 			 */
 			this.daController = await DAController.build();
+			this.logBootstrapEvent(1002, "Data Action Controller Proxy is ready.");
 
 			/****
 			 * Propagate instance of Redis CLient
 			 */
 			await proxyService.setRedisClient(this.redisClient);
+			this.logBootstrapEvent(1003, "Listeners can subscribe to Redis Client.");	
 
 			/***
 			 * Propagate instance of User Action Controller
 			 */
 			await proxyService.setUAController(this.uaController);
+			this.logBootstrapEvent(1003, "Listeners can subscribe to UA Contoller.");	
 
 			/***
 			 * Propagate instance of Data Action Controller
-			 */			
-			console.log("*** Bootstrap COntroller: signal DAController")
+			 */					
 			await proxyService.setDAController(this.daController);
+			this.logBootstrapEvent(1004, "Listeners can subscribe to DA Controller");
 
 			/***
 			 * Init Default DB Model
@@ -208,6 +220,7 @@ export class BootstrapController {
 			 * (4) Perform test operations (#TODO)
 			 */		
 			await this.configureDatabases();
+			this.logBootstrapEvent(1005, "Databases have been configured with predefined users and designated roles.");
 
 			/***
 			 * Configure infrastructure
@@ -216,6 +229,7 @@ export class BootstrapController {
 			 * (3) Local Store Directories
 			 */
 			await this.configureInfrastructure();
+			this.logBootstrapEvent(1006, "Public and private directories have been configured.")	
 
 			/***
 			 * Connect To User DB
@@ -232,339 +246,7 @@ export class BootstrapController {
 
 			console.log("==> Bootstrap Sequence finished")
 
-			// #TODO: Move to tests integration-database
-			/*
-			setTimeout( () => {
-				userModel.findOne( { 'core.email': 'addison.ryan@flintstones.org'} )
-				.then( (result:any) => {
-					console.log("**** Result ", result)
-				})
-			})			
 			
-			setTimeout( () => {
-				userModel.find( { 'core.role': 5} )
-				.then( (result:any) => {
-					console.log("**** Result ", result.length)
-				})
-			}, 2000)				
-			
-			setTimeout( () => { 
-				userModel.findAll(  )
-				.then( (result:any) => {
-					console.log("**** Result ", result.length)
-				})
-				.catch( (err:any) => {
-					console.log("***************************************************")
-					console.log(err)
-				})
-			}, 3000)				
-			
-					
-			setTimeout( () => {
-				userModel.findById( '5b1d82955bcbbb181c7b813a'  )
-				.then( (result:any) => {
-					console.log("**** Result ", result)
-				})
-				.catch( (err:any) => {
-					console.log("***************************************************")
-					console.log(err)
-				})
-			}, 4000) 
-
-		
-			setTimeout( () => {
-				userModel.findOneAndDelete( { 'core.email': 'lonie.casper@yahoo.com' })
-				.then( (result:any) => {
-					console.log("**** Result ", result)
-				})
-			}, 2000)
-		
-
-			setTimeout( () => {
-				console.log("**** Start update ")
-				userModel.findOneAndUpdate( 
-					{ 'core.email': 'addison.ryan@flintstones.org' },
-					{ $set: { 'core.role': 100}}
-				)
-				.then( (result:any) => {
-					console.log("**** Result OK ")
-				})
-				.catch( (err:any) => {
-					console.log("***************************************************") 
-					console.log(err)
-				})
-			}, 2000);	
-			*/			
-
-			/*
-			setTimeout( () => {
-				console.log("**** Start update ")
-				userModel.updateMany( 
-					{ 'core.role': 5 },
-					{ $set: { 'security.isAccountVerified': true}}
-				)
-				.then( (result:any) => {
-					console.log("**** Result OK ")
-				})
-				.catch( (err:any) => {
-					console.log("***************************************************")
-					console.log(err)
-				})
-			}, 2000);			
-			*/
-					
-			
-			// #TODO: Move to tests integration-database
-			/*
-			setTimeout( () => {
-				userReadModel.findOne( { 'core.email': 'addison.ryan@flintstones.org'} )
-				.then( (result:any) => {
-					console.log("**** Result ", result)
-				})
-			})
-
-			setTimeout( () => {
-				userReadModel.find( { 'core.role': 5} )
-				.then( (result:any) => {
-					console.log("**** Result ", result.length)
-				})
-			}, 2000)
-			
-			setTimeout( () => { 
-				userReadModel.findAll(  )
-				.then( (result:any) => {
-					console.log("**** Result ", result.length)
-				})
-				.catch( (err:any) => {
-					console.log("***************************************************")
-					console.log(err)
-				})
-			}, 2000)
-			
-			setTimeout( () => {
-				userReadModel.findById( '5b1d82955bcbbb181c7b813a'  )
-				.then( (result:any) => {
-					console.log("**** Result ", result)
-				})
-				.catch( (err:any) => {
-					console.log("***************************************************")
-					console.log(err)
-				})
-			}, 2000)
-			*/
-
-			// #TODO: Move to tests integration-database
-			/*
-			setTimeout( () => {
-				clientModel.findOne( { 'core.email': 'golden.nicolas@flintstones.org'} )
-				.then( (result:any) => {
-					console.log("**** Result ", result)
-				})
-			})			
-			
-			setTimeout( () => {
-				clientModel.find( { 'core.role': 10} )
-				.then( (result:any) => {
-					console.log("**** Result ", result.length)
-				})
-			}, 2000)	
-
-
-			setTimeout( () => { 
-				clientModel.findAll(  )
-				.then( (result:any) => {
-					console.log("**** Result ", result.length)
-				})
-				.catch( (err:any) => {
-					console.log("***************************************************")
-					console.log(err)
-				})
-			}, 3000);
-
-			setTimeout( () => {
-				clientModel.findById( '5b1d82955bcbbb181c7b8290'  )
-				.then( (result:any) => {
-					console.log("**** Result ", result)
-				})
-				.catch( (err:any) => {
-					console.log("***************************************************")
-					console.log(err)
-				})
-			}, 4000)	
-
-			setTimeout( () => {
-				console.log("**** Start update ")
-				clientModel.findOneAndUpdate( 
-					{ 'core.email': 'golden.nicolas@flintstones.org' },
-					{ $set: { 'core.url': 'blablabla'}}
-				)
-				.then( (result:any) => {
-					console.log("**** Result OK ")
-				})
-				.catch( (err:any) => {
-					console.log("***************************************************")
-					console.log(err)
-				})
-			}, 5000);			
-
-
-			setTimeout( () => {
-				clientModel.findOneAndDelete( { 'core.email': 'rodger.kub@icloud.com' })
-				.then( (result:any) => {
-					console.log("**** Result ", result)
-				})
-			}, 6000)
-			*/
-
-			// #TODO: Move to tests integration-database
-			/*
-			setTimeout( () => {
-				clientReadModel.findOne( { 'core.email': 'golden.nicolas@flintstones.org'} )
-				.then( (result:any) => {
-					console.log("**** Result ", result)
-				})
-			})
-
-			setTimeout( () => {
-				clientReadModel.find( { 'core.role': 10} )
-				.then( (result:any) => {
-					console.log("**** Result ", result.length)
-				})
-			}, 2000)
-			
-			setTimeout( () => { 
-				clientReadModel.findAll(  )
-				.then( (result:any) => {
-					console.log("**** Result ", result.length)
-				})
-				.catch( (err:any) => {
-					console.log("***************************************************")
-					console.log(err)
-				})
-			}, 2000)
-			
-			setTimeout( () => {
-				clientReadModel.findById( '5b1d82955bcbbb181c7b8290'  )
-				.then( (result:any) => {
-					console.log("**** Result ", result)
-				})
-				.catch( (err:any) => {
-					console.log("***************************************************")
-					console.log(err)
-				})
-			}, 2000)
-			*/
-
-			// #TODO: Move to tests integration-database
-			/*
-			setTimeout( () => {
-				customerModel.findOne( { 'core.email': 'jamie.shanahan@zoho.com'} )
-				.then( (result:any) => {
-					console.log("**** Result ", result)
-				})
-			})			
-			
-			setTimeout( () => {
-				customerModel.find( { 'core.role': 20} )
-				.then( (result:any) => {
-					console.log("**** Result ", result.length)
-				})
-			}, 2000);
-			
-			setTimeout( () => { 
-				customerModel.findAll(  )
-				.then( (result:any) => {
-					console.log("**** Result ", result.length)
-				})
-				.catch( (err:any) => {
-					console.log("***************************************************")
-					console.log(err)
-				})
-			}, 3000)				
-			
-					
-			setTimeout( () => {
-				customerModel.findById( '5b1d82955bcbbb181c7b8122'  )
-				.then( (result:any) => {
-					console.log("**** Result ", result)
-				})
-				.catch( (err:any) => {
-					console.log("***************************************************")
-					console.log(err)
-				})
-			}, 4000)
-
-		
-			setTimeout( () => {
-				customerModel.findOneAndDelete( { 'core.email': 'andreanne.smith@zoho.com' })
-				.then( (result:any) => {
-					console.log("**** Result ", result)
-				})
-			}, 5000)
-		
-
-			setTimeout( () => {
-				console.log("**** Start update ")
-				customerModel.findOneAndUpdate( 
-					{ 'core.email': 'jamie.shanahan@zoho.com' },
-					{ $set: { 'core.url': 'blablabla'}}
-				)
-				.then( (result:any) => {
-					console.log("**** Result OK ")
-				})
-				.catch( (err:any) => {
-					console.log("***************************************************")
-					console.log(err)
-				})
-			}, 6000);		
-			*/
-		
-			/*
-			setTimeout( () => {
-				console.log("**** Start update ")
-				customerModel.updateMany( 
-					{ 'core.role': 20 },
-					{ $set: { 'core.role': 7777}}
-				)
-				.then( (result:any) => {
-					console.log("**** Result OK ")
-				})
-				.catch( (err:any) => {
-					console.log("***************************************************")
-					console.log(err)
-				})
-			}, 7000);			
-			*/
-			/*
-
-			// #TODO: Move to tests integration-database
-			/*
-			setTimeout( () => {
-				customerReadModel.findOne( { 'core.email': 'jamie.shanahan@zoho.com'} )
-				.then( (result:any) => {
-					console.log("**** Result ", result)
-				})
-			})
-
-			setTimeout( () => {
-				customerReadModel.find( { 'core.role': 20} )
-				.then( (result:any) => {
-					console.log("**** Result ", result.length)
-				})
-			}, 1000)
-			
-			setTimeout( () => { 
-				customerReadModel.findAll(  )
-				.then( (result:any) => {
-					console.log("**** Result ", result.length)
-				})
-				.catch( (err:any) => {
-					console.log("***************************************************")
-					console.log(err)
-				})
-			}, 2000)
-			*/
-				
 			
 
 			return Promise.resolve();

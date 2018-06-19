@@ -7,6 +7,7 @@ import { DefaultModel} from "./default.model";
 import { TUSER } from "../types";
 import { IUser } from "../interfaces";
 import { ReadWriteRepositoryBase } from "../../engines";
+import { ApplicationLogger } from "../../controllers";
 
 /***
  * Local Repository that contains all methods for 
@@ -37,8 +38,17 @@ export class UserModel extends DefaultModel  {
 		this._userModel = userModel;
 
 		proxyService.userDBLive$.subscribe( (state:boolean) => {						
+			
 			if(proxyService.userDB) this.userDBConn = proxyService.userDB;				
 			this.repo = new UserRepository( this.userDBConn, this.redisClient );
+
+			 // log event 
+	        ApplicationLogger.application({
+	            section:'BootstrapController', 
+	            eventID: 1017, 
+	            action: 'DB User ReadWrite Model and Repository has initialized.'
+	        });
+
 		});		
 	}	
 
