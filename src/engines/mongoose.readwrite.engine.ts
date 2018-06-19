@@ -5,7 +5,6 @@
  * (3) switch between storage solutions (redis versus mongodb)
  * (4) switch between localhost/mlab etc
  */
-import util from "util";
 import mongoose from 'mongoose';
 import { Document, Schema, ModelPopulateOptions } from "mongoose";
 
@@ -25,8 +24,23 @@ import {
     PERSON_SUBTYPE_SYSTEM_USER,
     PERSON_SUBTYPE_USER,
     PERSON_SUBTYPE_CLIENT,
-    PERSON_SUBTYPE_CUSTOMER
+    PERSON_SUBTYPE_CUSTOMER,
+
+    /****
+     * Type Collections we dont cache 
+     */
+     EXCLUDE_FROM_CACHING_COLLECTIONS
+
 } from "../util/secrets";
+
+import {
+    constructPrimaryKey,
+    constructSecundaryKey,
+    constructTimeslotKey,
+    constructTimestamp,
+    toObjectId, 
+    testForObjectId
+} from "./mongoose/helpers";
 
 /****
  * Person SubType Mongoose Schemas
@@ -35,10 +49,7 @@ import { systemUserSchema } from "../shared/schemas/systemuser.schema";
 import { userSchema } from "../shared/schemas/user.schema";
 import { clientSchema} from "../shared/schemas/client.schema";
 import { customerSchema } from "../shared/schemas/customer.schema";
-
 import { IMongooseModels, IRead, IWrite, IBulk } from "./mongoose/interfaces";
-
-import { toObjectId, testForObjectId } from "./mongoose/helpers"; 
 
 
 export let ObjectId = mongoose.Schema.Types.ObjectId;
@@ -55,6 +66,8 @@ export 	class ReadWriteRepositoryBase<T extends mongoose.Document>
 
     private client:any;
 
+    private schemaIdentifier:string;
+
     constructor(     
 
         // Schema Identifier    
@@ -65,7 +78,9 @@ export 	class ReadWriteRepositoryBase<T extends mongoose.Document>
 
         // redisClient
         redisClient:any
-    ) {           
+    ) {          
+
+        this.schemaIdentifier = schemaIdentifier;    
 
         switch(schemaIdentifier) {
             case PERSON_SUBTYPE_SYSTEM_USER:  
@@ -86,138 +101,255 @@ export 	class ReadWriteRepositoryBase<T extends mongoose.Document>
     }
 
     /***
-     *
+     * 
      */
-    _constructRedisHashKey() {        
-        let dbName:string = this._model.db.name;
-        let collectionName:string = this._model.collection.collectionName;    
+    private constructArgs(condition:any, fields:Object, options:Object) {
+
+        let isReadByIdFunction:boolean;
+        let searchID:mongoose.Types.ObjectId;
+
+        if( testForObjectId(condition) ) 
+            isReadByIdFunction=true;
+
+        let args:any = [];
+        if(isReadByIdFunction) {
+            searchID = toObjectId(condition);            
+        } else {
+            if(condition) args.push(condition);
+            if(fields) args.push(fields);
+            if(options) args.push(options);
+        }
+
         return {
-            dbName,
-            collectionName,
-            hashKey: `${dbName}-${collectionName}`
+            isReadByIdFunction,
+            args,
+            searchID
         };
     }
 
-    /***
+     /***
      *
      */
-    getKey (query:any):string {
-     
-        let key:string;
-        let keys:string[] = Object.keys(query);
-            
-        return (keys[0]) ?
-            keys[0].toString() :
-            'all';       
+    private async queryDontCache (
+        condition:any, 
+        fields:any, 
+        options:any,
+        exec?:Function, 
+        callback?:any
+    ) {
+
+        let result:Document|Document[]; 
+        let err:any;
+
+        try {
+
+            /****
+             * @isReadByIdFunction:boolean
+             * Set to true if Model Mongoose Method searches by ObjectId
+             * @searchID: mongoose.Types.ObjectId
+             * Stores Mongoose Document ObjectID;
+             * @args: []
+             * Stores arguments for Mongoose exec method
+             */
+            const { isReadByIdFunction, 
+                    args, 
+                    searchID }:any = this.constructArgs(condition, fields, options);
+
+            if(!isReadByIdFunction) {
+                result = await exec.apply( this._model, args); 
+            } else {
+                result = await exec.call( this._model, searchID );  
+            }  
+
+            console.log(result)
+
+            return callback.call(this, null, result);  
+        }
+        catch (e) { err=e;}
+        finally {
+            return callback.call(this, null, result);               
+        }
     }
 
     /***
-     *
+     * Try to findCachedQuery
      */
-    async cache (condition:any, fields:any, options:any, exec?:Function, callback?:any) {  
+    private async getCacheValue (        
+        condition:Object, 
+        fields:Object, 
+        options:any,   
+        model:any
+    ) {
+
+        /**
+         * grab dbName and collection Name from Mongoose connection
+         * to construct redis hashkey
+         */
+        const {dbName, collectionName, hashKey}:any = constructPrimaryKey(model); 
 
         /***
-         * Set to true if Model Mongoose Method searches by ObjectId
+         * Retrieve first property of <condition> object
+         * @key:string|number
+         */
+        let key:string|number = constructSecundaryKey(condition);
+        let timeslotKey:string = constructTimeslotKey(hashKey, key);         
+      
+        /****
          * @isReadByIdFunction:boolean
-         */
-        let isReadByIdFunction:boolean=false;
-
-        /***
-         * Stores Mongoose Document ObjectID;
+         * Set to true if Model Mongoose Method searches by ObjectId
          * @searchID: mongoose.Types.ObjectId
+         * Stores Mongoose Document ObjectID;
+         * @args: []
+         * Stores arguments for Mongoose exec method
          */
-        let searchID:mongoose.Types.ObjectId;
+        const { isReadByIdFunction, 
+                args, 
+                searchID }:any = this.constructArgs(condition, fields, options);                     
+       
+        let cacheValue:any = await this.client.hget(hashKey, key);
+        let expireValue:any = await this.client.get(timeslotKey);  
 
-        /***
-         * Query or Cache result
-         */
+        console.log("==> READWRITE Engine")
+        console.log("(0) Condition: ", condition)
+        console.log("(1) Hash Key: ", hashKey)
+        console.log("(2) Key: ", key)
+        console.log("(3) TS Key: ", timeslotKey)
+        console.log("(4) Expire Value ", expireValue  ) 
+        console.log("(5) Cache Value, ", cacheValue)      
+
+        return {
+            isReadByIdFunction,
+            hashKey,
+            key,
+            timeslotKey,
+            args,
+            searchID,
+            cacheValue,
+            expireValue
+        }
+    }
+
+    /***
+     * (1) Execute Mongoose model Function
+     * (2) Store Query result in Redis Cache
+     * (3) Store Twin key with expiration in Redis Cache
+     * (4) Return callback to caller
+     */
+    private async queryThenCache(
+        isReadByIdFunction:boolean,
+        hashKey:string,
+        key: string,
+        timeslotKey:string,
+        searchID: mongoose.Types.ObjectId,
+        args: any,
+        exec: Function,
+        callback: any
+    ) {
+
         let result:Document|Document[]; 
+        let err:any;
+
+        try {
+
+            // (1) Execute Mongoose model Function        
+            if(!isReadByIdFunction) { 
+                result = await exec.apply( this._model, args);  } 
+            else {
+                result = await exec.call( this._model, searchID );  
+            }           
+
+            // (2) Store result in Redis Cache
+            this.client.hset( hashKey, key, JSON.stringify(result) );
+
+            // (3) Store Twin key with expiration in Redis Cache
+            let ts:number =  constructTimestamp();        
+            this.client.set( timeslotKey, ts, 'EX', 40 );
+        } 
+
+        catch (e) { err = e; }
+
+        finally {
+
+            /***
+             * Bind arguments with <apply> method
+             * provides given this value and arguments as
+             * an array or array-like object()
+             */
+            if(err) {
+                return callback.apply(this, [err]);
+
+            /***
+             * Bind arguments with <call> method
+             * provides given this value and arguments individually
+             */
+            } else {                
+                return callback.call(this, null, result);                
+            }
+        }
+    }
+      /***
+     * Caching Configuration
+     * (1)  Only cacche if setting <USE_LOCAL_REDIS_SERVER> is set to true
+     * (2)  Do not cache excluded collections defined in EXCLUDE_FROM_CACHING_COLLECTIONS
+     *      Only cache subdocument queries associated with these collections
+     * (3)  All datastore queries are cached by default
+     */
+    async cache (condition:any, fields:any, options:any, exec?:Function, callback?:any) {          
+  
+        /***
+         * Determine if collection is protected 
+         */
+        let isProtectedCollection:boolean;
+        let cName:string = this._model.collection.collectionName;    
+        isProtectedCollection = EXCLUDE_FROM_CACHING_COLLECTIONS.includes( cName )       
 
         /***
-         * Return default query if we are not caching db queries
+         * NO CACHING        
+         */  
+        if(!USE_LOCAL_REDIS_SERVER || isProtectedCollection ) {
+            console.log("*** Execute Database Query Only ") 
+            return this.queryDontCache(condition, fields, options, exec, callback);           
+
+        /***
+         * REDIS CACHING
          */
-        if(!USE_LOCAL_REDIS_SERVER) {
+        } else {                  
 
-            console.log("*** USE REDIS CACHING ", USE_LOCAL_REDIS_SERVER)
+            const {
 
-            let err:any;
+                // is findById method or regular query
+                isReadByIdFunction, 
+                
+                // Primary <HSET> key
+                hashKey,
+                
+                // Secundary <HSET> Key
+                key,
 
-            try {
+                // Primary <SET> key for matching keyh value with expiration value
+                timeslotKey,
 
-                if( testForObjectId(condition) ) 
-                    isReadByIdFunction=true;
+                // Arguments array for Mongoose Query Method
+                args, 
 
-                var args:any = [];
-                if(isReadByIdFunction) {
-                    searchID = toObjectId(condition);            
-                } else {
-                    if(condition) args.push(condition);
-                    if(fields) args.push(fields);
-                    if(options) args.push(options);
-                }
+                // Mongoose Object ID
+                searchID, 
 
-                if(!isReadByIdFunction) {
-                    result = await exec.apply( this._model, args); 
-                } else {
-                    result = await exec.call( this._model, searchID );  
-                }  
+                // Redis cache value for this database query
+                cacheValue, 
 
-                return callback.call(this, null, result);  
-            }
-            catch (e) { err=e;}
-            finally {
-                return callback.call(this, null, result);               
-            }           
-        
-        } else {                 
+                // Redis cache value for twin key with expiration value 
+                expireValue 
 
-            /**
-             * grab dbName and collection Name from Mongoose connection
-             * to construct redis hashkey
-             */
-            const {dbName, collectionName, hashKey}:any = this._constructRedisHashKey();
-
-            /***
-             * Retrieve first property of <condition> object
-             * @key:string|number
-             */
-            let key:string|number = this.getKey(condition);
-
-            /**
-             *  Test condition argument to identify Mongoose ID or Object with nested property
-             */
-            if( testForObjectId(condition) ) 
-                isReadByIdFunction=true;
-
-            /***
-             * Build argyments list depending whether model method is
-             * (1)
-             * (2)
-             */
-            var args:any = [];
-            if(isReadByIdFunction) {
-                searchID = toObjectId(condition);            
-            } else {
-                if(condition) args.push(condition);
-                if(fields) args.push(fields);
-                if(options) args.push(options);
-            }
-           
-           /*
-            console.log("==> ReadWrite Engine")
-            console.log("(0) Condition: ", condition)
-            console.log("(1) Hash Key: ", hashKey)
-            console.log("(2) Key: ", key)
-            console.log("(3) Args ",  args)     
-           */
-            let cacheValue:any = await this.client.hget(hashKey, key);
-
+            }:any = await this.getCacheValue( condition, fields, options, this._model );          
+     
 
             /***
              * Redis Cache has stored value for this query
              */
-            if(cacheValue) {           
-
+            if(cacheValue && expireValue) {        
+ 
+                console.log(" ==> Serving from Cache");               
                 // parse cache value to json
                 const doc = JSON.parse(cacheValue);        
                 
@@ -225,61 +357,28 @@ export 	class ReadWriteRepositoryBase<T extends mongoose.Document>
                 const result = Array.isArray(doc)
                     ? doc.map(d => new this._model(d))
                     : new this._model(doc);
-
+                  console.log(result)
                 return callback(null, result);
             }       
         
-            let err:any;
-         
-
-            try {
-
-                /***
-                 * Execute Mongoose model Function
-                 */
-                if(!isReadByIdFunction) {
-                    result = await exec.apply( this._model, args); 
-                } else {
-                   result = await exec.call( this._model, searchID );  
-                }           
-
-                /***
-                 * Store result in Redis Cache
-                 */              
-                this.client.hset( 
-                    hashKey, 
-                    key, 
-                    JSON.stringify(result),  
-                    REDIS_WRITE_QUERIES_EXPIRATION_TYPE,
-                    REDIS_WRITE_QUERIES_EXPIRATION_TIME 
-                );       
-            } 
-
-            catch (e) {
-                err = e;
-            }
-
-            finally {
-
-                /***
-                 * Bind arguments with <apply> method
-                 * provides given this value and arguments as
-                 * an array or array-like object()
-                 */
-                if(err) {
-                    return callback.apply(this, [err]);
-
-                /***
-                 * Bind arguments with <call> method
-                 * provides given this value and arguments individually
-                 */
-                } else {                
-                    return callback.call(this, null, result);                
-                }
-            }
-
+            /***
+             * Execute Mongoose Query,
+             * store its result and matching expiration key in Redis 
+             */
+            console.log(" ==> Serving from Database ")    
+            return this.queryThenCache(
+                isReadByIdFunction,
+                hashKey,
+                key,
+                timeslotKey,
+                searchID,
+                args,
+                exec,
+                callback
+            );             
         }
     }
+    
 
     /***
      * Model functions

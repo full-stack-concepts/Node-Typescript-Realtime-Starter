@@ -21,7 +21,9 @@ import {
     constructPrimaryKey,
     constructSecundaryKey,
     constructTimeslotKey,
-    constructTimestamp
+    constructTimestamp,
+    toObjectId, 
+    testForObjectId
 } from "./mongoose/helpers";
 
 /****
@@ -33,8 +35,6 @@ import { clientSchema} from "../shared/schemas/client.schema";
 import { customerSchema } from "../shared/schemas/customer.schema";
 
 import { IMongooseModels, IRead } from "./mongoose/interfaces";
-import { toObjectId, testForObjectId } from "./mongoose/helpers";
-
 
 export 	class ReadRepositoryBase<T extends mongoose.Document>  
 		implements 
