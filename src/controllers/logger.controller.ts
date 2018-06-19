@@ -38,7 +38,7 @@ const timestampToString = ():string => {
 const stringFormat = printf ( (info:any) => {
 	const ts:string = tsFormatter().toString();
 	const tsString:string = timestampToString();
-	return `${tsString} = ${ts} - [${info.label}] - ${info.level}: ${info.message}`;
+	return ` [${info.label}] - ${tsString} - ${ts} - ${info.level}: ${info.message}`;
 });
 
 /****

@@ -11,8 +11,17 @@ export function analyse(req:Request, res:Response, next:NextFunction) {
 
 	clientDetectionService.analyse(req, res)
     .then( (info:any) => {
+
     	console.log(info)
-    	let logString:string = ` ip: ${info.ip} - viewport: ${info.viewport}`;
+
+        // analyse url
+        let protocol:string = req.protocol;
+        let host:string = req.get('host');
+        let url:string = req.originalUrl;        
+
+    	let logString:string = ` -protocol: ${protocol} -host: ${host} -url:${url}`;
+        if(info.ip) logString += ` -ip: ${info.ip}`;
+        if(info.viewport) logString += `- viewport: ${info.viewport}`;
     	if(info.osInfo.android)  logString += ` -android: ${info.osInfo.android}`;
     	if(info.osInfo.iOS)  logString += ` -iOS: ${info.osInfo.iOS}`;
     	if(info.osInfo.iPhone)  logString += ` -iPhone: ${info.osInfo.iPhone}`;

@@ -54,14 +54,18 @@ class UserRouter extends DefaultRouter {
         this.router.use(allowMethods);
 
         // type req to any -> origin property unkown on Request
-        this.router.use(allowOrigin);     
-        
+        this.router.use(allowOrigin);   
+
+        /*****
+		 *  Analyse client on root entry
+		 */		
+		this.router.use(analyse);             
 	}
 
 	private setRoutes():void {
 
 		/*****
-		 *  Analyse client on root entry
+		 *  Analyse client on root entry and log enty
 		 */		
 		this.router.get('/', analyse);       
 

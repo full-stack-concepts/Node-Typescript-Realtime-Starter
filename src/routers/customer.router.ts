@@ -57,14 +57,14 @@ export class CustomerRouter extends DefaultRouter {
 
         // type req to any -> origin property unkown on Request
         this.router.use(allowOrigin);     
-	}
 
-	private setRoutes():void {
-
-		/*****
+        /*****
 		 *  Analyse client on root entry
 		 */		
-		this.router.get('/', analyse); 
+		this.router.use(analyse);   
+	}
+
+	private setRoutes():void {	
        
        	// enable local authentication
         if(LOCAL_AUTH_CONFIG.enable) { 
