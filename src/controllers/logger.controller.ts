@@ -93,14 +93,24 @@ const accessLogTransport = new transports.File({
  * Transport: Test Log
  */
 const testLogTransport = new transports.File({
-	level: 'tests',	
+	level: 'test',	
 	filename: logPaths.$tests,		
 	maxsize: 5242880, // 5MB
 	maxFiles: 3
 });
 
 /****
- * Bootstrap Logger
+ * Transport: Error Log
+ */
+const errorLogTransport = new transports.File({
+	level: 'error',	
+	filename: logPaths.$errors,		
+	maxsize: 5242880, // 5MB
+	maxFiles: 3
+});
+
+/****
+ * Application Logger
  */
 export const ApplicationLogger:any = createLogger({	
 
@@ -121,6 +131,30 @@ export const ApplicationLogger:any = createLogger({
 	 	applicationLogTransport
 	]
 });
+
+/****
+ * Error Logger
+ */
+export const ErrorLogger:any = createLogger({	
+
+	// message level scheme
+	levels: customLevels.levels,	
+	
+	format: combine(		
+		metadata(),
+		timestamp({ format: 'DD-MM-YYYY HH:mm:ss:ssss' }),
+		entryFormatter(),
+		format.json()	
+	),	
+
+	// winston error handling
+	exitOnError: false,	
+
+	transports: [	 
+	 	errorLogTransport
+	]
+});
+
 
 /****
  * HTTP Logger

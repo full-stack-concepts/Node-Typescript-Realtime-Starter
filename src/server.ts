@@ -6,7 +6,6 @@ import * as https from 'https';
 import * as debug from 'debug';
 import dotenv from 'dotenv';
 import  path from 'path';
-import fs from 'fs';
 
 // interfaces
 import { ServerOptions, ProcessEnv } from './shared/interfaces/';
@@ -23,7 +22,7 @@ import { proxyService } from "./services";
  * Bootstrap Controller
  */
 import { bootstrapController } from "./controllers";
-import { DAController } from "./controllers";
+import { DAController, ErrorLogger } from "./controllers";
 
 /**
  * EXPRESS APPLICATION CODE
@@ -174,15 +173,22 @@ export const createServer = ():Promise<any> => {
 
     /* Log stack trace on worker dead */
     process.on('uncaughtException', (err) => {
-        
-        let d:string = (new Date).toUTCString();
-        let message:string = `S{d} - uncaughtException ${err.message}`;
-        let stack = err.stack;
-        
-        // #TODO : log error  
-        console.log(err)        
-    });
-   
+
+        /***
+         * Log Critical System Error
+         */
+        ErrorLogger.error({
+            section: 'Application',
+            eventID: 1,
+            status: `Critical Error: ${err.message}`,
+            stack: JSON.stringify(err.stack)
+        });    
+
+        /***
+         * Terminate Application
+         */
+        process.exit(1);
+    });  
 
     /**
      * Create HTTPS server.
@@ -198,6 +204,7 @@ export const createServer = ():Promise<any> => {
     } else if(EXPRESS_SERVER_MODE==='http') {       
         
        httpServer = http.createServer(App);    
+              
     }       
 
     /**
@@ -205,7 +212,7 @@ export const createServer = ():Promise<any> => {
      */
     let server = httpServer.listen(PORT);
     httpServer.on('error', onError);
-    httpServer.on('listening', onListening);    
+    httpServer.on('listening', onListening);      
 
     return Promise.resolve(server);    
 }

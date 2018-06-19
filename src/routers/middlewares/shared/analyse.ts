@@ -5,9 +5,7 @@ import { clientDetectionService } from "../../../services";
 /****
  * Analyse client on root router entry 
  */
-export function analyse(req:Request, res:Response, next:NextFunction) {   
-
-	console.log("*** Root entry") 
+export function analyse(req:Request, res:Response, next:NextFunction) {   	
 
 	clientDetectionService.analyse(req, res)
     .then( (info:any) => {

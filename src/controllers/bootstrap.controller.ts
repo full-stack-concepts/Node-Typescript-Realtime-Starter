@@ -3,7 +3,7 @@ import { Observable, Subscription } from "rxjs";
 /****
  * Import Dependencies
  */
-import { RedisController, UAController, DAController, ApplicationLogger } from "../controllers";
+import { RedisController, UAController, DAController, ApplicationLogger, ErrorLogger } from "../controllers";
 import { proxyService, connectToUserDatabase, connectToProductDatabase } from "../services";
 import { configureDatabases } from "../services/db/db.admin.service";
 import { testForSystemUser, createSystemUser } from "../services/user/system.user.service";
@@ -56,7 +56,7 @@ export class BootstrapController {
 	 */
 	private logBootstrapEvent(eventID:number, action:string='') {
 		let section:string = 'BootstrapController';
-		ApplicationLogger.application({section, eventID, action})
+		ApplicationLogger.application({section, eventID, action});
 	}
 
 	/***
@@ -84,8 +84,15 @@ export class BootstrapController {
 	}
 
 	private err(err:any) {
-		console.error("Critical Error: bootstrap sequence failed ")
-		console.error(err);
+		
+		let section:string = 'BootstrapController';
+		let eventID:number=2;
+		let status:string =  `Critical Error - Bootstrap sequence failed ${err.message}`;
+		let stack:string = JSON.stringify(err.stack) || "";
+
+
+		
+		ErrorLogger.error({ section, eventID, status, stack });    
 		process.exit(1);
 	}
 
@@ -244,10 +251,7 @@ export class BootstrapController {
 			// process thick: 
 			await createSystemUser();		
 
-			console.log("==> Bootstrap Sequence finished")
-
-			
-			
+			console.log("==> Bootstrap Sequence finished");			
 
 			return Promise.resolve();
 

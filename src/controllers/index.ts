@@ -5,6 +5,7 @@ export { UAController} from "./user.action.controller";
 export { DAController } from "./data.action.controller";
 export { 	 
 	ApplicationLogger, 
+	ErrorLogger,
 	HTTPLogger, HTTPLoggerStream,
 	TestLogger
 } from "./logger.controller";
