@@ -9,3 +9,5 @@ export {
 	HTTPLogger, HTTPLoggerStream,
 	TestLogger
 } from "./logger.controller";
+
+export {environmentController} from "./environment.controller";

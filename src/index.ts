@@ -1,3 +1,23 @@
 import { createServer } from "./server";
 
-createServer();
+import {
+    environmentController
+} from "./controllers/environment.controller";
+
+const init = async () => {
+
+	// environmentController.load();
+
+	createServer();  
+}
+
+init();
+
+
+
+
+
+
+
+
+

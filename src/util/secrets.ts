@@ -1,3 +1,11 @@
+/****
+ * Note: Use equality operator (==) to cast dotenv strings to boolean (your settings file)
+ */
+
+import {
+    environmentController
+} from "../controllers/environment.controller";
+
 import dotenv from "dotenv";
 import fs from "fs";
 import moment from "moment-timezone";
@@ -11,11 +19,10 @@ import { IDatabasePriority } from "../shared/interfaces";
 import { isEmail, FormValidation } from "../util";
 
 /****
- * Note: Use equality operator (==) to cast dotenv strings to boolean (your settings file)
+ * Load environment files from env directory
+ * to use different path: loadEnvironmentalVariables('./mydirname')
  */
-if (fs.existsSync(".env")) {   
-    dotenv.config({ path: ".env" });
-}
+environmentController.loadEnvironmentalVariables();
 
 const isString = (str:string):boolean => {
 	return (!str || str && typeof str === 'string');

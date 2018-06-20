@@ -10,8 +10,6 @@ import  path from 'path';
 // interfaces
 import { ServerOptions, ProcessEnv } from './shared/interfaces/';
 
-
-
 /****
  * App Services
  */
@@ -116,7 +114,7 @@ function getSSL():ServerOptions {
     switch (ENVIRONMENT) {
         case 'dev': 
             options.key = getCertificate(PATH_TO_DEV_PRIVATE_KEY);
-            options.cert =  getCertificate( PATH_TO_DEV_CERTIFICATE,);
+            options.cert =  getCertificate( PATH_TO_DEV_CERTIFICATE);
             break;
 
         case 'prod': 
@@ -204,7 +202,7 @@ export const createServer = ():Promise<any> => {
     } else if(EXPRESS_SERVER_MODE==='http') {       
         
        httpServer = http.createServer(App);    
-              
+
     }       
 
     /**
