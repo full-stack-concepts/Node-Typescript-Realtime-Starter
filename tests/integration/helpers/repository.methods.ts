@@ -14,8 +14,16 @@ import {
  */
 export class ReadRepository extends ReadRepositoryBase<any> {
 	
+
+	public model:any;
+
 	constructor(userType:string, connection:mongoose.Model<any>, redisClient:any) {
-		super(userType, connection, redisClient);
+		super(userType, connection, redisClient);		
+	}
+
+	public getModel() {
+		this.model = this._model;
+		return this.model;
 	}
 }
 
@@ -24,7 +32,14 @@ export class ReadRepository extends ReadRepositoryBase<any> {
  */
 export class ReadWriteRepository extends ReadWriteRepositoryBase<any> {
 
+	public model:any;
+
 	constructor(userType:string, connection:mongoose.Model<any>, redisClient:any) {
 		super(userType, connection, redisClient);
+	}
+
+	public getModel() {
+		this.model = this._model;
+		return this.model;
 	}
 }

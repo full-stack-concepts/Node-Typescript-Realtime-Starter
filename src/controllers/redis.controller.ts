@@ -3,6 +3,7 @@ import util from "util";
 
 import {
 	USE_LOCAL_REDIS_SERVER,
+	AUTHENTICATE_REDIS_SERVER,
 	REDIS_LOCAL_URL,
 	REDIS_LOCAL_PORT,
 	REDIS_LOCAL_PASSWORD,
@@ -12,6 +13,8 @@ import {
 	REDIS_WRITE_QUERIES_EXPIRATION_TIME
 
 } from "../util/secrets";
+
+import { ErrorLogger } from "../controllers";
 
 export class RedisController  {	
 
@@ -47,10 +50,11 @@ export class RedisController  {
 			client.hset = util.promisify(client.hset);
 			client.hget = util.promisify(client.hget);
 
-			client.auth( REDIS_LOCAL_PASSWORD, (err:any) => {
-    			if (err) throw err;
-			});
-
+			if(AUTHENTICATE_REDIS_SERVER) {
+				client.auth( REDIS_LOCAL_PASSWORD, (err:any) => {
+	    			if (err) throw err;
+				});
+			}		
 
 			/****
 			 * eturn Redis CLient to Bootstrap Controller
@@ -58,10 +62,11 @@ export class RedisController  {
 			return Promise.resolve(client); 
 
 
-		} catch(e) {
-
-			console.error("Redis Server Error: please check your configuration settings for Redis - could not connect")
-			process.exit(1)
+		} catch(err) {
+			
+			let status:string =  `Critical Error - Could not connect to Redis Server ${err.message}`;
+			let stack:string = JSON.stringify(err.stack) || "";		
+			ErrorLogger.error({ section:'RedisController', eventID:10, status, stack });    			
 		}
 	}
 }

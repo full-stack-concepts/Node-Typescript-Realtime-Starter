@@ -333,9 +333,11 @@ dbAccounts.forEach( ({ value, txt }) => {
  * REDIS SERVER
  */
 export const USE_LOCAL_REDIS_SERVER = process.env["USE_LOCAL_REDIS_SERVER"] == 'true';
+export const AUTHENTICATE_REDIS_SERVER = process.env["AUTHENTICATE_REDIS_SERVER"] == 'true';
 export const REDIS_LOCAL_URL = process.env["REDIS_LOCAL_URL"];
 export const REDIS_LOCAL_HOSTNAME = process.env["REDIS_LOCAL_HOSTNAME"];
-export const REDIS_LOCAL_PORT = parseInt(process.env["REDIS_LOCAL_PORT"]);
+export const REDIS_LOCAL_PORT = process.env["REDIS_LOCAL_PORT"];
+console.log(" REDIS PORT ", REDIS_LOCAL_PORT, typeof(REDIS_LOCAL_PORT) === 'number')
 export const REDIS_LOCAL_PASSWORD = process.env["REDIS_LOCAL_PASSWORD"]
 
 export const REDIS_READ_QUERIES_EXPIRATION_TYPE = process.env["REDIS_READ_QUERIES_EXPIRATION_TYPE"];

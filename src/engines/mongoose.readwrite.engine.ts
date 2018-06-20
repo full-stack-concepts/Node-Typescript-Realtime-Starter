@@ -62,7 +62,7 @@ export 	class ReadWriteRepositoryBase<T extends mongoose.Document>
 			IWrite<T>,  
 			IBulk<T> {
    
-    private _model: any; // mongoose.Model<mongoose.Document>;   
+    public _model: any; // mongoose.Model<mongoose.Document>;   
 
     private client:any;
 
@@ -80,9 +80,9 @@ export 	class ReadWriteRepositoryBase<T extends mongoose.Document>
         redisClient:any
     ) {          
 
-        this.schemaIdentifier = schemaIdentifier;    
+        this.schemaIdentifier = schemaIdentifier.toLowerCase();    
 
-        switch(schemaIdentifier) {
+        switch(this.schemaIdentifier) {
             case PERSON_SUBTYPE_SYSTEM_USER:  
                 this.createSystemUserModel(conn); 
             break;

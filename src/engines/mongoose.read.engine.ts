@@ -41,7 +41,7 @@ export 	class ReadRepositoryBase<T extends mongoose.Document>
 			IMongooseModels<T>, 
 			IRead<T> {
    
-    private _model: any; // mongoose.Model<mongoose.Document>;    
+    public _model: any; // mongoose.Model<mongoose.Document>;    
 
     private client:any;
 
@@ -59,13 +59,13 @@ export 	class ReadRepositoryBase<T extends mongoose.Document>
         redisClient:any
     ) {       
 
-        this.schemaIdentifier = schemaIdentifier;   
+        this.schemaIdentifier = schemaIdentifier.toLowerCase();   
 
-        switch(schemaIdentifier) {
+        switch(this.schemaIdentifier) {
             case PERSON_SUBTYPE_SYSTEM_USER:  
                 this.createSystemUserModel(conn); 
             break;
-            case PERSON_SUBTYPE_USER: 
+            case PERSON_SUBTYPE_USER:             
                 this.createUserModel(conn); 
             break;            
             case PERSON_SUBTYPE_CLIENT: 
@@ -366,7 +366,7 @@ export 	class ReadRepositoryBase<T extends mongoose.Document>
          this._model = connection.model('SystemUser', systemUserSchema, 'systemusers', true);
     }
 
-    createUserModel(connection:any):void {
+    createUserModel(connection:any):void {       
          this._model = connection.model('User', userSchema, 'users', true);
     }
 
@@ -387,13 +387,7 @@ export 	class ReadRepositoryBase<T extends mongoose.Document>
 
     findById(_id: string, callback: (error: any, result: T) => void) {
         this.cache(_id, null, null, this._model.findById, callback);    
-    }
-
-    /*
-    findOne(cond: Object, callback: (err: any, res: T) => void): any {
-        return this._model.findOne(cond, callback);
-    }
-    */
+    }  
 
     findOne(query:Object, callback?: (err: any, res: T) => void): any {
         console.log("**** Query: ", query)
