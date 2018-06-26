@@ -10,4 +10,5 @@ export {
 	TestLogger
 } from "./logger.controller";
 
-export {environmentController} from "./environment.controller";
+export { environmentController } from "./environment.controller";
+export { mailController, MAController } from "./mailer.controller";

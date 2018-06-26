@@ -77,3 +77,25 @@ export {
  * Tests
  */
 export { IResponse } from "./tests/response.interface";
+
+export {
+	IMetadataObj
+} from "./index.signature";
+
+/***
+ * Mailer
+ */
+
+export { 
+	IEmailMessage,
+	IEmailAttachment,
+	IEmailSMTPOptions,
+	IEmailSMTPDefaults,
+	IEmailAuthentication
+} from "./mailer";
+
+/***
+ * App Communication
+ */
+export { IAppMessage} from "./apps/app.message.interface";
+export { IMessageID } from "./apps/app.requestid.interface";

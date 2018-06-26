@@ -39,3 +39,8 @@ export { connectToUserDatabase, DBUserService } from "./db/db.user.service";
  * CLient/HTTP Services
  */
 export { clientDetectionService } from "./http/client.analyzer.service";
+
+/***
+ * Mail Services
+ */
+export { mailService } from "./mail/mail.service";

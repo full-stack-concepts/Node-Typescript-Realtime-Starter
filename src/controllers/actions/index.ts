@@ -46,4 +46,11 @@ export {
 	LOCAL_STORAGE_ADD
 } from "./data.actions";
 
+/****
+ * Pre-defined Mail Actions
+ */
+export {
+	SEND_SYSTEM_EMAIL
+} from "./mail.actions";
+
 

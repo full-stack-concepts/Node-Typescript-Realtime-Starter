@@ -788,6 +788,20 @@ export const STORE_WEBTOKEN_AS_COOKIE = process.env["STORE_WEBTOKEN_AS_COOKIE"] 
 export const WEBTOKEN_COOKIE = process.env["WEBTOKEN_COOKIE"];
 export const SEND_TOKEN_RESPONSE = process.env["SEND_TOKEN_RESPONSE"] == 'true';
 
+/***
+ * Node Mailer
+ */
+export const MAILER_SMTP_PROVIDER = process.env["MAILER_SMTP_PROVIDER"];
+export const SMTP_HOST_URL = process.env["SMTP_HOST_URL"];
+export const SMTP_PORT = process.env["SMTP_PORT"];
+export const SMTP_AUTH_USER = process.env["SMTP_AUTH_USER"];
+export const SMTP_AUTH_PASSWORD = process.env["SMTP_AUTH_PASSWORD"];
+export const MAILER_DEFAULT_FROM_ADDRESS = process.env["MAILER_DEFAULT_FROM_ADDRESS"];
+export const MAILER_DEFAULT_SENDER_ADDRESS = process.env["MAILER_DEFAULT_SENDER_ADDRESS"];
+export const SMTP_SECURE = process.env["SMTP_SECURE"] == 'true';
+export const SMTP_IGNORE_TLS = process.env["SMTP_IGNORE_TLS"] == 'true';
+export const SMTP_REQUIRE_TLS = process.env["SMTP_REQUIRE_TLS"] == 'true';
+
 
 if(STORE_WEBTOKEN_AS_COOKIE) {
 

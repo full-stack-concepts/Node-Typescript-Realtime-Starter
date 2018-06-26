@@ -1,9 +1,24 @@
 import { Observable, Subscription } from "rxjs";
 
 /****
+ * Import Actions
+ */
+import {
+	SEND_SYSTEM_EMAIL
+} from "./actions";
+
+/****
  * Import Dependencies
  */
-import { RedisController, UAController, DAController, ApplicationLogger, ErrorLogger } from "../controllers";
+import { 
+	RedisController, 
+	UAController, 
+	DAController, 
+	ApplicationLogger, 
+	ErrorLogger, 
+	mailController, MAController 
+} from "../controllers";
+
 import { proxyService, connectToUserDatabase, connectToProductDatabase } from "../services";
 import { configureDatabases } from "../services/db/db.admin.service";
 import { testForSystemUser, createSystemUser } from "../services/user/system.user.service";
@@ -29,6 +44,7 @@ export class BootstrapController {
 	redisClient:any;
 	uaController:Function;
 	daController:Function;
+	maController:Function;
 
 	constructor() {
 		this.configureSubscribers();
@@ -239,6 +255,15 @@ export class BootstrapController {
 			this.logBootstrapEvent(1006, "Public and private directories have been configured.")	
 
 			/***
+			 * Mail Controller
+			 * (1)  Build Mail Action Proxy			 	
+			 * (2) Build Mail Action Proxy
+			 */
+			this.maController = await MAController.build();
+			await mailController.init();		
+			this.logBootstrapEvent(1019, "Mail Controller has initialized.")
+
+			/***
 			 * Connect To User DB
 			 */
 			await connectToUserDatabase();
@@ -248,10 +273,20 @@ export class BootstrapController {
 			 */ 
 			await connectToProductDatabase();		
 
-			// process thick: 
+			/***
+			 *
+			 */ 
 			await createSystemUser();		
 
-			console.log("==> Bootstrap Sequence finished");			
+			/***
+			 * Send email to application owner 
+			 * that application has booted successfully
+			 */
+			this.maController[SEND_SYSTEM_EMAIL]();
+
+			console.log("==> Bootstrap Sequence finished");		
+
+
 
 			return Promise.resolve();
 

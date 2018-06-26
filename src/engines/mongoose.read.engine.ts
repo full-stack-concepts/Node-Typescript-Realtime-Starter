@@ -389,8 +389,7 @@ export 	class ReadRepositoryBase<T extends mongoose.Document>
         this.cache(_id, null, null, this._model.findById, callback);    
     }  
 
-    findOne(query:Object, callback?: (err: any, res: T) => void): any {
-        console.log("**** Query: ", query)
+    findOne(query:Object, callback?: (err: any, res: T) => void): any {      
         this.cache(query, {}, {}, this._model.findOne, callback);       
     }   
 

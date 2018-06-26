@@ -113,8 +113,7 @@ export class ModelMethods {
 	public updateMany (query:Object, update:any={}, options:Object={} ):Promise<any> {		
 		const repo = this.repo;
 		return new Promise ( (resolve, reject) => {		
-			repo.updateMany ( query, update, options, (err:any, res:any) => {								
-				console.log(err, res)
+			repo.updateMany ( query, update, options, (err:any, res:any) => {												
 				if(err) {  reject(err); } 
 				else { resolve(res); } 			
 			});
@@ -124,8 +123,7 @@ export class ModelMethods {
 	public remove (query:Object):Promise<any> {		
 		const repo = this.repo;
 		return new Promise ( (resolve, reject) => {		
-			repo.remove ( query, (err:any, res:any) => {								
-				console.log(err, res)
+			repo.remove ( query, (err:any, res:any) => {											
 				if(err) {  reject(err); } 
 				else { resolve(); } 			
 			});

@@ -2,11 +2,12 @@ import stream from "stream";
 import Transport from "winston-transport";
 import moment from "moment-timezone";
 import {createLogger, transports, format }  from 'winston';
-const { combine, timestamp, label, printf, metadata } = format;
-const split = require("split");
 
 import { ENVIRONMENT } from "../util/secrets";
 import { logPaths, customLevels } from "./logging";
+
+const { combine, timestamp, label, printf, metadata } = format;
+const split = require("split");
 
 /***
  * Application Settings

@@ -159,9 +159,7 @@ export 	class ReadWriteRepositoryBase<T extends mongoose.Document>
                 result = await exec.apply( this._model, args); 
             } else {
                 result = await exec.call( this._model, searchID );  
-            }  
-
-            console.log(result)
+            }            
 
             return callback.call(this, null, result);  
         }
