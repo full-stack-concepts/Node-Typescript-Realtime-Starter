@@ -1,12 +1,20 @@
 /***
  * Communication between controller and forked and spawned child application
  */
+
+import { IEmailMessage } from "../../interfaces";
+
 export interface IAppMessage {
 
 	/****
-	 * UUID Identifier 
+	 * UUID Identifier used in Controller Queue
 	 */
-	id: string,
+	queueID: string,
+
+	/****
+	 * MessageId -  UUID Identifier for registered email object
+	 */
+	messageId?:string,
 
 	/***
 	 * Constroller Request identifier: string
@@ -14,9 +22,9 @@ export interface IAppMessage {
 	controllerRequest?:string,
 
 	/***
-	 * Message Content
+	 * EMail Content
 	 */
-	message?: any
+	email?: IEmailMessage,
 
 	/***
 	 *
@@ -24,8 +32,13 @@ export interface IAppMessage {
 	status?:boolean,
 
 	/***
-	 *
+	 * Error Stack
 	 */
-	error?:any;
+	trace?:any,
+
+	/***
+	 * Error Message
+	 */
+	message?:string
 
 }

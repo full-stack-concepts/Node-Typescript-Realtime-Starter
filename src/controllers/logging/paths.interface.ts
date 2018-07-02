@@ -6,6 +6,7 @@ export interface ILogPaths {
 	$errors:		string,
 	$warnings:		string,
 	$info:			string,
-	$tests:			string
+	$tests:			string,
+	$mail:			string
 };
 

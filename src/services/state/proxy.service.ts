@@ -1,8 +1,9 @@
 /*****
  * Injectable Proxy Service
- * Propagates app state to subscribed observers
+ * Propagates State Requests to subscribed observers
  */
 import { Subject } from "rxjs";
+import { IEmailMessage} from "../../shared/interfaces";
 
 /****
  * 
@@ -41,6 +42,23 @@ class ProxyService {
 	 * App Event Bus: signal DB Users Service to connect
 	 */
 	public connectUsersDatabase$:Subject<boolean> = new Subject();
+
+	/***
+	 * App Event Bus: request Email Controller to send email
+	 */
+	public sendEmail$:Subject<boolean> = new Subject();
+	private _email:IEmailMessage;
+
+	public setNextEmail(email:IEmailMessage):void {
+		this._email = email;
+		this.sendEmail$.next(true);
+	}
+	
+	public getNextEmail():IEmailMessage { 
+		const email:IEmailMessage = this._email;
+		this._email = null;
+		return email;
+	}	
 
 
 	/***

@@ -7,7 +7,8 @@ export {
 	ApplicationLogger, 
 	ErrorLogger,
 	HTTPLogger, HTTPLoggerStream,
-	TestLogger
+	TestLogger,
+	MailLogger
 } from "./logger.controller";
 
 export { environmentController } from "./environment.controller";

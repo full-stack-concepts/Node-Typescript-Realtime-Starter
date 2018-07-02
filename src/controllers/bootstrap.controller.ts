@@ -1,6 +1,11 @@
 import { Observable, Subscription } from "rxjs";
 
 /****
+ * Import System Settings
+ */
+import { SEND_MAIL_ON_BOOTSTRAP_SEQUENCE_FINISHED } from "../util/secrets";
+
+/****
  * Import Actions
  */
 import {
@@ -33,6 +38,10 @@ import {
 } from "../util";
 
 import { DefaultModel, userModel, userReadModel, clientModel, clientReadModel, customerModel, customerReadModel } from "../shared/models";
+
+import {
+	SYSTEM_BOOTSTRAP_SEQUENCE_FINISHED_EMAIL
+} from "./mail/identifiers";
 
 
 export class BootstrapController {
@@ -190,6 +199,11 @@ export class BootstrapController {
 		}
 	}	
 
+	private sendBootstrapFinalizedEmail():void {
+		if(SEND_MAIL_ON_BOOTSTRAP_SEQUENCE_FINISHED)
+			this.maController[SEND_SYSTEM_EMAIL](SYSTEM_BOOTSTRAP_SEQUENCE_FINISHED_EMAIL);
+	}
+
 	async init() {	
 
 		try {
@@ -281,8 +295,8 @@ export class BootstrapController {
 			/***
 			 * Send email to application owner 
 			 * that application has booted successfully
-			 */
-			this.maController[SEND_SYSTEM_EMAIL]();
+			 */			
+			this.sendBootstrapFinalizedEmail()
 
 			console.log("==> Bootstrap Sequence finished");		
 

@@ -11,5 +11,5 @@ export interface IMessageID {
 	/***
 	 * Section: string
 	 */
-	section:string
+	requestID:string
 }

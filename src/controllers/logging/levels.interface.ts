@@ -7,6 +7,7 @@ export interface ICustomLevels {
   		debug: number, 
   		application: number,
   		access: number,
-  		tests:number
+  		tests:number,
+      mail:number
 	}
 };

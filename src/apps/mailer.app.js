@@ -77,7 +77,8 @@ class Emailer {
 	}
 
 	/***
-	 * Validate HTML template
+	 * (1) Unescape Sprintf template
+     * (2) Validate HTML template    
 	 */
 	testTemplate(html) {
         return new Promise((resolve, reject) => {
@@ -130,6 +131,8 @@ class Emailer {
 	 */	
     process(message) {
 
+        console.log("*** Send new Email")
+
         // (1) process thick: create smtp transporter
         this.createTransporter();
         
@@ -173,51 +176,51 @@ class Emailer {
 	}
 }
 
-const respondWithError = (err, id, controllerRequest, message) => {
-    process.send({ id: id,  status: false, error: err });
+const respondWithError = (queueID, messageId, email, error) => {    
+    console.log("(2) Error ", error)
+    process.send({ queueID: queueID,  messageId: messageId, status: false, trace: error.stack, message:error.message, email: email });
 };
-const respondWithSuccess = (err, id, controllerRequest, message) => {
-    process.send({ id: id, status: true });
+const respondWithSuccess = (queueID, messageId, email) => {
+    process.send({ queueID: queueID, messageId: messageId, email: email, status:true });
 };
-const respondWithErrorToController = (id, controllerRequest, err) => {
-    process.send({ id: id, controllerRequest: controllerRequest, error: err, status: false });
+const respondWithErrorToController = (queueID, controllerRequest, error) => {
+    process.send({ queueID: queueID, controllerRequest: controllerRequest, trace: error.stack, message: error.message, status: false });
 };
-const respondWithSuccessToController = (id, controllerRequest, message) => {
-    process.send({ id: id, controllerRequest: controllerRequest, status: true });
+const respondWithSuccessToController = (queueID, controllerRequest, message) => {
+    process.send({ queueID: queueID, controllerRequest: controllerRequest, status: true });
 };
 
 /***
  * Process Event Listener: Message
  */
-process.on('message', ({id, message, controllerRequest, }) => {
+process.on('message', ({queueID, email, controllerRequest, }) => {
 
     const emailer = new Emailer();
-    let err;
+    let error;
     let finalResult;
 
-    console.log("----------------------------------------------------------------------------------------------------")
-    console.log("**** (1) Incoming Message or controllerRequest")
-   
-    console.log(id, controllerRequest, message)
-    
+    /***
+     * Execute Controller Request
+     */    
     if (controllerRequest) {
+        executeControllerRequest(queueID, controllerRequest);    
 
-        executeControllerRequest(id, controllerRequest);
-    
+    /***
+     * Send Email
+     */
     } else {
-        try {
-            // send email
-            const { result } = emailer.process(message);
+        try {          
+            const { result } = emailer.process(email);
             finalResult = result;
         }
         catch (e) {
-            err = e;
+            error = e;
         }
-        finally {
-            if (err)
-                respondWithError(err, message);
-            if (!err)
-                respondWithSuccess(finalResult, message);
+        finally {           
+            if (error)
+                respondWithError(queueID, email.messageId, email, error || error.stack);
+            if (!error)
+                respondWithSuccess(queueID, email.messageId, email);
         }
     }
 });
@@ -225,10 +228,8 @@ process.on('message', ({id, message, controllerRequest, }) => {
 /***
  * Controller Request
  */
-const executeControllerRequest = (id, controllerRequest) => {
-	
-    console.log(" (2) process request", controllerRequest)
-	
+const executeControllerRequest = (id, controllerRequest) => {	
+  
     const emailer = new Emailer();
     let error;
     switch (controllerRequest) {

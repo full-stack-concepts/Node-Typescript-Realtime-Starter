@@ -91,7 +91,8 @@ export {
 	IEmailAttachment,
 	IEmailSMTPOptions,
 	IEmailSMTPDefaults,
-	IEmailAuthentication
+	IEmailAuthentication,
+	ISystemTemplateData
 } from "./mailer";
 
 /***

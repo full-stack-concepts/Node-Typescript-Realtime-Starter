@@ -11,6 +11,7 @@ export const customLevels:ICustomLevels = {
   		debug: 4, 
   		application: 5,
   		access: 6,
-        tests:7
+        tests:7,
+        mail:8
 	}
 };

@@ -135,6 +135,11 @@ export {
 	constructCompanyTwitterAccount
 } from "./data.functions.util";
 
+export {
+	tsFormatter,
+	timestampToString
+} from "./date.util";
+
 
 
 

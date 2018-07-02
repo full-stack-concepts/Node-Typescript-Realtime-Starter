@@ -1,0 +1,6 @@
+export {
+	SYSTEM_BOOTSTRAP_SEQUENCE_FINISHED,
+	SYSTEM_BOOTSTRAP_SEQUENCE_FINISHED_EMAIL   
+} from "./message.identifiers";
+
+  

@@ -14,6 +14,7 @@ export const logPaths:ILogPaths = {
 	$errors:		`${rootPath}/logs/error.log`,
 	$warnings:		`${rootPath}/logs/warnings.log`,
 	$info:			`${rootPath}/logs/info.log`,
-	$tests:			`${rootPath}/logs/tests.log`
+	$tests:			`${rootPath}/logs/tests.log`,
+	$mail:			`${rootPath}/logs/mail.log`
 };
 

@@ -12,29 +12,12 @@ const split = require("split");
 /***
  * Application Settings
  */
-import {  
-	EXPRESS_SERVER_MODE,
-    TIME_ZONE,
-} from "../util/secrets";
-
-/***
- * Winston
- */
+import { EXPRESS_SERVER_MODE, TIME_ZONE } from "../util/secrets";
 
 /***
  * Message Formatting
  */
-
-const tsFormatter = ():number => {
-	return Math.round((new Date()).getTime() / 1000);
-}
-
-const timestampToString = ():string => {
-
-	let ts:number = Math.round(+new Date());
-    let date:Date = new Date(ts);
-    return moment(date).tz( TIME_ZONE ).format('DD-MM-YYYY HH:mm:ss:ssss').toString();     
-}
+import { tsFormatter, timestampToString } from "../util";
 
 const stringFormat = printf ( (info:any) => {
 	const ts:string = tsFormatter().toString();
@@ -109,6 +92,17 @@ const errorLogTransport = new transports.File({
 	maxsize: 5242880, // 5MB
 	maxFiles: 3
 });
+
+/****
+ * Transport: Mail Log
+ */
+const mailLogTransport = new transports.File({
+	level: 'mail',	
+	filename: logPaths.$mail,		
+	maxsize: 5242880, // 5MB
+	maxFiles: 3
+});
+
 
 /****
  * Application Logger
@@ -198,6 +192,30 @@ export const TestLogger:any = createLogger({
 
 	transports: [	 
 	 	testLogTransport
+	]
+});
+
+
+/****
+ * Mail Logger
+ */
+export const MailLogger:any = createLogger({
+
+	// message level scheme
+	levels: customLevels.levels,	
+	
+	format: combine(		
+		metadata(),
+		timestamp(),
+		entryFormatter(),
+		format.json()	
+	),	
+
+	// winston error handling
+	exitOnError: false,	
+
+	transports: [	 
+	 	mailLogTransport
 	]
 });
 

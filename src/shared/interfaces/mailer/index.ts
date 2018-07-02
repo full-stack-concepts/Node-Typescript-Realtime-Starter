@@ -5,4 +5,6 @@ export {
 	IEmailSMTPDefaults,
 	IEmailAuthentication
 } from "./smtp.interface";
-
+export {
+	ISystemTemplateData
+} from "./system.template.data.interface";

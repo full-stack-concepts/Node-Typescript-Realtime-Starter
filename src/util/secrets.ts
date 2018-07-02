@@ -35,6 +35,11 @@ export const ENVIRONMENT =process.env["ENVIRONMENT"];
 process.env.NODE_ENV = ENVIRONMENT || "dev";
 
 /***
+ * Applciation NAME: used in logs and system emails
+ */
+export const APPLICAION_NAME = process.env["APPLICATION_NAME"] || "server";
+
+/***
  * Express server instance runs either in http or https
  */
 export const EXPRESS_SERVER_MODE = process.env["EXPRESS_SERVER_MODE"];
@@ -787,6 +792,12 @@ if(	!Number.isInteger(LOCAL_AUTH_FORM_MAX_LENGTH_FIRST_NAME) ||
 export const STORE_WEBTOKEN_AS_COOKIE = process.env["STORE_WEBTOKEN_AS_COOKIE"] == 'true';
 export const WEBTOKEN_COOKIE = process.env["WEBTOKEN_COOKIE"];
 export const SEND_TOKEN_RESPONSE = process.env["SEND_TOKEN_RESPONSE"] == 'true';
+
+
+/***
+ * Mail Events
+ */
+export const SEND_MAIL_ON_BOOTSTRAP_SEQUENCE_FINISHED = process.env["SEND_MAIL_ON_BOOTSTRAP_SEQUENCE_FINISHED"] === 'true';
 
 /***
  * Node Mailer

@@ -9,6 +9,7 @@ export interface IEmailMessage {
 	/****
 	 * Generic Fields
 	 */
+
 	// email address of the sende
 	from?: string | IEmailAddress,
 
