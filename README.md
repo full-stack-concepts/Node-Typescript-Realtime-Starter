@@ -188,6 +188,52 @@ Our Project folder structure:
 | **tests/integration**    | Contains application integration tests and associated build processes                         |
 | **tests/unit**           | Contains application unit tests and associated build processes                                |
 
+# Pre-defined User Account Types
+
+This application predefines three categories of _user_ accounts to identify different _roles_ and _permissions_ per account category. These structured data types are defined internally but share Typescript interface definitions and Mongoose SubDocument Definitions. All user accounts are stored inside the **Users Database**.
+
+## A **User subtypes**
+
+The category Users defines roles and permissons for CMS management and internal operatoins.
+
+
+##### - System User
+
+The System User account is your fail safe when you can't access your application. When the application initializes the systemuser is confugured as a Cluster DB Admin and as the master user account. To set the credentials for this account edit environmental file _env/env.default_,
+
+```
+SYSTEM_ADMIN_FIRST_NAME=John
+SYSTEM_ADMIN_LAST_NAME=Doe
+SYSTEM_ADMIN_EMAIL=johndoe@example.com
+SYSTEM_ADMIN_USER=johndoe@example.com
+SYSTEM_ADMIN_PASSWORD=passwordtoospecial
+```
+
+##### - Admin
+
+Account Admins are the administrators of the _Power Users_, _Authors_ and _Users_ accounts.  Admins can create, edit, and delete accounts (all user roles) and permissions (all user roles). 
+
+##### - Power User
+
+Power Users can set permissions for all user subtypes, clients and customers.
+
+##### - Author
+
+Authors can create, edit and delete articles.
+
+##### - User
+
+Users can comment on published articles.
+
+## **Client**
+
+This application defines a _client_ is an account type that provides services for or sells products to customers. 
+
+## **Customer**
+
+A _customer_ is an account type that purchases services or products from _clients_.
+
+
 
 # System Events
 
