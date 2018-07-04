@@ -99,8 +99,8 @@ export class BootstrapController {
 
 				if(this.testMode || (this.userDBLive && this.productDBLive && this.uaController && this.daController) ) sub$.unsubscribe();
 				if(this.userDBLive && this.productDBLive  && this.uaController && this.daController) {
-					this.logBootstrapEvent(1007, "User Database is live");
-					this.logBootstrapEvent(1008, "Products Database is live");
+					this.logBootstrapEvent(1008, "User Database is live");
+					this.logBootstrapEvent(1009, "Products Database is live");
 					console.log("SIGNAL SIGNAL SIGNAL")
 					// proxyService.startDataOperations();
 				}			
@@ -236,13 +236,13 @@ export class BootstrapController {
 			 * Propagate instance of User Action Controller
 			 */
 			await proxyService.setUAController(this.uaController);
-			this.logBootstrapEvent(1003, "Listeners can subscribe to UA Contoller.");	
+			this.logBootstrapEvent(1004, "Listeners can subscribe to UA Contoller.");	
 
 			/***
 			 * Propagate instance of Data Action Controller
 			 */					
 			await proxyService.setDAController(this.daController);
-			this.logBootstrapEvent(1004, "Listeners can subscribe to DA Controller");
+			this.logBootstrapEvent(1005, "Listeners can subscribe to DA Controller");
 
 			/***
 			 * Init Default DB Model
@@ -257,7 +257,7 @@ export class BootstrapController {
 			 * (4) Perform test operations (#TODO)
 			 */		
 			await this.configureDatabases();
-			this.logBootstrapEvent(1005, "Databases have been configured with predefined users and designated roles.");
+			this.logBootstrapEvent(1006, "Databases have been configured with predefined users and designated roles.");
 
 			/***
 			 * Configure infrastructure
@@ -266,7 +266,7 @@ export class BootstrapController {
 			 * (3) Local Store Directories
 			 */
 			await this.configureInfrastructure();
-			this.logBootstrapEvent(1006, "Public and private directories have been configured.")	
+			this.logBootstrapEvent(1007, "Public and private directories have been configured.")	
 
 			/***
 			 * Mail Controller

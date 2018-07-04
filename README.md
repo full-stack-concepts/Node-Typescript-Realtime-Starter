@@ -189,6 +189,9 @@ Our Project folder structure:
 | **tests/unit**           | Contains application unit tests and associated build processes                                |
 
 
+# System Events
+
+Node.js is perfect for event-driven applications.This application has many event identifiers that are logged. To review pre-defined event identifiers please cobsult the [events document](docs/events.md)
 
 
 

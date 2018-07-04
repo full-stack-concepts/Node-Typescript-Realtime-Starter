@@ -48,7 +48,7 @@ export class SystemUserModel extends DefaultModel  {
 			 // log event 
 	        ApplicationLogger.application({
 	            section:'BootstrapController', 
-	            eventID: 1015, 
+	            eventID: 1016	, 
 	            action: 'DB SystemUser ReadWrite Model and Repository has initialized.'
 	        });
 		});		

@@ -45,7 +45,7 @@ export class ClientModel extends DefaultModel  {
 			 // log event 
 	        ApplicationLogger.application({
 	            section:'BootstrapController', 
-	            eventID: 1011, 
+	            eventID: 1012, 
 	            action: 'DB Client ReadWrite Model and Repository has initialized.'
 	        });
 		});		

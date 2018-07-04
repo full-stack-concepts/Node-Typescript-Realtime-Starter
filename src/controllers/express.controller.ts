@@ -54,12 +54,12 @@ class ExpressController {
         this.middleware();
         this.routes();    
 
-        // log event Express Controller ready
+         // log event Express Controller ready
         ApplicationLogger.application({
             section:'BootstrapController', 
-            eventID: 1009, 
+            eventID: 1010, 
             action: 'Express Controller is ready.'}
-        );
+        );       
     }   
 
     private initPassPort():void {

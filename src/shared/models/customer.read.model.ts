@@ -45,7 +45,7 @@ export class CustomerReadModel extends DefaultModel  {
 			// log event 
 	        ApplicationLogger.application({
 	            section:'BootstrapController', 
-	            eventID: 1014, 
+	            eventID: 1015, 
 	            action: 'DB Customer Read Only Model and Repository has initialized.'
 	        });
 		});		
