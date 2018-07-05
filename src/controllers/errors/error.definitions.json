@@ -1,0 +1,51 @@
+{
+
+	"user": [
+				
+		{
+			"action": "authentication", 
+			"provider": "google",
+			"number": 1030, 
+			"message": "Authenticated Google user is not a natural person (business or organization)."
+		},
+
+		{
+			"action": "authentication", 
+			"provider": "google",
+			"number": 1031, 
+			"message": "Authenticated Google user has no public ID or default Google Identifier."
+		},
+
+		{
+			"action": "authentication", 
+			"provider": "google",
+			"number": 1032, 
+			"message": "No valid user name could be constructed for authenticated Google user."
+		},
+
+		{
+			"action": "authentication", 
+			"provider": "google",
+			"number": 1033, 
+			"message": "'No email account could be extracted from authenticated Google user's profile."
+		},
+
+		{
+			"action": "authentication", 
+			"provider": "google",
+			"number": 1034, 
+			"message": "Authenticated Google user has no public ID or default Google Identifier."
+		}
+
+	],
+
+	"database": [
+		{
+			"action": "save", 
+			"number": 1030, 
+			"message": "An error occured when saving new user"
+		}
+
+	]
+				
+}
