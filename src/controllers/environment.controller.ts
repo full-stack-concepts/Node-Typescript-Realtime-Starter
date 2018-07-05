@@ -59,22 +59,17 @@ export class EnvironmentController {
 			/****
 			 * Filter example files
 			 */
-			files = files.filter( (file:string) => {				
-				return !file.match(/.*example/ig);
-			});	 	
+			files = files.filter( (file:string) => !file.match(/.*example/ig) );	 	
 					
 			/***
 			 * Parse file
 			 */
 			files.forEach( (file:string) => {				
 				const pathToFile:string = path.join(this.rootPath, "env", file);
-				if (fs.existsSync(pathToFile)) {   
-					console.log("Loading .... ", pathToFile)
+				if (fs.existsSync(pathToFile)) {   				
     				dotenv.config({ path: pathToFile });
 				}
-			});
-
-			console.log(process.env["VALUE"])
+			});			
 		}
 
 		catch(e) {err = e;}

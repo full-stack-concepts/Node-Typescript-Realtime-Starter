@@ -16,10 +16,11 @@ import {
  * Import Dependencies
  */
 import { 
+	errorController,
 	RedisController, 
 	UAController, 
 	DAController, 
-	ApplicationLogger, 
+	ApplicationLogger, 	
 	ErrorLogger, 
 	mailController, MAController 
 } from "../controllers";
@@ -114,8 +115,6 @@ export class BootstrapController {
 		let eventID:number=2;
 		let status:string =  `Critical Error - Bootstrap sequence failed ${err.message}`;
 		let stack:string = JSON.stringify(err.stack) || "";
-
-
 		
 		ErrorLogger.error({ section, eventID, status, stack });    
 		process.exit(1);
@@ -209,6 +208,11 @@ export class BootstrapController {
 		try {
 
 			/***
+			 * Await Build of Error Controller
+			 */
+			await errorController.build();			
+
+			/***
 			 * Await build of Redis Client
 			 */
 			this.redisClient = await RedisController.buildLocal();
@@ -298,7 +302,12 @@ export class BootstrapController {
 			 */			
 			this.sendBootstrapFinalizedEmail()
 
+			let test = await errorController.getErrorDefinition(1030)
+			console.log(test);
+
 			console.log("==> Bootstrap Sequence finished");		
+
+
 
 
 
