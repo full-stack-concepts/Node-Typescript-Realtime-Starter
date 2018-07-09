@@ -823,6 +823,33 @@ if(STORE_WEBTOKEN_AS_COOKIE) {
 }
 
 /***
+ *  Loggerer Settings
+ */
+export const LOG_SYSTEM_EVENTS = process.env["LOG_SYSTEM_EVENTS"] == 'true';
+export const LOG_LOCALLY:boolean = process.env["LOG_LOCALLY"] == 'true';
+export const LOG_REMOTE_ON_PAPERTRAIL_APP:boolean = process.env["LOG_REMOTE_ON_PAPERTRAIL_APP"] == 'true';
+export const LOGGER_PAPERTRAILAPP_HOST = process.env["LOGGER_PAPERTRAILAPP_HOST"];
+export const LOGGER_PAPERTRAILAPP_PORT = parseInt(process.env["LOGGER_PAPERTRAILAPP_PORT"]);
+
+/***
+ * Test for Papertrail account ig user logs but not locally
+ */
+if(LOG_SYSTEM_EVENTS && !LOG_LOCALLY) {
+	let err:boolean=false;
+	if(!LOGGER_PAPERTRAILAPP_HOST || (LOGGER_PAPERTRAILAPP_HOST && typeof(LOGGER_PAPERTRAILAPP_HOST)!='string' ) ) {
+		err=true;
+	}
+	if(!LOGGER_PAPERTRAILAPP_PORT || (LOGGER_PAPERTRAILAPP_PORT && !Number.isInteger(LOGGER_PAPERTRAILAPP_PORT) ) )  {
+		err=true;
+	}
+
+	if(err) {
+		console.error("Logger Settings: a critical error occured ");
+		process.exit(1);
+	}
+}
+
+/***
  * Checks before bootstrapping application
  */
 if(!EXPRESS_SERVER_MODE) {

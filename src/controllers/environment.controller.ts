@@ -16,7 +16,6 @@ const rootPath  = require("app-root-path");
 promisify(fs.readdir).bind(fs);
 promisify(fs.readFile).bind(fs);
 
-
 export class EnvironmentController {
 
 	private rootPath:string = rootPath.path.toString();
@@ -65,7 +64,7 @@ export class EnvironmentController {
 			 * Parse file
 			 */
 			files.forEach( (file:string) => {				
-				const pathToFile:string = path.join(this.rootPath, "env", file);
+				const pathToFile:string = path.join(this.rootPath, "env", file);			
 				if (fs.existsSync(pathToFile)) {   				
     				dotenv.config({ path: pathToFile });
 				}

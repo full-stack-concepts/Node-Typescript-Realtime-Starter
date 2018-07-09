@@ -6,7 +6,7 @@ import {
 	AppControllerModel
 } from "./lib/app.controller.model";
 
-import { ApplicationLogger, ErrorLogger, MailLogger } from "../controllers";
+import { LoggerController, ErrorLogger, MailLogger } from "../controllers";
 
 import { 
 	IEmailMessage, 
@@ -41,7 +41,7 @@ export class MAController {
 			});		
 
 		} catch(e) {	
-			process.exit(1)
+			process.exit(1);
 		}
 	}
 }
@@ -294,11 +294,7 @@ export class MailController extends AppControllerModel {
 		if(status) {
 			switch(controllerRequest) {
 				case 'verify':
-					ApplicationLogger.application({
-						section: 'BootstrapController', 
-						eventID: 1020, 
-						action: 'SMTP Configuration Email Provider has been verified.'
-					});
+					
 				break;
 			}
 		}

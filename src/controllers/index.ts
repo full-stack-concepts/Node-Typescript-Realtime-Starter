@@ -10,7 +10,8 @@ export {
 	HTTPLogger, HTTPLoggerStream,
 	TestLogger,
 	MailLogger
-} from "./logger.controller";
+} from "./logging";
 
 export { environmentController } from "./environment.controller";
 export { mailController, MAController } from "./mailer.controller";
+export { loggerController, LoggerController } from "./logger.controller";

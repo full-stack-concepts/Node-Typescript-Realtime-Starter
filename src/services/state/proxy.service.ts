@@ -116,6 +116,7 @@ class ProxyService {
 	 * Set state of local MongoDB Instance to live
 	 */
 	public setUserDBLive():void {		
+		console.log("*** BP 7")
 		this.userDBLive$.next(true);
 	}
 

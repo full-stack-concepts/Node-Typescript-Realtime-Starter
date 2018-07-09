@@ -6,6 +6,8 @@
         "target": "es2016",
         "noImplicitAny": true,
         "suppressImplicitAnyIndexErrors": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
         "moduleResolution": "node",
         "sourceMap": true,
         "outDir": "dist",

@@ -6,6 +6,30 @@ import {
 	ILoginTracker
 } from "../interfaces";
 
+export interface IPersonSecurity {
+	latestLogOn?: Date,
+	latestModification?: Date,
+	accountType: number,
+	isAccountVerified: boolean,
+	isTemporaryPassword?:boolean,
+	isPasswordEncrypted:boolean
+}
+
+export interface IPersonAccounts {
+	googleID?: string,
+	facebookID?: string,
+	localID?:string
+}
+
+export interface IPersonConfiguration {
+	isThumbnailSet?: boolean,	
+	isGooglePlusUser?: boolean,
+	isGoogleUser?: boolean,
+	isFacebookUser?:boolean,
+	isAddressSet?:boolean,
+	hasExternalThumbnailUrl?:boolean
+}
+
 export interface IPerson extends Document  {
 
 	// unique identifier method
@@ -29,30 +53,11 @@ export interface IPerson extends Document  {
 
 	logins: ILoginTracker[],
 
-	security: {
-		latestLogOn?: Date,
-		latestModification?: Date,
-		accountType: number,
-		isAccountVerified: boolean,
-		isTemporaryPassword?:boolean,
-		isPasswordEncrypted:boolean
-	},
+	security: IPersonSecurity,
 
-	configuration: {
-		isThumbnailSet?: boolean,	
-		isGooglePlusUser?: boolean,
-		isGoogleUser?: boolean,
-		isFacebookUser?:boolean,
-		isAddressSet?:boolean,
-		hasExternalThumbnailUrl?:boolean
-	},
+	configuration: IPersonConfiguration,
 
-
-	accounts?: {
-		googleID: string,
-		facebookID?: string,
-		localID?:string
-	},
+	accounts?: IPersonAccounts,
 
 	profile: {
 

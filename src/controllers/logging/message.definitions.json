@@ -1,0 +1,129 @@
+[
+	{
+		"section": "BootstrapController",
+		"eventID": 1000,
+		"action": "RedisController has been build."		
+	},
+
+	{
+		"section": "BootstrapController",
+		"eventID": 1001,
+		"action": "User Action Controller Proxy is ready."
+	},
+
+	{
+		"section": "BootstrapController",
+		"eventID": 1002,
+		"action": "Data Action Controller Proxy is ready."
+	},
+
+	{
+		"section": "BootstrapController",
+		"eventID": 1003,
+		"action": "Listeners can subscribe to Redis Client."
+	},
+
+	{
+		"section": "BootstrapController",
+		"eventID": 1004,
+		"action": "Listeners can subscribe to UA Contoller."
+	},
+
+	{
+		"section": "BootstrapController",
+		"eventID": 1005,
+		"action": "Listeners can subscribe to DA Controller."
+	},
+
+	{
+		"section": "BootstrapController",
+		"eventID": 1006,
+		"action": "Databases have been configured with predefined users and designated roles."
+	},
+
+	{
+		"section": "BootstrapController",
+		"eventID": 1007,
+		"action": "Public and private directories have been configured."
+	},
+
+	{
+		"section": "BootstrapController",
+		"eventID": 1008,
+		"action": "User Database is live."
+	},
+
+	{
+		"section": "BootstrapController",
+		"eventID": 1009,
+		"action": "Products Database is live."
+	},
+
+		{
+		"section": "BootstrapController",
+		"eventID": 1010,
+		"action": "Express Controller is ready."
+	},
+
+	{
+		"section": "BootstrapController",
+		"eventID": 1011,
+		"action": "System User account has been validated and configured."
+	},
+
+	{
+		"section": "BootstrapController",
+		"eventID": 1012,
+		"action": "DB Client ReadWrite Model and Repository has initialized."
+	},
+
+	{
+		"section": "BootstrapController",
+		"eventID": 1013,
+		"action": "DB Client Read Only Model and Repository has initialized."
+	},
+
+	{
+		"section": "BootstrapController",
+		"eventID": 1014,
+		"action": "DB Customer ReadWrite Model and Repository has initialized."
+	},
+
+	{
+		"section": "BootstrapController",
+		"eventID": 1015,
+		"action": "DB Customer Read Only Model and Repository has initialized."
+	},
+
+	{
+		"section": "BootstrapController",
+		"eventID": 1016,
+		"action": "DB SystemUser ReadWrite Model and Repository has initialized."
+	},
+
+	{
+		"section": "BootstrapController",
+		"eventID": 1017,
+		"action": "DB User ReadWrite Model and Repository has initialized."
+	},
+
+	{
+		"section": "BootstrapController",
+		"eventID": 1017,
+		"action": "DB User ReadWrite Model and Repository has initialized."
+	},
+
+	{
+		"section": "BootstrapController",
+		"eventID": 1018,
+		"action": "DB User Read Only Model and Repository has initialized."
+	},
+
+	{
+		"section": "BootstrapController",
+		"eventID": 1019,
+		"action": "Mail Controller has initialized."
+	}
+
+]
+

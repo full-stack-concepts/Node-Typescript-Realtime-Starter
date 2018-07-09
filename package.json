@@ -46,6 +46,7 @@
         "unit-env-secrets-tests": "mocha -r ts-node/register tests/unit/secrets/**/*.spec.ts",
         "unit-infrastructure-tests": "mocha -r ts-node/register tests/unit/infrastructure/**/*.spec.ts --timeout=5000",
         "unit-usertypes-tests": "mocha -r ts-node/register tests/unit/usertypes/**/*.spec.ts",
+        "unit-schemas-tests": "mocha -r ts-node/register tests/unit/schemas/**/*.spec.ts",
         "integration-infrastructure-tests": "nyc mocha -r ts-node/register tests/integration/infrastructure/**/*.spec.ts --timeout 7500 --exit",
         "integration-db-readmodel-tests": "nyc mocha -r ts-node/register tests/integration/db/readmodels/**/*.spec.ts --timeout 15000 --exit",
         "integration-db-writemodel-tests": "nyc mocha -r ts-node/register tests/integration/db/writemodels/**/*.spec.ts --timeout 15000 --exit",
@@ -133,6 +134,7 @@
         "validator": "^9.4.1",
         "winston": "^3.0.0",
         "winston-daily-rotate-file": "^3.2.1",
+        "winston-papertrail": "^1.0.5",
         "winston-transport": "^4.2.0"
     },
     "devDependencies": {

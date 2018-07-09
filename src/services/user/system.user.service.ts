@@ -47,7 +47,7 @@ import {
 } from "../../util";
 
 import {
-	ApplicationLogger
+	LoggerController
 } from "../../controllers";
 
 export class SystemUserService extends UserOperations {
@@ -92,7 +92,6 @@ export class SystemUserService extends UserOperations {
 		 * Subscriber: wait until Bootstrap Signals UserDB is live
 		 */
 		proxyService.userDBLive$.subscribe( (state:boolean) => this.live = state );	
-
 	}	
 
 	/***
@@ -366,23 +365,17 @@ export class SystemUserService extends UserOperations {
 
 		// process thick: return to caller with user or create new system user		
 		.then( (u:any) => {				
-			if(u) {
+			if(u) {			
 				return Promise.resolve(u);
 			} else {
 				return this.insertDefaultSystemUser();
 			}
-		})
-		
+		})		
 
 		// process thick: return to caller and log event
 		.then( (user:ISystemUser) => {
 
-			 // log event Express Controller ready
-	        ApplicationLogger.application({
-	            section:'BootstrapController', 
-	            eventID: 1011, 
-	            action: 'System User account has been validated and configured.'
-	        });
+			// log event Express Controller ready			
 			return Promise.resolve(user) 
 		}) 		
 		

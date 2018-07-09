@@ -14,6 +14,8 @@ interface ErrorDefinition {
 	message?: string
 }
 
+type DefinitionsReadOnly = Readonly<ErrorDefinition[]>;
+
 export class ErrorController {
 
 	private errorsSubject:BehaviorSubject<ErrorDefinition[]> = new BehaviorSubject<ErrorDefinition[]>([]);
@@ -45,10 +47,10 @@ export class ErrorController {
 		}
 	}	
 
-	private getRange(number:number):ErrorDefinition[] {	
+	private getRange(number:number):DefinitionsReadOnly {			
 
 		let definitions:any = this.errorsSubject.value;		
-		let range:ErrorDefinition[];
+		let range:DefinitionsReadOnly;
 		switch(true) {
 			case (number>=1000 && number<=2000): range = definitions.user; break;
 		}
@@ -57,7 +59,7 @@ export class ErrorController {
 
 	public getErrorDefinition(number:number) {	
 		
-		let types:ErrorDefinition[] = this.getRange(number)		
+		let types:DefinitionsReadOnly = this.getRange(number)		
 		let pos = types.findIndex( (type:ErrorDefinition) => type.number === number );		
 		let def:ErrorDefinition = types.splice(pos,1)[0];
 		return Promise.resolve(def);

@@ -7,7 +7,7 @@ import { DefaultModel} from "./default.model";
 import { ISystemUser } from "../interfaces";
 import { ReadRepositoryBase } from "../../engines";
 import { TSYSTEMUSER } from "../types";
-import { ApplicationLogger } from "../../controllers";
+import { LoggerController } from "../../controllers";
 
 /***
  * Local Repository that contains all methods for 
@@ -44,13 +44,7 @@ export class SystemUserReadModel extends DefaultModel  {
 			
 			if(proxyService.userDB) this.userDBConn = proxyService.userDB;				
 			this.repo = new SystemUserReadRepository( this.userDBConn, this.redisClient );
-
-			// log event 
-	        ApplicationLogger.application({
-	            section:'BootstrapController', 
-	            eventID: 1016, 
-	            action: 'DB System User Read Only Model and Repository has initialized.'
-	        });
+						
 		});		
 	}				
 

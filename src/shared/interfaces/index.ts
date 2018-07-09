@@ -10,7 +10,12 @@ export { ILoginTracker } from "./login.tracker.interface";
 /***
  * IPerson: Generic
  */
-export { IPerson } from "./person.interface";
+export { 
+	IPersonSecurity,
+	IPersonAccounts,
+	IPersonConfiguration,
+	IPerson 
+} from "./person.interface";
 // user type guards
 export {	
 	isOfPersonType,

@@ -7,7 +7,7 @@ import { DefaultModel } from "./default.model";
 import { IClient } from "../interfaces";
 import { ReadRepositoryBase } from "../../engines";
 import { TCLIENT } from "../types";
-import { ApplicationLogger } from "../../controllers";
+import { LoggerController } from "../../controllers";
 
 /***
  * Local Repository that contains all methods for 
@@ -40,14 +40,7 @@ export class ClientReadModel extends DefaultModel  {
 		proxyService.userDBLive$.subscribe( (state:boolean) => {	
 
 			if(proxyService.userDB) this.userDBConn = proxyService.userDB;				
-			this.repo = new ClientReadRepository( this.userDBConn, this.redisClient );
-
-			// log event 
-	        ApplicationLogger.application({
-	            section:'BootstrapController', 
-	            eventID: 1013, 
-	            action: 'DB Client Read Only Model and Repository has initialized.'
-	        });
+			this.repo = new ClientReadRepository( this.userDBConn, this.redisClient );			
 		});		
 	}	
 	

@@ -27,7 +27,7 @@ import SystemUserRouter from "../routers/systemuser.router";
 import UserRouter from '../routers/user.router';
 import ClientRouter from '../routers/client.router';
 import CustomerRouter from '../routers/customer.router';
-import { ApplicationLogger } from "../controllers";
+import { loggerController } from "../controllers";
 
 /***
  * Import Niddleware functions
@@ -53,13 +53,7 @@ class ExpressController {
         this.initPassPort();
         this.middleware();
         this.routes();    
-
-         // log event Express Controller ready
-        ApplicationLogger.application({
-            section:'BootstrapController', 
-            eventID: 1010, 
-            action: 'Express Controller is ready.'}
-        );       
+       
     }   
 
     private initPassPort():void {

@@ -16,13 +16,14 @@ import {
  * Import Dependencies
  */
 import { 
+	loggerController,
 	errorController,
 	RedisController, 
 	UAController, 
 	DAController, 
 	ApplicationLogger, 	
 	ErrorLogger, 
-	mailController, MAController 
+	mailController, MAController	
 } from "../controllers";
 
 import { proxyService, connectToUserDatabase, connectToProductDatabase } from "../services";
@@ -80,9 +81,8 @@ export class BootstrapController {
 	 * Logger
 	 * Default Event ID for Bootstrap Controller = 1000; 
 	 */
-	private logBootstrapEvent(eventID:number, action:string='') {
-		let section:string = 'BootstrapController';
-		ApplicationLogger.application({section, eventID, action});
+	private logBootstrapEvent(eventID:number) {
+		loggerController.log(eventID, 'application');
 	}
 
 	/***
@@ -100,8 +100,8 @@ export class BootstrapController {
 
 				if(this.testMode || (this.userDBLive && this.productDBLive && this.uaController && this.daController) ) sub$.unsubscribe();
 				if(this.userDBLive && this.productDBLive  && this.uaController && this.daController) {
-					this.logBootstrapEvent(1008, "User Database is live");
-					this.logBootstrapEvent(1009, "Products Database is live");
+					this.logBootstrapEvent(1008);
+					this.logBootstrapEvent(1009);
 					console.log("SIGNAL SIGNAL SIGNAL")
 					// proxyService.startDataOperations();
 				}			
@@ -208,45 +208,55 @@ export class BootstrapController {
 		try {
 
 			/***
+			 * Await built of Log Controller
+			 */
+			await loggerController.build();
+
+			/***
+			 * Test Remote Transport per Logger
+			 */
+			await loggerController.configureTransportsPerLogger();
+
+			/***
 			 * Await Build of Error Controller
 			 */
-			await errorController.build();			
+			await errorController.build();	
 
 			/***
 			 * Await build of Redis Client
 			 */
 			this.redisClient = await RedisController.buildLocal();
-			this.logBootstrapEvent( 1000, "RedisController has been build.")
+			this.logBootstrapEvent( 1000);			
 			
 			/***
 			 * Test build of User Action Controller Proxy
 			 */
 			this.uaController = await UAController.build();		
-			this.logBootstrapEvent(1001, "User Action Controller Proxy is ready.")	
+			this.logBootstrapEvent(1001)	
 
 			/****
 			 * Test build of Data Action Controller Proxy
 			 */
 			this.daController = await DAController.build();
-			this.logBootstrapEvent(1002, "Data Action Controller Proxy is ready.");
+			this.logBootstrapEvent(1002);
 
 			/****
 			 * Propagate instance of Redis CLient
 			 */
 			await proxyService.setRedisClient(this.redisClient);
-			this.logBootstrapEvent(1003, "Listeners can subscribe to Redis Client.");	
+			this.logBootstrapEvent(1003);	
 
 			/***
 			 * Propagate instance of User Action Controller
 			 */
 			await proxyService.setUAController(this.uaController);
-			this.logBootstrapEvent(1004, "Listeners can subscribe to UA Contoller.");	
+			this.logBootstrapEvent(1004);	
 
 			/***
 			 * Propagate instance of Data Action Controller
 			 */					
 			await proxyService.setDAController(this.daController);
-			this.logBootstrapEvent(1005, "Listeners can subscribe to DA Controller");
+			this.logBootstrapEvent(1005);
 
 			/***
 			 * Init Default DB Model
@@ -261,7 +271,7 @@ export class BootstrapController {
 			 * (4) Perform test operations (#TODO)
 			 */		
 			await this.configureDatabases();
-			this.logBootstrapEvent(1006, "Databases have been configured with predefined users and designated roles.");
+			this.logBootstrapEvent(1006);
 
 			/***
 			 * Configure infrastructure
@@ -270,7 +280,7 @@ export class BootstrapController {
 			 * (3) Local Store Directories
 			 */
 			await this.configureInfrastructure();
-			this.logBootstrapEvent(1007, "Public and private directories have been configured.")	
+			this.logBootstrapEvent(1007)	
 
 			/***
 			 * Mail Controller
@@ -279,7 +289,7 @@ export class BootstrapController {
 			 */
 			this.maController = await MAController.build();
 			await mailController.init();		
-			this.logBootstrapEvent(1019, "Mail Controller has initialized.")
+			this.logBootstrapEvent(1019)
 
 			/***
 			 * Connect To User DB
@@ -294,14 +304,14 @@ export class BootstrapController {
 			/***
 			 *
 			 */ 
-			await createSystemUser();		
+			// await createSystemUser();		
 
 			/***
 			 * Send email to application owner 
 			 * that application has booted successfully
 			 */			
 			this.sendBootstrapFinalizedEmail()
-
+			
 			let test = await errorController.getErrorDefinition(1030)
 			console.log(test);
 

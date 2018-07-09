@@ -198,7 +198,7 @@ export class UserOperations extends PersonProfile {
 		return Promise.map( PERSON_SUBTYPE_TO_MODELS, ( personType:string) => {	
 			return this.findUser( personType, email) 
 				.then( (res:any) => { return { [personType]: res}; })
-				.catch( (err:any) => '<errorNumber2>');				
+				.catch( (err:any) => Promise.reject(1100));				
 		})		
 	
 		// process thick: evaluate query results 
@@ -267,7 +267,7 @@ export class UserOperations extends PersonProfile {
 		let v:boolean;
 		v=FormValidation.isEmail(email);
 		return new Promise ( (resolve, reject) => {
-			(v)?resolve(true):reject('<errorNumber1>');
+			(v)?resolve(true):reject(1101);
 		});
 	}	
 
@@ -278,7 +278,7 @@ export class UserOperations extends PersonProfile {
 		let v:boolean;
 		v = FormValidation.testPassword(pw);	
 		return new Promise ( (resolve, reject) => {
-			(v)?resolve(true):reject('<errorNumber2>');
+			(v)?resolve(true):reject(1102);
 		});		
 	}	
 
@@ -302,7 +302,7 @@ export class UserOperations extends PersonProfile {
 	    }
 	    catch(e) { err =e; }
 	    finally {	      
-	        if(err) throw new Error('errorNumberAuthenticationTracker');
+	        if(err) throw new Error('1110');
 	        if(!err) return login;
 	    }  
 	}
@@ -328,7 +328,7 @@ export class UserOperations extends PersonProfile {
 	protected testFirstName({ value, required, minLength, maxLength}:any):Promise<boolean> {		
 		return this.testString(value, required, minLength, maxLength)
 		.then( () => Promise.resolve(true) )
-		.catch( (state:boolean) => Promise.reject('<errorNumber3>'));
+		.catch( (state:boolean) => Promise.reject(1120));
 	}
 
 	/***
@@ -337,7 +337,7 @@ export class UserOperations extends PersonProfile {
 	protected testLastName({ value, required, minLength, maxLength}:any):Promise<boolean> {		
 		return this.testString(value, required, minLength, maxLength)
 		.then( () => Promise.resolve(true) )
-		.catch( (state:boolean) => Promise.reject('<errorNumber4>'));
+		.catch( (state:boolean) => Promise.reject(1121));
 	}
 
 	/***
@@ -359,7 +359,7 @@ export class UserOperations extends PersonProfile {
 	            if( decrypted===decrypt.data) {
 	                return Promise.resolve(user)
 	            } else {
-	                return Promise.reject("<errorNumber Vector>");
+	                return Promise.reject(1030);
 	            }
 	        })
 	        .catch( (err:any) => Promise.reject(err));
@@ -372,7 +372,7 @@ export class UserOperations extends PersonProfile {
 	            if( decrypted === decrypt.data) {
 	                return Promise.resolve(user)
 	            } else {
-	                return Promise.reject("<errorNumber Crypto>");
+	                return Promise.reject(1031);
 	            }
 	        })
 	        .catch( (err:any) => Promise.reject(err));      
@@ -385,7 +385,7 @@ export class UserOperations extends PersonProfile {
 	            if(valid) {
 	                return Promise.resolve(user)
 	            } else {
-	                return Promise.reject("<errorNumber Bcypt>");
+	                return Promise.reject(1032);
 	            }
 	        })
 	        .catch( (err:any) => Promise.reject(err) );
@@ -417,7 +417,7 @@ export class UserOperations extends PersonProfile {
 	        	encrypt = {	method, hash, data:pwd };
 	        	return Promise.resolve({ user, encrypt});
 	        }) 
-	        .catch( (err:any) => Promise.reject("<errorNumber>"))
+	        .catch( (err:any) => Promise.reject(1035));
 	    }
 
 	    // Method 2: Crypto  
@@ -427,7 +427,7 @@ export class UserOperations extends PersonProfile {
 	        	encrypt = {	method, hash, data:pwd };
 	        	return Promise.resolve({ user, encrypt});
 	        }) 
-	        .catch( (err:any) => Promise.reject("<errorNumber>"))
+	        .catch( (err:any) => Promise.reject(1036));
 	    }   
 
 	    // Method 3: Bcrypt/
@@ -437,7 +437,7 @@ export class UserOperations extends PersonProfile {
 	        	encrypt = {	method, hash, data:pwd };
 	        	return Promise.resolve({ user, encrypt});
 	        }) 
-	        .catch( (err:any) => Promise.reject("<errorNumber>"))
+	        .catch( (err:any) => Promise.reject(1038))
 	    }       		
 	}
 
@@ -468,7 +468,7 @@ export class UserOperations extends PersonProfile {
 
 			// ** Error: User Directories could not be created
 			if(!userDirectory.dirCreated) {
-				return Promise.reject('<errorNumber4>');
+				return Promise.reject(1150);
 			} else {
 
 				// Process image: assign default url to thumbnail property of user object
@@ -535,7 +535,7 @@ export class UserOperations extends PersonProfile {
 
 			// ** Error: User Directories could not be created
 			if(!userDirectory.dirCreated) {
-				return Promise.reject('<errorNumber4>');
+				return Promise.reject(1151);
 			} else {
 
 				// Process image: assign default url to thumbnail property of user object
@@ -606,7 +606,7 @@ export class UserOperations extends PersonProfile {
 
 			// ** Error: User Directories could not be created
 			if(!userDirectory.dirCreated) {
-				return Promise.reject('<errorNumber4>');
+				return Promise.reject(1150);
 			} else {
 
 				// Process image: assign default url to thumbnail property of user object
@@ -796,9 +796,7 @@ export class UserOperations extends PersonProfile {
 		if(hostType === 1) {							
 			return model.findOne( query )
 			.then( (u:any) => { return Promise.resolve(u); })
-			.catch( (err:any) => {					
-				console.error('<errorNumberX666>'); 
-			});				
+			.catch( (err:any) => Promise.reject(1160) ); 		
 		}	
 
 		/***
@@ -843,7 +841,7 @@ export class UserOperations extends PersonProfile {
 
 			return model.createUser(user)
 			.then( (res:any) => { return Promise.resolve(res) })
-			.catch( (err:any) => '<errorNumberX>');				
+			.catch( (err:any) => Promise.reject(1170));				
 		}	
 
 		/***
@@ -852,7 +850,7 @@ export class UserOperations extends PersonProfile {
 		if(hostType === 2) {			
 			return model.remoteCreateUser( user, collection)
 			.then( (res:any) => { return Promise.resolve(user); })
-			.catch( (err:any) => '<errorNumberXX>' );					
+			.catch( (err:any) => Promise.reject(1171) );					
 		}
 	}	
 
@@ -947,7 +945,7 @@ export class UserOperations extends PersonProfile {
 				
 				return model.findOneAndUpdate (query, update)
 				.then( (res:any) => Promise.resolve(res) )
-				.catch( (err:any) => Promise.reject('<errorNumber Update Host type 1A>') );	
+				.catch( (err:any) => Promise.reject(1180) );	
 
 
 			/*****
@@ -963,7 +961,7 @@ export class UserOperations extends PersonProfile {
 					const model:any = setting.model;	
 					return model.findOneAndUpdate (query, update)
 					.then( (res:any) => Promise.resolve(res))
-					.catch( (err:any) => Promise.reject('<errorNumber Update Host type 1B >'))	
+					.catch( (err:any) => Promise.reject(1181))	
 				}))
 				.then( () => Promise.resolve() )
 				.catch( (err:any) => Promise.reject(err));
