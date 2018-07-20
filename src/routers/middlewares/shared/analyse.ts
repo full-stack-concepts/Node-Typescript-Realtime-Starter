@@ -29,7 +29,7 @@ export function analyse(req:Request, res:Response, next:NextFunction) {
 
     	HTTPLogger.access(logString);    
     })
-    .catch( (err:any) => {
+    .catch( (err:Error) => {
     	// #TODO: log error
     	console.error("Error ", err);
     });	

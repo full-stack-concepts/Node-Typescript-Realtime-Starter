@@ -53,7 +53,7 @@ passport.use(new GoogleStrategy({
 			profile
 		)
 		.then( (user:any) => { return done(null, user);  })
-		.catch( (err:any) => { return done(err); })				
+		.catch( (err:Error) => { return done(err); })				
 		
 	}) 
 );  
@@ -78,7 +78,7 @@ passport.use( new FacebookStrategy({
 
 	fb.authenticateFacebookUser( accessToken, profile)
 	.then( (user:any) => { return done(null, user);  })
-	.catch( (err:any) => { return done(err); })		
+	.catch( (err:Error) => { return done(err); })		
 
 
 }));

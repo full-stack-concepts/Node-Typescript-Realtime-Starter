@@ -128,7 +128,7 @@ describe("Infrastructure", () => {
 
 		it("should have a function that removes directories or files", async() => {
 			
-			let err:any;			
+			let err:Error;			
 			
 			try { await removeDirectory($pathToTestDir); }
 			catch(e) {err = e;}
@@ -137,7 +137,7 @@ describe("Infrastructure", () => {
 
 		it("should have a function that writes JSON to file", async() => {
 			console.log($pathToJsonFile)
-			let err:any;
+			let err:Error;
 			try { await writeJSON( $pathToJsonFile, $json ); }
 			catch(e) { err = e;}
 			finally { expect(err).to.equal(undefined); }

@@ -114,7 +114,7 @@ export class CustomerRouter extends DefaultRouter {
         	res.status(200).json({token:token});
 
 		})
-		.catch( (err:any) => console.error(err) );				
+		.catch( (err:Error) => console.error(err) );				
 	}
 
 	 /****
@@ -138,7 +138,7 @@ export class CustomerRouter extends DefaultRouter {
         	res.status(200).json({token:token});
 
 		})
-		.catch( (err:any) => console.error(err) );	
+		.catch( (err:Error) => console.error(err) );	
 	}	
 
 	/****
@@ -148,7 +148,7 @@ export class CustomerRouter extends DefaultRouter {
 		let findRequest:IFindUser = req.body;
 		this.uaController[FIND_CUSTOMER](findRequest)			
 		.then( (customer:ICustomer) => res.status(200).json({customer}) )
-		.catch( (err:any) => console.error(err) );		
+		.catch( (err:Error) => console.error(err) );		
 	}
 
 	/****
@@ -158,7 +158,7 @@ export class CustomerRouter extends DefaultRouter {
 		let deleteRequest:IDeleteUser = req.body;
 		this.uaController[DELETE_CUSTOMER](deleteRequest)			
 		.then( () => res.status(200).json({isCustomerDeleted:true}) )
-		.catch( (err:any) => console.error(err) );	
+		.catch( (err:Error) => console.error(err) );	
 	}
 }
 

@@ -165,7 +165,7 @@ class UserRouter extends DefaultRouter {
         	res.status(200).json({token:token});
 
 		})
-		.catch( (err:any) => console.error(err) );				
+		.catch( (err:Error) => console.error(err) );				
 	}	
 
     /****
@@ -188,7 +188,7 @@ class UserRouter extends DefaultRouter {
         	res.status(200).json({token:token});
 
 		})
-		.catch( (err:any) => console.error(err) );		
+		.catch( (err:Error) => console.error(err) );		
 	}	
 
 	/****
@@ -202,7 +202,7 @@ class UserRouter extends DefaultRouter {
         	// send user 
         	res.status(200).json({user});
 		})
-		.catch( (err:any) => console.error(err) );		
+		.catch( (err:Error) => console.error(err) );		
 	}
 
 	/****
@@ -212,7 +212,7 @@ class UserRouter extends DefaultRouter {
 		let deleteRequest:IDeleteUser = req.body;
 		this.uaController[DELETE_USER](deleteRequest)			
 		.then( () => res.status(200).json({isUserDeleted:true}) )
-		.catch( (err:any) => console.error(err) );		
+		.catch( (err:Error) => console.error(err) );		
 
 	}
 }

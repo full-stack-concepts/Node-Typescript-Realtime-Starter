@@ -35,7 +35,7 @@ export class RedisController {
 		redisClient.hset = util.promisify(redisClient.hset);
 		redisClient.hget = util.promisify(redisClient.hget);
 
-		redisClient.auth( REDIS_LOCAL_PASSWORD, (err:any) => {
+		redisClient.auth( REDIS_LOCAL_PASSWORD, (err:Error) => {
 			if (err) throw err;
 		});
 

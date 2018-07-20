@@ -9,7 +9,7 @@ export { proxyService } from "./state/proxy.service";
 /***
  * User Services
  */
-export { testForSystemUser, createSystemUser, systemUserService, SystemUserService } from "./user/system.user.service";
+export { createSystemUser, systemUserService, SystemUserService } from "./user/system.user.service";
 export { UserOperations } from "./user/user.ops.service";
 export { userService, UserService } from "./user/user.service";
 export { googleUserService, GoogleUserService } from "./user/user.google.service";

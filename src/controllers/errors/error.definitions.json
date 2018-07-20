@@ -1,75 +1,118 @@
 {
 
+	"server": [
+
+		{
+			"action": "HTTPS Protocol Error", 
+			"provider": "application",
+			"number": 2001, 
+			"msg": "HTTPS Server exiten on error:"
+		},
+
+		{
+			"action": "HTTP Protocol Error", 
+			"provider": "application",
+			"number": 2002, 
+			"msg": "HTTP Server exiten on error:"
+		}
+
+	],
+
+	"uncaught": [
+
+		{
+			"action": "Generic", 
+			"provider": "application",
+			"number": 9000, 
+			"msg": "Uncaught Exception Error: ",
+			"stack": null
+		}
+
+
+	],
+
+	"critical": [
+
+		{
+			"action": "bootstrap-sequence", 
+			"provider": "application",
+			"number": 10000, 
+			"msg": "Bootstrap sequence failed on critical error",
+			"stack": null
+		}
+
+	],
+
 	"user": [
 				
 		{
 			"action": "authentication", 
 			"provider": "google",
 			"number": 11030, 
-			"message": "Authenticated Google user is not a natural person (business or organization)."
+			"msg": "Authenticated Google user is not a natural person (business or organization)."
 		},
 
 		{
 			"action": "authentication", 
 			"provider": "google",
 			"number": 11031, 
-			"message": "Authenticated Google user has no public ID or default Google Identifier."
+			"msg": "Authenticated Google user has no public ID or default Google Identifier."
 		},
 
 		{
 			"action": "authentication", 
 			"provider": "google",
 			"number": 11032, 
-			"message": "No valid user name could be constructed for authenticated Google user."
+			"msg": "No valid user name could be constructed for authenticated Google user."
 		},
 
 		{
 			"action": "authentication", 
 			"provider": "google",
 			"number": 11033, 
-			"message": "'No email account could be extracted from authenticated Google user's profile."
+			"msg": "'No email account could be extracted from authenticated Google user's profile."
 		},
 
 		{
 			"action": "authentication", 
 			"provider": "google",
 			"number": 11034, 
-			"message": "Authenticated Google user has no public ID or default Google Identifier."
+			"msg": "Authenticated Google user has no public ID or default Google Identifier."
 		},
 
 		{
 			"action": "query_user", 
 			"provider": "User Operations",
 			"number": 11100, 
-			"message": "Error occured while querying user collections for user."
+			"msg": "Error occured while querying user collections for user."
 		},
 
 		{
 			"action": "test_user_email", 
 			"provider": "User Operations",
 			"number": 11101, 
-			"message": "User has an invalid email address."
+			"msg": "User has an invalid email address."
 		},
 
 		{
 			"action": "test_user_password", 
 			"provider": "User Operations",
 			"number": 11102, 
-			"message": "User has entered an invalid password."
+			"msg": "User has entered an invalid password."
 		},
 
 		{
 			"action": "add_user_authentication_moment", 
 			"provider": "User Operations",
 			"number": 11110, 
-			"message": "Could not generate authentication object aftert user logged on"
+			"msg": "Could not generate authentication object aftert user logged on"
 		},
 
 		{
 			"action": "test_user_firstname", 
 			"provider": "User Operations",
 			"number": 11120, 
-			"message": "New user has entered an invalid first name."
+			"msg": "New user has entered an invalid first name."
 		},
 
 		{
@@ -83,42 +126,42 @@
 			"action": "decrypt_user_password", 
 			"provider": "User Operations",
 			"number": 11130, 
-			"message": "Decryption attempt of user password with Crypto and initialization vector failed."
+			"msg": "Decryption attempt of user password with Crypto and initialization vector failed."
 		},
 
 		{
 			"action": "decrypt_user_password", 
 			"provider": "User Operations",
 			"number": 11131, 
-			"message": "Decryption attempt of user password with default Crypto failed."
+			"msg": "Decryption attempt of user password with default Crypto failed."
 		},
 
 		{
 			"action": "decrypt_user_password", 
 			"provider": "User Operations",
 			"number": 11132, 
-			"message": "Decryption attempt of user password with BCrypt failed."
+			"msg": "Decryption attempt of user password with BCrypt failed."
 		},
 
 		{
 			"action": "encrypt_user_password", 
 			"provider": "User Operations",
 			"number": 11135, 
-			"message": "Encryption attempt of user password with Crypto and initialization vector failed."
+			"msg": "Encryption attempt of user password with Crypto and initialization vector failed."
 		},
 
 		{
 			"action": "encrypt_user_password", 
 			"provider": "User Operations",
 			"number": 11136, 
-			"message": "Encryption attempt of user password with default Crypto failed."
+			"msg": "Encryption attempt of user password with default Crypto failed."
 		},
 
 		{
 			"action": "encrypt_user_password", 
 			"provider": "User Operations",
 			"number": 11137, 
-			"message": "Encryption attempt of user password with BCrypt failed."
+			"msg": "Encryption attempt of user password with BCrypt failed."
 		},
 
 
@@ -126,56 +169,76 @@
 			"action": "create_user_directory", 
 			"provider": "User Operations",
 			"number": 11150, 
-			"message": "Creation of public directory for default user failed."
+			"msg": "Creation of public directory for default user failed."
 		},
 
 		{
 			"action": "create_user_directory", 
 			"provider": "User Operations",
 			"number": 11151, 
-			"message": "Creation of public directory for customer user type failed."
+			"msg": "Creation of public directory for customer user type failed."
 		},
 
 		{
 			"action": "find_user", 
 			"provider": "User Operations",
 			"number": 11160, 
-			"message": "An error occured when trying to find local user."
+			"msg": "An error occured when trying to find local user."
 		},
 
 		{
 			"action": "insert_user", 
 			"provider": "User Operations",
 			"number": 11170, 
-			"message": "An error occured when trying to insert a new user into the <local> database."
+			"msg": "An error occured when trying to insert a new user into the <local> database."
 		},
 
 		{
 			"action": "insert_user", 
 			"provider": "User Operations",
 			"number": 11171, 
-			"message": "An error occured when trying to insert a new user into the <remote> database."
+			"msg": "An error occured when trying to insert a new user into the <remote> database."
 		},
 
 		{
 			"action": "update_user", 
 			"provider": "User Operations",
 			"number": 11180, 
-			"message": "An error occured when trying to update existing user in <local> database."
+			"msg": "An error occured when trying to update existing user in <local> database."
 		},
 
 		{
 			"action": "update_user", 
 			"provider": "User Operations",
 			"number": 11181, 
-			"message": "An error occured when trying to update existing user in <remote> database."
-		}	],
+			"msg": "An error occured when trying to update existing user in <remote> database."
+		}	
+	],
+
+	"systemuser": [
+
+		{
+			"action": "System User Service Uncaugth Error", 
+			"provider": "System User Service",
+			"number": 12000, 
+			"msg": "System user error: "
+		},
+
+		{
+			"action": "System User Profile formatting", 
+			"provider": "System User Service",
+			"number": 12010, 
+			"msg": "System user error: "
+		}
+
+	],
 
 	"database": [
+		
 		{
 			"action": "save", 
 			"number": 11030, 
-			"message": "An error occured when saving new user"
+			"msg": "An error occured when saving new user"
 		}
 
 	]

@@ -109,14 +109,14 @@ describe("Local Redis Server", () => {
 		let delAsync:any;
 		let key:string = 'write-something';
 		let value:number = 1000;
-		let err:any;
+		let err:Error;
 
 		before( (done) => {
 
 			redisClient = redis.createClient( `${REDIS_LOCAL_URL}:${REDIS_LOCAL_PORT}` );	
 
 			if(AUTHENTICATE_REDIS_SERVER) {
-				redisClient.auth( REDIS_LOCAL_PASSWORD, (err:any) => {
+				redisClient.auth( REDIS_LOCAL_PASSWORD, (err:Error) => {
 	    			if (err) throw err;
 				});
 			}	
@@ -168,7 +168,7 @@ describe("Local Redis Server", () => {
      */
     describe("Cache", () => {
 
-        let err:any;
+        let err:Error;
 
         let methods:any;
         let connection:any;

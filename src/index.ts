@@ -1,16 +1,21 @@
 import { createServer } from "./server";
 
-import {
-    environmentController
-} from "./controllers/environment.controller";
-
 const init = async () => {
 
-	// environmentController.load();
-
-	createServer();  
+	try {
+		await createServer();  
+	}
+	catch(err) {
+		if(err) {
+			console.error("*** Critical Error: ", err.message )
+			process.exit(1);
+		}
+	}
 }
 
+/***
+ * Initialize HTTP(S) Server
+ */
 init();
 
 

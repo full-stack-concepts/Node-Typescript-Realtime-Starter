@@ -61,7 +61,7 @@ export class DefaultRouter {
         	// send token with json response
 			res.status(200).json({token:token});    
         })
-        .catch( (err:any) => console.error(err) );		
+        .catch( (err:Error) => console.error(err) );		
 
     }    
 

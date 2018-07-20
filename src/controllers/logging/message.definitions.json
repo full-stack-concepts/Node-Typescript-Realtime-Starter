@@ -69,60 +69,6 @@
 		"section": "BootstrapController",
 		"eventID": 1011,
 		"action": "System User account has been validated and configured."
-	},
-
-	{
-		"section": "BootstrapController",
-		"eventID": 1012,
-		"action": "DB Client ReadWrite Model and Repository has initialized."
-	},
-
-	{
-		"section": "BootstrapController",
-		"eventID": 1013,
-		"action": "DB Client Read Only Model and Repository has initialized."
-	},
-
-	{
-		"section": "BootstrapController",
-		"eventID": 1014,
-		"action": "DB Customer ReadWrite Model and Repository has initialized."
-	},
-
-	{
-		"section": "BootstrapController",
-		"eventID": 1015,
-		"action": "DB Customer Read Only Model and Repository has initialized."
-	},
-
-	{
-		"section": "BootstrapController",
-		"eventID": 1016,
-		"action": "DB SystemUser ReadWrite Model and Repository has initialized."
-	},
-
-	{
-		"section": "BootstrapController",
-		"eventID": 1017,
-		"action": "DB User ReadWrite Model and Repository has initialized."
-	},
-
-	{
-		"section": "BootstrapController",
-		"eventID": 1017,
-		"action": "DB User ReadWrite Model and Repository has initialized."
-	},
-
-	{
-		"section": "BootstrapController",
-		"eventID": 1018,
-		"action": "DB User Read Only Model and Repository has initialized."
-	},
-
-	{
-		"section": "BootstrapController",
-		"eventID": 1019,
-		"action": "Mail Controller has initialized."
 	}
 
 ]

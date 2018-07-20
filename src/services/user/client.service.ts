@@ -162,7 +162,7 @@ export class ClientService extends UserOperations {
 		// process thick: return to caller so webtoken can be created
 		.then( ( token:string) => Promise.resolve(token) ) 
 
-		.catch( (err:any) => {		
+		.catch( (err:Error) => {		
 			Promise.reject(err);
 		});	
 	}
@@ -206,7 +206,7 @@ export class ClientService extends UserOperations {
 		// process thick: return to caller so webtoken can be created
 		.then( ( token:string) => Promise.resolve(token) ) 
 
-		.catch( (err:any) => Promise.reject(err) );	
+		.catch( (err:Error) => Promise.reject(err) );	
 	}
 
 	/***
@@ -236,7 +236,7 @@ export class ClientService extends UserOperations {
 			delete client._id;
 			return Promise.resolve( client ) 
 		})
-		.catch( (err:any) => Promise.reject(err));
+		.catch( (err:Error) => Promise.reject(err));
 	}
 
 	/***
@@ -262,7 +262,7 @@ export class ClientService extends UserOperations {
 
 		return clientModel.remove({ [field]:[ID]})
 		.then( () => Promise.resolve() )
-		.catch( (err:any) => Promise.reject(err));
+		.catch( (err:Error) => Promise.reject(err));
 
 	}
 }
@@ -276,28 +276,28 @@ class ActionService {
 		let instance:any = new ClientService();
 		return instance.registerClient(application)
 			.then( (user:IUser) => Promise.resolve(user) )
-			.catch( (err:any) => Promise.reject(err) );
+			.catch( (err:Error) => Promise.reject(err) );
 	}
 
 	public loginClient( login:ILoginRequest ) {
 		let instance:any = new ClientService();
 		return instance.loginClient(login)
 			.then( (token:string) => Promise.resolve(token) )
-			.catch( (err:any) => Promise.reject(err) );
+			.catch( (err:Error) => Promise.reject(err) );
 	}
 
 	public findSingleClient( find:IFindUser ) {
 		let instance:any = new ClientService();
 		return instance.findSingleClient(find)
 			.then( (client:IClient) => Promise.resolve(client) )
-			.catch( (err:any) => Promise.reject(err) );
+			.catch( (err:Error) => Promise.reject(err) );
 	}
 
 	public deleteSingleClient( request:IDeleteUser ) {
 		let instance:any = new ClientService();
 		return instance.deleteSingleClient(request)
 			.then( () => Promise.resolve() )
-			.catch( (err:any) => Promise.reject(err) );
+			.catch( (err:Error) => Promise.reject(err) );
 	}
 }
 

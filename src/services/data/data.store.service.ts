@@ -50,12 +50,12 @@ export class DataStore {
 
 		return Promise.map( $stores, (store:string) => {
 			let pathToFile:string = `${path.join($dataStore,store)}\\data.json`;				
-			jsonFile.writeFile( pathToFile, data, {spaces:1}, (err:any) => {															
+			jsonFile.writeFile( pathToFile, data, {spaces:1}, (err:Error) => {															
 				(err)? Promise.reject(err):Promise.resolve();				
 			});	
 		})
 		.then( () => Promise.resolve() )
-		.catch( (err:any) => {
+		.catch( (err:Error) => {
 			console.error("Local DataStore: generated data could not be saved. ", err );
 			process.exit(1);
 		});	

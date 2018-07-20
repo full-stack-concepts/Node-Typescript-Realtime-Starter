@@ -57,7 +57,7 @@ export class DBProductService {
 		return `mongodb://${a.user}:${a.password}@${a.host}:${a.port}/${a.db}?maxPoolSize=${DB_MAX_POOL_SIZE}`;	
 	}	
 
-	private defaultErrorMessage(err:any):void {
+	private defaultErrorMessage(err:Error):void {
 		console.error("Local Database : Could not connect to Product Databse. Please check your configuration.");
 		console.error(err);
 		process.exit(1);
@@ -125,7 +125,7 @@ export const connectToProductDatabase = () => {
 	const instance:any = new DBProductService();
 	return instance.connect()
 	.then( () => Promise.resolve() )
-	.catch( (err:any) => Promise.reject(err) );	
+	.catch( (err:Error) => Promise.reject(err) );	
 }
 
 

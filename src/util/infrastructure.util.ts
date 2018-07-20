@@ -87,7 +87,7 @@ export const readPrivateKeyForTokenAuthentication = ():Buffer => {
 export const readDevConfiguration= () => {
 	let $path:string = path.join( rootPath, ".env");
 	return new Promise( (resolve, reject) => {
-		fs.pathExists( $path, (err:any, exists:boolean) => {			
+		fs.pathExists( $path, (err:Error, exists:boolean) => {			
 			(err)?reject(err):resolve(exists);
 		});
 	});	
@@ -99,7 +99,7 @@ export const readDevConfiguration= () => {
 export const readProdConfiguration=() => {
 	let $path:string = path.join( rootPath, ".prod");
 	return new Promise( (resolve, reject) => {
-		fs.pathExists( $path, (err:any, exists:boolean) => {
+		fs.pathExists( $path, (err:Error, exists:boolean) => {
 			(err)?reject(err):resolve(exists);
 		});
 	});	
@@ -117,9 +117,9 @@ export const getRootPath = ():string => {
  */
 export const createDirectory = ( $dir:string ):Promise<any> => {
 	return new Promise ( (resolve, reject) => {		
-		fs.stat ( $dir, ( err:any, stats:any) => {			
+		fs.stat ( $dir, ( err:Error, stats:any) => {			
 			if(err) {
-				mkdirp ( $dir, (err:any) => { (err) ? reject(err):resolve(true); })
+				mkdirp ( $dir, (err:Error) => { (err) ? reject(err):resolve(true); })
 			} else { 
 				resolve(); 
 			}
@@ -132,7 +132,7 @@ export const createDirectory = ( $dir:string ):Promise<any> => {
  */
 export const removeDirectory = ( $dir:string):Promise<any> => {
 	return new Promise( (resolve, reject) => {
-		fs.remove($dir, (err:any) => {
+		fs.remove($dir, (err:Error) => {
 			if(err) reject(err);
 			if(!err) resolve();
 		});
@@ -181,7 +181,7 @@ export const fileStatistics = ($pathToFile:string):Promise<any> => {
 	return new Promise( (resolve, reject) => {
 		fs.stat ( $pathToFile)
 		.then( (stats:any) => resolve(stats) )
-		.catch( (err:any) => reject(err) );			
+		.catch( (err:Error) => reject(err) );			
 	});
 }
 
@@ -189,7 +189,7 @@ export const fileStatistics = ($pathToFile:string):Promise<any> => {
  * JSON file
  */
 export const writeJSON = ($pathToFile:string, $json:any) => {
-	return jsonFile.writeFile( $pathToFile, $json, (err:any) => {	
+	return jsonFile.writeFile( $pathToFile, $json, (err:Error) => {	
 		return new Promise( (resolve, reject) => {
 			(err)?reject(err):resolve();
 		});
@@ -251,7 +251,7 @@ export const createUserSubDirectories = ($userDir:string) => {
 		createDirectory( $dir );
 	})		
 	.then( () => Promise.resolve() )
-	.catch( (err:any) => Promise.reject(err) );  
+	.catch( (err:Error) => Promise.reject(err) );  
 }
 
 export const pathToDefaultUserThumbnail = ():string => {
@@ -269,7 +269,7 @@ export const createPublicUserDirectory = ($userName:string):PromiseLike<IAUserDi
 	return createDirectory( $pathToUserDir )
 	.then( () => createUserSubDirectories( $pathToUserDir ))
 	.then( () => Promise.resolve({ dirCreated:true }) )
-	.catch( (err:any) => Promise.reject({ dirCreated: false, err: err }) );
+	.catch( (err:Error) => Promise.reject({ dirCreated: false, err: err }) );
 }
 
 /***
@@ -284,7 +284,7 @@ export const createPrivateUserDirectory =  ($userName:string):PromiseLike<IAUser
 	return createDirectory( $pathToUserDir )
 	.then( () => createUserSubDirectories( $pathToUserDir ))
 	.then( () => Promise.resolve({ dirCreated:true }) )
-	.catch( (err:any) => Promise.reject({ dirCreated: false, err: err }) ); 
+	.catch( (err:Error) => Promise.reject({ dirCreated: false, err: err }) ); 
 }
 
 /*****
@@ -304,7 +304,7 @@ export const storeUserImage = ( rawThumbnail:IRawThumbnail, $userName:string)=> 
 
 	return new Promise( (resolve, reject) => {
 		writeStream.on('finish', () => resolve({stored:true}) );
-		writeStream.on('error', (err:any) => reject({stored:false, err: err}) );
+		writeStream.on('error', (err:Error) => reject({stored:false, err: err}) );
 		writeStream.end( () => resolve({stored:true}) );
 	});	
 }   	

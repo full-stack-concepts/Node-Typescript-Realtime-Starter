@@ -48,14 +48,53 @@ const metaDataFormatter = (info:any):string => {
  *
  */
 const MESSAGE:string = 'message'
-export const entryFormatter = format( (info:any, opts:any) => {
-
-	const MESSAGE:string = 'message';
+export const entryFormatter = format( (info:any, opts:any) => {	
 
 	// format metadata
 	info = metaDataFormatter(info);
 	info[MESSAGE] = JSON.stringify(info.message);
 	return info;
+});
+
+/****
+ *
+ */
+export const entryErrorFormatter = format( (info:any, opts:any) => {
+
+	let raw = info;
+	let label:string, 
+		environment:number, 
+		ts:number = tsFormatter();
+
+	if(ENVIRONMENT==='dev') {  
+		label = 'Development'; 
+		environment = 1;	
+	} 
+	else { 
+		label = 'Production'; 
+		environment =  2;
+	}
+
+	/***
+	 * BuiLd Error Metadata Object
+	 */
+	info.metadata = { 		
+		label, 										// @string, environment type
+		environment,								// @number: environemnt type
+		ts,											// @number: timestamp in ms
+		action:		info.message.action,			// @string: application section identifier
+		provider:	info.message.provider,          // @string: microservice identifier
+		eventID: 	info.message.number,			// @number: errorID
+		stack: 		info.message.stack, 				// @string:	strinigfied error trace
+		errorType:	info.message.errorType 			// @number: JavaScript error constructor
+	};
+
+	/***
+	 * Overwrite 
+	 */
+	info.message = info.message.msg;
+
+	return info;	
 });
 
 /****
@@ -90,7 +129,7 @@ export const ErrorLogger:any = createLogger({
 	format: combine(		
 		metadata(),
 		timestamp({ format: 'DD-MM-YYYY HH:mm:ss:ssss' }),
-		entryFormatter(),
+		entryErrorFormatter(),
 		format.json()	
 	),	
 

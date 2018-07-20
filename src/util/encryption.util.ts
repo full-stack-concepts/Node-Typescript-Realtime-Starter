@@ -20,7 +20,7 @@ const isString = (str:string):boolean => {
  */
 export const encryptWithInitializationVector = (data:string) => {   
 
-    let err:any;  
+    let err:Error;  
     let iv:Buffer;
     let cipher: any;
     let encrypted:Buffer;
@@ -50,7 +50,7 @@ export const encryptWithInitializationVector = (data:string) => {
 export const decryptWithInitializationVector = (hash:string) => {    
 
     
-    let err:any;
+    let err:Error;
     let textParts:string[];
     let iv:Buffer;
     let encryptedText:Buffer;
@@ -84,7 +84,7 @@ export const decryptWithInitializationVector = (hash:string) => {
  */
 export const encryptWithCrypto = (data:any) => {
 
-    let err:any;
+    let err:Error;
     let cipher: any;
     let crypted:Buffer|string;
 
@@ -102,7 +102,7 @@ export const encryptWithCrypto = (data:any) => {
 
 export const decryptWithCrypto  = (data:any) => {
 
-    let err:any;    
+    let err:Error;    
     let decipher:any;
     let decrypted:string;
 
@@ -132,5 +132,5 @@ export const encryptWithBcrypt = ( password:string) => {
 export const decryptWithBcrypt = ( str:string, hash:string) => {
     return bcrypt.compare( str, hash)
     .then( (valid:boolean) => Promise.resolve(valid) )
-    .catch( (err:any) => Promise.reject(err));
+    .catch( (err:Error) => Promise.reject(err));
 }

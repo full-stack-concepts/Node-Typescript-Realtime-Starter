@@ -50,7 +50,7 @@ export class CustomerModel extends DefaultModel  {
 	public createUser(customer:ICustomer): Promise<any> {	
 		const repo = new CustomerRepository( this.userDBConn, this.redisClient );
 		return new Promise ( (resolve, reject) => {
-			repo.create(customer, (err:any, res:any) => {						
+			repo.create(customer, (err:Error, res:any) => {						
 				if(err) { reject(err);} else { resolve(res);}
 			});
 		});

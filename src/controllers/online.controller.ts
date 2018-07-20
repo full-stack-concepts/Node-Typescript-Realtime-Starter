@@ -59,14 +59,14 @@ class OnlineController {
 		.then( () => this.initOnlineAuthentication() )
 	}
 
-	private _exit(err:any) {
+	private _exit(err:Error) {
 		console.error("Online Controller: criticial error ");
 		process.exit(1);
 	}
 
 	private configureControllers():Promise<void> {
 
-		let err:any;
+		let err:Error;
 
 		try {
 
@@ -141,9 +141,6 @@ class OnlineController {
 			 *  Find associated user 
 			 */	
 			const decodedToken:string = socket.decoded_token;
-
-			// #TODO: return error if user does not exist			
-
 
 			/****
 			 * Wrap socket in observable class & update managers

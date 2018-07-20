@@ -50,13 +50,10 @@ import {
  */
 const AdminService:any = serviceManager.inject("adminDB");
 
-/****
- * 
- */
-// typescript fix for global
-const myGlobal:any = global;
-myGlobal.userDB
-myGlobal.productDB;
+/***
+ * error Controller
+ */ 
+import { errorController } from "./controllers";
 
 /***
  * Test if Environment variables for this development mode dev|prod are loaded
@@ -175,34 +172,46 @@ export const createServer = ():Promise<any> => {
         /***
          * Log Critical System Error
          */
-        ErrorLogger.error({
-            section: 'Application',
-            eventID: 1,
-            status: `Critical Error: ${err.message}`,
-            stack: JSON.stringify(err.stack)
-        });    
+        errorController.log(9000, err);    
 
         /***
          * Terminate Application
          */
         process.exit(1);
-    });  
+    }); 
+
+    let err:Error; 
 
     /**
      * Create HTTPS server.
      */
     if(EXPRESS_SERVER_MODE==='https') {     
 
-        let options:ServerOptions = getSSL();
-        httpServer = https.createServer(options, App);      
+        try {
+            let options:ServerOptions = getSSL();
+            httpServer = https.createServer(options, App);             
+        }
+        catch(e) { err = e;}
+        finally {
+            if(err) {              
+                return Promise.reject(err);
+            }
+        }
 
     /**
      * Create HTTP server.
      */
     } else if(EXPRESS_SERVER_MODE==='http') {       
         
-       httpServer = http.createServer(App);    
-
+        try {
+            httpServer = http.createServer(App);            
+        }
+        catch(e) { err = e;}
+        finally {
+            if(err) {            
+                return Promise.reject(err);
+            }
+        }
     }       
 
     /**

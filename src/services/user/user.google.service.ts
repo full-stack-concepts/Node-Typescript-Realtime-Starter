@@ -22,7 +22,8 @@ export class GoogleUserService extends UserOperations {
 	 */
 	private grabEmailFromGoogleProfile(profile:any):Promise<string> {       	
 
-	    let email:string, err:any
+	    let email:string, err:Error;
+
 	    try { email = profile.emails[0].value;} 
 	    catch(e) {err = e;  }
 	    finally {       	       
@@ -204,7 +205,7 @@ export class GoogleUserService extends UserOperations {
 		 */
 		.then( (user:IUser|IClient|ICustomer) => Promise.resolve(user) )
 
-		.catch( (err:any) => {
+		.catch( (err:Error) => {
 			Promise.reject(err);		
 		});	
 	}		

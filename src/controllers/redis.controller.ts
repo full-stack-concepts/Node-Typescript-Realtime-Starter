@@ -51,7 +51,7 @@ export class RedisController  {
 			client.hget = util.promisify(client.hget);
 
 			if(AUTHENTICATE_REDIS_SERVER) {
-				client.auth( REDIS_LOCAL_PASSWORD, (err:any) => {
+				client.auth( REDIS_LOCAL_PASSWORD, (err:Error) => {
 	    			if (err) throw err;
 				});
 			}		
@@ -66,7 +66,8 @@ export class RedisController  {
 			
 			let status:string =  `Critical Error - Could not connect to Redis Server ${err.message}`;
 			let stack:string = JSON.stringify(err.stack) || "";		
-			ErrorLogger.error({ section:'RedisController', eventID:10, status, stack });    			
+			console.error(status);
+			process.exit(1);
 		}
 	}
 }

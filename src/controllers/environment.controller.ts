@@ -38,7 +38,7 @@ export class EnvironmentController {
 		pathToEnvDirectory?:string
 	):string[]  {
 
-		let err:any;
+		let err:Error;
 		let files:string[];
 
 		if(pathToEnvDirectory) {
@@ -98,7 +98,7 @@ export class EnvironmentController {
 
 	private async reloadEnvironment(files:string[]):Promise<boolean> {
 
-		let err:any;		
+		let err:Error;		
 
 		files.forEach( async (file:string) => {
 
@@ -130,14 +130,11 @@ export class EnvironmentController {
 				});				
 			}
 
-			catch(e) {
-				err = e; 
-			}					
-
+			catch(e) { err = e; }					
 		});	
 
 		if(err) {
-			return Promise.resolve(err);
+			return Promise.reject(err);
 		} else {
 			return Promise.resolve(true);
 		}

@@ -141,7 +141,7 @@ export class WebToken {
 		let query:string = `{ 'accounts.${account.providerID}':'${account.value}' }`;	
 		return userModel.remoteFindOneOnly(query, 'users')
 		.then(  (user:IUser) => { return Promise.resolve(user); })
-		.catch( (err:any) => Promise.reject(err) );
+		.catch( (err:Error) => Promise.reject(err) );
 	}
 
 	static removeDatabaseIDFromUserObject( user:IUser ) {		

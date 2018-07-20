@@ -95,7 +95,7 @@ export class SystemUserRouter extends DefaultRouter {
         	res.json({token:token});
 
 		})
-		.catch( (err:any) => console.error(err) );	
+		.catch( (err:Error) => console.error(err) );	
 	}
 	
 }

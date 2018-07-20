@@ -116,7 +116,7 @@ export class ClientAnalyzerService {
 
 	private _getClientConfig(req:Request):Promise<any> {	
 
-		var err:any;
+		var err:Error;
 		try {
 
 			this.mD = new MobileDetect(req.headers['user-agent']);

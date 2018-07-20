@@ -17,6 +17,11 @@ import { TSYSTEMUSER } from "../../shared/types";
 import { proxyService } from "../state/proxy.service";
 import { WebToken } from "./token.service";
 
+/***
+ * Loggers
+ */
+import { errorController } from "../../controllers";
+
 import  {
 	SET_SYSTEM_ADMIN_ACCOUNT,
 	SYSTEM_ADMIN_FIRST_NAME,
@@ -46,9 +51,6 @@ import {
 	constructUserCredentials
 } from "../../util";
 
-import {
-	LoggerController
-} from "../../controllers";
 
 export class SystemUserService extends UserOperations {
 
@@ -115,7 +117,7 @@ export class SystemUserService extends UserOperations {
 			email:email.toLowerCase(),
 		}
 
-		let err:any;
+		let err:Error;
 		return new Promise( (resolve, reject) => {
 			try {			
 
@@ -137,10 +139,10 @@ export class SystemUserService extends UserOperations {
 				u = this.setDisplayNames(u, form);
 
 				// user credentials: userName && url 
-				u = this.setCredentials(u);	              	
+				u = this.setCredentials(u);	   
 			}
 			catch(e) { err = e; }
-			finally { if(err) {reject('<errorNumber6>');} else { resolve(u); } }		
+			finally { if(err) {reject({errorID:12010,err});} else { resolve(u); } }		
 
 		});		
 	}		
@@ -220,11 +222,11 @@ export class SystemUserService extends UserOperations {
 		.then( (res:any) => Promise.resolve() )
 
 		// catch error
-		.catch( (err:any) => Promise.reject(err) );
+		.catch( (err:Error) => Promise.reject(err) );
 	}	
 
 	// #TODO: split this function per subtype
-	private setDefaultPriviliges(u:ISystemUser):ISystemUser{		
+	private setDefaultPriviliges(u:ISystemUser):ISystemUser{			
 
 		/***
 		 * Collection roles: System users
@@ -292,34 +294,7 @@ export class SystemUserService extends UserOperations {
 				x => { if(this.live) { sub$.unsubscribe(); resolve(); } }
 			);
 		});
-	}	
-
-	/***
-	 * Test Account Type 
-	 * Expected type value : 5
-	 */
-	private testAccountType(user:ISystemUser) {
-		if(user.core.role != 1 || user.security.accountType != 1) {
-			return Promise.resolve(user);
-		} else {
-			return Promise.reject("<errorNumber>");
-		}
-	}
-
-	/***
-	 *
-	 */
-	private addLogin(user:ISystemUser):ISystemUser {
-
-		let login:ILoginTracker = this.authenticationTracker();
-		let _logins:ILoginTracker[]=[];
-		
-		if( user.logins && Array.isArray(user.logins)) _logins = cloneArray(user.logins);						
-		_logins.push(login);
-		user.logins=_logins;
-		
-		return user;
-	}
+	}		
 
 	/***
 	 * Create SystemUser From fron enviromental settings file (.env or .prod)
@@ -358,7 +333,7 @@ export class SystemUserService extends UserOperations {
 				isPassword:boolean, 
 				hasFirstName:boolean, 
 				hasLastName:boolean
-			) => { 			
+			) => { 							
 				return this.findUser( PERSON_SUBTYPE_SYSTEM_USER, this.userEmail); 
 			})		
 		})
@@ -382,9 +357,12 @@ export class SystemUserService extends UserOperations {
 		/***
 		 * Critical error: call process exit
 		 */		
-		.catch( (err:any) => {
+		.catch( ({errorID, err}:any) => {		
+
 			console.error("*** Criticial error: Sytem User from environmental settings file could not be generated. Please select your settings.");
-			console.error("*** Crititical error: ", err );			
+			console.error("*** Crititical error: ", errorID, err );	
+			if(!errorID) errorID= 12000;		
+			errorController.log(errorID, err);
 			process.exit(1);
 		});		
 	}
@@ -429,7 +407,7 @@ export class SystemUserService extends UserOperations {
 		// process thick: return to caller so webtoken can be created
 		.then( ( token:string) => Promise.resolve(token) ) 
 
-		.catch( (err:any) => Promise.reject(err) );	
+		.catch( (err:Error) => Promise.reject(err) );	
 	}
 }
 
@@ -442,24 +420,12 @@ class ActionService {
 		let instance:any = new SystemUserService();
 		return instance.loginSystemUser(login)
 			.then( (token:string) => Promise.resolve(token) )
-			.catch( (err:any) => Promise.reject(err) );
+			.catch( (err:Error) => Promise.reject(err) );
 	}
 
 }
 
 export const systemUserService:any = new ActionService();
-
-
-/****
- * Export for Bootstrap Controller
- * @testForSystemUser
- */
-export const testForSystemUser = () => {
-	const instance:any = new SystemUserService();
-	return instance.createSystemUser()
-	.then( () => Promise.resolve() )
-	.catch( (err:any) => Promise.reject(err) );	
-}
 
 /****
  * Export for Bootstrap Controller

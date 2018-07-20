@@ -15,7 +15,7 @@ export const testForObjectId = (id:any) => {
     }
 
     let testID:mongoose.Types.ObjectId;
-    let err:any;
+    let err:Error;
 
     try { testID = this.toObjectId(testString); }
     catch (e) { err = e;}

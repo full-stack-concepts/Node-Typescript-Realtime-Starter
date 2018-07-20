@@ -36,7 +36,7 @@ interface encryptPasswordFunction {
 export const encryptPassword = (password:string) => {
 
     let method:number = this.__pickPasswordEncryptionMethod();
-    let err:any;
+    let err:Error;
     let hash:Buffer|string;  
   
     if(!RANDOMIZE_PASSWORD_ENCRYPTION)
@@ -49,21 +49,21 @@ export const encryptPassword = (password:string) => {
     if(method===1) {       
         return encryptWithInitializationVector(password)
         .then( (hash:string|Buffer) => Promise.resolve({method:method, hash:hash, data:null}) ) 
-        .catch( (err:any) => Promise.reject("<errorNumber>"))
+        .catch( (err:Error) => Promise.reject("<errorNumber>"))
     }
 
     // Method 2: Crypto  
     else if(method === 2) {
         return encryptWithCrypto(password)
         .then( (hash:string|Buffer) => Promise.resolve({method:method, hash:hash, data:null}) ) 
-        .catch( (err:any) => Promise.reject("<errorNumber>"))
+        .catch( (err:Error) => Promise.reject("<errorNumber>"))
     }   
 
     // Method 3: Bcrypt/
     else if(method === 3) {      
         return encryptWithBcrypt(password)
         .then( (hash:string|Buffer) => Promise.resolve({method:method, hash:hash, data:null}) ) 
-        .catch( (err:any) => Promise.reject("<errorNumber>"))
+        .catch( (err:Error) => Promise.reject("<errorNumber>"))
     }       
 }
 */
@@ -71,7 +71,7 @@ export const encryptPassword = (password:string) => {
 /*
 export const decryptPassword = ({method, hash, data}:IEncryption)=> {
     console.log("==> (4) decrypt password ", method, data)
-    let err:any;
+    let err:Error;
     let pw:Buffer|string; 
 
     //Method 1: Decrypt with Initialization Vector
@@ -85,7 +85,7 @@ export const decryptPassword = ({method, hash, data}:IEncryption)=> {
                 return Promise.reject("<errorNumber>");
             }
         })
-        .catch( (err:any) => Promise.reject(err));
+        .catch( (err:Error) => Promise.reject(err));
     }
 
     // Method 2: Crypto  
@@ -98,7 +98,7 @@ export const decryptPassword = ({method, hash, data}:IEncryption)=> {
                 return Promise.reject("<errorNumber>");
             }
         })
-        .catch( (err:any) => Promise.reject(err));      
+        .catch( (err:Error) => Promise.reject(err));      
     }
 
     // Method 3: Bcrypt
@@ -112,7 +112,7 @@ export const decryptPassword = ({method, hash, data}:IEncryption)=> {
                 return Promise.reject("<errorNumber>");
             }
         })
-        .catch( (err:any) => Promise.reject(err) );
+        .catch( (err:Error) => Promise.reject(err) );
     }
 }
 

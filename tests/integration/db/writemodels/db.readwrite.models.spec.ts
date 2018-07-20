@@ -62,7 +62,7 @@ const readWriteModels:string[] = [
 
  describe("Database User READWRITE Model Methods", () => {
 
-	let err:any;
+	let err:Error;
 	let users:ISystemUser[] | IUser[] | IClient[] | ICustomer[];
 	let user: ISystemUser | IUser | IClient | ICustomer;
 
@@ -142,7 +142,7 @@ const readWriteModels:string[] = [
 
 			return configActions.forEach( async (config:any) => {	
 
-				let err:any;
+				let err:Error;
 				let user:IUser;
 				let identifier:string;
 
@@ -181,7 +181,7 @@ const readWriteModels:string[] = [
 
 		it("return an array of systemusers, clients or customers without error", async () => {	
 
-			let err:any;	
+			let err:Error;	
 
 			return configActions.forEach( async (config:any) => {	
 
@@ -210,7 +210,7 @@ const readWriteModels:string[] = [
 
 			return configActions.forEach( async (config:any) => {	
 
-				let err:any;
+				let err:Error;
 				let user:IUser;
 				let identifier:string;
 

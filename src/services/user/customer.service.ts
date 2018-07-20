@@ -161,7 +161,7 @@ export class CustomerService extends UserOperations {
 		// process thick: return to caller so webtoken can be created
 		.then( ( token:string) => Promise.resolve(token) ) 
 
-		.catch( (err:any) => Promise.reject(err) );	
+		.catch( (err:Error) => Promise.reject(err) );	
 	}
 
 	public registerCustomer(form:ICustomerApplication) {
@@ -195,7 +195,7 @@ export class CustomerService extends UserOperations {
 		// process thick: return to caller so webtoken can be created
 		.then( ( token:string) => Promise.resolve(token) ) 
 
-		.catch( (err:any) => Promise.reject(err) );	
+		.catch( (err:Error) => Promise.reject(err) );	
 	}
 
 	/***
@@ -225,7 +225,7 @@ export class CustomerService extends UserOperations {
 			delete customer._id;
 			return Promise.resolve( customer ) 
 		})
-		.catch( (err:any) => Promise.reject(err));
+		.catch( (err:Error) => Promise.reject(err));
 	}
 
 	/***
@@ -251,7 +251,7 @@ export class CustomerService extends UserOperations {
 
 		return customerModel.remove({ [field]:[ID]})
 		.then( () => Promise.resolve() )
-		.catch( (err:any) => Promise.reject(err));
+		.catch( (err:Error) => Promise.reject(err));
 
 	}
 }
@@ -265,29 +265,29 @@ class ActionService {
 		let instance:any = new CustomerService();
 		return instance.registerCustomer(application)
 			.then( (customer:ICustomer) => Promise.resolve(customer) )
-			.catch( (err:any) => Promise.reject(err) );
+			.catch( (err:Error) => Promise.reject(err) );
 	}
 
 	public loginCustomer( login:ILoginRequest ) {
 		let instance:any = new CustomerService();
 		return instance.loginCustomer(login)
 			.then( (token:string) => Promise.resolve(token) )
-			.catch( (err:any) => Promise.reject(err) );
+			.catch( (err:Error) => Promise.reject(err) );
 	}
 
 	public findSingleCustomer( find:IFindUser ) {
 		let instance:any = new CustomerService();
 		return instance.findSingleCustomer(find)
 			.then( (customer:ICustomer) => Promise.resolve(customer) )
-			.catch( (err:any) => Promise.reject(err) );
+			.catch( (err:Error) => Promise.reject(err) );
 	}
 
 	public deleteSingleCustomer( request:IDeleteUser ) {
 		let instance:any = new CustomerService();
 		return instance.deleteSingleCustomer(request)
 			.then( () => Promise.resolve() )
-			.catch( (err:any) => Promise.reject(err) );
+			.catch( (err:Error) => Promise.reject(err) );
 	}
 }
 
-export const customerService:any = new CustomerService();
+export const customerService:CustomerService = new CustomerService();

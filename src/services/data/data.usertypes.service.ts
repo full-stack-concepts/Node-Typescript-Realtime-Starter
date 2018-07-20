@@ -55,7 +55,7 @@ export class UserTypes {
 
 		)
 		.then( () => {return Promise.resolve(); })
-		.catch( (err:any) => console.error(err) );
+		.catch( (err:Error) => console.error(err) );
 	}
 
 	/******
@@ -88,7 +88,7 @@ export class UserTypes {
 			.then( () =>  Promise.resolve() )
 
 			// error handler
-			.catch( (err:any) => Promise.reject(err) )
+			.catch( (err:Error) => Promise.reject(err) )
 		});
 		
 	}
@@ -103,7 +103,7 @@ export class UserTypes {
 			clientModel.remove({})
 			.then( () => clientModel.insert( collection ) )
 			.then( () => Promise.resolve())
-			.catch( (err:any) => Promise.reject(err))
+			.catch( (err:Error) => Promise.reject(err))
 		);
 	}
 
@@ -116,7 +116,7 @@ export class UserTypes {
 			customerModel.remove({})
 			.then( () => customerModel.insert( collection ) )
 			.then( () => Promise.resolve())
-			.catch( (err:any) => Promise.reject(err))
+			.catch( (err:Error) => Promise.reject(err))
 		)
 	}
 
@@ -174,14 +174,14 @@ export class UserTypes {
 				})
 			)
 			.then( res => Promise.resolve(res) )
-			.catch( (err:any) => Promise.reject(err) );
+			.catch( (err:Error) => Promise.reject(err) );
 		})
 
 		// process thick: return to caller
 		.then( (res:any) =>  { Promise.resolve(res) })
 
 		// error handling
-		.catch( (err:any) => console.error(err) );	
+		.catch( (err:Error) => console.error(err) );	
 
 	}
 
@@ -192,7 +192,7 @@ export class UserTypes {
 			clientModel.mlab_deleteCollection( DB_CLIENTS_COLLECTION_NAME  )
 			.then( () => userModel.mlab_insert( DB_CLIENTS_COLLECTION_NAME, collection ) ) 
 			.then( (res:any) => { Promise.resolve(res) })
-			.catch( (err:any) => Promise.reject(err))
+			.catch( (err:Error) => Promise.reject(err))
 		);
 
 	}
@@ -204,7 +204,7 @@ export class UserTypes {
 			customerModel.mlab_deleteCollection( DB_CUSTOMERS_COLLECTION_NAME  )
 			.then( () => customerModel.mlab_insert( DB_CUSTOMERS_COLLECTION_NAME, collection ) ) 
 			.then( (res:any) => { Promise.resolve(res) })
-			.catch( (err:any) => Promise.reject(err))
+			.catch( (err:Error) => Promise.reject(err))
 		);
 
 

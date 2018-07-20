@@ -559,14 +559,14 @@ class ActionService {
 		let instance:any = new DataUtilitiesService();
 		return instance.createUserType(category,amount)
 			.then( (users:any) => Promise.resolve(users) )
-			.catch((err:any) => Promise.reject(err) );
+			.catch((err:Error) => Promise.reject(err) );
 	}	
 
 	public formatUserSubType(collection:any) {
 		let instance:any = new DataUtilitiesService();
 		return instance.formatUserSubType(collection)
 			.then( (result:any) => Promise.resolve(result) )
-			.catch((err:any) => Promise.reject(err) );
+			.catch((err:Error) => Promise.reject(err) );
 	}	
 }
 

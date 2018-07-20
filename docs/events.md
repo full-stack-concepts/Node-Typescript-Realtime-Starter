@@ -24,15 +24,7 @@ The following depictoin provides a high level overview of the initialization and
 | Product Database Live    | **1009**| Products Database is ready to perform queries                         | true    |
 | Express Controller Ready | **1010**| Express middleware configured for cookies, compression, headers etc   | true    |
 | System User Ready        | **1011**| System User created according settings in _env.default_ file          | true    |
-| Client RW Model Ready    | **1012**| DB Client ReadWrite Model has initialized                             | true    |
-| Client R Model ready     | **1013**| DB Client Read Only Model has initialized                             | true    |
-| Customer RW Model ready  | **1014**| DB Customer ReadWrite Model has initialized                           | true    |
-| Customer R Model ready   | **1015**| DB Customer Read Model has initialized                                | true    |
-| SystemUser RW Model ready| **1016**| DB SystemUser ReadWrite Model has initialized                         | true    |
-| User RW Model ready      | **1017**| DB User ReadWrite Model has initialized                               | true    |
-| User RW Model ready      | **1018**| DB User Read Only Model has initialized                               | true    |
-| Mail Controller ready    | **1019**| Mail Controller proxy has initialized                                 | true    |
-| SMTP Config Verified     | **1020**| SMTP Configuration Email Provider has been verified.                  | true    |
+
 
 
  

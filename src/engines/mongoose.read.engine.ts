@@ -118,7 +118,7 @@ export 	class ReadRepositoryBase<T extends mongoose.Document>
     ) {
 
         let result:Document|Document[]; 
-        let err:any;
+        let err:Error;
 
         try {
 
@@ -226,7 +226,7 @@ export 	class ReadRepositoryBase<T extends mongoose.Document>
     ) {
 
         let result:Document|Document[]; 
-        let err:any;
+        let err:Error;
 
         try {
 

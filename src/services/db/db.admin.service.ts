@@ -181,7 +181,7 @@ export class DBAdminService implements IndexSignature {
 		/****
 		 * Critical error
 		 */
-		 .catch( (err:any) => this.defaultErrorMessage(err) );		
+		 .catch( (err:Error) => this.defaultErrorMessage(err) );		
 
 	}
 
@@ -206,7 +206,7 @@ export class DBAdminService implements IndexSignature {
 
 		return this.client.db('admin').admin().listDatabases()
 		.then( (list:any) => Promise.resolve(list) )
-		.catch( (err:any) => Promise.reject(err) );		
+		.catch( (err:Error) => Promise.reject(err) );		
 	}
 
 	/****
@@ -242,7 +242,7 @@ export class DBAdminService implements IndexSignature {
 			});			
 		})		
 		.then( (result:any) => 	Promise.resolve() )	
-		.catch( (err:any) => Promise.reject(err) );
+		.catch( (err:Error) => Promise.reject(err) );
 	}
 
 	/****
@@ -299,7 +299,7 @@ export class DBAdminService implements IndexSignature {
 				return Promise.resolve({ [dbName]: requiredUsers })
 			})
 			.then( (requiredUsers) => Promise.resolve(requiredUsers) )
-			.catch( (err:any) => Promise.reject(err) )
+			.catch( (err:Error) => Promise.reject(err) )
 		})
 
 		.then( (requiredUsers) => Promise.resolve(requiredUsers) )	
@@ -320,7 +320,7 @@ export class DBAdminService implements IndexSignature {
 				return Promise.resolve(true);
 			}	
 		})
-		.catch( (err:any) => Promise.reject(err) );
+		.catch( (err:Error) => Promise.reject(err) );
 	}
 
 	/***
@@ -336,7 +336,7 @@ export class DBAdminService implements IndexSignature {
 			}
 		})
 		.then( (res:any) => Promise.resolve() )
-		.catch( (err:any) => Promise.reject(err) );
+		.catch( (err:Error) => Promise.reject(err) );
 	}
 
 	/****
@@ -352,7 +352,7 @@ export class DBAdminService implements IndexSignature {
 			] 
 		})
 		.then( (res:any) => Promise.resolve() )
-		.catch( (err:any) => Promise.reject(err) );
+		.catch( (err:Error) => Promise.reject(err) );
 	}
 
 	/****
@@ -370,7 +370,7 @@ export class DBAdminService implements IndexSignature {
 			roles: [{role: "readWrite", db: db}]
 		})
 		.then( (res:any) => Promise.resolve() )
-		.catch( (err:any) => Promise.reject(err) );
+		.catch( (err:Error) => Promise.reject(err) );
 	}
 
 	/****
@@ -385,7 +385,7 @@ export class DBAdminService implements IndexSignature {
 			roles: [ { role: "read", db: db }]
 		})
 		.then( (res:any) => Promise.resolve() )
-		.catch( (err:any) => Promise.reject(err) );
+		.catch( (err:Error) => Promise.reject(err) );
 	}	
 
 	/****
@@ -401,7 +401,7 @@ export class DBAdminService implements IndexSignature {
 
 		return this.adminDB.command({rolesInfo:1, showBuiltinRoles:1})
 		.then( (roles:any) => Promise.resolve(roles) )
-		.catch( (err:any) => Promise.reject(err) );
+		.catch( (err:Error) => Promise.reject(err) );
 	}
 
 	/***
@@ -422,7 +422,7 @@ export class DBAdminService implements IndexSignature {
 			if(role) return this[role](); 			
 		})
 		.then( (roles:any) => Promise.resolve(roles) )
-		.catch( (err:any) => Promise.reject(err) );
+		.catch( (err:Error) => Promise.reject(err) );
 	}	
 
 	/****
@@ -438,7 +438,7 @@ export class DBAdminService implements IndexSignature {
      		roles: []
 		})
 		.then( (roles:any) => Promise.resolve(roles) )
-		.catch( (err:any) => Promise.reject(err) );
+		.catch( (err:Error) => Promise.reject(err) );
 	}
 
 	/****
@@ -451,7 +451,7 @@ export class DBAdminService implements IndexSignature {
      		roles: []
 		})
 		.then( (roles:any) => Promise.resolve(roles) )
-		.catch( (err:any) => Promise.reject(err) );
+		.catch( (err:Error) => Promise.reject(err) );
 	}
 
 	private dropSystemViewsAnyDatabase() {
@@ -464,14 +464,14 @@ export class DBAdminService implements IndexSignature {
      		roles: []
 		})
 		.then( (roles:any) => Promise.resolve(roles) )
-		.catch( (err:any) => Promise.reject(err) );
+		.catch( (err:Error) => Promise.reject(err) );
 	}	
 
 	private closeConnection():void {
 		this.client.close();
 	}		
 
-	private defaultErrorMessage(err:any):void {
+	private defaultErrorMessage(err:Error):void {
 		console.error("Local Database : Could not configure MongoClient. Please check your configuration.");
 		console.error(err);
 		process.exit(1);
@@ -538,7 +538,7 @@ export class DBAdminService implements IndexSignature {
 					if(ac === 3) return this.createSystemReadOnlyAccount(account);
 				})
 				.then( () => Promise.resolve() )
-				.catch( (err:any) => Promise.reject(err) );		
+				.catch( (err:Error) => Promise.reject(err) );		
 			});
 		})		
 		
@@ -550,7 +550,7 @@ export class DBAdminService implements IndexSignature {
 
 		// process thick: return to caller
 		.then( () => Promise.resolve() )
-		.catch( (err:any) => this.defaultErrorMessage(err) );
+		.catch( (err:Error) => this.defaultErrorMessage(err) );
 	
 	}
 }
@@ -562,5 +562,5 @@ export const configureDatabases = () => {
 		const instance:any = new DBAdminService();
 	return instance.configureMongoDBClient()
 	.then( () => Promise.resolve() )
-	.catch( (err:any) => Promise.reject(err) );	
+	.catch( (err:Error) => Promise.reject(err) );	
 }

@@ -100,7 +100,7 @@ export class UserService extends UserOperations {
 		let query = { 'core.email': this.gmail };		
 		return userModel.remoteFindOneOnly(query, 'users')	
 		.then(  (user:IUser) => { return Promise.resolve(user); })
-		.catch( (err:any)    => { return Promise.reject(err); })	
+		.catch( (err:Error)    => { return Promise.reject(err); })	
 	}		
 
 	private getDefaultThumbnail():IRawThumbnail {
@@ -222,7 +222,7 @@ export class UserService extends UserOperations {
 		// process thick: return to caller so webtoken can be created
 		.then( ( token:string) => Promise.resolve(token) ) 
 
-		.catch( (err:any) => {		
+		.catch( (err:Error) => {		
 			Promise.reject(err);
 		});	
 	}
@@ -270,7 +270,7 @@ export class UserService extends UserOperations {
 		// process thick: return to caller so webtoken can be created
 		.then( ( token:string) => Promise.resolve(token) ) 
 
-		.catch( (err:any) => Promise.reject(err) );	
+		.catch( (err:Error) => Promise.reject(err) );	
 
 	}	
 
@@ -301,7 +301,7 @@ export class UserService extends UserOperations {
 			delete user._id;
 			return Promise.resolve( user ) 
 		})
-		.catch( (err:any) => Promise.reject(err));
+		.catch( (err:Error) => Promise.reject(err));
 	}
 
 	/***
@@ -327,7 +327,7 @@ export class UserService extends UserOperations {
 
 		return userModel.remove({ [field]:[ID]})
 		.then( () => Promise.resolve() )
-		.catch( (err:any) => Promise.reject(err));
+		.catch( (err:Error) => Promise.reject(err));
 
 	}
 }
@@ -341,28 +341,28 @@ class ActionService {
 		let instance:any = new UserService();
 		return instance.registerUser(application)
 			.then( (user:IUser) => Promise.resolve(user) )
-			.catch( (err:any) => Promise.reject(err) );
+			.catch( (err:Error) => Promise.reject(err) );
 	}
 
 	public loginUser( login:ILoginRequest ) {
 		let instance:any = new UserService();
 		return instance.loginUser(login)
 			.then( (token:string) => Promise.resolve(token) )
-			.catch( (err:any) => Promise.reject(err) );
+			.catch( (err:Error) => Promise.reject(err) );
 	}
 
 	public findSingleUser( find:IFindUser ) {
 		let instance:any = new UserService();
 		return instance.findSingleUser(find)
 			.then( (user:IUser) => Promise.resolve(user) )
-			.catch( (err:any) => Promise.reject(err) );
+			.catch( (err:Error) => Promise.reject(err) );
 	}
 
 	public deleteSingleUser( request:IDeleteUser ) {
 		let instance:any = new UserService();
 		return instance.deleteSingleUser(request)
 			.then( () => Promise.resolve() )
-			.catch( (err:any) => Promise.reject(err) );
+			.catch( (err:Error) => Promise.reject(err) );
 	}
 }
 

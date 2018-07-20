@@ -90,7 +90,7 @@ export class MailService {
 		return fs.stat($file)
 		.then( () => fs.readFile($file, 'utf8') )
 		.then( (tpl:string) => Promise.resolve(tpl) )
-		.catch( (err:any) => Promise.reject(err) );		
+		.catch( (err:Error) => Promise.reject(err) );		
 	}
 
 	/****
@@ -113,7 +113,7 @@ export class MailService {
 		definition:ISystemTemplateData
 	):Promise<string> {
 		
-		let err:any;
+		let err:Error;
 		let parsedTemplate:any;
 
 		try { parsedTemplate = sprintf(tpl, definition );	}
@@ -136,7 +136,7 @@ export class MailService {
 	):Promise<IEmailMessage> {
 
 		let email:IEmailMessage = deepCloneObject(TEmailMessage);
-		let err:any;	
+		let err:Error;	
 
 		try {
 
@@ -202,7 +202,7 @@ export class MailService {
 	 */	
 	public async sendSystemEmail(identifier:string, errorID:number) {	
 
-		let err:any;
+		let err:Error;
 
 		try {
 

@@ -198,7 +198,7 @@ export class UserOperations extends PersonProfile {
 		return Promise.map( PERSON_SUBTYPE_TO_MODELS, ( personType:string) => {	
 			return this.findUser( personType, email) 
 				.then( (res:any) => { return { [personType]: res}; })
-				.catch( (err:any) => Promise.reject(1100));				
+				.catch( (err:Error) => Promise.reject(1100));				
 		})		
 	
 		// process thick: evaluate query results 
@@ -229,7 +229,7 @@ export class UserOperations extends PersonProfile {
 		})
 		
 		// error handler
-		.catch( (err:any) => {		
+		.catch( (err:Error) => {		
 			return Promise.reject(err);
 		});				
 	}	
@@ -290,7 +290,7 @@ export class UserOperations extends PersonProfile {
 	    let ts:number = Math.round(+new Date());
 	    let date:Date = new Date(ts);
 	    let login:ILoginTracker;
-	    let err:any;
+	    let err:Error;
 	  
 	    try {
 	        login = {
@@ -362,7 +362,7 @@ export class UserOperations extends PersonProfile {
 	                return Promise.reject(1030);
 	            }
 	        })
-	        .catch( (err:any) => Promise.reject(err));
+	        .catch( (err:Error) => Promise.reject(err));
 		}
 
 		// Method 2: Crypto  
@@ -375,7 +375,7 @@ export class UserOperations extends PersonProfile {
 	                return Promise.reject(1031);
 	            }
 	        })
-	        .catch( (err:any) => Promise.reject(err));      
+	        .catch( (err:Error) => Promise.reject(err));      
 	    }
 
 	    // Method 3: Bcrypt
@@ -388,7 +388,7 @@ export class UserOperations extends PersonProfile {
 	                return Promise.reject(1032);
 	            }
 	        })
-	        .catch( (err:any) => Promise.reject(err) );
+	        .catch( (err:Error) => Promise.reject(err) );
 	    }		
 	}	
 
@@ -417,7 +417,7 @@ export class UserOperations extends PersonProfile {
 	        	encrypt = {	method, hash, data:pwd };
 	        	return Promise.resolve({ user, encrypt});
 	        }) 
-	        .catch( (err:any) => Promise.reject(1035));
+	        .catch( (err:Error) => Promise.reject(1035));
 	    }
 
 	    // Method 2: Crypto  
@@ -427,7 +427,7 @@ export class UserOperations extends PersonProfile {
 	        	encrypt = {	method, hash, data:pwd };
 	        	return Promise.resolve({ user, encrypt});
 	        }) 
-	        .catch( (err:any) => Promise.reject(1036));
+	        .catch( (err:Error) => Promise.reject(1036));
 	    }   
 
 	    // Method 3: Bcrypt/
@@ -437,7 +437,7 @@ export class UserOperations extends PersonProfile {
 	        	encrypt = {	method, hash, data:pwd };
 	        	return Promise.resolve({ user, encrypt});
 	        }) 
-	        .catch( (err:any) => Promise.reject(1038))
+	        .catch( (err:Error) => Promise.reject(1038))
 	    }       		
 	}
 
@@ -516,7 +516,7 @@ export class UserOperations extends PersonProfile {
 
 		// process thick: return to caller
 		.then ( (client:IClient) => Promise.resolve(client) )	
-		.catch( (err:any) => {		
+		.catch( (err:Error) => {		
 			Promise.reject(err) 
 		});		 
 	}		
@@ -583,7 +583,7 @@ export class UserOperations extends PersonProfile {
 
 		// process thick: return to caller
 		.then ( (customer:ICustomer) => Promise.resolve(customer) )	
-		.catch( (err:any) => {		
+		.catch( (err:Error) => {		
 			Promise.reject(err) 
 		});		 
 	}		
@@ -654,7 +654,7 @@ export class UserOperations extends PersonProfile {
 
 		// process thick: return to caller
 		.then ( (user:IUser) => Promise.resolve(user) )	
-		.catch( (err:any) => {		
+		.catch( (err:Error) => {		
 			Promise.reject(err) 
 		});		 
 	}	
@@ -684,7 +684,7 @@ export class UserOperations extends PersonProfile {
 	 */
 	protected fetchUserImage( user:ISystemUser|IUser|IClient|ICustomer ) {
 
-		let err:any;
+		let err:Error;
 		let url:string = user.profile.images.externalThumbnailUrl;		
 
 		/****
@@ -796,7 +796,7 @@ export class UserOperations extends PersonProfile {
 		if(hostType === 1) {							
 			return model.findOne( query )
 			.then( (u:any) => { return Promise.resolve(u); })
-			.catch( (err:any) => Promise.reject(1160) ); 		
+			.catch( (err:Error) => Promise.reject(1160) ); 		
 		}	
 
 		/***
@@ -805,7 +805,7 @@ export class UserOperations extends PersonProfile {
 		if(hostType === 2) {			
 			return model.remoteFindOneOnly(query, collection)	
 			.then(  (user:IUser) => { return Promise.resolve(user); })
-			.catch( (err:any)    => { return Promise.reject(err); });
+			.catch( (err:Error)    => { return Promise.reject(err); });
 		}
 	}
 
@@ -841,7 +841,7 @@ export class UserOperations extends PersonProfile {
 
 			return model.createUser(user)
 			.then( (res:any) => { return Promise.resolve(res) })
-			.catch( (err:any) => Promise.reject(1170));				
+			.catch( (err:Error) => Promise.reject(1170));				
 		}	
 
 		/***
@@ -850,7 +850,7 @@ export class UserOperations extends PersonProfile {
 		if(hostType === 2) {			
 			return model.remoteCreateUser( user, collection)
 			.then( (res:any) => { return Promise.resolve(user); })
-			.catch( (err:any) => Promise.reject(1171) );					
+			.catch( (err:Error) => Promise.reject(1171) );					
 		}
 	}	
 
@@ -907,7 +907,7 @@ export class UserOperations extends PersonProfile {
 				}
 			) 
 			.then( () => Promise.resolve(user))
-			.catch( (err:any) => Promise.reject(err));
+			.catch( (err:Error) => Promise.reject(err));
 		})
 		
 		// process thick: return to caller so webtoken can be created
@@ -915,7 +915,7 @@ export class UserOperations extends PersonProfile {
 			return Promise.resolve(user); 
 		})
 
-		.catch( (err:any) => {		
+		.catch( (err:Error) => {		
 			Promise.reject(err);
 		});	
 	}
@@ -945,7 +945,7 @@ export class UserOperations extends PersonProfile {
 				
 				return model.findOneAndUpdate (query, update)
 				.then( (res:any) => Promise.resolve(res) )
-				.catch( (err:any) => Promise.reject(1180) );	
+				.catch( (err:Error) => Promise.reject(1180) );	
 
 
 			/*****
@@ -961,10 +961,10 @@ export class UserOperations extends PersonProfile {
 					const model:any = setting.model;	
 					return model.findOneAndUpdate (query, update)
 					.then( (res:any) => Promise.resolve(res))
-					.catch( (err:any) => Promise.reject(1181))	
+					.catch( (err:Error) => Promise.reject(1181))	
 				}))
 				.then( () => Promise.resolve() )
-				.catch( (err:any) => Promise.reject(err));
+				.catch( (err:Error) => Promise.reject(err));
 
 			}
 		}		

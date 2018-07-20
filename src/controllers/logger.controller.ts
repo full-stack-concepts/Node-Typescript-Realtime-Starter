@@ -21,13 +21,9 @@ interface ILogger {
 }
 
 /***
- * Application Settings
+ * Application Logging Settings
  */
-import { 
-	ENVIRONMENT,
-	// express settings
-	EXPRESS_SERVER_MODE, TIME_ZONE,	
-	// logger settings
+import { 		
 	LOG_SYSTEM_EVENTS, LOG_LOCALLY, LOG_REMOTE_ON_PAPERTRAIL_APP, LOGGER_PAPERTRAILAPP_HOST, LOGGER_PAPERTRAILAPP_PORT
 } from "../util/secrets";
 
@@ -39,12 +35,10 @@ import {
 } from "./logging";
 
 // 
-const ExitOnError = (err:any) => {
+const ExitOnError = (err:Error) => {
 	console.error("Critical Error Remote Logging: ", err.message)
 	process.exit(1);
 }
-
-
 
 /***
  *
@@ -108,7 +102,7 @@ export class LoggerController {
 		return getDefinitions($file)
 		.then( (definitions:ILogMessage[]) => this.messagesSubject.next(definitions) )
 		.then( () => { return Promise.resolve();})
-		.catch( (err:any) => ExitOnError(err) );		
+		.catch( (err:Error) => ExitOnError(err) );		
 	}
 
 	/***
@@ -132,7 +126,7 @@ export class LoggerController {
 				remoteTransport.on('connect', (message:any) =>  { 					
 					Promise.all(
 						loggersCollection.map( (entry:any, index:number) => entry.logger.add(remoteTransport) )
-					).then( () => resolve()).catch( (err:any) => ExitOnError(err))					
+					).then( () => resolve()).catch( (err:Error) => ExitOnError(err))					
 				});				
 			} else {
 				resolve();

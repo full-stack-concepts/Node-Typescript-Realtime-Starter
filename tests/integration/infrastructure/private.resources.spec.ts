@@ -38,7 +38,7 @@ describe( "Private Directories Manager", () => {
 	 */
 	before( async () => {
 
-		let err:any;	
+		let err:Error;	
 
 		try {		
 			const r:any = await fileStatistics($rootDir);
@@ -56,7 +56,7 @@ describe( "Private Directories Manager", () => {
 
 	it( "should be capable of creating private directories with datastore", async() => {
 
-		let err:any;
+		let err:Error;
 		let obj:Object;
 
 		try { 

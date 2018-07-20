@@ -38,7 +38,7 @@ export class ModelMethods {
 	public findAll ( query:Object={}, fields:Object={}, options:Object={}):Promise<any> {
 		const repo = this.repo;
 		return new Promise ( (resolve, reject) => {
-			repo.find ( {}, fields, options, (err:any, res:any) => {					
+			repo.find ( {}, fields, options, (err:Error, res:any) => {					
 				if(err) { reject(err);} 
 				else if(!res) {  resolve(); } 
 				else {  resolve(res); }
@@ -50,7 +50,7 @@ export class ModelMethods {
 	public find (query:Object, fields:Object={}, options:Object={} ):Promise<any> {
 		const repo = this.repo;
 		return new Promise ( (resolve, reject) => {
-			repo.find ( query, fields, options, (err:any, res:any) => {					
+			repo.find ( query, fields, options, (err:Error, res:any) => {					
 				if(err) {  reject(err); } 
 				else if(!res) { resolve(); } 
 				else { resolve(res); }
@@ -61,7 +61,7 @@ export class ModelMethods {
 	public findOne (query:Object):Promise<any> {
 		const repo = this.repo;
 		return new Promise ( (resolve, reject) => {
-			repo.findOne ( query, (err:any, res:any) => {								
+			repo.findOne ( query, (err:Error, res:any) => {								
 				if(err) { reject(err); } 
 				else if(!res) { resolve(); } 
 				else { resolve(res); }
@@ -72,7 +72,7 @@ export class ModelMethods {
 	public findById(id:string):Promise<any> {
 		const repo = this.repo;
 		return new Promise ( (resolve, reject) => {
-			repo.findById ( id, (err:any, res:any) => {					
+			repo.findById ( id, (err:Error, res:any) => {					
 				if(err) {reject(err); } else { resolve(res); }
 			});
 		});
@@ -82,7 +82,7 @@ export class ModelMethods {
 	public insert(users:any): Promise<any> {
 		const repo = this.repo;
 		return new Promise ( (resolve, reject) => {
-			repo.insertMany( users, (err:any, res:any) => {			
+			repo.insertMany( users, (err:Error, res:any) => {			
 				if(err) {reject(err); } else { resolve(res); }
 			});
 		});
@@ -91,7 +91,7 @@ export class ModelMethods {
 	public findOneAndDelete (query:Object, options:Object={} ):Promise<any> {
 		const repo = this.repo;
 		return new Promise ( (resolve, reject) => {
-			repo.findOneAndDelete ( query, options, (err:any, res:any) => {					
+			repo.findOneAndDelete ( query, options, (err:Error, res:any) => {					
 				if(err) {  reject(err); } 
 				if(err) {  reject(err); } 
 				else { resolve(); } 	
@@ -102,7 +102,7 @@ export class ModelMethods {
 	public findOneAndUpdate (query:Object, update:Object={}, options:Object={} ):Promise<any> {	
 		const repo = this.repo;
 		return new Promise ( (resolve, reject) => {
-			repo.findOneAndUpdate ( query, update, options, (err:any, res:any) => {								
+			repo.findOneAndUpdate ( query, update, options, (err:Error, res:any) => {								
 				if(err) {  reject(err); } 
 				else { resolve(res); } 			
 			});
@@ -113,7 +113,7 @@ export class ModelMethods {
 	public updateMany (query:Object, update:any={}, options:Object={} ):Promise<any> {		
 		const repo = this.repo;
 		return new Promise ( (resolve, reject) => {		
-			repo.updateMany ( query, update, options, (err:any, res:any) => {												
+			repo.updateMany ( query, update, options, (err:Error, res:any) => {												
 				if(err) {  reject(err); } 
 				else { resolve(res); } 			
 			});
@@ -123,7 +123,7 @@ export class ModelMethods {
 	public remove (query:Object):Promise<any> {		
 		const repo = this.repo;
 		return new Promise ( (resolve, reject) => {		
-			repo.remove ( query, (err:any, res:any) => {											
+			repo.remove ( query, (err:Error, res:any) => {											
 				if(err) {  reject(err); } 
 				else { resolve(); } 			
 			});

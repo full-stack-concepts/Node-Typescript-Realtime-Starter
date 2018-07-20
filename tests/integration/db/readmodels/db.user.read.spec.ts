@@ -56,7 +56,7 @@ var configActions:any = [];
 
 describe("Database User Read Model Methods", () => {
 
-	let err:any;
+	let err:Error;
 	let users:IUser[] | IClient[] | ICustomer[];
 	let user: IUser | IClient | ICustomer;
 
@@ -131,7 +131,7 @@ describe("Database User Read Model Methods", () => {
 
 			return configActions.forEach( async (config:any) => {	
 
-				let err:any;
+				let err:Error;
 				let user:IUser;
 				let identifier:string;
 
@@ -175,7 +175,7 @@ describe("Database User Read Model Methods", () => {
 
 		it("return an array of users, clients or customers without error", async () => {	
 
-			let err:any;	
+			let err:Error;	
 
 
 			return configActions.forEach( async (config:any) => {	

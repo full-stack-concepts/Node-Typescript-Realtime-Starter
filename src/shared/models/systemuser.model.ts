@@ -53,7 +53,7 @@ export class SystemUserModel extends DefaultModel  {
 	public createUser(user:ISystemUser): Promise<any> {			
 		const repo = new SystemUserRepository( this.userDBConn, this.redisClient );		
 		return new Promise ( (resolve, reject) => {
-			repo.create(user, (err:any, res:any) => {			
+			repo.create(user, (err:Error, res:any) => {			
 				if(err) { reject(err);} else { resolve(res);}
 			});
 		});

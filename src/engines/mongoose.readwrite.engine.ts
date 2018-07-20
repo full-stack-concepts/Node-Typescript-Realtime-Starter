@@ -139,7 +139,7 @@ export 	class ReadWriteRepositoryBase<T extends mongoose.Document>
     ) {
 
         let result:Document|Document[]; 
-        let err:any;
+        let err:Error;
 
         try {
 
@@ -245,7 +245,7 @@ export 	class ReadWriteRepositoryBase<T extends mongoose.Document>
     ) {
 
         let result:Document|Document[]; 
-        let err:any;
+        let err:Error;
 
         try {
 
@@ -409,15 +409,15 @@ export 	class ReadWriteRepositoryBase<T extends mongoose.Document>
     }  
 
     delete(_id: string, callback: (error: any, result: any) => void) {
-        this._model.remove({ _id: toObjectId(_id) }, (err:any) => callback(err, null));
+        this._model.remove({ _id: toObjectId(_id) }, (err:Error) => callback(err, null));
     }
 
     findOneAndDelete(conditions:Object={}, options:Object={}, callback: (error: any, result: any) => void) {         
-        this._model.findOneAndRemove( conditions, options, (err:any, result:any) => callback(err, result));
+        this._model.findOneAndRemove( conditions, options, (err:Error, result:any) => callback(err, result));
     }
 
     findOneAndUpdate(conditions:Object={}, update:Object={}, options:Object={}, callback: (error: any, result: any) => void) {         
-        this._model.findOneAndUpdate( conditions, update, options, (err:any, result:any) => callback(err, result));
+        this._model.findOneAndUpdate( conditions, update, options, (err:Error, result:any) => callback(err, result));
     }   
 
      /***

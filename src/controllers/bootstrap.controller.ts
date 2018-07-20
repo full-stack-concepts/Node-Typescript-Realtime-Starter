@@ -28,7 +28,7 @@ import {
 
 import { proxyService, connectToUserDatabase, connectToProductDatabase } from "../services";
 import { configureDatabases } from "../services/db/db.admin.service";
-import { testForSystemUser, createSystemUser } from "../services/user/system.user.service";
+import { createSystemUser } from "../services/user/system.user.service";
 
 import {
 	DATA_GENERATE
@@ -109,14 +109,12 @@ export class BootstrapController {
 		);
 	}
 
-	private err(err:any) {
-		
-		let section:string = 'BootstrapController';
-		let eventID:number=2;
-		let status:string =  `Critical Error - Bootstrap sequence failed ${err.message}`;
-		let stack:string = JSON.stringify(err.stack) || "";
-		
-		ErrorLogger.error({ section, eventID, status, stack });    
+	/***
+	 * Log Critical Error
+	 * @err:Error
+	 */
+	private err(err:Error) {		
+		errorController.log(10000, err);	
 		process.exit(1);
 	}
 
@@ -126,7 +124,7 @@ export class BootstrapController {
 	 */
 	private initDefaultDatabaseModel() {
 
-		let err:any;
+		let err:Error;
 		try { const model = new DefaultModel();} 
 		catch(e) { err = e; }
 		finally { if(err) this.err(err); return; }
@@ -147,7 +145,7 @@ export class BootstrapController {
 	 */
 	private async configureDatabases():Promise<void> {		
 		
-		let err:any;
+		let err:Error;
 		try {
 			const $dbConfig = await configureDatabases();
 		}
@@ -182,21 +180,6 @@ export class BootstrapController {
 			}
 		}
 	}
- 
-	/***
-	 * Test if Super Admin system User
-	 * Clone of MongoDB SuperAdmin, injected into <systemusers> collection
-	 */
-	private async systemUser():Promise<void> {		
-		let err;
-		try {
-			const $systemUser = await testForSystemUser();
-		}
-		catch(e) { err=e;}
-		finally {
-			if(err) { this.err(err); } else { return Promise.resolve();}
-		}
-	}	
 
 	private sendBootstrapFinalizedEmail():void {
 		if(SEND_MAIL_ON_BOOTSTRAP_SEQUENCE_FINISHED)
@@ -220,7 +203,7 @@ export class BootstrapController {
 			/***
 			 * Await Build of Error Controller
 			 */
-			await errorController.build();	
+			await errorController.build();			
 
 			/***
 			 * Await build of Redis Client
@@ -304,22 +287,15 @@ export class BootstrapController {
 			/***
 			 *
 			 */ 
-			// await createSystemUser();		
+			await createSystemUser();		
 
 			/***
 			 * Send email to application owner 
 			 * that application has booted successfully
 			 */			
-			this.sendBootstrapFinalizedEmail()
-			
-			let test = await errorController.getErrorDefinition(1030)
-			console.log(test);
+			this.sendBootstrapFinalizedEmail()		
 
 			console.log("==> Bootstrap Sequence finished");		
-
-
-
-
 
 			return Promise.resolve();
 

@@ -179,7 +179,7 @@ export class FaceBookUserService extends UserOperations {
 		 */
 		.then( (user:IUser|IClient|ICustomer) => Promise.resolve(user) )
 
-		.catch( (err:any) => Promise.reject(err));	
+		.catch( (err:Error) => Promise.reject(err));	
 
 		
 	}
