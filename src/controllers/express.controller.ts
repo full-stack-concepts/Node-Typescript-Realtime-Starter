@@ -8,9 +8,14 @@ import logger from "morgan";
 import passport from "passport";
 import morgan from "morgan";
 import { Router, Request, Response, NextFunction} from "express";
+import graphQLHTTP from "express-graphql";
+const cors = require("cors");
 
 // import passport for authentication support
 require("../shared/auth-strategies/passport");
+
+import { graphqlSchema } from "../shared/graphql/index.ql";
+import { printSchema } from 'graphql/utilities/schemaPrinter';
 
 import {
     ENVIRONMENT,
@@ -52,8 +57,7 @@ class ExpressController {
         this.router = express.Router();    
         this.initPassPort();
         this.middleware();
-        this.routes();    
-       
+        this.routes();          
     }   
 
     private initPassPort():void {
@@ -88,13 +92,47 @@ class ExpressController {
          * https://www.npmjs.com/package/body-parser
          */  
         this.express.use(bodyParser.json());
-        this.express.use(bodyParser.urlencoded({ extended: false }));     
-
-        // TestLogger.tests({level: 'intergration', category: 'user', feature:'routes'})
-        
+        this.express.use(bodyParser.urlencoded({ extended: false }));             
     }
 
-    private routes():void {
+    private routes():void {      
+
+
+        /****
+         * Main graphql route needs a schema with datatypes
+         */
+        this.express.use('/ql',
+            cors(),   
+            graphQLHTTP(request => {
+                const startTime = Date.now();
+                return {
+                    schema: graphqlSchema,
+                    graphiql: true,
+                    extensions({ document, variables, operationName, result }) {
+                        return { runTime: Date.now() - startTime };
+                    }
+                };
+            })
+        );
+
+        /*****
+         * Graphql Schema
+         */
+        /*
+        this.express.use('/schema',    ,
+            (request:Request, response:Response, next:NextFunction) => {
+                response.set('Content-Type', 'text/plain');
+                response.send(printSchema(graphqlSchema));
+            }
+        );
+        */
+
+        /*
+        this.express.use("/ql", graphQLHTTP({           
+            graphiql:true,
+            qlSchema    
+        }));
+        */
 
         /**
          * Public Directories

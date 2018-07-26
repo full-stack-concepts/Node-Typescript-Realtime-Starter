@@ -201,7 +201,7 @@ class ProxyService {
 		return Promise.resolve();
 	}
 
-	public get daCOntroller() {
+	public get daController() {
 		return this._daController;
 	}
 

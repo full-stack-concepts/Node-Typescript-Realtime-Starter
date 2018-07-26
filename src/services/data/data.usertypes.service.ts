@@ -34,6 +34,8 @@ export class UserTypes {
 	 */
 	public static storeLocally(data:any) {
 
+		console.log("*** Sore in Local Database")
+
 		if(!POPULATE_LOCAL_DATABASE)
 			return Promise.resolve();
 
@@ -75,19 +77,19 @@ export class UserTypes {
 		// process thick: create admin(s), poweruser(s), autthor(s), user(s)
 		.then( () => {
 			return Promise.all(				
+
 				usersCollection.map( ( _collection:any) => {	
 
 					let keys:string[] = Object.keys(_collection),
 						key:any = keys[0];
 					let collection:IUser[]= _collection[key];						
-
+					console.log("**** Inserting users: ", key, collection.length)
 					userModel.insert( collection );
 				})
-			)
-			// process thick: return to caller
-			.then( () =>  Promise.resolve() )
-
-			// error handler
+			)			
+			.then( (res:any) =>  {				
+				return Promise.resolve() 
+			})		
 			.catch( (err:Error) => Promise.reject(err) )
 		});
 		

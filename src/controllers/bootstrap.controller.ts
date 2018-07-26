@@ -26,7 +26,7 @@ import {
 	mailController, MAController	
 } from "../controllers";
 
-import { proxyService, connectToUserDatabase, connectToProductDatabase } from "../services";
+import { proxyService, connectToUserDatabase, connectToProductDatabase, dataBreeder } from "../services";
 import { configureDatabases } from "../services/db/db.admin.service";
 import { createSystemUser } from "../services/user/system.user.service";
 
@@ -104,6 +104,7 @@ export class BootstrapController {
 					this.logBootstrapEvent(1009);
 					console.log("SIGNAL SIGNAL SIGNAL")
 					// proxyService.startDataOperations();
+					dataBreeder.generateData()
 				}			
 			}
 		);

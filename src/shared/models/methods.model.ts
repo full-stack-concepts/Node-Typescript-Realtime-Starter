@@ -1,4 +1,5 @@
 import Promise from "bluebird";
+import fetch from "node-fetch";
 
 import { objectKeysLength, stringify, RemoteQueryBuilder } from "../../util";
 const headers:any= { 'Content-Type': 'application/json' };
@@ -15,8 +16,8 @@ export class ModelMethods {
 	 * Native Connections
 	 * inejected into Repository classes
 	 */
-	userDBConn:any;
-	productDBConn:any;
+	protected userDBConn:any;
+	protected productDBConn:any;
 
 	/****
 	 * Repository
@@ -26,7 +27,7 @@ export class ModelMethods {
 	/***
 	 * Redis Client
 	 */
-	redisClient:any;
+	protected redisClient:any;
 
 	/******************************************************************************************
 	 *
@@ -72,7 +73,7 @@ export class ModelMethods {
 	public findById(id:string):Promise<any> {
 		const repo = this.repo;
 		return new Promise ( (resolve, reject) => {
-			repo.findById ( id, (err:Error, res:any) => {					
+			repo.findById ( id, (err:Error, res:any) => {						
 				if(err) {reject(err); } else { resolve(res); }
 			});
 		});
@@ -82,7 +83,8 @@ export class ModelMethods {
 	public insert(users:any): Promise<any> {
 		const repo = this.repo;
 		return new Promise ( (resolve, reject) => {
-			repo.insertMany( users, (err:Error, res:any) => {			
+			repo.insertMany( users, (err:Error, res:any) => {	
+				console.log("*** Insert result ", res.length)		
 				if(err) {reject(err); } else { resolve(res); }
 			});
 		});

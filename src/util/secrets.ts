@@ -625,7 +625,9 @@ export const GENERATE_SAMPLE_DATA = process.env["GENERATE_SAMPLE_DATA"] == 'true
 export const POPULATE_LOCAL_DATASTORE = process.env["POPULATE_LOCAL_DATASTORE"] == 'true';
 export const POPULATE_LOCAL_DATABASE  = process.env["POPULATE_LOCAL_DATABASE"] == 'true';
 export const POPULATE_REMOTE_DATABASE  = process.env["POPULATE_REMOTE_DATABASE"] == 'true';
-export const DB_POPULATE_TEST_COLLECTIONS = process.env["DB_POPULATE_TEST_COLLECTIONS"].split(',');
+export const DB_POPULATE_COLLECTIONS = process.env["DB_POPULATE_COLLECTIONS"].split(',');
+export const COLLECTION_MINIMUM_TRESHOLD = parseInt(process.env["COLLECTION_MINIMUM_TRESHOLD"]);
+export const COLLECTION_MAXIMUM_TRESHOLD = parseInt(process.env["COLLECTION_MAXIMUM_TRESHOLD"]);
 export const DB_POPULATE_ADMINS =  Number(process.env["DB_POPULATE_ADMINS"]);
 export const DB_POPULATE_POWER_USERS =  Number(process.env["DB_POPULATE_POWER_USERS"]);
 export const DB_POPULATE_AUTHORS = Number(process.env["DB_POPULATE_AUTHORS"]);
@@ -633,7 +635,7 @@ export const DB_POPULATE_USERS =  Number(process.env["DB_POPULATE_USERS"]);
 export const DB_POPULATION_LOCALE = process.env["DB_POPULATION_LOCALE"];
 
 export const DB_CREATE_USERS = process.env["DB_CREATE_USERS"];
-export const DB_SYSTEM_USERS_COLLECTION_NAME = process.env["DB_SYSTEM_USERS_COLLECTION_NAME"] || "users";
+export const DB_SYSTEM_USERS_COLLECTION_NAME = process.env["DB_SYSTEM_USERS_COLLECTION_NAME"] || "systemusers";
 export const DB_USERS_COLLECTION_NAME = process.env["DB_USERS_COLLECTION_NAME"] || "users";
 export const DB_CREATE_CLIENTS = process.env["DB_CREATE_CLIENTS"];
 export const DB_CLIENTS_COLLECTION_NAME = process.env["DB_CLIENTS_COLLECTION_NAME"] || "clients";
@@ -644,8 +646,18 @@ export const DB_POPULATE_DEFAULT_CUSTOMERS= Number(process.env["DB_POPULATE_DEFA
 
 if(GENERATE_SAMPLE_DATA) {	
 
-	if(!DB_POPULATE_TEST_COLLECTIONS || !Array.isArray(DB_POPULATE_TEST_COLLECTIONS) ) {
-		console.error("DB Data Genersator: Please configure DB_POPULATE_TEST_COLLECTIONS array: specify to test for which DB collections");
+	if(!COLLECTION_MINIMUM_TRESHOLD || !Number.isInteger(COLLECTION_MINIMUM_TRESHOLD) ) {
+		console.error("DB Data Genersator: Please configure COLLECTION_MINIMUM_TRESHOLD: invalid integer");
+		process.exit(1);
+	}
+
+	if(!COLLECTION_MAXIMUM_TRESHOLD || !Number.isInteger(COLLECTION_MAXIMUM_TRESHOLD) ) {
+		console.error("DB Data Genersator: Please configure COLLECTION_MAXIMUM_TRESHOLD: invalid integer");
+		process.exit(1);
+	}
+
+	if(!DB_POPULATE_COLLECTIONS || !Array.isArray(DB_POPULATE_COLLECTIONS) ) {
+		console.error("DB Data Genersator: Please configure DB_POPULATE_COLLECTIONS array: specify to test for which DB collections");
 		process.exit(1);
 	}
 

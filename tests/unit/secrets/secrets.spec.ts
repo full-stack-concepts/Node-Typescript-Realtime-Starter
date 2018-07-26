@@ -70,7 +70,7 @@ import {
 	POPULATE_LOCAL_DATASTORE,
 	POPULATE_LOCAL_DATABASE,
 	POPULATE_REMOTE_DATABASE,	
-	DB_POPULATE_TEST_COLLECTIONS,
+	DB_POPULATE_COLLECTIONS,
 	DB_POPULATE_ADMINS,
 	DB_POPULATE_POWER_USERS,
 	DB_POPULATE_AUTHORS,
@@ -472,9 +472,9 @@ describe("Application", () => {
 		});
 
 		it("should instruct application which collections may contain sample data", () => {
-			 expect(DB_POPULATE_TEST_COLLECTIONS).to.be.an('array');
-			 if(DB_POPULATE_TEST_COLLECTIONS.length) {
-			 	DB_POPULATE_TEST_COLLECTIONS.forEach( i => expect(i).to.be.a('string'));
+			 expect(DB_POPULATE_COLLECTIONS).to.be.an('array');
+			 if(DB_POPULATE_COLLECTIONS.length) {
+			 	DB_POPULATE_COLLECTIONS.forEach( i => expect(i).to.be.a('string'));
 			 }
 		});
 
