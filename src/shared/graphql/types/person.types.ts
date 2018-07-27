@@ -392,16 +392,21 @@ export const devicesDefinition:ITypeDefinition = {
  *
  */
 const defaultUserFields = {
-    id:             { type: GraphQLID },
-    displayName:    { type: GraphQLString, description: 'Display Name' },
-    role:           { type: GraphQLInt, description: 'Assigned Role' },
-    email:          { type: GraphQLString, description: 'Email Address' },     
-    url:            { type: GraphQLString, description: 'Public Identifier' },
-    identifier:     { type: GraphQLString, description: 'Infrastructure Identifier' },     
-    personalia:     { type: PersonaliaType},
-    coreID:         { type: GraphQLID },
-    profileID:      { type: GraphQLID },
-    accountsID:     { type: GraphQLID },
+    id:             		{ type: GraphQLID },
+    displayName:    		{ type: GraphQLString, description: 'Display Name' },
+    role:           		{ type: GraphQLInt, description: 'Assigned Role' },
+    email:          		{ type: GraphQLString, description: 'Email Address' },     
+    url:            		{ type: GraphQLString, description: 'Public Identifier' },
+    identifier:     		{ type: GraphQLString, description: 'Infrastructure Identifier' },     
+    personalia:     		{ type: PersonaliaType},
+    coreSectionID:      	{ type: GraphQLID },
+    passwordSectionID:		{ type: GraphQLID },
+    loginsSectionID:		{ type: GraphQLID },
+    accountsSectionID:		{ type: GraphQLID },
+    securitySectionID:		{ type: GraphQLID },
+    configurationSectionID:	{ type: GraphQLID },
+    profileSectionID:   	{ type: GraphQLID },
+   	devicesSectionID:		{ type: GraphQLID },
 };
 
 export const userDefinition:ITypeDefinition = {
@@ -417,9 +422,14 @@ export const userDefinition:ITypeDefinition = {
 	        identifier: obj.core.identifier,
 	        personalia: obj.profile.personalia,
 	        displayName: obj.profile.displayNames.fullName,
-	        coreID: obj.core.id,
-	        profileID: obj.profile.id,
-	        accountsID: obj.accounts.id
+	        coreSectionID: obj.core.id,
+	        passwordSectionID: obj.password.id,
+	        loginsSectionID:  obj.logins.id,
+    		accountsSectionID:	obj.accounts.id,
+    		securitySectionID:	obj.security.id,
+    		configurationSectionID:	obj.configuration.id,
+	        profileSectionID: obj.profile.id,
+	        devicesSectionID: obj.devices.id
 	    };    
 	},
 	

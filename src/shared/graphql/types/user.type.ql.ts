@@ -9,7 +9,8 @@ import {
     GraphQLString,
     GraphQLInt,
     GraphQLFloat,
-    GraphQLBoolean 
+    GraphQLBoolean,
+
 } from 'graphql';
 
 /***
@@ -34,6 +35,11 @@ import {
 
 } from "./person.types";
 
+import {
+    PersonReadResolvers,
+    PersonWriteResolvers
+} from "../resolvers";
+
 /***
  *
  */
@@ -41,102 +47,68 @@ const query = {
 
     userFindByMail: {
         type: userDefinition.type,
-        args: { email: { type: GraphQLString, description: 'find by email' } },
-        async resolve(root:any, args:any) {                           
-            const users:any = await userReadModel.find({'core.email': args.email});
-            return userDefinition.format(users[0]);
-        }
+        args: { email: { type: GraphQLString, description: 'find by email' } },      
+        resolve: (root:any, args:any) => PersonReadResolvers.findByMail(root, args, 'user')       
     },
     
     userFindById: {
         type: userDefinition.type,
-         args: { id: { type: GraphQLID, description: 'find by Mongoose ID' } },
-         async resolve(root:any, args:any) {                       
-            const user:any = await userReadModel.findById(args.id);
-            return userDefinition.format(user);
-        }
+        args: { id: { type: GraphQLID, description: 'find by Mongoose ID' } },
+        resolve: (root:any, args:any) => PersonReadResolvers.findById(root, args, 'user')               
     },
 
     userFindByURL: {
         type: userDefinition.type,
         args:  { url: { type: GraphQLString, description: 'find by URL' } },
-        async resolve(root:any, args:any) {                       
-            const users:any = await userReadModel.find({"core.url": args.url});
-            return userDefinition.format(users[0]);
-        }
+        resolve: (root:any, args:any) => PersonReadResolvers.findByURL(root, args, 'user')             
     },
 
     userCoreDetails: {
         type: coreDefinition.type,
         args: { id: { type: GraphQLID, description: 'find User Core Object by its ID' } },
-        resolve(root:any, args:any) {                                         
-            return userReadModel.find({"core._id": args.id}, coreDefinition.filter )
-            .then( (users:any) => coreDefinition.format(users[0]) );
-        }
+        resolve: (root:any, args:any) => PersonReadResolvers.coreDetails(root, args, 'user')     
     },
 
     userProfile: {
         type: profileDefinition.type,
         args: { id: { type: GraphQLID, description: 'find User Profile Object by its ID' } },
-        resolve(root:any, args:any) {    
-            return userReadModel.find({"profile._id": args.id}, profileDefinition.filter)
-            .then( (users:any) => profileDefinition.format(users[0]) );
-        }
+        resolve: (root:any, args:any) => PersonReadResolvers.profile(root, args, 'user')            
     },
 
     userPassword: {
         type: passwordDefinition.type,
         args: { id: { type: GraphQLID, description: 'find User Password Object by its ID' } },
-        resolve(root:any, args:any) {        
-            return userReadModel.find({"password._id": args.id}, passwordDefinition.filter)
-            .then( (users:any) => passwordDefinition.format(users[0]) );
-        }
+        resolve: (root:any, args:any) => PersonReadResolvers.password(root, args, 'user')                
     },
 
     userLogins: {
         type: loginDefinition.type,
         args:  { id: { type: GraphQLID, description: 'find User Logins by its logins ObjectID' } },
-        resolve(root:any, args:any) {        
-            return userReadModel.find({"logins._id": args.id}, loginDefinition.filter)
-            .then( (users:any) => loginDefinition.format(users[0]) );
-        } 
+        resolve: (root:any, args:any) => PersonReadResolvers.logins(root, args, 'user')            
     },
 
     userAccounts: {
         type: accountsDefinition.type,
         args:  { id: { type: GraphQLID, description: 'find user logon accounts: Google, Facebook or LocalID' } },
-        resolve(root:any, args:any) {          
-             return userReadModel.find({"accounts._id": args.id}, accountsDefinition.filter)
-            .then( (users:any) => accountsDefinition.format(users[0]) );
-        } 
+        resolve: (root:any, args:any) => PersonReadResolvers.accounts(root, args, 'user')           
     },
 
     userSecurity: {
         type: securityDefinition.type,
         args:  { id: { type: GraphQLID, description: 'retrieve User Security Settings.' } },
-        resolve(root:any, args:any) {    
-            return userReadModel.find({"security._id": args.id}, securityDefinition.filter)
-            .then( (users:any) => securityDefinition.format(users[0]) );
-        } 
-
+        resolve: (root:any, args:any) => PersonReadResolvers.security(root, args, 'user')           
     },
 
     userConfiguration: {
         type: configurationDefinition.type,
         args:  { id: { type: GraphQLID, description: 'retrieve User Configuration Settings.' } },
-        resolve(root:any, args:any) {        
-             return userReadModel.find({"configuration._id": args.id}, configurationDefinition.filter)
-            .then( (users:any) => configurationDefinition.format(users[0]) );
-        } 
+        resolve: (root:any, args:any) => PersonReadResolvers.configuration(root, args, 'user')                 
     },
 
     userDevices: {
         type: devicesDefinition.type,
         args:  { id: { type: GraphQLID, description: 'retrieve User owned devices' } },
-        resolve(root:any, args:any) {        
-             return userReadModel.find({"devices._id": args.id}, devicesDefinition.filter)
-            .then( (users:any) => devicesDefinition.format(users[0]) );
-        } 
+        resolve: (root:any, args:any) => PersonReadResolvers.devices(root, args, 'user')          
     }
 };
 

@@ -51,5 +51,5 @@ export class UserReadModel extends DefaultModel  {
 
 }
 
-export const userReadModel = new UserReadModel(TUSER);
+export const userReadModel:UserReadModel = new UserReadModel(TUSER);
 

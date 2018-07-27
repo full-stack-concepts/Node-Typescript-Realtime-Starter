@@ -39,27 +39,21 @@ import {
  */
 const query = {  
 
-    systemUserFindByMail: {
+    systemUserFindById: {
         type: userDefinition.type,
-        args: { email: { type: GraphQLString, description: 'find by email' } },
-        async resolve(root:any, args:any) {                           
-            const users:any = await systemUserReadModel.find({'core.email': args.email});
-            return userDefinition.format(users[0]);
+         args: { id: { type: GraphQLID, description: 'find by Mongoose ID' } },
+         async resolve(root:any, args:any) {      
+            console.log("*** Find Ny ID ", args.id)                 
+            const user:any = await systemUserReadModel.findById(args.id);
+            console.log("*** Result ", user)
+            return userDefinition.format(user);
         }
-    }
+    },
 }
 
 export const SystemUserSchema = {
     query,  
-    types: [
-        // coreDefinition.type,
-        // profileDefinition.type,
-        // passwordDefinition.type,
-        // loginDefinition.type,
-        // accountsDefinition.type,
-        // securityDefinition.type,
-        // configurationDefinition.type,
-        // devicesDefinition.type,
+    types: [       
         userDefinition.type
     ]
 };

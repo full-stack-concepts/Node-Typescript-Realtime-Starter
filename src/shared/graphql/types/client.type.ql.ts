@@ -46,20 +46,30 @@ const query = {
             const users:any = await clientReadModel.find({'core.email': args.email});
             return userDefinition.format(users[0]);
         }
-    }
+    },
+
+    clientFindById: {
+        type: userDefinition.type,
+         args: { id: { type: GraphQLID, description: 'find by Mongoose ID' } },
+         async resolve(root:any, args:any) {                       
+            const user:any = await clientReadModel.findById(args.id);
+            return userDefinition.format(user);
+        }
+    },
+
+    clientFindByURL: {
+        type: userDefinition.type,
+        args:  { url: { type: GraphQLString, description: 'find by URL' } },
+        async resolve(root:any, args:any) {                       
+            const users:any = await clientReadModel.find({"core.url": args.url});
+            return userDefinition.format(users[0]);
+        }
+    },
 }
 
 export const ClientSchema = {
     query,  
-    types: [
-        // coreDefinition.type,
-        // profileDefinition.type,
-        // passwordDefinition.type,
-        // loginDefinition.type,
-        // accountsDefinition.type,
-        // securityDefinition.type,
-        // configurationDefinition.type,
-        // devicesDefinition.type,
+    types: [       
         userDefinition.type
     ]
 };
