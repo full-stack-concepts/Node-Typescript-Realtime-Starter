@@ -45,6 +45,20 @@ import {
  */
 const query = {  
 
+    usersAll: {
+        type: new GraphQLList(userDefinition.type),
+        resolve: () => PersonReadResolvers.findAll('user')
+    },
+
+    usersSelection: {
+        type: new GraphQLList(userDefinition.type),
+        args: { 
+            skip: { type: GraphQLInt, description: 'Method on a cursor to control where MongoDB begins returning results. This approach may be useful in implementing paginated results.' },      
+            limit:  { type: GraphQLInt, description: 'Method on a cursor to specify the maximum number of documents the cursor will return. limit() is analogous to the LIMIT statement in a SQL database.'} 
+        },
+        resolve: (root:any, args:any) => PersonReadResolvers.getRange(root, args, 'user')  
+    },       
+
     userFindByMail: {
         type: userDefinition.type,
         args: { email: { type: GraphQLString, description: 'find by email' } },      
@@ -109,7 +123,11 @@ const query = {
         type: devicesDefinition.type,
         args:  { id: { type: GraphQLID, description: 'retrieve User owned devices' } },
         resolve: (root:any, args:any) => PersonReadResolvers.devices(root, args, 'user')          
-    }
+    },
+
+
+
+
 };
 
 export const UserSchema = {

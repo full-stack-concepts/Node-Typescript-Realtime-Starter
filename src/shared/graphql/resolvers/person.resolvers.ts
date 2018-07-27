@@ -49,6 +49,28 @@ const formatOutput = (subtype:string, result:any) => {
 export const PersonReadResolvers =  {
 
 	/***
+	 * Query person subtype collection for all documents
+	 */
+	findAll: async (subtype:string) =>  {   
+		const _persons:any = await getModel(subtype).find({});	
+		let persons:any=[];
+		_persons.forEach( (person:IUser|IClient|ICustomer|ISystemUser) => {	persons.push(formatOutput(subtype, person)); });		
+		return persons;
+	},
+
+	/***
+	 * Query person subtype collection for rangge [skip, limit]
+	 */
+	getRange: async (root:any, args:any, subtype:string) => {	
+
+		let persons:any=[];
+		const _persons:any = await getModel(subtype).getRange({}, {}, {skip:args.skip, limit:args.limit} )	
+		_persons.forEach( (person:IUser|IClient|ICustomer|ISystemUser) => {	persons.push(formatOutput(subtype, person)); });	
+		return persons;
+	},
+
+	
+	/***
 	 * Query Person subtype collection to find user by mail address
 	 */
 	findByMail: async (root:any, args:any, subtype:string) =>  {        

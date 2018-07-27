@@ -47,6 +47,17 @@ export class ModelMethods {
 		})
 	}
 
+	public getRange ( query:Object={}, fields:Object={}, options:Object={} ):Promise<any> {
+		const repo = this.repo;
+		return new Promise ( (resolve, reject) => {
+			repo.find( query, fields, options, (err:Error, res:any) => {			
+				if(err) { reject(err);} 
+				else if(!res) {  resolve(); } 
+				else {  resolve(res); }
+			});		
+		});
+	}
+
 
 	public find (query:Object, fields:Object={}, options:Object={} ):Promise<any> {
 		const repo = this.repo;
