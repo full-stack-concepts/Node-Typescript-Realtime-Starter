@@ -10,7 +10,8 @@ import {
 	configurationDefinition,
 	devicesDefinition,
 	clientDefinition,
-	customerDefinition
+	customerDefinition,
+	systemUserDefinition
 } from "../types/person.types";
 
 import { 
@@ -39,6 +40,7 @@ const formatOutput = (subtype:string, result:any) => {
 		case 'user': output = userDefinition.format(result); break;
 		case 'client': output = clientDefinition.format(result); break;
 		case 'customer': output = customerDefinition.format(result); break;
+		case 'systemuser': output = systemUserDefinition.format(result); break;
 	}
 	return output;
 }
