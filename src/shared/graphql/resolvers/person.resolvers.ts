@@ -8,7 +8,8 @@ import {
 	accountsDefinition,
 	securityDefinition,
 	configurationDefinition,
-	devicesDefinition
+	devicesDefinition,
+	clientDefinition
 } from "../types/person.types";
 
 import { 
@@ -31,15 +32,28 @@ const getModel = (subtype:string) => {
 	return model;
 }
 
+const formatOutput = (subtype:string, result:any) => {
+	let output:any;
+	switch (subtype) {
+		case 'user': output = userDefinition.format(result); break;
+		case 'client': output = clientDefinition.format(result); break;
+	}
+	return output;
+}
+
 export const PersonReadResolvers =  {
 
 	/***
 	 * Query Person subtype collection to find user by mail address
 	 */
 	findByMail: async (root:any, args:any, subtype:string) =>  {        
+		console.log("**** Incoming Subtype ", subtype, args)
 		const model:UserReadModel | ClientReadModel | CustomerReadModel | SystemUserReadModel = getModel(subtype);                   
         const persons:IUser[]|IClient[]|ICustomer[]|ISystemUser[] = await model.find({'core.email': args.email});
-        return userDefinition.format(persons[0]);
+        // console.log("*** result ", persons)
+        console.log("***", userDefinition.format(persons[0]))
+
+        return formatOutput(subtype, persons[0]);
     },
 
     /***
@@ -47,7 +61,7 @@ export const PersonReadResolvers =  {
 	 */
     findById: async (root:any, args:any, subtype:string) => {            	
    		const person:IUser|IClient|ICustomer|ISystemUser = await getModel(subtype).findById(args.id);
-        return userDefinition.format(person);
+   		return formatOutput(subtype, person);
     },
 
     /***
@@ -55,7 +69,7 @@ export const PersonReadResolvers =  {
 	 */
     findByURL: async (root:any, args:any, subtype:string) => {            	
 		const persons:IUser[]|IClient[]|ICustomer[]|ISystemUser[] = await getModel(subtype).find({"core.url": args.url});
-        return userDefinition.format(persons[0]);
+      	return formatOutput(subtype, persons[0]);
     },
 
     /***
@@ -65,7 +79,6 @@ export const PersonReadResolvers =  {
     	const persons:IUser[]|IClient[]|ICustomer[]|ISystemUser[] = await getModel(subtype).find({"core._id": args.id}, coreDefinition.filter);   
     	return coreDefinition.format(persons[0]);
     },
-
 
     /***
 	 * Query Person subtype collection to find user <profile> by its Mongoose ID section
