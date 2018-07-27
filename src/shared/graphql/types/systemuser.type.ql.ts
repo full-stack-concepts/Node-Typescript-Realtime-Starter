@@ -32,13 +32,7 @@ import {
 /***
  *
  */
-const query = {  
-
-    systemUserFindByMail: {
-        type: systemUserDefinition.type,
-        args: { email: { type: GraphQLString, description: 'find by email' } },      
-        resolve: (root:any, args:any) => PersonReadResolvers.findByMail(root, args, 'systemuser')       
-    },
+const query = {    
 
     systemUserFindById: {
         type: systemUserDefinition.type,

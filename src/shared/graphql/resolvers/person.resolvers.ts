@@ -24,6 +24,7 @@ import {
 import { IUser, IClient, ICustomer, ISystemUser} from "../../interfaces";
 
 const getModel = (subtype:string) => {
+	console.log("*** Incoming subtype ", subtype)
 	let model:any;
 	switch(subtype) {
 		case 'user': model = userReadModel; break;
