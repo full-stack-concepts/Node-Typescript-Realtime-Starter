@@ -9,7 +9,8 @@ import {
 	securityDefinition,
 	configurationDefinition,
 	devicesDefinition,
-	clientDefinition
+	clientDefinition,
+	customerDefinition
 } from "../types/person.types";
 
 import { 
@@ -37,6 +38,7 @@ const formatOutput = (subtype:string, result:any) => {
 	switch (subtype) {
 		case 'user': output = userDefinition.format(result); break;
 		case 'client': output = clientDefinition.format(result); break;
+		case 'customer': output = customerDefinition.format(result); break;
 	}
 	return output;
 }

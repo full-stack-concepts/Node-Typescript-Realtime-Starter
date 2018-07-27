@@ -486,8 +486,59 @@ export const clientDefinition:ITypeDefinition = {
 	},
 	
 	type:  new GraphQLObjectType({
-   		name: 'UserType',
+   		name: 'clientType',
     	description: 'User Read Query',
+    	fields: () => (defaultClientFields)
+	})
+};
+
+/****
+ *
+ */
+const defaultCustomerFields = {
+    id:             		{ type: GraphQLID },
+    displayName:    		{ type: GraphQLString, description: 'Display Name' },
+    role:           		{ type: GraphQLInt, description: 'Assigned Role' },
+    email:          		{ type: GraphQLString, description: 'Email Address' },     
+    url:            		{ type: GraphQLString, description: 'Public Identifier' },
+    identifier:     		{ type: GraphQLString, description: 'Infrastructure Identifier' },     
+    personalia:     		{ type: PersonaliaType},
+    coreSectionID:      	{ type: GraphQLID },
+    passwordSectionID:		{ type: GraphQLID },   
+    accountsSectionID:		{ type: GraphQLID },
+    securitySectionID:		{ type: GraphQLID },
+    configurationSectionID:	{ type: GraphQLID },
+    profileSectionID:   	{ type: GraphQLID },
+   	devicesSectionID:		{ type: GraphQLID },
+};
+
+
+export const customerDefinition:ITypeDefinition = {
+
+	filter: {},
+	
+	format: (obj:any) => {
+		return {
+	        id: obj._id,                                      
+	        role: obj.core.role,
+	        email: obj.core.email,
+	        url: obj.core.url,
+	        identifier: obj.core.identifier,
+	        personalia: obj.profile.personalia,
+	        displayName: obj.profile.displayNames.fullName,
+	        coreSectionID: obj.core.id,
+	        passwordSectionID: obj.password.id,	       
+    		accountsSectionID:	obj.accounts.id,
+    		securitySectionID:	obj.security.id,
+    		configurationSectionID:	obj.configuration.id,
+	        profileSectionID: obj.profile.id,
+	        devicesSectionID: obj.devices.id
+	    };    
+	},
+	
+	type:  new GraphQLObjectType({
+   		name: 'CustomerType',
+    	description: 'Customer Read Query',
     	fields: () => (defaultUserFields)
 	})
 };

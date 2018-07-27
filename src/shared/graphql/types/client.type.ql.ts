@@ -12,10 +12,6 @@ import {
     GraphQLBoolean 
 } from 'graphql';
 
-/***
- * DB Model
- */
-import { clientReadModel } from "../../models";
 
 /****
  * Type Definitions
@@ -31,7 +27,6 @@ import {
     devicesDefinition,
     userDefinition,
     clientDefinition
-
 } from "./person.types";
 
 import {
@@ -45,19 +40,19 @@ import {
 const query = {  
 
     clientFindByMail: {
-        type: userDefinition.type,
+        type: clientDefinition.type,
         args: { email: { type: GraphQLString, description: 'find by email' } },      
         resolve: (root:any, args:any) => PersonReadResolvers.findByMail(root, args, 'client')       
     },
 
     clientFindById: {
-        type: userDefinition.type,
+        type: clientDefinition.type,
         args: { id: { type: GraphQLID, description: 'find by Mongoose ID' } },
         resolve: (root:any, args:any) => PersonReadResolvers.findById(root, args, 'client')               
     },
 
     clientFindByURL: {
-        type: userDefinition.type,
+        type: clientDefinition.type,
         args:  { url: { type: GraphQLString, description: 'find by URL' } },
         resolve: (root:any, args:any) => PersonReadResolvers.findByURL(root, args, 'client')             
     },    
@@ -109,6 +104,6 @@ const query = {
 export const ClientSchema = {
     query,  
     types: [       
-        userDefinition.type
+        clientDefinition.type
     ]
 };

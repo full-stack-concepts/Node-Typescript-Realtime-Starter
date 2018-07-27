@@ -12,10 +12,6 @@ import {
     GraphQLBoolean 
 } from 'graphql';
 
-/***
- * DB Model
- */
-import { customerReadModel } from "../../models";
 
 /****
  * Type Definitions
@@ -30,48 +26,84 @@ import {
     configurationDefinition,
     devicesDefinition,
     userDefinition,
-    PersonaliaType,
-
+    customerDefinition
 } from "./person.types";
 
+import {
+    PersonReadResolvers,
+    PersonWriteResolvers
+} from "../resolvers";
 
 /***
  *
  */
 const query = {  
 
-    customerFindByMail: {
-        type: userDefinition.type,
-        args: { email: { type: GraphQLString, description: 'find by email' } },
-        async resolve(root:any, args:any) {                           
-            const users:any = await customerReadModel.find({'core.email': args.email});
-            return userDefinition.format(users[0]);
-        }
+   customerFindByMail: {
+        type: customerDefinition.type,
+        args: { email: { type: GraphQLString, description: 'find by email' } },      
+        resolve: (root:any, args:any) => PersonReadResolvers.findByMail(root, args, 'customer')       
     },
 
     customerFindById: {
-        type: userDefinition.type,
-         args: { id: { type: GraphQLID, description: 'find by Mongoose ID' } },
-         async resolve(root:any, args:any) {                       
-            const user:any = await customerReadModel.findById(args.id);
-            return userDefinition.format(user);
-        }
+        type: customerDefinition.type,
+        args: { id: { type: GraphQLID, description: 'find by Mongoose ID' } },
+        resolve: (root:any, args:any) => PersonReadResolvers.findById(root, args, 'customer')               
     },
 
     customerFindByURL: {
-        type: userDefinition.type,
+        type: customerDefinition.type,
         args:  { url: { type: GraphQLString, description: 'find by URL' } },
-        async resolve(root:any, args:any) {                       
-            const users:any = await customerReadModel.find({"core.url": args.url});
-            return userDefinition.format(users[0]);
-        }
+        resolve: (root:any, args:any) => PersonReadResolvers.findByURL(root, args, 'customer')             
+    },    
+
+    customerCoreDetails: {
+        type: coreDefinition.type,
+        args: { id: { type: GraphQLID, description: 'find Customer Core Object by its ID' } },
+        resolve: (root:any, args:any) => PersonReadResolvers.coreDetails(root, args, 'customer')     
     },
+
+    customerProfile: {
+        type: profileDefinition.type,
+        args: { id: { type: GraphQLID, description: 'find Customer Profile Object by its ID' } },
+        resolve: (root:any, args:any) => PersonReadResolvers.profile(root, args, 'customer')            
+    },
+
+    customerPassword: {
+        type: passwordDefinition.type,
+        args: { id: { type: GraphQLID, description: 'find Customer Password Object by its ID' } },
+        resolve: (root:any, args:any) => PersonReadResolvers.password(root, args, 'customer')                
+    },
+
+    customerAccounts: {
+        type: accountsDefinition.type,
+        args:  { id: { type: GraphQLID, description: 'find customer logon accounts: Google, Facebook or LocalID' } },
+        resolve: (root:any, args:any) => PersonReadResolvers.accounts(root, args, 'customer')           
+    },
+
+    customerSecurity: {
+        type: securityDefinition.type,
+        args:  { id: { type: GraphQLID, description: 'retrieve Customer Security Settings.' } },
+        resolve: (root:any, args:any) => PersonReadResolvers.security(root, args, 'customer')           
+    },
+
+    customerConfiguration: {
+        type: configurationDefinition.type,
+        args:  { id: { type: GraphQLID, description: 'retrieve Customer Configuration Settings.' } },
+        resolve: (root:any, args:any) => PersonReadResolvers.configuration(root, args, 'customer')                 
+    },
+
+    customerDevices: {
+        type: devicesDefinition.type,
+        args:  { id: { type: GraphQLID, description: 'retrieve Customer owned devices' } },
+        resolve: (root:any, args:any) => PersonReadResolvers.devices(root, args, 'customer')          
+    }
 }
 
 export const CustomerSchema = {
     query,  
     types: [        
-        userDefinition.type
+        customerDefinition.type
     ]
 };
 
