@@ -21,4 +21,6 @@ export interface IRead<T> {
      * Finds document
      */
     find( query: Object, fields?: Object, options?: Object, callback?: (err: any, res: T[]) => void): mongoose.Query<T[]>;
+
+    count( query: Object, options?: Object, callback?: (err: any, res: T[]) => void): mongoose.Query<T[]>;
 }

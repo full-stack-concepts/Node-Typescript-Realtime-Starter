@@ -439,6 +439,10 @@ export 	class ReadWriteRepositoryBase<T extends mongoose.Document>
         this._model.find({}, callback);
     } 
 
+    count(query: Object, options:Object={}, callback: (err: any, res: T[]) => void): any {
+        this._model.count({}, callback);       
+    }   
+
     /***
      * Mongoose Bulk operations
      */

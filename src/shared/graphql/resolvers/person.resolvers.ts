@@ -59,7 +59,7 @@ export const PersonReadResolvers =  {
 	},
 
 	/***
-	 * Query person subtype collection for rangge [skip, limit]
+	 * Query person subtype collection for range [skip, limit]
 	 */
 	getRange: async (root:any, args:any, subtype:string) => {	
 
@@ -69,17 +69,20 @@ export const PersonReadResolvers =  {
 		return persons;
 	},
 
+	/***
+	 * Count documents in person subtype collection 
+	 */
+	count: async (subtype:string) => {			
+		const count:number = await getModel(subtype).count();	
+		return { count };
+	},
 	
 	/***
 	 * Query Person subtype collection to find user by mail address
 	 */
-	findByMail: async (root:any, args:any, subtype:string) =>  {        
-		console.log("**** Incoming Subtype ", subtype, args)
+	findByMail: async (root:any, args:any, subtype:string) =>  {        		
 		const model:UserReadModel | ClientReadModel | CustomerReadModel | SystemUserReadModel = getModel(subtype);                   
         const persons:IUser[]|IClient[]|ICustomer[]|ISystemUser[] = await model.find({'core.email': args.email});
-        // console.log("*** result ", persons)
-        console.log("***", userDefinition.format(persons[0]))
-
         return formatOutput(subtype, persons[0]);
     },
 

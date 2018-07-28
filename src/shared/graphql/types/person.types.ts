@@ -23,6 +23,14 @@ interface ITypeDefinition {
 	type: any
 }
 
+export const CounterType = new GraphQLObjectType({
+	name: "CounterType",
+    description: "Counts documents per collection",   
+    fields: {
+    	count: { type:GraphQLInt}
+    }
+})
+
 export const coreDefinition:ITypeDefinition = {
 
 	filter: {

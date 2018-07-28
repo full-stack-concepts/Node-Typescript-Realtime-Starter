@@ -25,8 +25,8 @@ import {
     securityDefinition,
     configurationDefinition,
     devicesDefinition,
-    userDefinition,
-    clientDefinition
+    clientDefinition,
+    CounterType
 } from "./person.types";
 
 import {
@@ -38,6 +38,26 @@ import {
  *
  */
 const query = {  
+
+    clientsAll: {
+        type: new GraphQLList(clientDefinition.type),
+        resolve: () => PersonReadResolvers.findAll('client')
+    },
+
+    clientsSelection: {
+        type: new GraphQLList(clientDefinition.type),
+        args: { 
+            skip: { type: GraphQLInt, description: 'Method on a cursor to control where MongoDB begins returning results. This approach may be useful in implementing paginated results.' },      
+            limit:  { type: GraphQLInt, description: 'Method on a cursor to specify the maximum number of documents the cursor will return. limit() is analogous to the LIMIT statement in a SQL database.'} 
+        },
+        resolve: (root:any, args:any) => PersonReadResolvers.getRange(root, args, 'user')  
+    },   
+
+    clientsCount: {
+        type: CounterType,
+        args: { },      
+        resolve: () => PersonReadResolvers.count('client')
+    }, 
 
     clientFindByMail: {
         type: clientDefinition.type,

@@ -58,6 +58,17 @@ export class ModelMethods {
 		});
 	}
 
+	public count ( query:Object={}, options:Object={} ):Promise<any> {
+		const repo = this.repo;
+		return new Promise ( (resolve, reject) => {
+			repo.count( query, options, (err:Error, result:any) => {			
+				console.log(err, result)
+				if(err) { reject(err);} 			
+				else {  resolve(result); }
+			});		
+		});
+	}
+
 
 	public find (query:Object, fields:Object={}, options:Object={} ):Promise<any> {
 		const repo = this.repo;

@@ -393,6 +393,10 @@ export 	class ReadRepositoryBase<T extends mongoose.Document>
 
     find(query: Object, fields:Object={}, options:Object={}, callback: (err: any, res: T[]) => void): any {
         this.cache(query, fields, options, this._model.find, callback);        
+    } 
+
+    count(query: Object, options:Object={}, callback: (err: any, res: T[]) => void): any {
+        this._model.count({}, callback);       
     }     
     
 }

@@ -32,6 +32,7 @@ import {
     devicesDefinition,
     userDefinition,
     PersonaliaType,
+    CounterType
 
 } from "./person.types";
 
@@ -57,7 +58,13 @@ const query = {
             limit:  { type: GraphQLInt, description: 'Method on a cursor to specify the maximum number of documents the cursor will return. limit() is analogous to the LIMIT statement in a SQL database.'} 
         },
         resolve: (root:any, args:any) => PersonReadResolvers.getRange(root, args, 'user')  
-    },       
+    },     
+
+    usersCount: {
+        type: CounterType,
+        args: { },      
+        resolve: () => PersonReadResolvers.count('user')
+    },
 
     userFindByMail: {
         type: userDefinition.type,
