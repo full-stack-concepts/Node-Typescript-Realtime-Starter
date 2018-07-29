@@ -167,7 +167,3 @@ export const PersonReadResolvers =  {
  	}   
 }
 
-export const PersonWriteResolvers =  {
-
-	
-}

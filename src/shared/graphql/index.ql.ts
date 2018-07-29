@@ -11,8 +11,9 @@ import { CustomerSchema} from "./types/customer.type.ql";
 import { SystemUserSchema} from "./types/systemuser.type.ql";
 
 export const graphqlSchema = new GraphQLSchema({
+
     query: new GraphQLObjectType({
-        name: 'UserTypeQueries',
+        name: "Query",
         fields: () => Object.assign(
             UserSchema.query,
             ClientSchema.query,
@@ -20,11 +21,23 @@ export const graphqlSchema = new GraphQLSchema({
             SystemUserSchema.query
         )
     }),  
+
+    mutation: new GraphQLObjectType({
+        name: "Mutation",
+        fields: () => Object.assign(
+            UserSchema.mutation,
+            ClientSchema.mutation,
+            CustomerSchema.mutation
+        )
+    }),
    
     // subscription: new GraphQLObjectType({
     //     name: 'Subscription',
     //     fields: () => Object.assign(
-    //         UserSchema.subscription,        
+    //      UserSchema.subscription,        
+    //      ClientSchema.subscription,
+    //      CustomerSchema.subscription,
+    //      SsytemUserScheam.subscription    
     //     )
     // }),
     types: [       

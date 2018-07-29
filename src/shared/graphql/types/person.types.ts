@@ -29,7 +29,28 @@ export const CounterType = new GraphQLObjectType({
     fields: {
     	count: { type:GraphQLInt}
     }
-})
+});
+
+export const NewUserType = new GraphQLObjectType({
+	name: "NewUserType",
+	description: "Interface for New User, Client or Customer",
+	fields: () => ({
+		
+		// form fields
+		firstName: { type:GraphQLString, description: "First Name"},
+		middleName: { type:GraphQLString, description: "Middle Name"},
+		lastName: { type:GraphQLString, description: "Last Name"},
+		email: { type:GraphQLString, description: "Valid email address" },
+		password: {	type: GraphQLString,  description: "Password string" },
+		confirmPassword: {	type: GraphQLString,  description: "Confirm Password string" },
+		
+		// response fields
+		error:  { type: GraphQLBoolean, description: "Error Status"},
+		status:  { type: GraphQLBoolean, description: "Mutation Status"},
+		message: { type:GraphQLString, description: "Error String "},
+		errorID:  { type:GraphQLInt, description: "Event Error ID"},
+	})
+});
 
 export const coreDefinition:ITypeDefinition = {
 

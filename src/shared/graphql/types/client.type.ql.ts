@@ -26,12 +26,13 @@ import {
     configurationDefinition,
     devicesDefinition,
     clientDefinition,
-    CounterType
+    CounterType,
+    NewUserType
 } from "./person.types";
 
 import {
     PersonReadResolvers,
-    PersonWriteResolvers
+    PersonMutationResolvers
 } from "../resolvers";
 
 /***
@@ -118,11 +119,28 @@ const query = {
         args:  { id: { type: GraphQLID, description: 'retrieve User owned devices' } },
         resolve: (root:any, args:any) => PersonReadResolvers.devices(root, args, 'client')          
     }
+}
 
+/***
+ *
+ */
+const mutation = {
+    CreateNewClient: {
+        type: NewUserType,
+        args: {
+            firstName: { type: new GraphQLNonNull(GraphQLString) },
+            middleName:  { type: GraphQLString },
+            lastName: { type: new GraphQLNonNull(GraphQLString) },
+            email: { type: new GraphQLNonNull(GraphQLString) },
+            password: {type: new GraphQLNonNull(GraphQLString) },
+            confirmPassword: { type: GraphQLString }
+        },
+        resolve: (root:any, args:any, context:any) => PersonMutationResolvers.addPerson(root, args, context, 'client')         }
 }
 
 export const ClientSchema = {
     query,  
+    mutation,
     types: [       
         clientDefinition.type
     ]

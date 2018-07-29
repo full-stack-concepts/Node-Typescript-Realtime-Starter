@@ -516,9 +516,7 @@ export class UserOperations extends PersonProfile {
 
 		// process thick: return to caller
 		.then ( (client:IClient) => Promise.resolve(client) )	
-		.catch( (err:Error) => {		
-			Promise.reject(err) 
-		});		 
+		.catch( (err) => Promise.reject(err) );		 
 	}		
 
 	/*****
@@ -583,9 +581,7 @@ export class UserOperations extends PersonProfile {
 
 		// process thick: return to caller
 		.then ( (customer:ICustomer) => Promise.resolve(customer) )	
-		.catch( (err:Error) => {		
-			Promise.reject(err) 
-		});		 
+		.catch( (err:Error) => Promise.reject(err) );		 
 	}		
 
 	/*****	
@@ -654,9 +650,7 @@ export class UserOperations extends PersonProfile {
 
 		// process thick: return to caller
 		.then ( (user:IUser) => Promise.resolve(user) )	
-		.catch( (err:Error) => {		
-			Promise.reject(err) 
-		});		 
+		.catch( (err:Error) => Promise.reject(err) );		 
 	}	
 
 	/****
@@ -841,7 +835,7 @@ export class UserOperations extends PersonProfile {
 
 			return model.createUser(user)
 			.then( (res:any) => { return Promise.resolve(res) })
-			.catch( (err:Error) => Promise.reject(1170));				
+			.catch( (err:Error) => Promise.reject(11170));	
 		}	
 
 		/***
@@ -850,7 +844,7 @@ export class UserOperations extends PersonProfile {
 		if(hostType === 2) {			
 			return model.remoteCreateUser( user, collection)
 			.then( (res:any) => { return Promise.resolve(user); })
-			.catch( (err:Error) => Promise.reject(1171) );					
+			.catch( (err:Error) => Promise.reject(11171) );					
 		}
 	}	
 

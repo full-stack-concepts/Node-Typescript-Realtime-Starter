@@ -9,6 +9,7 @@ import {
 	FormValidation
 } from "../../util";
 
+import { errorController } from "../../controllers";
 import { UserOperations } from "./user.ops.service";
 import { IUser, IClient, ICustomer, IClientApplication, ILoginRequest, IEncryption, ILoginTracker, IFindUser, IDeleteUser } from "../../shared/interfaces";
 import { TCLIENT } from "../../shared/types";
@@ -162,8 +163,11 @@ export class ClientService extends UserOperations {
 		// process thick: return to caller so webtoken can be created
 		.then( ( token:string) => Promise.resolve(token) ) 
 
-		.catch( (err:Error) => {		
-			Promise.reject(err);
+		.catch( (err:any) => {				
+			let errorID:number;
+			if(!Number.isInteger(err)) { errorID=11000;} else {errorID=err; }
+			errorController.log(errorID, err);
+			return Promise.reject({errorID, message: errorController.getMessage(errorID)});
 		});	
 	}
 

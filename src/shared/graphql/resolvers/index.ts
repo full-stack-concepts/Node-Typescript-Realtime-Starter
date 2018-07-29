@@ -1,4 +1,7 @@
 export {
-	PersonReadResolvers,
-	PersonWriteResolvers
-} from "./person.resolvers";
+	PersonReadResolvers	
+} from "./person.read.resolvers";
+
+export {
+	PersonMutationResolvers
+} from "./person.mutation.resolvers";

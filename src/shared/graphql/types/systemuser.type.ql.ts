@@ -26,7 +26,7 @@ import {
 
 import {
     PersonReadResolvers,
-    PersonWriteResolvers
+    PersonMutationResolvers
 } from "../resolvers";
 
 /***

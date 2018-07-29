@@ -30,6 +30,10 @@ import {
 	customerModel
 } from "../../shared/models";
 
+import {
+	errorController
+} from "../../controllers";
+
 export class CustomerService extends UserOperations {
 
 	constructor() {
@@ -195,7 +199,12 @@ export class CustomerService extends UserOperations {
 		// process thick: return to caller so webtoken can be created
 		.then( ( token:string) => Promise.resolve(token) ) 
 
-		.catch( (err:Error) => Promise.reject(err) );	
+		.catch( (err:any) => {				
+			let errorID:number;
+			if(!Number.isInteger(err)) { errorID=11000;} else {errorID=err; }
+			errorController.log(errorID, err);
+			return Promise.reject({errorID, message: errorController.getMessage(errorID)});
+		});	
 	}
 
 	/***

@@ -44,6 +44,13 @@
 	],
 
 	"user": [
+
+		{
+			"action": "generic-user-error", 
+			"provider": "User Opertion Service",
+			"number": 11000, 
+			"msg": null
+		},
 				
 		{
 			"action": "authentication", 

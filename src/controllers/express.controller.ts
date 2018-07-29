@@ -103,11 +103,12 @@ class ExpressController {
          */
         this.express.use('/ql',
             cors(),   
-            graphQLHTTP(request => {
+            graphQLHTTP( (request:Request, response:Response) => {
                 const startTime = Date.now();
                 return {
                     schema: graphqlSchema,
                     graphiql: true,
+                    context: { request, response },
                     extensions({ document, variables, operationName, result }) {
                         return { runTime: Date.now() - startTime };
                     }
@@ -125,13 +126,6 @@ class ExpressController {
                 response.send(printSchema(graphqlSchema));
             }
         );
-        */
-
-        /*
-        this.express.use("/ql", graphQLHTTP({           
-            graphiql:true,
-            qlSchema    
-        }));
         */
 
         /**

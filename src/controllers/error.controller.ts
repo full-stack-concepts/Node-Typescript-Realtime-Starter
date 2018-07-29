@@ -105,13 +105,16 @@ export class ErrorController {
 
 	/***
 	 * @errorID: number
-	 * @err: Object
+	 * @err: Object || any
 	 */
-	public log(errorID:number, err:Error) {				
+	public log(errorID:number, err:any) {			
 
-		let types:DefinitionsReadOnly = this.getRange(errorID);				
-		let pos:number = types.findIndex( (type:ErrorDefinition) => type.number === errorID );		
-		let def:ErrorDefinition = types.splice(pos,1)[0];	
+		if(!err || Number.isInteger(err)) err = {};
+
+		console.log(errorID, err)	
+
+		let types:DefinitionsReadOnly = this.getRange(errorID);			
+		let def:ErrorDefinition = types.find( (type:ErrorDefinition) => type.number === errorID );
 
 		// repair error type if necessary
 		if(!err.hasOwnProperty("message")) err.message="";
@@ -121,7 +124,7 @@ export class ErrorController {
 		def.errorType = this.analyseErrorType(err);	
 
 		// format error massage and stack property
-		def.msg = `${def.msg}: ${err.message}`;
+		// def.msg = `${def.msg}: ${err.message}`;
 		def.stack = JSON.stringify(err.stack);		
 
 		// log locally only
@@ -134,6 +137,13 @@ export class ErrorController {
 			ErrorLogger.info(def);
 		}	
 	}	
+
+	public getMessage(errorID:number) {			
+		let types:DefinitionsReadOnly = this.getRange(errorID);					
+		let def:ErrorDefinition = types.find( (type:ErrorDefinition) => type.number === errorID );		
+		return def.msg;
+	}
+
 }
 
 export const errorController:ErrorController = new ErrorController();

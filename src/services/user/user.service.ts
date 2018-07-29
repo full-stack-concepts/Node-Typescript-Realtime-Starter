@@ -15,6 +15,8 @@ const join = Promise.join;
 Promise.promisifyAll(fs);
 Promise.promisifyAll(fileType);
 
+import {errorController} from "../../controllers";
+
 /***
  * Import Actions
  */
@@ -130,13 +132,14 @@ export class UserService extends UserOperations {
 
 		// password confirmatoin
 		if(LOCAL_AUTH_CONFIG.requirePasswordConfirmation) {
+			if(form.confirmPassword) form.confirmPassword = form.password;
 			if(!FormValidation.testPassword(form.confirmPassword)) tests.push(6);
 			if(form.confirmPassword && form.password != form.confirmPassword) tests.push(7);
 		}	 
 
 		form.email.toLowerCase();
 		
-		const valid = tests.length;
+		const valid = tests.length;		
 
 		if(!valid ) {
 			return Promise.resolve();
@@ -193,6 +196,8 @@ export class UserService extends UserOperations {
 	 */
 	public registerUser(form:IUserApplication) {	
 
+		console.log("*** (1) Register User")
+
 		/***
 		 * Validate application Form
 		 */
@@ -222,8 +227,11 @@ export class UserService extends UserOperations {
 		// process thick: return to caller so webtoken can be created
 		.then( ( token:string) => Promise.resolve(token) ) 
 
-		.catch( (err:Error) => {		
-			Promise.reject(err);
+		.catch( (err:any) => {		
+			let errorID:number;
+			if(!Number.isInteger(err)) { errorID=11000;} else {errorID=err; }
+			errorController.log(errorID, err);
+			return Promise.reject({errorID, message: errorController.getMessage(errorID)});
 		});	
 	}
 

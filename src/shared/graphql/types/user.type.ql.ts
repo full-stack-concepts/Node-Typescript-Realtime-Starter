@@ -13,10 +13,7 @@ import {
 
 } from 'graphql';
 
-/***
- * DB Model
- */
-import { userReadModel } from "../../models";
+import { UAController } from "../../../controllers";
 
 /****
  * Type Definitions
@@ -30,16 +27,18 @@ import {
     securityDefinition,
     configurationDefinition,
     devicesDefinition,
-    userDefinition,
-    PersonaliaType,
-    CounterType
+    userDefinition,  
+    CounterType,
+    NewUserType
 
 } from "./person.types";
 
 import {
     PersonReadResolvers,
-    PersonWriteResolvers
+    PersonMutationResolvers
 } from "../resolvers";
+
+
 
 /***
  *
@@ -132,13 +131,29 @@ const query = {
         resolve: (root:any, args:any) => PersonReadResolvers.devices(root, args, 'user')          
     },
 
-
-
-
 };
+
+/***
+ *
+ */
+const mutation = {
+    CreateNewUser: {
+        type: NewUserType,
+        args: {
+            firstName: { type: new GraphQLNonNull(GraphQLString) },
+            middleName:  { type: GraphQLString },
+            lastName: { type: new GraphQLNonNull(GraphQLString) },
+            email: { type: new GraphQLNonNull(GraphQLString) },
+            password: {type: new GraphQLNonNull(GraphQLString) },
+            confirmPassword: { type: GraphQLString }
+        },
+        resolve: (root:any, args:any, context:any) => PersonMutationResolvers.addPerson(root, args, context, 'user')         }
+}
+
 
 export const UserSchema = {
     query,  
+    mutation,
     types: [
         coreDefinition.type,
         profileDefinition.type,
