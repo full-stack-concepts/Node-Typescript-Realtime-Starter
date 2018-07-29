@@ -197,7 +197,7 @@
 			"action": "insert_user", 
 			"provider": "User Operations",
 			"number": 11170, 
-			"msg": "An error occured when trying to insert a new user into the <local> database."
+			"msg": "An error occured when trying to insert a new user into the <local> database. User may already exist."
 		},
 
 		{
@@ -219,6 +219,21 @@
 			"provider": "User Operations",
 			"number": 11181, 
 			"msg": "An error occured when trying to update existing user in <remote> database."
+		},
+
+
+		{
+			"action": "delete_user", 
+			"provider": "User Operations",
+			"number": 11185, 
+			"msg": "An error occured when trying to remove an existing user from the database. Did you provide a field value that identifies the user? "
+		},
+
+		{
+			"action": "delete_user", 
+			"provider": "User Operations",
+			"number": 11186, 
+			"msg": "An error occured when trying to remove an existing user from the database: database model for this user type could not be allocated.? "
 		}	
 	],
 

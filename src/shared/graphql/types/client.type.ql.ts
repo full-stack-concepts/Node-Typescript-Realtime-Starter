@@ -27,7 +27,8 @@ import {
     devicesDefinition,
     clientDefinition,
     CounterType,
-    NewUserType
+    NewUserType,
+    DeleteUserType
 } from "./person.types";
 
 import {
@@ -125,6 +126,7 @@ const query = {
  *
  */
 const mutation = {
+
     CreateNewClient: {
         type: NewUserType,
         args: {
@@ -135,7 +137,19 @@ const mutation = {
             password: {type: new GraphQLNonNull(GraphQLString) },
             confirmPassword: { type: GraphQLString }
         },
-        resolve: (root:any, args:any, context:any) => PersonMutationResolvers.addPerson(root, args, context, 'client')         }
+        resolve: (root:any, args:any, context:any) => PersonMutationResolvers.addPerson(root, args, context, 'client')         
+    },
+
+    DeleteClient: {
+        type: DeleteUserType,
+        args: {
+            email: { type: GraphQLString },
+            url:  { type: GraphQLString },
+            identifier:  { type: GraphQLString }
+        },
+        resolve: (root:any, args:any, context:any) => 
+            PersonMutationResolvers.deletePerson(root, args, context, 'client') 
+    }
 }
 
 export const ClientSchema = {

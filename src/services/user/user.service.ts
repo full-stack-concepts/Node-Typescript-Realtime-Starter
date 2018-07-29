@@ -313,30 +313,21 @@ export class UserService extends UserOperations {
 	}
 
 	/***
-	 * Delete user By ID
+	 * Delete user By ID: request props
 	 * @emal:string
 	 * @url:string
 	 * @identifier:string
 	 */
 	public deleteSingleUser(request:IDeleteUser) {
-		
-		type key = keyof IDeleteUser;
-		let keys:string[] = Object.keys(request);
-		let ID:string;
-		let field:string;
 
-		keys.forEach( (key:any) => {			
-			if(request[key]) {
-				field = `core.${key}`;
-				ID = request[key];
-			}
-		});
-		if(!field || !ID) return Promise.reject('<errorNumber>');
-
-		return userModel.remove({ [field]:[ID]})
-		.then( () => Promise.resolve() )
-		.catch( (err:Error) => Promise.reject(err));
-
+		return this.deleteUser('user', request)
+		.then( () => Promise.resolve())
+		.catch( (err:any) => {		
+			let errorID:number;
+			if(!Number.isInteger(err)) { errorID=11000;} else {errorID=err; }
+			errorController.log(errorID, err);
+			return Promise.reject({errorID, message: errorController.getMessage(errorID)});
+		});	
 	}
 }
 

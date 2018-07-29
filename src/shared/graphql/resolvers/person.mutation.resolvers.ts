@@ -1,7 +1,10 @@
-import { REGISTER_NEW_USER, REGISTER_NEW_CLIENT, REGISTER_NEW_CUSTOMER } from "../../../controllers/actions";
+import { 
+	REGISTER_NEW_USER, REGISTER_NEW_CLIENT, REGISTER_NEW_CUSTOMER,
+	DELETE_USER, DELETE_CLIENT, DELETE_CUSTOMER
+} from "../../../controllers/actions";
 import { UAController } from "../../../controllers";
 import { proxyService } from "../../../services";
-import { IUserApplication } from "../../interfaces";
+import { IUserApplication, IDeleteUser } from "../../interfaces";
 import { STORE_WEBTOKEN_AS_COOKIE, WEBTOKEN_COOKIE, SEND_TOKEN_RESPONSE } from "../../../util/secrets";
 
 
@@ -24,8 +27,19 @@ const defineActionOnPersonAdd:Function = (subtype:string):string => {
 	return action;
 }
 
+const defineActionOnPersonDelete:Function = (subtype:string):string => {
+	let action:string;
+	switch(subtype) {
+		case 'user': action = DELETE_USER; break;
+		case 'client': action = DELETE_CLIENT; break;
+		case 'customer': action = DELETE_CUSTOMER; break;
+	}
+	return action;
+}
+
+
 /****
- *
+ *  Create Person subtype document
  */
 const addPerson = async (root:any, args:any, context:any, subtype:string):Promise<any> => {
 
@@ -59,11 +73,31 @@ const addPerson = async (root:any, args:any, context:any, subtype:string):Promis
 
 }
 
+/****
+ * Delete Person subtype document
+ */
+const deletePerson = async (root:any, args:any, context:any, subtype:string):Promise<any> => {
+
+	console.log(" => Incoming subtype ", subtype)	
+	const ACTION:string = defineActionOnPersonDelete(subtype);
+	let deleteRequest:IDeleteUser = {email:args.email, url:args.url, identifier: args.identifier}
+	let err: any;
+
+	try { await uaController[ACTION](deleteRequest); } 
+    catch(e) { err = e; }
+    finally {             
+    	console.log("FInal: ", err);
+        if(err) return { error: true, status: false, errorID: err.errorID, message: err.message };
+        if(!err) return Object.assign({}, args, { error: false, status: true});
+    }     
+}
+
 /***
  *
  */
 export const PersonMutationResolvers =  {
 
-	addPerson: addPerson
+	addPerson,
+	deletePerson
 
 }

@@ -33,7 +33,7 @@ export const CounterType = new GraphQLObjectType({
 
 export const NewUserType = new GraphQLObjectType({
 	name: "NewUserType",
-	description: "Interface for New User, Client or Customer",
+	description: "Create Person subtype User, Client or Customer.",
 	fields: () => ({
 		
 		// form fields
@@ -44,6 +44,24 @@ export const NewUserType = new GraphQLObjectType({
 		password: {	type: GraphQLString,  description: "Password string" },
 		confirmPassword: {	type: GraphQLString,  description: "Confirm Password string" },
 		
+		// response fields
+		error:  { type: GraphQLBoolean, description: "Error Status"},
+		status:  { type: GraphQLBoolean, description: "Mutation Status"},
+		message: { type:GraphQLString, description: "Error String "},
+		errorID:  { type:GraphQLInt, description: "Event Error ID"},
+	})
+});
+
+export const DeleteUserType =  new GraphQLObjectType({
+	name: "DeleteUserType",
+	description: "Delete Person subtype User, Client or Customer.",
+	fields: () => ({
+
+		// form fields
+		email:  { type: GraphQLString, description: "Person's email address"},
+    	url:  { type: GraphQLString, description: "Person's url string"},
+    	identifier: { type: GraphQLString, description: "Person's infrastructure identifier"},
+
 		// response fields
 		error:  { type: GraphQLBoolean, description: "Error Status"},
 		status:  { type: GraphQLBoolean, description: "Mutation Status"},

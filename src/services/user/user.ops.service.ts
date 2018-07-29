@@ -61,7 +61,7 @@ import {
 } from "../../util";
 
 import {
-	IPerson, IUser, ISystemUser, IClient, ICustomer, IDatabasePriority, IRawThumbnail, IEncryption, ILoginTracker
+	IPerson, IUser, ISystemUser, IClient, ICustomer, IDatabasePriority, IRawThumbnail, IEncryption, ILoginTracker, IDeleteUser
 } from "../../shared/interfaces"; 
 
 import {
@@ -87,6 +87,10 @@ import {
 	DATA_CREATE_USER_TYPE,
 	DATA_FORMAT_USER_SUBTYPE	
 } from "../../controllers/actions";
+
+import {
+	errorController
+} from "../../controllers";
 
 export class UserOperations extends PersonProfile {
 
@@ -801,6 +805,53 @@ export class UserOperations extends PersonProfile {
 			.then(  (user:IUser) => { return Promise.resolve(user); })
 			.catch( (err:Error)    => { return Promise.reject(err); });
 		}
+	}
+
+	protected _initSequence():Promise<any> {
+   		return Promise.resolve();
+    }  
+
+	/***
+	 * Delete User (called by child class Person subtype)
+	 */
+	protected deleteUser(userType: string, request:IDeleteUser) {
+
+		/****
+		 * Find Model Setting for this User Type
+		 */	
+		const setting:IModelSetting = this._getWriteModel(userType);	
+
+		/****
+		 * Define user subtype model
+		 */
+		const model:any = setting.model;		
+
+		/****
+		 * Test if a user identifier was provided (email/url/UUID)
+		 */
+		type key = keyof IDeleteUser;
+		let keys:string[] = Object.keys(request);
+		let ID:string;
+		let field:string;
+
+		keys.forEach( (key:any) => {			
+			if(request[key]) {
+				field = `core.${key}`;
+				ID = request[key];
+			}
+		});			
+
+		return this._initSequence()
+		.then( () => {
+			let errorID:number;
+			if(!field || !ID) errorID = 11185; 
+			if(!model) errorID = 11186;
+			if(errorID) { return Promise.reject(errorID);}
+			else { return Promise.resolve(); }		
+		})
+		.then( () => model.remove({ [field]:[ID]}) )
+		.then( () => Promise.resolve() )
+		.catch( (err:any) => Promise.reject(err) );
 	}
 
 	/***
