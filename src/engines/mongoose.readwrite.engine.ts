@@ -138,6 +138,8 @@ export 	class ReadWriteRepositoryBase<T extends mongoose.Document>
         callback?:any
     ) {
 
+          console.log("**** fields ", fields)      
+
         let result:Document|Document[]; 
         let err:Error;
 
@@ -154,6 +156,8 @@ export 	class ReadWriteRepositoryBase<T extends mongoose.Document>
             const { isReadByIdFunction, 
                     args, 
                     searchID }:any = this.constructArgs(condition, fields, options);
+
+            console.log( " IS ReadByID Function ", condition, isReadByIdFunction, args)
 
             if(!isReadByIdFunction) {
                 result = await exec.apply( this._model, args); 
@@ -423,8 +427,8 @@ export 	class ReadWriteRepositoryBase<T extends mongoose.Document>
      /***
      * Mongoose Read Operations
      */
-    findById(_id: string, callback: (error: any, result: T) => void) {
-        this.cache(_id, null, null, this._model.findById, callback);    
+    findById(_id: string, fields:Object, callback: (error: any, result: T) => void) {
+        this.cache(_id, fields, null, this._model.findById, callback);    
     }
 
     findOne(query:Object, callback?: (err: any, res: T) => void): any {
@@ -434,7 +438,7 @@ export 	class ReadWriteRepositoryBase<T extends mongoose.Document>
     find(query?: Object, fields?:Object, options?:Object, callback?: (err: any, res: T[]) => void): any {
         this.cache(query, fields, options, this._model.find, callback);        
     }  
-
+    
     retrieve( callback: (error: any, result: T) => void) {
         this._model.find({}, callback);
     } 

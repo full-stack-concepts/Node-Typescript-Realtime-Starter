@@ -28,7 +28,8 @@ import {
     clientDefinition,
     CounterType,
     NewUserType,
-    DeleteUserType
+    DeleteUserType,
+    ChangePasswordType
 } from "./person.types";
 
 import {
@@ -149,6 +150,18 @@ const mutation = {
         },
         resolve: (root:any, args:any, context:any) => 
             PersonMutationResolvers.deletePerson(root, args, context, 'client') 
+    },
+
+
+    ChangeClientPassword: {
+        type: ChangePasswordType,
+        args: {
+            id:  { type: GraphQLID },          
+            oldPassword: { type: new GraphQLNonNull(GraphQLString) },
+            password:  { type: new GraphQLNonNull(GraphQLString) },
+            confirmPassword:  { type: new GraphQLNonNull(GraphQLString) },
+        },
+        resolve: (root:any, args:any, context:any) => PersonMutationResolvers.changePassword(root, args, context, 'client') 
     }
 }
 

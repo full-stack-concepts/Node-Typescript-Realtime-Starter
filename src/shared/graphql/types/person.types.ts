@@ -70,6 +70,42 @@ export const DeleteUserType =  new GraphQLObjectType({
 	})
 });
 
+export const TestLoginType = new GraphQLObjectType({
+	name: "TestLoginType",
+	description: "Test User Loging",
+	fields: () => ({
+
+		email:  { type: GraphQLString, description: "User EMail Address"},
+		password: { type: GraphQLString, description: "New user password"},
+
+		// response fields
+		error:  { type: GraphQLBoolean, description: "Error Status"},
+		status:  { type: GraphQLBoolean, description: "Mutation Status"},
+		message: { type:GraphQLString, description: "Error String "},
+		errorID:  { type:GraphQLInt, description: "Event Error ID"},
+	})
+
+})
+
+export const ChangePasswordType = new GraphQLObjectType({
+	name: "ChangePasswordType",
+	description: "Change User Password",
+	fields: () => ({
+
+		// form fields
+		 id: { type: GraphQLString, description: "User Identifier"},
+		oldPassword:  { type: GraphQLString, description: "Current user password"},
+    	password:  { type: GraphQLString, description: "New user password"},
+    	confirmPassword: { type: GraphQLString, description: "Confirmation new user password"},
+
+    	// response fields
+		error:  { type: GraphQLBoolean, description: "Error Status"},
+		status:  { type: GraphQLBoolean, description: "Mutation Status"},
+		message: { type:GraphQLString, description: "Error String "},
+		errorID:  { type:GraphQLInt, description: "Event Error ID"}
+	})
+});
+
 export const coreDefinition:ITypeDefinition = {
 
 	filter: {

@@ -5,7 +5,7 @@ import {
 
 
 // Import each models schema
-import { UserSchema } from "./types/user.type.ql";
+import { UserSchema } from "./types/user.type.ql"; 
 import { ClientSchema} from "./types/client.type.ql";
 import { CustomerSchema} from "./types/customer.type.ql";
 import { SystemUserSchema} from "./types/systemuser.type.ql";

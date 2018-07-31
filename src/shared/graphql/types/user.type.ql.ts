@@ -30,7 +30,9 @@ import {
     userDefinition,  
     CounterType,
     NewUserType,
-    DeleteUserType
+    DeleteUserType,
+    ChangePasswordType,
+    TestLoginType
 
 } from "./person.types";
 
@@ -160,7 +162,27 @@ const mutation = {
             identifier:  { type: GraphQLString }
         },
         resolve: (root:any, args:any, context:any) => PersonMutationResolvers.deletePerson(root, args, context, 'user') 
+    },
 
+    // Aabvb@3459083453098_____
+    TestUserLogin: {
+        type: TestLoginType,
+        args: {
+            email: { type: new GraphQLNonNull(GraphQLString) },
+            password: { type: new GraphQLNonNull(GraphQLString) }, 
+        },
+        resolve: (root:any, args:any, context:any) => PersonMutationResolvers.testLogin(root, args, context, 'user') 
+    },
+
+    ChangeUserPassword: {
+        type: ChangePasswordType,
+        args: {
+            id:  { type: GraphQLID },          
+            oldPassword: { type: new GraphQLNonNull(GraphQLString) },
+            password:  { type: new GraphQLNonNull(GraphQLString) },
+            confirmPassword:  { type: new GraphQLNonNull(GraphQLString) },
+        },
+        resolve: (root:any, args:any, context:any) => PersonMutationResolvers.changePassword(root, args, context, 'user') 
     }
 }
 

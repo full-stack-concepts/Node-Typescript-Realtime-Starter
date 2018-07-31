@@ -5,7 +5,7 @@ import Promise from "bluebird";
 import fetch from "node-fetch";
 import fileType from "file-type";
 const uuidv1 = require("uuid/v1");
-
+import validator from "validator";
 import moment from "moment-timezone";
 
 import { PersonProfile} from "./user.profile.service";
@@ -61,7 +61,7 @@ import {
 } from "../../util";
 
 import {
-	IPerson, IUser, ISystemUser, IClient, ICustomer, IDatabasePriority, IRawThumbnail, IEncryption, ILoginTracker, IDeleteUser
+	IPerson, IUser, ISystemUser, IClient, ICustomer, IDatabasePriority, IRawThumbnail, IEncryption, ILoginTracker, IDeleteUser, IChangePassword
 } from "../../shared/interfaces"; 
 
 import {
@@ -224,18 +224,16 @@ export class UserOperations extends PersonProfile {
 				for(let i:number=0; i<items.length; i++) {
 					let item:ISystemUser|IUser|IClient|ICustomer = items[i];		
 				
-					if(item && item.core && item.core.email && item.core.email === email) {					
+					if(item && item.core && item.core.email && item.core.email === email) {									
 						person = item;
-					}
-				};						
+					} 
+				};					
 				return Promise.resolve( person );
 			});			
 		})
 		
 		// error handler
-		.catch( (err:Error) => {		
-			return Promise.reject(err);
-		});				
+		.catch( (err:Error) => Promise.reject(err) );				
 	}	
 
 	protected cloneAndRemoveDatabaseID(_user:IUser|IClient|ICustomer) {			
@@ -280,9 +278,9 @@ export class UserOperations extends PersonProfile {
 	 */
 	protected testPassword(pw:string):Promise<boolean> {
 		let v:boolean;
-		v = FormValidation.testPassword(pw);	
+		v = FormValidation.testPassword(pw);		
 		return new Promise ( (resolve, reject) => {
-			(v)?resolve(true):reject(1102);
+			(v)?resolve(true):reject(11205);
 		});		
 	}	
 
@@ -350,11 +348,18 @@ export class UserOperations extends PersonProfile {
 	 */
 	protected validateUserPassword(user:any, password:string) {
 
+		/***
+		 * If no user/client/customer found grapghql mutatoin query is calling wrong collectoin
+		 */
+		if(!user) return Promise.reject(11206)
+
 		let decrypt:IEncryption = {
 			hash: user.password.value, 
 			method: user.password.method,  
 			data:password 
 		};		
+
+		console.log("*** decrypt password ", decrypt.hash, password)
 
 		// Crypto with Initialization Vector
 		if(decrypt.method === 1) {
@@ -363,7 +368,7 @@ export class UserOperations extends PersonProfile {
 	            if( decrypted===decrypt.data) {
 	                return Promise.resolve(user)
 	            } else {
-	                return Promise.reject(1030);
+	                return Promise.reject(11200);
 	            }
 	        })
 	        .catch( (err:Error) => Promise.reject(err));
@@ -376,7 +381,7 @@ export class UserOperations extends PersonProfile {
 	            if( decrypted === decrypt.data) {
 	                return Promise.resolve(user)
 	            } else {
-	                return Promise.reject(1031);
+	                return Promise.reject(11201);
 	            }
 	        })
 	        .catch( (err:Error) => Promise.reject(err));      
@@ -389,7 +394,7 @@ export class UserOperations extends PersonProfile {
 	            if(valid) {
 	                return Promise.resolve(user)
 	            } else {
-	                return Promise.reject(1032);
+	                return Promise.reject(11202);
 	            }
 	        })
 	        .catch( (err:Error) => Promise.reject(err) );
@@ -855,6 +860,71 @@ export class UserOperations extends PersonProfile {
 	}
 
 	/***
+	 *
+	 */
+	protected changePassword(userType: string, request:IChangePassword) {
+
+		/****
+		 * Find Model Setting for this User Type => Define user subtype model
+		 */	
+		const setting:IModelSetting = this._getWriteModel(userType);		
+		const model:any = setting.model;	
+
+		/****
+		 * Test if a user identifier was provided (email/UUID)
+		 */
+		let userID:string = request.id;	
+		let currentUser:IUser|IClient|ICustomer;
+		let errorID:number;
+
+		console.log("**** DATA CHANGE PW REQUEST ", request)
+
+		return this._initSequence()
+
+		// process thick: validate request object
+		.then( () => {
+			if(!request.id || (request.id && typeof(request.id) != 'string')) errorID = 11200;			
+			if(request.oldPassword === request.password) errorID = 11203;
+			if(request.password != request.confirmPassword) errorID = 11204;			
+			console.log("*** ErrorID ", errorID)
+			if(errorID) { return Promise.reject(errorID);}
+			else { return Promise.resolve(); }		
+		})
+
+		// process thick: test new password
+		.then( () => this.testPassword(request.password) )
+
+		// process thick: test confirmation password
+		.then( () => this.testPassword(request.confirmPassword) )		
+
+		// process thick: get user/client/customer
+		.then( () => model.findById(userID) )
+
+		// process thick: validate current password
+		.then( (user:IUser|IClient|ICustomer) => this.validateUserPassword(user, request.oldPassword) )
+
+		// process thick: encrypt new password
+		.then( (user:IUser|IClient|ICustomer) => this.encryptPassword(user, request.password) )
+
+		// process thick: save new encrypted password
+		.then( ({user, encrypt}:any) =>  this.updateUser(
+				{'_id': request.id },
+				{ 	$set: { 
+						'security.isPasswordEncrypted': true, 
+						'password.value': encrypt.hash,
+						'password.method': encrypt.method						
+					}
+				})
+		)
+
+		// process thick: return to caller 
+		.then( () => Promise.resolve() )		
+		
+		// error handling: error processed by caller 
+		.catch( (err:any) => Promise.reject(err) ); 
+	}
+
+	/***
 	 * Create New User per model
 	 */
 	protected insertUser( userType:string, user:IPerson|ISystemUser|IUser|IClient|ICustomer) {
@@ -1006,7 +1076,10 @@ export class UserOperations extends PersonProfile {
 					const model:any = setting.model;	
 					return model.findOneAndUpdate (query, update)
 					.then( (res:any) => Promise.resolve(res))
-					.catch( (err:Error) => Promise.reject(1181))	
+					.catch( (err:Error) => {
+						console.log(err)
+						Promise.reject(1181)
+					})	
 				}))
 				.then( () => Promise.resolve() )
 				.catch( (err:Error) => Promise.reject(err));

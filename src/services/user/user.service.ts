@@ -25,7 +25,7 @@ import {
 } from "../../controllers/actions";
 
 import { 
-	IUser, IClient, ICustomer, IGoogleUser, ILoginRequest, IDatabasePriority, IRawThumbnail, ILoginTracker, IUserApplication, IEncryption, IFindUser, IDeleteUser
+	IUser, IClient, ICustomer, IGoogleUser, ILoginRequest, IDatabasePriority, IRawThumbnail, ILoginTracker, IUserApplication, IEncryption, IFindUser, IDeleteUser, IChangePassword
 } from "../../shared/interfaces";
 
 import { 
@@ -278,8 +278,12 @@ export class UserService extends UserOperations {
 		// process thick: return to caller so webtoken can be created
 		.then( ( token:string) => Promise.resolve(token) ) 
 
-		.catch( (err:Error) => Promise.reject(err) );	
-
+		.catch( (err:any) => {		
+			let errorID:number;
+			if(!Number.isInteger(err)) { errorID=11000;} else {errorID=err; }
+			errorController.log(errorID, err);
+			return Promise.reject({errorID, message: errorController.getMessage(errorID)});
+		});	
 	}	
 
 	/***
@@ -329,12 +333,27 @@ export class UserService extends UserOperations {
 			return Promise.reject({errorID, message: errorController.getMessage(errorID)});
 		});	
 	}
+
+	/***
+	 *
+	 */
+	public changePasswordUser(request:IChangePassword) {
+
+		return this.changePassword('user', request)
+		.then( () => Promise.resolve())
+		.catch( (err:any) => {		
+			let errorID:number;
+			if(!Number.isInteger(err)) { errorID=11000;} else {errorID=err; }
+			errorController.log(errorID, err);
+			return Promise.reject({errorID, message: errorController.getMessage(errorID)});
+		});	
+	}
 }
 
 /****
  * Public Interface for User Actions Controller
  */
-class ActionService {
+class ActionService {	
 
 	public registerUser( application:IUserApplication ) {
 		let instance:any = new UserService();
@@ -363,9 +382,19 @@ class ActionService {
 			.then( () => Promise.resolve() )
 			.catch( (err:Error) => Promise.reject(err) );
 	}
+
+	public changePasswordUser(request:IChangePassword) {		
+		let instance:any = new UserService();
+		return instance.changePasswordUser(request)
+			.then( () => Promise.resolve() )
+			.catch( (err:Error) => Promise.reject(err) );
+	}
 }
 
 export const userService:any = new ActionService();
+
+
+
 
 
 

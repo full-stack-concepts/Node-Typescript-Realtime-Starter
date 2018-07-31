@@ -73,7 +73,7 @@ export class ModelMethods {
 	public find (query:Object, fields:Object={}, options:Object={} ):Promise<any> {
 		const repo = this.repo;
 		return new Promise ( (resolve, reject) => {
-			repo.find ( query, fields, options, (err:Error, res:any) => {					
+			repo.find ( query, fields, options, (err:Error, res:any) => {									
 				if(err) {  reject(err); } 
 				else if(!res) { resolve(); } 
 				else { resolve(res); }
@@ -92,10 +92,10 @@ export class ModelMethods {
 		});
 	}
 
-	public findById(id:string):Promise<any> {
+	public findById(id:string, fields:Object={}):Promise<any> {
 		const repo = this.repo;
 		return new Promise ( (resolve, reject) => {
-			repo.findById ( id, (err:Error, res:any) => {						
+			repo.findById ( id, fields, (err:Error, res:any) => {						
 				if(err) {reject(err); } else { resolve(res); }
 			});
 		});

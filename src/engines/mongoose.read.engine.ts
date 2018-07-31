@@ -272,7 +272,7 @@ export 	class ReadRepositoryBase<T extends mongoose.Document>
      *      Only cache subdocument queries associated with these collections
      * (3)  All datastore queries are cached by default
      */
-    async cache (condition:any, fields:any, options:any, exec?:Function, callback?:any) {          
+    async cache (condition:any, fields:any, options:any, exec?:Function, callback?:any) {    
   
         /***
          * Determine if collection is protected 
@@ -383,7 +383,7 @@ export 	class ReadRepositoryBase<T extends mongoose.Document>
         this._model.find({}, callback);
     }
 
-    findById(_id: string, callback: (error: any, result: T) => void) {
+    findById(_id: string, fields:Object, callback: (error: any, result: T) => void) {
         this.cache(_id, null, null, this._model.findById, callback);    
     }  
 

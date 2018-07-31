@@ -48,7 +48,7 @@ import {
 } from "../../shared/interfaces";
 
 import {
-	encryptWithInitializationVector
+	encryptWithBcrypt
 } from "../../util";
 
 /****
@@ -496,10 +496,10 @@ export class DataUtilitiesService  {
 				u.core.role = u.security.accountType = accountType;
 
 				// encrypt password of fake suer with Crypto Vector Method
-				return encryptWithInitializationVector(u.password.value)
+				return encryptWithBcrypt(u.password.value.toString().trim())
 				.then( (hash:string) => {
 					u.password.value = hash;
-					u.password.method = 1;
+					u.password.method = 3;
 					return Promise.resolve(u);
 				});
 			})

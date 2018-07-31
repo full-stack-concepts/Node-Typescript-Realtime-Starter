@@ -97,11 +97,10 @@ class ExpressController {
 
     private routes():void {      
 
-
         /****
-         * Main graphql route needs a schema with datatypes
+         * Main User Data Queries and Mutations
          */
-        this.express.use('/ql',
+        this.express.use('/ql/user/',
             cors(),   
             graphQLHTTP( (request:Request, response:Response) => {
                 const startTime = Date.now();

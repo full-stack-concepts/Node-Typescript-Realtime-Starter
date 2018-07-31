@@ -50,7 +50,7 @@ describe("Data Encryption", () => {
      * Test if encryption method defaults to bcrypt (method type 3) 
      * if randomize policiy is set to true
      */
-    it("should select Bcrypt encryption when randomize policy is set to true", () => {
+    it("should select Bcrypt encryption when randomize policy is set to false", () => {
 
     	const policy:boolean = RANDOMIZE_PASSWORD_ENCRYPTION;
     	const method:number = pickPasswordEncryptionMethod();

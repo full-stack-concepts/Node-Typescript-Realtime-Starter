@@ -10,7 +10,7 @@ export interface IRead<T> {
     /***
      * Finds a single document by its _id field
      */
-    findById: (id: string, callback: (error: any, result: T) => void) => void;
+    findById: (id: string, fields:Object, callback: (error: any, result: T) => void) => void;
 
     /***
      * Finds one document

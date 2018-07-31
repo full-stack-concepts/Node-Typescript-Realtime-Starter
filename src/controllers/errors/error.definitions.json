@@ -190,7 +190,7 @@
 			"action": "find_user", 
 			"provider": "User Operations",
 			"number": 11160, 
-			"msg": "An error occured when trying to find local user."
+			"msg": "An error occured when trying to find local user, client, or customer"
 		},
 
 		{
@@ -234,7 +234,60 @@
 			"provider": "User Operations",
 			"number": 11186, 
 			"msg": "An error occured when trying to remove an existing user from the database: database model for this user type could not be allocated.? "
-		}	
+		},
+
+		{
+			"action": "decrypt_user_password", 
+			"provider": "User Operations",
+			"number": 11200, 
+			"msg": "Decryption Error: could not decrypt password type 1 - Crypto with initializationVector. Did you provide an old or wrong password?"
+		},
+
+		{
+			"action": "decrypt_user_password", 
+			"provider": "User Operations",
+			"number": 11201, 
+			"msg": "Decryption Error: could not decrypt password type 2 - Default Crypto. Did you provide an old or wrong password?"
+		},
+
+		{
+			"action": "decrypt_user_password", 
+			"provider": "User Operations",
+			"number": 11202, 
+			"msg": "Decryption Error: could not decrypt password type 3 - BCrypt. Did you provide an old or wrong password?"
+		},
+
+
+		{
+			"action": "user_password_change", 
+			"provider": "User Operations",
+			"number": 11203, 
+			"msg": "Data Error: Old password equals new password. No change needed."
+		},
+
+
+		{
+			"action": "user_password_change", 
+			"provider": "User Operations",
+			"number": 11204, 
+			"msg": "Data Error: user incorrectly confirmed new password."
+		},
+
+		{
+			"action": "user_password_change", 
+			"provider": "User Operations",
+			"number": 11205, 
+			"msg": "Data Error: new password does no match defined <Password policy>"
+		},
+
+		{
+			"action": "user_password_change", 
+			"provider": "User Operations",
+			"number": 11206, 
+			"msg": "Data Error: No matching user found for this password change. Are you using the right GraphhQL mutation query?"
+		}
+
+
 	],
 
 	"systemuser": [

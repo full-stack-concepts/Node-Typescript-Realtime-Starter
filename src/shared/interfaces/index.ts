@@ -40,6 +40,7 @@ export { IFindUser } from "./user/user.find.interface";
 export { IDeleteUser } from "./user/user.delete.interface";
 export { UserTokenObject } from "./user/user.tokenobject.interface";
 export { IUserDefinitions} from "./user/user.definitions.interface";
+export { IChangePassword} from "./user/user.changepassword.interface";
 
 export {
 	IUserJob,

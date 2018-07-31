@@ -1,10 +1,12 @@
 import { 
 	REGISTER_NEW_USER, REGISTER_NEW_CLIENT, REGISTER_NEW_CUSTOMER,
-	DELETE_USER, DELETE_CLIENT, DELETE_CUSTOMER
+	DELETE_USER, DELETE_CLIENT, DELETE_CUSTOMER,
+	CHANGE_PASSWORD_USER, CHANGE_PASSWORD_CLIENT,CHANGE_PASSWORD_CUSTOMER,
+	LOGIN_USER, LOGIN_CLIENT, LOGIN_CUSTOMER
 } from "../../../controllers/actions";
 import { UAController } from "../../../controllers";
 import { proxyService } from "../../../services";
-import { IUserApplication, IDeleteUser } from "../../interfaces";
+import { IUserApplication, IDeleteUser, ILoginRequest, IChangePassword } from "../../interfaces";
 import { STORE_WEBTOKEN_AS_COOKIE, WEBTOKEN_COOKIE, SEND_TOKEN_RESPONSE } from "../../../util/secrets";
 
 
@@ -33,6 +35,26 @@ const defineActionOnPersonDelete:Function = (subtype:string):string => {
 		case 'user': action = DELETE_USER; break;
 		case 'client': action = DELETE_CLIENT; break;
 		case 'customer': action = DELETE_CUSTOMER; break;
+	}
+	return action;
+}
+
+const defineActionOnPersonChangePassword:Function = (subtype:string):string => {
+	let action:string;
+	switch(subtype) {
+		case 'user': action = CHANGE_PASSWORD_USER; break;
+		case 'client': action = CHANGE_PASSWORD_CLIENT; break;
+		case 'customer': action = CHANGE_PASSWORD_CUSTOMER; break;
+	}
+	return action;
+}
+
+const defineActionOnPersonTestLogin:Function = (subtype:string):string => {
+	let action:string;
+	switch(subtype) {
+		case 'user': action = LOGIN_USER; break;
+		case 'client': action = LOGIN_CLIENT; break;
+		case 'customer': action = LOGIN_CUSTOMER; break;
 	}
 	return action;
 }
@@ -92,12 +114,54 @@ const deletePerson = async (root:any, args:any, context:any, subtype:string):Pro
     }     
 }
 
+/****
+ *
+ */
+export const testLogin = async (root:any, args:any, context:any, subtype:string):Promise<any> => {
+
+	let login:ILoginRequest = {  email:args.email, password: args.password };
+	const ACTION:string = defineActionOnPersonTestLogin(subtype);
+	
+	let err:any;
+	try { await uaController[LOGIN_USER](login); } 
+    catch(e) { err = e; }
+    finally {             
+    	console.log("FInal: ", err);
+        if(err) return { error: true, status: false, errorID: err.errorID, message: err.message };
+        if(!err) return Object.assign({}, args, { error: false, status: true});
+    }    
+
+
+}
+
+/****
+ * 
+ */
+export const changePassword = async (root:any, args:any, context:any, subtype:string):Promise<any> => {
+
+	console.log(" => Incoming subtype ", subtype)	
+	
+	const ACTION:string = defineActionOnPersonChangePassword(subtype);
+	let request:IChangePassword = { id: args.id, oldPassword: args.oldPassword, password: args.password, confirmPassword: args.confirmPassword };
+
+	console.log(" => Performiong Action ", ACTION)	
+
+	let err:any;
+	try { await uaController[ACTION](request); } 
+    catch(e) { err = e; }
+    finally {             
+    	console.log("FInal: ", err);
+        if(err) return { error: true, status: false, errorID: err.errorID, message: err.message };
+        if(!err) return Object.assign({}, args, { error: false, status: true});
+    }    
+}
+
 /***
  *
  */
 export const PersonMutationResolvers =  {
-
 	addPerson,
-	deletePerson
-
+	deletePerson,
+	changePassword,
+	testLogin
 }

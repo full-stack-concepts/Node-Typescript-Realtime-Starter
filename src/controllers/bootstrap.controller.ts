@@ -101,9 +101,7 @@ export class BootstrapController {
 				if(this.testMode || (this.userDBLive && this.productDBLive && this.uaController && this.daController) ) sub$.unsubscribe();
 				if(this.userDBLive && this.productDBLive  && this.uaController && this.daController) {
 					this.logBootstrapEvent(1008);
-					this.logBootstrapEvent(1009);
-					console.log("SIGNAL SIGNAL SIGNAL")
-					// proxyService.startDataOperations();
+					this.logBootstrapEvent(1009);					
 					dataBreeder.generateData()
 				}			
 			}

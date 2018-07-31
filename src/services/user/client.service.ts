@@ -11,7 +11,7 @@ import {
 
 import { errorController } from "../../controllers";
 import { UserOperations } from "./user.ops.service";
-import { IUser, IClient, ICustomer, IClientApplication, ILoginRequest, IEncryption, ILoginTracker, IFindUser, IDeleteUser } from "../../shared/interfaces";
+import { IUser, IClient, ICustomer, IClientApplication, ILoginRequest, IEncryption, ILoginTracker, IFindUser, IDeleteUser, IChangePassword } from "../../shared/interfaces";
 import { TCLIENT } from "../../shared/types";
 import { WebToken} from "./token.service";
 
@@ -260,6 +260,23 @@ export class ClientService extends UserOperations {
 			return Promise.reject({errorID, message: errorController.getMessage(errorID)});
 		});	
 	}
+
+	/***
+	 *
+	 */
+	public changePasswordClient(request:IChangePassword) {
+
+		console.log("*** Incoming request")
+
+		return this.changePassword('client', request)
+		.then( () => Promise.resolve())
+		.catch( (err:any) => {		
+			let errorID:number;
+			if(!Number.isInteger(err)) { errorID=11000;} else {errorID=err; }
+			errorController.log(errorID, err);
+			return Promise.reject({errorID, message: errorController.getMessage(errorID)});
+		});	
+	}
 }
 
 /****
@@ -291,6 +308,13 @@ class ActionService {
 	public deleteSingleClient( request:IDeleteUser ) {
 		let instance:any = new ClientService();
 		return instance.deleteSingleClient(request)
+			.then( () => Promise.resolve() )
+			.catch( (err:Error) => Promise.reject(err) );
+	}
+
+	public changePasswordClient(request:IChangePassword) {
+		let instance:any = new ClientService();
+		return instance.changePasswordClient(request)
 			.then( () => Promise.resolve() )
 			.catch( (err:Error) => Promise.reject(err) );
 	}
