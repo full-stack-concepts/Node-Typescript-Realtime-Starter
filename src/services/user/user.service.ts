@@ -383,7 +383,8 @@ class ActionService {
 			.catch( (err:Error) => Promise.reject(err) );
 	}
 
-	public changePasswordUser(request:IChangePassword) {		
+	public changePasswordUser(request:IChangePassword) {	
+		console.log(arguments)	
 		let instance:any = new UserService();
 		return instance.changePasswordUser(request)
 			.then( () => Promise.resolve() )

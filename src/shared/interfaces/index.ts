@@ -6,6 +6,7 @@ export { IListOptions } from './mlab.listquery.interface';
 export { IUpdateOptions } from './mlab.update.interface';
 export { IConnection, IDatabasePriority } from "./db.interface";
 export { ILoginTracker } from "./login.tracker.interface";
+export { IPasswordTracker} from "./password.tracker.interface";
 
 /***
  * IPerson: Generic

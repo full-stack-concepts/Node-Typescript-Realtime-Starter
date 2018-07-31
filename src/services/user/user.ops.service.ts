@@ -61,7 +61,8 @@ import {
 } from "../../util";
 
 import {
-	IPerson, IUser, ISystemUser, IClient, ICustomer, IDatabasePriority, IRawThumbnail, IEncryption, ILoginTracker, IDeleteUser, IChangePassword
+	IPerson, IUser, ISystemUser, IClient, ICustomer, IDatabasePriority, IRawThumbnail, IEncryption, 
+	ILoginTracker, IPasswordTracker, IDeleteUser, IChangePassword
 } from "../../shared/interfaces"; 
 
 import {
@@ -315,11 +316,9 @@ export class UserOperations extends PersonProfile {
 	protected updateLoginsArray(
 		user:ISystemUser|IUser|IClient|ICustomer,
 		login:ILoginTracker
-	):ILoginTracker[] {
-		
+	):ILoginTracker[] {		
 		let _logins:ILoginTracker[]=[];		
-		if( user.logins && Array.isArray(user.logins)) 
-			_logins = cloneArray(user.logins);						
+		if( user.logins && Array.isArray(user.logins)) _logins = cloneArray(user.logins);						
 		_logins.push(login);	
 		return _logins;
 	}
@@ -358,8 +357,6 @@ export class UserOperations extends PersonProfile {
 			method: user.password.method,  
 			data:password 
 		};		
-
-		console.log("*** decrypt password ", decrypt.hash, password)
 
 		// Crypto with Initialization Vector
 		if(decrypt.method === 1) {
@@ -412,13 +409,8 @@ export class UserOperations extends PersonProfile {
 		if(!RANDOMIZE_PASSWORD_ENCRYPTION)
         	method = 3;   
 
-        if(forceMethod)
-        	method = forceMethod;     
-
-		if(user && !forceMethod) {
-			return Promise.resolve({ user, encrypt });
-		}
-
+        if(forceMethod) method = forceMethod;     		
+	
 		 //Method 1: Crypt with Initialization Vector
 	    if(method===1) {  	    	
 	        return encryptWithInitializationVector(pwd)
@@ -443,7 +435,7 @@ export class UserOperations extends PersonProfile {
 	    else if(method === 3) {      
 	        return encryptWithBcrypt(pwd)
 	        .then( (hash:string) => {
-	        	encrypt = {	method, hash, data:pwd };
+	        	encrypt = {	method, hash, data:pwd };	        	
 	        	return Promise.resolve({ user, encrypt});
 	        }) 
 	        .catch( (err:Error) => Promise.reject(1038))
@@ -859,6 +851,52 @@ export class UserOperations extends PersonProfile {
 		.catch( (err:any) => Promise.reject(err) );
 	}
 
+	private createPasswordTracker(
+		user:IUser|IClient|ICustomer 
+	):IPasswordTracker {
+
+		let ts:number = Math.round(+new Date());
+	    let date:Date = new Date(ts);
+
+	    return {
+ 			timestamp: ts,
+	        date: moment(date).tz( TIME_ZONE ).toString(),
+	        hash: user.password.value,
+    		method: user.password.method
+	    };
+	}
+
+	/***
+	 *
+	 */
+	private addPasswordTracker(
+		user:IUser|IClient|ICustomer, 
+		encrypt:IEncryption
+	) {
+		
+	    let tracker:IPasswordTracker;
+	    let h:IPasswordTracker[];
+	    let _trackers:IPasswordTracker[];
+	    let err:Error;
+	  
+	    try {
+
+	        tracker = this.createPasswordTracker(user);    	     
+	        h = user.password.history;
+	        if(!h || (h && !Array.isArray(h))) h = [];
+	        _trackers = cloneArray(h);
+	        _trackers.push(tracker);
+
+	        user.password.history = _trackers;	
+	       
+	    }
+	    catch(e) { err =e; }
+	    finally {	      
+	        if(err) throw new Error('11207');
+	        if(!err) return { user, encrypt };
+	    }  
+	}
+
 	/***
 	 *
 	 */
@@ -875,9 +913,7 @@ export class UserOperations extends PersonProfile {
 		 */
 		let userID:string = request.id;	
 		let currentUser:IUser|IClient|ICustomer;
-		let errorID:number;
-
-		console.log("**** DATA CHANGE PW REQUEST ", request)
+		let errorID:number;				
 
 		return this._initSequence()
 
@@ -885,8 +921,7 @@ export class UserOperations extends PersonProfile {
 		.then( () => {
 			if(!request.id || (request.id && typeof(request.id) != 'string')) errorID = 11200;			
 			if(request.oldPassword === request.password) errorID = 11203;
-			if(request.password != request.confirmPassword) errorID = 11204;			
-			console.log("*** ErrorID ", errorID)
+			if(request.password != request.confirmPassword) errorID = 11204;					
 			if(errorID) { return Promise.reject(errorID);}
 			else { return Promise.resolve(); }		
 		})
@@ -906,13 +941,17 @@ export class UserOperations extends PersonProfile {
 		// process thick: encrypt new password
 		.then( (user:IUser|IClient|ICustomer) => this.encryptPassword(user, request.password) )
 
+		// process thick: create password tracker object
+		.then( ({user, encrypt}:any ) => this.addPasswordTracker(user, encrypt) )
+
 		// process thick: save new encrypted password
 		.then( ({user, encrypt}:any) =>  this.updateUser(
 				{'_id': request.id },
 				{ 	$set: { 
 						'security.isPasswordEncrypted': true, 
 						'password.value': encrypt.hash,
-						'password.method': encrypt.method						
+						'password.method': encrypt.method,
+						'password.history': user.password.history					
 					}
 				})
 		)
@@ -1076,10 +1115,7 @@ export class UserOperations extends PersonProfile {
 					const model:any = setting.model;	
 					return model.findOneAndUpdate (query, update)
 					.then( (res:any) => Promise.resolve(res))
-					.catch( (err:Error) => {
-						console.log(err)
-						Promise.reject(1181)
-					})	
+					.catch( (err:Error) => Promise.reject(1181) )	
 				}))
 				.then( () => Promise.resolve() )
 				.catch( (err:Error) => Promise.reject(err));

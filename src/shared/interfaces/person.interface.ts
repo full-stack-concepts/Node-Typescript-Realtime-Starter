@@ -3,7 +3,8 @@ import { Document } from "mongoose";
 import { 
 	IUserAddress,
 	IUserDevice,
-	ILoginTracker
+	ILoginTracker,
+	IPasswordTracker
 } from "../interfaces";
 
 export interface IPersonSecurity {
@@ -48,7 +49,8 @@ export interface IPerson extends Document  {
 	password: {
 		value: string,
 		method: number,
-		secret?: string
+		secret?: string,
+		history: IPasswordTracker[]
 	}
 
 	logins: ILoginTracker[],

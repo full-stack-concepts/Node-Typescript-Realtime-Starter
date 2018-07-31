@@ -21,7 +21,7 @@ export class UAController  {
 
 			return new Proxy( controller, { 
 				get: await function(target:any, property:any) {
-					console.log("==> REQUEST ", property)
+					console.log("==> REQUEST ", property)					
 					 return userService[property] || 
 					 		facebookUserService[property] || 
 					 		googleUserService[property] ||

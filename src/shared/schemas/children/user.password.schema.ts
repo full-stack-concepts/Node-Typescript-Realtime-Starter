@@ -7,7 +7,8 @@ import { Schema } from "mongoose";
 const password = {
 	value: { type: String, required: false, match: /(?=.*[a-zA-Z])(?=.*[0-9]+).*/ },
 	method: { type: Number, required: false},
-	secret: { type:String, required:false}
+	secret: { type:String, required:false},
+	history: { type:Array, required:false}
 };
 
 /*****

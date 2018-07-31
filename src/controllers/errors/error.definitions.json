@@ -285,6 +285,13 @@
 			"provider": "User Operations",
 			"number": 11206, 
 			"msg": "Data Error: No matching user found for this password change. Are you using the right GraphhQL mutation query?"
+		},
+
+		{
+			"action": "user_password_change", 
+			"provider": "User Operations",
+			"number": 11207, 
+			"msg": "Data Error: Password change could not be added to security history "
 		}
 
 
