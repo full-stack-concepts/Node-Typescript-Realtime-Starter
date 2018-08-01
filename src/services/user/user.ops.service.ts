@@ -855,17 +855,15 @@ export class UserOperations extends PersonProfile {
 		user:IUser|IClient|ICustomer 
 	):IPasswordTracker {
 
-		let ts:number = Math.round(+new Date());
-	    let date:Date = new Date(ts);
-	    let isoDate:string = date.toISOString();
+		const DateTimeObject:any = this.dateTimeFormatter();
 
-	    return {
- 			timestamp: ts,
-	        date,
-	        isoDate,
+		return {
+			timestamp: DateTimeObject.ts,
+	        date: DateTimeObject.date,
+	        isoDate: DateTimeObject.isoDate,
 	        hash: user.password.value,
     		method: user.password.method
-	    };
+		}		
 	}
 
 	/***

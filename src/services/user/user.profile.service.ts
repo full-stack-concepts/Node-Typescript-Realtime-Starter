@@ -1,7 +1,8 @@
 const uuidv1 = require("uuid/v1");
 import randomNumber from "random-number";
+import moment from "moment-timezone";
 
-import { LOCAL_AUTH_CONFIG } from "../../util/secrets";
+import { LOCAL_AUTH_CONFIG, TIME_ZONE, DATE_FORMAT, TIME_FORMAT } from "../../util/secrets";
 import { capitalizeString } from "../../util";
 
 import { IUserApplication, IClientApplication, ICustomerApplication, IEncryption} from "../../shared/interfaces";
@@ -146,7 +147,7 @@ export class PersonProfile {
 		u.profile.displayNames.sortName = this.constructProfileSortName(n);
 
 		return u;
-	}
+	}	
 
 	/***
 	 *
@@ -157,6 +158,36 @@ export class PersonProfile {
 		u.core.userName = credentials.userName;
 		u.core.url = credentials.url;  
 		return u;
+	}
+
+	protected _toLocalTime(ts:number):Date {
+		
+		let date:Date = new Date(ts);
+		let offset = (new Date().getTimezoneOffset() / 60) * -1;
+		let newDate:Date =new Date( ts + ( offset * 60 * 60 * 1000 ));
+		return newDate;
+	}
+
+	/***
+	 * Default DateTimeFormatter
+	 */
+	protected dateTimeFormatter() {
+
+	    let ts:number = Math.round(+new Date());
+	    let date:Date = this._toLocalTime(ts);
+	    let isoDate:string = moment(
+	    	this._toLocalTime(ts).toISOString())
+	    		.tz( TIME_ZONE )
+	    		.utc()
+	    		.format();
+
+	    return {
+	    	ts,
+	    	date, 
+	    	isoDate
+	    }
+
+
 	}
 }
 
