@@ -123,6 +123,8 @@ export const PersonReadResolvers =  {
 	 */
     password: async (root:any, args:any, subtype:string) => {   	
    		const persons:IUser[]|IClient[]|ICustomer[]|ISystemUser[] = await getModel(subtype).find({"password._id": args.id}, passwordDefinition.filter)
+   		console.log("--------------------------------------")
+   		console.log(persons[0])
    		return passwordDefinition.format(persons[0]);
     },
 

@@ -857,10 +857,12 @@ export class UserOperations extends PersonProfile {
 
 		let ts:number = Math.round(+new Date());
 	    let date:Date = new Date(ts);
+	    let isoDate:string = date.toISOString();
 
 	    return {
  			timestamp: ts,
-	        date: moment(date).tz( TIME_ZONE ).toString(),
+	        date,
+	        isoDate,
 	        hash: user.password.value,
     		method: user.password.method
 	    };
@@ -941,7 +943,7 @@ export class UserOperations extends PersonProfile {
 		// process thick: encrypt new password
 		.then( (user:IUser|IClient|ICustomer) => this.encryptPassword(user, request.password) )
 
-		// process thick: create password tracker object
+		// process thick: create password tracker object then add it so security history array
 		.then( ({user, encrypt}:any ) => this.addPasswordTracker(user, encrypt) )
 
 		// process thick: save new encrypted password
@@ -1072,16 +1074,30 @@ export class UserOperations extends PersonProfile {
 		.catch( (err:Error) => {		
 			Promise.reject(err);
 		});	
-	}
+	}	
 
-	/***
-	 * Convert User Subtype to its associated DB Model
-	 */
-	protected convertUserSubTypeToDatabaseModel(subType:string) {
-		return this._getWriteModel(subType).model;		
-	}
 
 	protected updateUser (query:any, update:any, subType?:string) {
+
+		/*
+		let ts:number = Math.round(+new Date());
+	    let date:Date = new Date(ts);
+
+	    console.log("*** incoming update ", update)
+
+	    if(update.hasOwnProperty('$set')) {
+	    	console.log("(1) clone update object" )
+	    	let obj = deepCloneObject(update.$set);
+	    	obj['updatedAt'] = date;
+	    	console.log("(2) Add date field ")	    	
+	    	update.$set = obj;
+	    	console.log("(3) ", update)
+
+	    	
+	    } else {
+	    	console.log("*** wrong update")
+	    }
+	    */
 
 		/*****
 		 * HOST TYPE 1
@@ -1093,12 +1109,12 @@ export class UserOperations extends PersonProfile {
 			 * (1) look up model is subTtype is provided
 			 * (2) then update user
 			 */ 
-			if(subType && typeof(subType) === 'string') {
+			if(subType && typeof(subType) === 'string') {				
 				
-				const model:any = this.convertUserSubTypeToDatabaseModel(subType);				
-				
-				return model.findOneAndUpdate (query, update)
-				.then( (res:any) => Promise.resolve(res) )
+				const model:any = this._getWriteModel(subType).model;				
+
+				return model.findOneAndUpdate (query, update)				
+				.then( (res:any) => Promise.resolve() )
 				.catch( (err:Error) => Promise.reject(1180) );	
 
 

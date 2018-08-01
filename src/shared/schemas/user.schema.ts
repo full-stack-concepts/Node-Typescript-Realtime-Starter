@@ -31,7 +31,9 @@ export const user = {
 	configuration: configurationSchema,
 	accounts: accountsSchema,
 	profile: profileSchema,
-	devices: devicesSchema
+	devices: devicesSchema,
+	createdAt: Date,
+	modifiedAt: Date
 };
 
 /*****
@@ -45,18 +47,32 @@ export const user = {
  */
 const schema:Schema = new Schema( user );
 
+/***
+ * Model Middleware
+ */
 schema.pre('save', (next) => {
 
 	/*
 	 * Add here functions you would like to be executed
 	 * before student document is saved
-	 */
-
+	 */ 
 	next();
 });
 
-export const userSchema:Schema = schema;
+import moment from "moment-timezone";
+import { TIME_ZONE } from "../../util/secrets";
 
+schema.pre('update', function() {
+
+	console.log("*** Execute Update Middleware function ")
+
+	let ts:number = Math.round(+new Date());
+	let date:Date = new Date(ts);
+
+	this.update({},{ $set: { updatedAt: new Date() } });
+});
+
+export const userSchema:Schema = schema;
 
 
 

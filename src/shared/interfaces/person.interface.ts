@@ -103,6 +103,9 @@ export interface IPerson extends Document  {
 
 	profileRaw?:Object,
 
-	devices?: IUserDevice[]
+	devices?: IUserDevice[],
+
+	createdAt: Date,
+	modifiedAt: Date
 
 }

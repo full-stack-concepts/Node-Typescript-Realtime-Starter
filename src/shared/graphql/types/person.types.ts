@@ -3,6 +3,9 @@
  */
 import { userReadModel } from "../../models";
 
+/***
+ * Import Default Graphql Types
+ */
 import {
     GraphQLID,
     GraphQLEnumType,
@@ -16,6 +19,13 @@ import {
     GraphQLFloat,
     GraphQLBoolean 
 } from 'graphql';
+
+/***
+ * Import Dynamic Grpaphql Types (Scalars)
+ */
+import { DateTimeScalar } from "../scalars/datetime.scalar";
+import { BigIntegerScalar} from "../scalars/bigint.scalar";
+import { DateScalar } from "../scalars/date.scalar";
 
 interface ITypeDefinition {
 	filter: Object,
@@ -267,6 +277,21 @@ export const profileDefinition:ITypeDefinition = {
 	})
 }
 
+
+/***
+ *
+ */
+const PasswordHistoryType = new GraphQLObjectType({
+    name: "PasswordHistoryType",    
+    fields: {    
+        timestamp: { type: BigIntegerScalar},
+        hash: { type: GraphQLString},
+        method: { type: GraphQLInt},
+        date: { type: DateScalar },
+        isoDate: { type: DateTimeScalar },
+    }
+});
+
 export const passwordDefinition:ITypeDefinition = {
 
 	filter: {
@@ -276,8 +301,9 @@ export const passwordDefinition:ITypeDefinition = {
 
 	format: (obj:any) => {
   		return {        
-        	id: obj.password._id,
-        	method: obj.password.method
+        	id: obj.password._id,        	
+        	method: obj.password.method,
+        	history: obj.password.history
     	};
 	},
 
@@ -286,7 +312,8 @@ export const passwordDefinition:ITypeDefinition = {
     	description: "User Password Model. You can use this query to retrieve user's password encryption method. Encryption method is an integer greater than 0 and smaller than 4.",
     	fields: {    
         	id:         { type: GraphQLID },
-        	method:     { type: GraphQLInt, description: "Encryption method for user password"}
+        	method:     { type: GraphQLInt, description: "Encryption method for user password"},
+        	history: 	{ type: new GraphQLList(PasswordHistoryType)}
     	}
 	})
 }

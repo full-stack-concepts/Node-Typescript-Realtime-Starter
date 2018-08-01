@@ -45,7 +45,6 @@ import {
 	SYSTEM_BOOTSTRAP_SEQUENCE_FINISHED_EMAIL
 } from "./mail/identifiers";
 
-
 export class BootstrapController {
 
 	userDBLive:boolean;
