@@ -34,6 +34,16 @@
         ],
         "report-dir": "./coverage"
     },
+    "lint-staged": {
+        "concurrent": false,
+        "subTaskConcurrency":1,
+        "linters": {
+            ".ts": [
+                "typescript-autoformat-test",
+                "git-add"
+            ]
+        }
+    },
     "scripts": {
         "start": "npm run serve",
         "build": "concurrently -k -n \"npm run delete-dist\" \"npm run build-ts\"",
@@ -60,7 +70,9 @@
         "debug": "npm run build && npm run watch-debug",
         "serve-debug": "nodemon --inspect dist/index.js",
         "watch-debug": "concurrently -k -p \"[{name}]\" -n \"Sass,TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-sass\" \"npm run watch-ts\" \"npm run serve-debug\"",
-        "delete-dist": "rimraf -rf ./dist/"
+        "delete-dist": "rimraf -rf ./dist/",
+        "typescript-autoformat-test": "find src/services/state/ -iname *.ts | xargs ./node_modules/.bin/tsfmt -r"
+
     },
     "dependencies": {
         "@types/uuid": "^3.4.3",
@@ -208,9 +220,11 @@
         "concurrently": "^3.5.1",
         "cross-env": "^5.1.4",
         "express-winston": "^2.5.1",
+        "husky": "^0.14.3",
         "is-valid-path": "^0.1.1",
         "istanbul": "^0.4.5",
         "jest": "^22.4.0",
+        "lint-staged": "^7.2.0",
         "mocha": "^5.2.0",
         "node-sass": "^4.7.2",
         "nodemon": "^1.13.0",
@@ -224,6 +238,7 @@
         "ts-jest": "^22.4.6",
         "ts-node": "^5.0.0",
         "tslint": "^5.9.1",
-        "typescript": "^2.7.2"
+        "typescript": "^2.7.2",
+        "typescript-formatter": "^7.2.2"
     }
 }
