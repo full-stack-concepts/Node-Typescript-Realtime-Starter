@@ -22,7 +22,7 @@ import { systemUserReadModel } from "../../models";
  */
 import {
     systemUserDefinition
-} from "./person.types";
+} from "../type.definitions";
 
 import {
     PersonReadResolvers,

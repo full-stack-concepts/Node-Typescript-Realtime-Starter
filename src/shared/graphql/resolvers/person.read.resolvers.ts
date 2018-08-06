@@ -1,13 +1,4 @@
 
-import {		
-	coreDefinition,		
-	accountsDefinition,
-	securityDefinition,
-	configurationDefinition,
-	devicesDefinition,
-	systemUserDefinition
-} from "../types/person.types";
-
 import {
 	smallUserDefinition,
 	userDefinition,
@@ -15,9 +6,15 @@ import {
 	clientDefinition,
 	smallCustomerDefinition,
 	customerDefinition,
+	systemUserDefinition,
 	profileDefinition,
 	passwordDefinition,
 	loginDefinition,
+	devicesDefinition,
+	securityDefinition,
+	configurationDefinition,
+	accountsDefinition,
+	coreDefinition
 } from "../type.definitions";
 
 import { 

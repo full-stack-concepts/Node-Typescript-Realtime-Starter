@@ -16,12 +16,7 @@ import {
 /****
  * Type Definitions
  */
-import {
-    coreDefinition,        
-    accountsDefinition,
-    securityDefinition,
-    configurationDefinition,
-    devicesDefinition,     
+import {                 
     CounterType,
     NewUserType,
     DeleteUserType,
@@ -31,9 +26,14 @@ import {
 import {
     smallCustomerDefinition,
     customerDefinition,
+    coreDefinition,
     profileDefinition,
     passwordDefinition,
     loginDefinition,
+    devicesDefinition,   
+    securityDefinition,
+    configurationDefinition,
+    accountsDefinition
 } from "../type.definitions";
 
 

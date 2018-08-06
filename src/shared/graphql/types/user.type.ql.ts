@@ -18,12 +18,7 @@ import { UAController } from "../../../controllers";
 /****
  * Type Definitions
  */
-import {
-    coreDefinition,      
-    accountsDefinition,
-    securityDefinition,
-    configurationDefinition,
-    devicesDefinition,    
+import {        
     CounterType,
     NewUserType,
     DeleteUserType,
@@ -33,11 +28,16 @@ import {
 } from "./person.types";
 
 import {
-     smallUserDefinition,
-     userDefinition,
-     profileDefinition,
-     passwordDefinition,
-     loginDefinition,
+    smallUserDefinition,
+    userDefinition,
+    coreDefinition,
+    profileDefinition,
+    passwordDefinition,
+    loginDefinition,
+    devicesDefinition, 
+    securityDefinition,
+    configurationDefinition,
+    accountsDefinition
 } from "../type.definitions";
 
 import {

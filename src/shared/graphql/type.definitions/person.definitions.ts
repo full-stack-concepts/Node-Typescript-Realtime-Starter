@@ -85,3 +85,13 @@ export const ImagesType = new GraphQLObjectType({
         avatar:  { type: GraphQLString}
     }
 });
+
+
+export const LocationType = new  GraphQLObjectType({
+    name: "LocationType",
+    description: "Location Model",
+    fields: {
+        latitude:    { type: GraphQLFloat}, 
+        longitude:    { type: GraphQLFloat}
+    }
+});
