@@ -5,7 +5,7 @@ import "rxjs/add/operator/take";
 import "rxjs/add/operator/map";
 
 import { deepCloneObject} from "../../util";
-import { IUser, IClient, ICustomer} from "../../shared/interfaces"; 
+import { IUser, IClient, ICustomer, IUserAddress} from "../../shared/interfaces"; 
 import { TUSER, TCLIENT, TCUSTOMER } from "../../shared/types";
 import { constructUserCredentials } from "../../util";
 
@@ -145,24 +145,48 @@ export class DataUtilitiesService  {
 		return user;
 	}
 
-	/***
-	 * Data Factory: user address & location
-	 */
-	public fakeUserAddressAndLocation (user:any) {
-
-		/*************************************************************************************
+	/*************************************************************************************
 		 * User Address Details, location (modify as you like)
 		 * @street:string	
 		 * @houseNumber: string
 		 * @addition:string
 		 * @suffix: string
-		 * @zipcode:string
+		 * @areacode:string
 		 * @city:string
 		 * @county:string,
 		 * @countyCode:string
 		 * @country:string
 		 * @countryCode:string
+		 * @location.latutude: number
+		 * @location.longitude: number
 		 */
+
+	public fakeSingleAddress():IUserAddress {
+
+		return {
+			street: streetName().trim(),
+			houseNumber: houseNumber().toString().trim(),
+			suffix:streetSuffix().trim(),
+			addition: '',
+			areacode: zipCode().trim(),
+			city: city().trim(),
+			county: country().trim(),	
+			country: country().trim(),
+			countryCode: countryCode().trim(),
+			location: {
+				latitude: latitude(),
+				longitude: longitude()
+			}
+		};
+
+	}
+
+	/***
+	 * Data Factory: user address & location
+	 */
+	public fakeUserAddressAndLocation (user:any) {
+
+		
 		let _street:string = streetName().trim(),
 			_houseNumber:string = houseNumber().toString().trim(),
 			_suffix:string = streetSuffix().trim(),
@@ -187,10 +211,12 @@ export class DataUtilitiesService  {
 		user.profile.address.countryCode = _countryCode;
 
 		/***
-		 * Geo Location
+		 * Address Geo Location
 		 */
-		user.profile.location.latitude = latitude();
-		user.profile.location.longitude = longitude();
+		user.profile.location = {
+			latitude: latitude(),
+			longitude: longitude()
+		}		
 			
 
 		// type assertionL and finally confirm that address has been configured
@@ -342,10 +368,7 @@ export class DataUtilitiesService  {
 		user = this.fakeUserSecurity( user );
 
 		//User Personalia 
-		user = this.fakeUserPersonalia( user );	
-
-		// User Address
-		user = this.fakeUserAddressAndLocation( user );
+		user = this.fakeUserPersonalia( user );			
 
 		// User Device
 		user = this.fakeUserDevice( user );	
@@ -359,10 +382,7 @@ export class DataUtilitiesService  {
 		client = this.fakeUserSecurity( client );
 
 		// Client Personalia 
-		client = this.fakeUserPersonalia( client );	
-
-		// Client Address
-		client = this.fakeUserAddressAndLocation( client );
+		client = this.fakeUserPersonalia( client );		
 
 		// Client Company
 		client = this.fakeCompany( client );
@@ -379,10 +399,7 @@ export class DataUtilitiesService  {
 		customer = this.fakeUserSecurity( customer );
 
 		//User Personalia 
-		customer = this.fakeUserPersonalia( customer );	
-
-		// User Address
-		customer = this.fakeUserAddressAndLocation( customer );
+		customer = this.fakeUserPersonalia( customer );			
 
 		// User Device
 		customer = this.fakeUserDevice( customer );	
@@ -553,7 +570,7 @@ export class DataUtilitiesService  {
  * Public Interface for Data Actions Controller
  */
 
-class ActionService {
+export class ActionService {
 
 	public createUserType(category:string, amount:number) {
 		let instance:any = new DataUtilitiesService();
@@ -567,6 +584,11 @@ class ActionService {
 		return instance.formatUserSubType(collection)
 			.then( (result:any) => Promise.resolve(result) )
 			.catch((err:Error) => Promise.reject(err) );
+	}	
+
+	public fakeSingleAddress():IUserAddress {
+		let instance:any = new DataUtilitiesService();
+		return instance.fakeSingleAddress();			
 	}	
 }
 

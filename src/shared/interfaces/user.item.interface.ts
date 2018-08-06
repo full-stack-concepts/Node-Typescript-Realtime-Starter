@@ -3,6 +3,9 @@ export interface IUserJob  {
 }
 
 export interface IUserAddress {
+	userID?:any,
+	clientID?:any,
+	customerID?:any,
 	street?:string,
 	houseNumber?:string,
 	suffix?:string,
@@ -15,7 +18,11 @@ export interface IUserAddress {
 	countryCode?:string,
 	addressLine1?:string,
 	addressLine2?:string,
-	addressLine3?:string
+	addressLine3?:string,
+	location?:{
+		longitude?:number,
+		latitude?:number
+	},
 }
 
 export interface IUserCommunication {

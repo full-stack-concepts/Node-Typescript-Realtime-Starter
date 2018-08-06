@@ -20,22 +20,7 @@ const profile = {
 		sortName:  {type: String, required: false }
 	},	
 
-	address: {
-		street: 		{type: String, required: false },
-		houseNumber:	{type: String, required: false },
-		suffix:			{type: String, required: false },
-		addition:		{type: String, required: false },
-		areacode:		{type: String, required: false },
-		city:			{type: String, required: false },
-		county:			{type: String, required: false },
-		country:		{type: String, required: false },
-		countryCode:	{type: String, required: false },
-	},		
-
-	location: {
-		latitude:		{type: Number, required: false }, 
-		longitude: 		{type: String, required: false }
-	},
+	address: {type: mongoose.Schema.Types.ObjectId, required: false },
 
 	/****
 	 * Google Geo Object

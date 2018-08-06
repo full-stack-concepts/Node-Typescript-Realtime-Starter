@@ -236,10 +236,7 @@ export class ClientService extends UserOperations {
 		if(!field || !ID) return Promise.reject('<errorNumber>');
 
 		return clientModel.findOne({ [field]:[ID]})
-		.then( (client:IClient) => {
-			delete client._id;
-			return Promise.resolve( client ) 
-		})
+		.then( (client:IClient) => Promise.resolve( client ) )
 		.catch( (err:Error) => Promise.reject(err));
 	}
 

@@ -7,7 +7,6 @@ Promise.promisifyAll(fs);
 Promise.promisifyAll(mongoose);
 
 import { IUser} from "../../shared/interfaces";
-import { userModel, UserModel } from "../../shared/models"
 import { deepCloneObject } from "../../util";
 
 /****
@@ -136,6 +135,7 @@ export class WebToken {
 	 	});	 	
 	}
 
+	/*
 	static getUser(account:any) {	
 
 		let query:string = `{ 'accounts.${account.providerID}':'${account.value}' }`;	
@@ -143,6 +143,7 @@ export class WebToken {
 		.then(  (user:IUser) => { return Promise.resolve(user); })
 		.catch( (err:Error) => Promise.reject(err) );
 	}
+	*/
 
 	static removeDatabaseIDFromUserObject( user:IUser ) {		
 		let _user:IUser = deepCloneObject(user);

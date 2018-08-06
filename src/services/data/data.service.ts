@@ -7,7 +7,6 @@ import faker from "faker";
 import Promise from "bluebird";
 import chain from 'lodash/chain';
 import { IUser, IClient, ICustomer } from "../..//shared/interfaces";
-import { UserModel, ClientModel, CustomerModel} from "../../shared/models";
 import { RemoteQueryBuilder } from "../../util";
 import { IListOptions} from "../../shared/interfaces";
 

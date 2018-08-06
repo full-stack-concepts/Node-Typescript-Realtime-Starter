@@ -574,6 +574,11 @@ export const PERSON_SUBTYPE_USER = process.env["PERSON_SUBTYPE_USER"].toLowerCas
 export const PERSON_SUBTYPE_CLIENT = process.env["PERSON_SUBTYPE_CLIENT"].toLowerCase();
 export const PERSON_SUBTYPE_CUSTOMER = process.env["PERSON_SUBTYPE_CUSTOMER"].toLowerCase();
 
+/*****
+ * Independent Person related type definitions
+ */
+export const ADDRESS_TYPE = process.env["ADDRESS_TYPE"].toLowerCase();
+
 
 export const PERSON_SUBTYPES:string[] = [
 	PERSON_SUBTYPE_SYSTEM_USER,
@@ -589,7 +594,7 @@ export const PERSON_SUBTYPE_TO_MODELS:string[] = [
 	PERSON_SUBTYPE_SYSTEM_USER,
 	PERSON_SUBTYPE_USER,
 	PERSON_SUBTYPE_CLIENT,
-	PERSON_SUBTYPE_CUSTOMER
+	PERSON_SUBTYPE_CUSTOMER	
 ];
 
 export const USE_PERSON_SUBTYPE_USER = process.env["USE_PERSON_SUBTYPE_USER"] == 'true';

@@ -17,20 +17,25 @@ import {
  * Type Definitions
  */
 import {
-    coreDefinition,
-    profileDefinition,
-    passwordDefinition,
-    loginDefinition,
+    coreDefinition,        
     accountsDefinition,
     securityDefinition,
     configurationDefinition,
-    devicesDefinition,  
-    customerDefinition,
+    devicesDefinition,     
     CounterType,
     NewUserType,
     DeleteUserType,
     ChangePasswordType
 } from "./person.types";
+
+import {
+    smallCustomerDefinition,
+    customerDefinition,
+    profileDefinition,
+    passwordDefinition,
+    loginDefinition,
+} from "../type.definitions";
+
 
 import {
     PersonReadResolvers,
@@ -46,12 +51,12 @@ const query = {
 
 
     customersAll: {
-        type: new GraphQLList(customerDefinition.type),
+        type: new GraphQLList(smallCustomerDefinition.type),
         resolve: () => PersonReadResolvers.findAll('customer')
     },
 
     customersSelection: {
-        type: new GraphQLList(customerDefinition.type),
+        type: new GraphQLList(smallCustomerDefinition.type),
         args: { 
             skip: { type: GraphQLInt, description: 'Method on a cursor to control where MongoDB begins returning results. This approach may be useful in implementing paginated results.' },      
             limit:  { type: GraphQLInt, description: 'Method on a cursor to specify the maximum number of documents the cursor will return. limit() is analogous to the LIMIT statement in a SQL database.'} 

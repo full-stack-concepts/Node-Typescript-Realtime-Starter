@@ -39,7 +39,7 @@ import {
 	publicDirectoryManager	
 } from "../util";
 
-import { DefaultModel, userModel, userReadModel, clientModel, clientReadModel, customerModel, customerReadModel } from "../shared/models";
+import { DefaultModel, userModel, userReadModel, clientModel, clientReadModel, customerModel, customerReadModel, addressModel } from "../shared/models";
 
 import {
 	SYSTEM_BOOTSTRAP_SEQUENCE_FINISHED_EMAIL
@@ -140,6 +140,7 @@ export class BootstrapController {
 	 * 		(b) UserModel 			-  readWrite native connection
 	 * 		(c) ClientModel			-  readWrite native connection
 	 *		(d) CustomerModel		-  readWrite native connection
+	 * 		(e) addressModel        -  readwrite native connection
 	 */
 	private async configureDatabases():Promise<void> {		
 		

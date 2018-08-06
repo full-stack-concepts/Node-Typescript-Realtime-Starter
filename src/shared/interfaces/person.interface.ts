@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Document } from "mongoose";
 
 import { 
@@ -73,12 +74,7 @@ export interface IPerson extends Document  {
 			familyName:  string
 		},
 
-		address?:IUserAddress,
-
-		location?:{
-			longitude?:number,
-			latitude:number
-		},
+		address?: mongoose.Schema.Types.ObjectId,		
 
 		displayNames?: {
 			fullName?: string,

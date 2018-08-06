@@ -1,27 +1,34 @@
 
-import {
-	userDefinition,
-	coreDefinition,
-	profileDefinition,
-	passwordDefinition,
-	loginDefinition,
+import {		
+	coreDefinition,		
 	accountsDefinition,
 	securityDefinition,
 	configurationDefinition,
 	devicesDefinition,
-	clientDefinition,
-	customerDefinition,
 	systemUserDefinition
 } from "../types/person.types";
+
+import {
+	smallUserDefinition,
+	userDefinition,
+	smallClientDefinition,
+	clientDefinition,
+	smallCustomerDefinition,
+	customerDefinition,
+	profileDefinition,
+	passwordDefinition,
+	loginDefinition,
+} from "../type.definitions";
 
 import { 
 	userReadModel, UserReadModel, 
 	clientReadModel, ClientReadModel, 
 	customerReadModel, CustomerReadModel, 
-	systemUserReadModel, SystemUserReadModel 
+	systemUserReadModel, SystemUserReadModel,
+	addressModel, AddressModel
 } from "../../models";
 
-import { IUser, IClient, ICustomer, ISystemUser} from "../../interfaces";
+import { IUser, IClient, ICustomer, ISystemUser, IUserAddress} from "../../interfaces";
 
 const getModel = (subtype:string) => {
 	console.log("*** Incoming subtype ", subtype)
@@ -35,15 +42,25 @@ const getModel = (subtype:string) => {
 	return model;
 }
 
-const formatOutput = (subtype:string, result:any) => {
+const formatOutput = (subtype:string, result:any, address:IUserAddress) => {
 	let output:any;
 	switch (subtype) {
-		case 'user': output = userDefinition.format(result); break;
-		case 'client': output = clientDefinition.format(result); break;
-		case 'customer': output = customerDefinition.format(result); break;
+		case 'user': output = userDefinition.format(result, address); break;
+		case 'client': output = clientDefinition.format(result, address); break;
+		case 'customer': output = customerDefinition.format(result, address); break;
 		case 'systemuser': output = systemUserDefinition.format(result); break;
 	}
 	return output;
+}
+
+const buildAddressQuery = (subtype:string, id:string):Object => {
+
+	let query:Object;    
+    if(subtype==='user') query = { "userID": id};
+    if(subtype==='client') query = { "clientID": id};
+    if(subtype==='customer') query = { "customerID": id};
+
+    return query;
 }
 
 export const PersonReadResolvers =  {
@@ -54,7 +71,9 @@ export const PersonReadResolvers =  {
 	findAll: async (subtype:string) =>  {   
 		const _persons:any = await getModel(subtype).find({});	
 		let persons:any=[];
-		_persons.forEach( (person:IUser|IClient|ICustomer|ISystemUser) => {	persons.push(formatOutput(subtype, person)); });		
+		_persons.forEach( (person:IUser|IClient|ICustomer|ISystemUser) => {	
+			persons.push(formatOutput(subtype, person, null)); 
+		});		
 		return persons;
 	},
 
@@ -65,7 +84,7 @@ export const PersonReadResolvers =  {
 
 		let persons:any=[];
 		const _persons:any = await getModel(subtype).getRange({}, {}, {skip:args.skip, limit:args.limit} )	
-		_persons.forEach( (person:IUser|IClient|ICustomer|ISystemUser) => {	persons.push(formatOutput(subtype, person)); });	
+		_persons.forEach( (person:IUser|IClient|ICustomer|ISystemUser) => {	persons.push(formatOutput(subtype, person, null)); });	
 		return persons;
 	},
 
@@ -80,10 +99,14 @@ export const PersonReadResolvers =  {
 	/***
 	 * Query Person subtype collection to find user by mail address
 	 */
-	findByMail: async (root:any, args:any, subtype:string) =>  {        		
-		const model:UserReadModel | ClientReadModel | CustomerReadModel | SystemUserReadModel = getModel(subtype);                   
-        const persons:IUser[]|IClient[]|ICustomer[]|ISystemUser[] = await model.find({'core.email': args.email});
-        return formatOutput(subtype, persons[0]);
+	findByMail: async (root:any, args:any, subtype:string) =>  {  		
+
+        const persons:IUser[]|IClient[]|ICustomer[]|ISystemUser[] = await getModel(subtype).find({"core.email": args.email});
+  		const id:string =  persons[0]._id.toString();
+        const query:Object = buildAddressQuery(subtype, id);	       
+        const address:any = await addressModel.find(query);
+        return formatOutput(subtype, persons[0], address[0]);	   
+      
     },
 
     /***
@@ -91,7 +114,10 @@ export const PersonReadResolvers =  {
 	 */
     findById: async (root:any, args:any, subtype:string) => {            	
    		const person:IUser|IClient|ICustomer|ISystemUser = await getModel(subtype).findById(args.id);
-   		return formatOutput(subtype, person);
+   		const id:string =  person._id.toString();
+		const query:Object = buildAddressQuery(subtype, id);
+		const address:any = await addressModel.find(query);
+		return formatOutput(subtype, person, address[0]);
     },
 
     /***
@@ -99,7 +125,10 @@ export const PersonReadResolvers =  {
 	 */
     findByURL: async (root:any, args:any, subtype:string) => {            	
 		const persons:IUser[]|IClient[]|ICustomer[]|ISystemUser[] = await getModel(subtype).find({"core.url": args.url});
-      	return formatOutput(subtype, persons[0]);
+		const id:string =  persons[0]._id.toString();
+        const query:Object = buildAddressQuery(subtype, id);	       
+        const address:any = await addressModel.find(query);
+        return formatOutput(subtype, persons[0], address[0]);	   
     },
 
     /***

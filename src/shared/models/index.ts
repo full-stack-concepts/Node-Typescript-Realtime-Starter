@@ -12,3 +12,5 @@ export { clientReadModel, ClientReadModel, ClientReadRepository} from "./client.
 
 export { customerModel, CustomerModel, CustomerRepository } from "./customer.model";
 export { customerReadModel, CustomerReadModel, CustomerReadRepository} from "./customer.read.model";
+
+export { addressModel, AddressModel} from "./address.model";

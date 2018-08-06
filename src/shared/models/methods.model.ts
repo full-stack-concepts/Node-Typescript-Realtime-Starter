@@ -71,12 +71,12 @@ export class ModelMethods {
 
 
 	public find (query:Object, fields:Object={}, options:Object={} ):Promise<any> {
-		const repo = this.repo;
+		const repo = this.repo;		
 		return new Promise ( (resolve, reject) => {
-			repo.find ( query, fields, options, (err:Error, res:any) => {									
+			repo.find ( query, fields, options, (err:Error, result:any) => {			
 				if(err) {  reject(err); } 
-				else if(!res) { resolve(); } 
-				else { resolve(res); }
+				else if(!result) { resolve(); } 
+				else { resolve(result); }
 			});
 		});
 	}
@@ -102,6 +102,21 @@ export class ModelMethods {
 	}
 
 	/*** WRITE OPERATIONS **/
+	public create(query:Object, returnIdOnly:boolean=false):Promise<any> {
+		const repo = this.repo;
+		return new Promise ( (resolve, reject) => {
+			repo.create ( query, (err:Error, result:any) => {									
+				if(err) {reject(err); } else { 
+					if(returnIdOnly) {
+						resolve ({ id: result._id });
+					} else {
+						resolve(result); 
+					}
+				}
+			});
+		});
+	}
+
 	public insert(users:any): Promise<any> {
 		const repo = this.repo;
 		return new Promise ( (resolve, reject) => {

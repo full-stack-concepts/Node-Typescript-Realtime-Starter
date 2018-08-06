@@ -26,4 +26,10 @@ export interface IMongooseModels<T> {
      */
     createCustomerModel:  ( connection: mongoose.Model<mongoose.Document>, callback: () => void) => void;
 
+     /***
+     * Read Write Address Model
+     */
+    createAddressModel:  ( connection: mongoose.Model<mongoose.Document>, callback: () => void) => void;
+
+
 }

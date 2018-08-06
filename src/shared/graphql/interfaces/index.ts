@@ -1,0 +1,1 @@
+export {ITypeDefinition} from "./type.interface";

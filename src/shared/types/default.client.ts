@@ -51,24 +51,7 @@ export const TCLIENT:IClient = <IClient | any> {
 		displayNames: {
 			fullName: null,
 			sortName: null
-		},
-
-		address: {
-			street:null,
-			houseNumber:null,
-			suffix:null,
-			addition:null,
-			areacode:null,
-			city:null,
-			county:null,
-			country:null,
-			countryCode:null
-		},
-
-		location: {
-			latitude:null,
-			longitude: null
-		},
+		},		
 
 		images: {	     		     		
      		thumbnail: null,

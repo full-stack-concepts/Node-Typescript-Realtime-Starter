@@ -71,7 +71,7 @@
         "serve-debug": "nodemon --inspect dist/index.js",
         "watch-debug": "concurrently -k -p \"[{name}]\" -n \"Sass,TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-sass\" \"npm run watch-ts\" \"npm run serve-debug\"",
         "delete-dist": "rimraf -rf ./dist/",
-        "typescript-autoformat-test": "find src/services/state/ -iname *.ts | xargs ./node_modules/.bin/tsfmt -r"
+        "typescript-autoformat": "find src/ -iname *.ts | xargs ./node_modules/.bin/tsfmt -r"
 
     },
     "dependencies": {

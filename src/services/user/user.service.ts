@@ -309,10 +309,7 @@ export class UserService extends UserOperations {
 		if(!field || !ID) return Promise.reject('<errorNumber>');
 
 		return userModel.findOne({ [field]:[ID]})
-		.then( (user:IUser) => {
-			delete user._id;
-			return Promise.resolve( user ) 
-		})
+		.then( (user:IUser) => Promise.resolve( user ) )
 		.catch( (err:Error) => Promise.reject(err));
 	}
 

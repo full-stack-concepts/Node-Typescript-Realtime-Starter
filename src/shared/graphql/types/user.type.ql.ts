@@ -19,15 +19,11 @@ import { UAController } from "../../../controllers";
  * Type Definitions
  */
 import {
-    coreDefinition,
-    profileDefinition,
-    passwordDefinition,
-    loginDefinition,
+    coreDefinition,      
     accountsDefinition,
     securityDefinition,
     configurationDefinition,
-    devicesDefinition,
-    userDefinition,  
+    devicesDefinition,    
     CounterType,
     NewUserType,
     DeleteUserType,
@@ -37,11 +33,17 @@ import {
 } from "./person.types";
 
 import {
+     smallUserDefinition,
+     userDefinition,
+     profileDefinition,
+     passwordDefinition,
+     loginDefinition,
+} from "../type.definitions";
+
+import {
     PersonReadResolvers,
     PersonMutationResolvers
 } from "../resolvers";
-
-
 
 /***
  *
@@ -49,12 +51,12 @@ import {
 const query = {  
 
     usersAll: {
-        type: new GraphQLList(userDefinition.type),
+        type: new GraphQLList(smallUserDefinition.type),
         resolve: () => PersonReadResolvers.findAll('user')
     },
 
     usersSelection: {
-        type: new GraphQLList(userDefinition.type),
+        type: new GraphQLList(smallUserDefinition.type),
         args: { 
             skip: { type: GraphQLInt, description: 'Method on a cursor to control where MongoDB begins returning results. This approach may be useful in implementing paginated results.' },      
             limit:  { type: GraphQLInt, description: 'Method on a cursor to specify the maximum number of documents the cursor will return. limit() is analogous to the LIMIT statement in a SQL database.'} 

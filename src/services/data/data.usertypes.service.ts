@@ -5,17 +5,20 @@
  * @customers
  */
 import fetch from "node-fetch";
+import mongoose from "mongoose";
 
 import { 
 	IUser, 
 	IClient, 
-	ICustomer 
+	ICustomer,
+	IUserAddress
 } from "../../shared/interfaces";
 
 import { 
 	userModel, UserModel, 
 	clientModel, ClientModel, 
-	customerModel, CustomerModel
+	customerModel, CustomerModel,
+	addressModel, AddressModel
 } from "../../shared/models";
 
 import {
@@ -26,15 +29,46 @@ import {
 	DB_CUSTOMERS_COLLECTION_NAME 
 } from "../../util/secrets";
 
+import {
+	dataUtilitiesService
+} from "./data.utilities.service";
+
+import {deepCloneObject} from "../../util";
+
+/***
+ * AddressObject Formatter
+ */
+const createAddressObject:Function = (
+	mongooseID:any, 
+	subtype:string
+)=> {
+
+	let address:IUserAddress = dataUtilitiesService.fakeSingleAddress();
+
+	if(subtype === 'customer') {
+
+		console.log(" *** id ", mongooseID)
+		console.log( "*** subtype ", subtype )
+		console.log(" *** address ", address)
+	}
+	if(subtype === 'user') address.userID = mongooseID.id;
+	if(subtype === 'client') address.clientID = mongooseID.id;
+	if(subtype === 'customer') address.customerID = mongooseID.id;
+
+	console.log(address)
+	console.log("---------------------------------------------------------")
+
+	return address;
+
+}
+
 
 export class UserTypes {
 
 	/******
 	 * Stores generated data in local MongoDB instance
 	 */
-	public static storeLocally(data:any) {
-
-		console.log("*** Sore in Local Database")
+	public static storeLocally(data:any) {		
 
 		if(!POPULATE_LOCAL_DATABASE)
 			return Promise.resolve();
@@ -44,14 +78,12 @@ export class UserTypes {
 				let keys:string[] = Object.keys(data[key]),
 					category:string = keys[0];	
 
-				if(category==='users') {
-					UserTypes.processGeneratedUsers( obj.users );
-				
+				if(category==='users') { 
+					UserTypes.processGeneratedUsers( obj.users );				
 				} else if(category==='defaultClient') {
-					UserTypes.processGeneratedClients(obj, 'defaultClient')
-
+					UserTypes.processGeneratedClients(obj, 'defaultClient');
 				} else if(category==='defaultCustomer') {					
-					UserTypes.processGeneratedCustomers(obj, 'defaultCustomer')
+					UserTypes.processGeneratedCustomers(obj, 'defaultCustomer');
 				}
 			})
 
@@ -69,30 +101,36 @@ export class UserTypes {
 	 * user: IUser
 	 * }
 	 */
-	private static processGeneratedUsers( usersCollection:any) {	
+	private static processGeneratedUsers( usersCollection:any) {
+
+		let keys:string[];
+		let key:any;		
 
 		// process thick: empty collection
 		return  userModel.remove({})
 
 		// process thick: create admin(s), poweruser(s), autthor(s), user(s)
-		.then( () => {
-			return Promise.all(				
+		.then( () => {			
 
+			return addressModel.remove({})
+			.then( () => Promise.all(				
 				usersCollection.map( ( _collection:any) => {	
-
-					let keys:string[] = Object.keys(_collection),
-						key:any = keys[0];
-					let collection:IUser[]= _collection[key];						
-					console.log("**** Inserting users: ", key, collection.length)
-					userModel.insert( collection );
-				})
+					let userID:mongoose.Schema.Types.ObjectId;
+					key = Object.keys(_collection)[0];			
+					let users:IUser[]= _collection[key];					
+					return users.map( (user:IUser) => {
+						userModel.create(user, true) // create user and return its id
+						.then( (id:mongoose.Schema.Types.ObjectId) => {
+							userID = id;
+							return createAddressObject(userID, 'user');
+						})
+						.then( (address:IUserAddress) => addressModel.create(address, true) )												
+						.catch( (err:Error) => Promise.reject(err) )
+					});				
+				}))
 			)			
-			.then( (res:any) =>  {				
-				return Promise.resolve() 
-			})		
 			.catch( (err:Error) => Promise.reject(err) )
-		});
-		
+		});		
 	}
 
 	/*****
@@ -100,26 +138,41 @@ export class UserTypes {
 	 */
 	private static processGeneratedClients( data:any, cName:string) {
 
-		let collection:IClient[]= this.getSubCollection(data, cName)		
-		return (
-			clientModel.remove({})
-			.then( () => clientModel.insert( collection ) )
-			.then( () => Promise.resolve())
-			.catch( (err:Error) => Promise.reject(err))
-		);
+		const clients:IClient[]= this.getSubCollection(data, cName);
+
+		return clientModel.remove({})
+		.then( () => Promise.all(
+			clients.map( (client:IClient) => {
+				let clientID:mongoose.Schema.Types.ObjectId;
+				clientModel.create(client, true).then( (id:mongoose.Schema.Types.ObjectId) => {
+					clientID = id;
+					return createAddressObject(clientID, 'client');
+				})
+				.then( (address:IUserAddress) => addressModel.create(address, true) )				
+				.catch((err:Error) => Promise.reject(err) )
+			})	
+		))
+		.catch( (err:Error) => Promise.reject(err))
 	}
 
 	/*****
 	 *
 	 */
 	private static processGeneratedCustomers( data:any, cName:string ) {
-		let collection:ICustomer[]= this.getSubCollection(data, cName)		
-		return ( 
-			customerModel.remove({})
-			.then( () => customerModel.insert( collection ) )
-			.then( () => Promise.resolve())
-			.catch( (err:Error) => Promise.reject(err))
-		)
+		let customers:ICustomer[]= this.getSubCollection(data, cName)		
+		return customerModel.remove({})
+		.then( () => Promise.all(
+			customers.map( (customer:ICustomer) => {
+				let customertID:mongoose.Schema.Types.ObjectId;
+				customerModel.create(customer, true).then( (id:mongoose.Schema.Types.ObjectId) => {
+					customertID = id;
+					return createAddressObject(customertID, 'customer');
+				})
+				.then( (address:IUserAddress) => addressModel.create(address, true) )				
+				.catch((err:Error) => Promise.reject(err) )
+			})
+		))
+		.catch( (err:Error) => Promise.reject(err))
 	}
 
 	private static getSubCollection(data:any, cName:string):any {

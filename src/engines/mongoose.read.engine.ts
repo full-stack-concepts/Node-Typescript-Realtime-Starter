@@ -7,13 +7,23 @@ import { Schema } from "mongoose";
  * Redis Settings
  */
 import { 
+
+    // Redis settings
     USE_LOCAL_REDIS_SERVER,
     REDIS_READ_QUERIES_EXPIRATION_TYPE,
     REDIS_READ_QUERIES_EXPIRATION_TIME,
+
+    /****
+     * Person Model Identifiers
+     */
     PERSON_SUBTYPE_SYSTEM_USER,
     PERSON_SUBTYPE_USER,
     PERSON_SUBTYPE_CLIENT,
     PERSON_SUBTYPE_CUSTOMER,
+
+    // Person Model related identifiers
+    ADDRESS_TYPE,
+
     EXCLUDE_FROM_CACHING_COLLECTIONS
 } from "../util/secrets";
 
@@ -29,10 +39,13 @@ import {
 /****
  * Person SubType Mongoose Schemas
  */
-import { systemUserSchema } from "../shared/schemas/systemuser.schema";
-import { userSchema } from "../shared/schemas/user.schema";
-import { clientSchema} from "../shared/schemas/client.schema";
-import { customerSchema } from "../shared/schemas/customer.schema";
+import { 
+    systemUserSchema, 
+    userSchema, 
+    clientSchema,
+    customerSchema,
+    addressSchema
+} from "../shared/schemas";
 
 import { IMongooseModels, IRead } from "./mongoose/interfaces";
 
@@ -62,18 +75,11 @@ export 	class ReadRepositoryBase<T extends mongoose.Document>
         this.schemaIdentifier = schemaIdentifier.toLowerCase();   
 
         switch(this.schemaIdentifier) {
-            case PERSON_SUBTYPE_SYSTEM_USER:  
-                this.createSystemUserModel(conn); 
-            break;
-            case PERSON_SUBTYPE_USER:             
-                this.createUserModel(conn); 
-            break;            
-            case PERSON_SUBTYPE_CLIENT: 
-                this.createClientModel(conn);        
-            break;
-            case PERSON_SUBTYPE_CUSTOMER:
-                this.createCustomerModel(conn);               
-            break;
+            case PERSON_SUBTYPE_SYSTEM_USER:    this.createSystemUserModel(conn);   break;
+            case PERSON_SUBTYPE_USER:           this.createUserModel(conn);         break;            
+            case PERSON_SUBTYPE_CLIENT:         this.createClientModel(conn);       break;
+            case PERSON_SUBTYPE_CUSTOMER:       this.createCustomerModel(conn);     break;
+            case ADDRESS_TYPE:                  this.createAddressModel(conn);      break;
         }        
 
         this.client = redisClient;
@@ -374,6 +380,10 @@ export 	class ReadRepositoryBase<T extends mongoose.Document>
 
     createCustomerModel(connection:any):void {
          this._model = connection.model('Customer', customerSchema, 'customers', true);
+    }      
+
+    createAddressModel(connection:any):void {
+         this._model = connection.model('Address', addressSchema, 'addresses', true);
     }      
 
     /***
