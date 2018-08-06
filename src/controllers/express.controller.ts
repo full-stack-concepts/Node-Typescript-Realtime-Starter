@@ -115,17 +115,17 @@ class ExpressController {
             })
         );
 
-        /*****
+         /*****
          * Graphql Schema
          */
-        /*
-        this.express.use('/schema',    ,
-            (request:Request, response:Response, next:NextFunction) => {
-                response.set('Content-Type', 'text/plain');
-                response.send(printSchema(graphqlSchema));
-            }
-        );
-        */
+        this.express.use('/schema/',
+            cors(),   
+                (req:Request, res:Response, _next:NextFunction) => {
+                    res.set('Content-Type', 'text/plain');
+                    res.send(printSchema(graphqlSchema));
+                }
+        );      
+       
 
         /**
          * Public Directories
