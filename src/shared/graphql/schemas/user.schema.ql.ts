@@ -2,14 +2,11 @@ import {
     GraphQLID,
     GraphQLEnumType,
     GraphQLInterfaceType,
-    GraphQLObjectType,
     GraphQLList,
     GraphQLNonNull,
     GraphQLSchema,
     GraphQLString,
-    GraphQLInt,
-    GraphQLFloat,
-    GraphQLBoolean,
+    GraphQLInt    
 
 } from 'graphql';
 
@@ -37,7 +34,7 @@ import {
     devicesDefinition, 
     securityDefinition,
     configurationDefinition,
-    accountsDefinition
+    accountsDefinition,
 } from "../type.definitions";
 
 import {

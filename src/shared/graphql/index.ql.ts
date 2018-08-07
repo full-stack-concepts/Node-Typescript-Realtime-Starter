@@ -5,10 +5,11 @@ import {
 
 
 // Import each models schema
-import { UserSchema } from "./types/user.type.ql"; 
-import { ClientSchema} from "./types/client.type.ql";
-import { CustomerSchema} from "./types/customer.type.ql";
-import { SystemUserSchema} from "./types/systemuser.type.ql";
+import { UserSchema } from "./schemas/user.schema.ql"; 
+import { ClientSchema} from "./schemas/client.schema.ql";
+import { CustomerSchema} from "./schemas/customer.schema.ql";
+import { SystemUserSchema} from "./schemas/systemuser.schema.ql";
+import { AddressSchema} from "./schemas/address.schema.ql";
 
 export const graphqlSchema = new GraphQLSchema({
 
@@ -18,7 +19,8 @@ export const graphqlSchema = new GraphQLSchema({
             UserSchema.query,
             ClientSchema.query,
             CustomerSchema.query,
-            SystemUserSchema.query
+            SystemUserSchema.query,
+            AddressSchema.query
         )
     }),  
 
@@ -27,7 +29,8 @@ export const graphqlSchema = new GraphQLSchema({
         fields: () => Object.assign(
             UserSchema.mutation,
             ClientSchema.mutation,
-            CustomerSchema.mutation
+            CustomerSchema.mutation,
+            AddressSchema.mutation
         )
     }),
    
@@ -42,6 +45,7 @@ export const graphqlSchema = new GraphQLSchema({
     // }),
     types: [       
         ...UserSchema.types,
+        ...AddressSchema.types
     ]
 });
 

@@ -23,6 +23,11 @@ export { customerDefinition} from "./customer.definition";
 export { systemUserDefinition } from "./systemuser.definition";
 
 /***
+ * Other Independent Main Definitions
+ */
+export { addressDefinition } from "./address.definition";
+
+/***
  * Person  subtype definitions
  */
 export { profileDefinition} from "./person.profile.definition";

@@ -120,10 +120,10 @@ class ExpressController {
          */
         this.express.use('/schema/',
             cors(),   
-                (req:Request, res:Response, _next:NextFunction) => {
-                    res.set('Content-Type', 'text/plain');
-                    res.send(printSchema(graphqlSchema));
-                }
+            (req:Request, res:Response, _next:NextFunction) => {
+                res.set('Content-Type', 'text/plain');
+                res.send(printSchema(graphqlSchema));
+            }
         );      
        
 

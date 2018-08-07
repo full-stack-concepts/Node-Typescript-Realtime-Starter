@@ -22,7 +22,7 @@ export const constructPrimaryKey = (model:any) => {
  * @query: object
  * returns either stringified Object.keys(query)[0]query[key] or 'all'
  */
-export const constructSecundaryKey = (query:Object):string => {
+export const constructSecundaryKey = (query:Object, cName:string):string => {
     
     let key:string;
     let value:string;
@@ -31,9 +31,17 @@ export const constructSecundaryKey = (query:Object):string => {
   
     key = keys[0];        
     value = query[key];
-    key = key.replace('.', '');
-    value = value.replace(/[^\w\s]/gi, '');
-    redisKey = `${key}${value}`;
+
+    console.log("***********************************************************************")
+    console.log(key, value)
+
+    if(key) {
+        key = key.replace('.', '');
+        value = value.replace(/[^\w\s]/gi, '');
+        redisKey = `${key}${value}`;
+    } else {
+        redisKey = `collection-${cName}`;
+    }
         
     return (keys[0]) ?
         redisKey :

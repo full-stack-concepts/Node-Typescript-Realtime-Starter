@@ -50,12 +50,11 @@ export const userDefinition:ITypeDefinition = {
 	        role: obj.core.role,
 	        email: obj.core.email,
 	        url: obj.core.url,
-	        identifier: obj.core.identifier,
-	        personalia: obj.profile.personalia,
+	        identifier: obj.core.identifier,	      
 	        displayName: obj.profile.displayNames.fullName,
 	        coreSectionID: obj.core.id,
-	        passwordSectionID: obj.password.id,
-	        // loginsSectionID:  obj.logins.id,
+	        personalia: obj.profile.personalia,
+	        passwordSectionID: obj.password.id,	      
     		accountsSectionID:	obj.accounts.id,
     		securitySectionID:	obj.security.id,
     		configurationSectionID:	obj.configuration.id,
@@ -71,3 +70,5 @@ export const userDefinition:ITypeDefinition = {
     	fields: () => (defaultUserFields)
 	})
 };
+
+//    // loginsSectionID:  obj.logins.id,

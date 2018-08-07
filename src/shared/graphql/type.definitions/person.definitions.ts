@@ -35,19 +35,24 @@ export const DisplayNamesType = new GraphQLObjectType({
     }
 });
 
+import { userDefinition} from "./user.definition";
+import { userModel} from "../../models";
 export const AddressType = new  GraphQLObjectType({
     name: "AddressType",
     description: "Address Model",
     fields: {
-        street:             { type: GraphQLString},
-        houseNumber:        { type: GraphQLInt},
-        suffix:             { type: GraphQLString},
-        addition:           { type: GraphQLString},
-        areacode:           { type: GraphQLString},
-        city:               { type: GraphQLString},
-        county:             { type: GraphQLString},
-        country:            { type: GraphQLString},
-        countryCode:        { type: GraphQLString},      
+        userID:         { type: GraphQLString},
+        clientID:       { type: GraphQLString},
+        customerID:     { type: GraphQLString},
+        street:         { type: GraphQLString},
+        houseNumber:    { type: GraphQLInt },
+        suffix:         { type: GraphQLString},
+        addition:       { type: GraphQLString},
+        areacode:       { type: GraphQLString},
+        city:           { type: GraphQLString},
+        county:         { type: GraphQLString},
+        country:        { type: GraphQLString},
+        countryCode:    { type: GraphQLString}       
     }
 });
 

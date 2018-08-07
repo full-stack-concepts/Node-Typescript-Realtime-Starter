@@ -211,7 +211,7 @@ describe("Local Redis Server", () => {
             _hashKey = hashKey;
 
             // construct secudary key
-            let key:string|number = constructSecundaryKey({test:'redis', section: 'hashkey'});
+            let key:string|number = constructSecundaryKey({test:'redis', section: 'hashkey'}, _collectionName);
 
             _key = key;
 

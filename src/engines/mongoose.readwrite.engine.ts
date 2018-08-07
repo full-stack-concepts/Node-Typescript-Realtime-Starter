@@ -180,7 +180,8 @@ export 	class ReadWriteRepositoryBase<T extends mongoose.Document>
         condition:Object, 
         fields:Object, 
         options:any,   
-        model:any
+        model:any,
+        cName:string
     ) {
 
         /**
@@ -193,7 +194,7 @@ export 	class ReadWriteRepositoryBase<T extends mongoose.Document>
          * Retrieve first property of <condition> object
          * @key:string|number
          */
-        let key:string|number = constructSecundaryKey(condition);
+        let key:string|number = constructSecundaryKey(condition, cName);
         let timeslotKey:string = constructTimeslotKey(hashKey, key);         
       
         /****
@@ -217,7 +218,7 @@ export 	class ReadWriteRepositoryBase<T extends mongoose.Document>
         console.log("(2) Key: ", key)
         console.log("(3) TS Key: ", timeslotKey)
         console.log("(4) Expire Value ", expireValue  ) 
-        console.log("(5) Cache Value, ", cacheValue)      
+        // console.log("(5) Cache Value, ", cacheValue)      
 
         return {
             isReadByIdFunction,
@@ -296,14 +297,14 @@ export 	class ReadWriteRepositoryBase<T extends mongoose.Document>
      *      Only cache subdocument queries associated with these collections
      * (3)  All datastore queries are cached by default
      */
-    async cache (condition:any, fields:any, options:any, exec?:Function, callback?:any) {          
+    async cache (condition:any, fields:any, options:any, exec?:Function, callback?:any) {   
   
         /***
          * Determine if collection is protected 
          */
         let isProtectedCollection:boolean;
-        let cName:string = this._model.collection.collectionName;    
-        isProtectedCollection = EXCLUDE_FROM_CACHING_COLLECTIONS.includes( cName )       
+        let cName:string = this._model.collection.collectionName;           
+        isProtectedCollection = EXCLUDE_FROM_CACHING_COLLECTIONS.includes( cName )   
 
         /***
          * NO CACHING        
@@ -343,7 +344,7 @@ export 	class ReadWriteRepositoryBase<T extends mongoose.Document>
                 // Redis cache value for twin key with expiration value 
                 expireValue 
 
-            }:any = await this.getCacheValue( condition, fields, options, this._model );          
+            }:any = await this.getCacheValue( condition, fields, options, this._model, cName );          
      
 
             /***
@@ -439,7 +440,7 @@ export 	class ReadWriteRepositoryBase<T extends mongoose.Document>
         this.cache(query, {}, {}, this._model.findOne, callback);       
     }
 
-    find(query?: Object, fields?:Object, options?:Object, callback?: (err: any, res: T[]) => void): any {
+    find(query?: Object, fields?:Object, options?:Object, callback?: (err: any, res: T[]) => void): any {      
         this.cache(query, fields, options, this._model.find, callback);        
     }  
     

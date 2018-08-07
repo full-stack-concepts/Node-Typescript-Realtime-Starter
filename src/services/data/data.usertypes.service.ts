@@ -44,22 +44,12 @@ const createAddressObject:Function = (
 )=> {
 
 	let address:IUserAddress = dataUtilitiesService.fakeSingleAddress();
-
-	if(subtype === 'customer') {
-
-		console.log(" *** id ", mongooseID)
-		console.log( "*** subtype ", subtype )
-		console.log(" *** address ", address)
-	}
+	
 	if(subtype === 'user') address.userID = mongooseID.id;
 	if(subtype === 'client') address.clientID = mongooseID.id;
 	if(subtype === 'customer') address.customerID = mongooseID.id;
 
-	console.log(address)
-	console.log("---------------------------------------------------------")
-
 	return address;
-
 }
 
 

@@ -2,7 +2,6 @@
 import mongoose from 'mongoose';
 import { Schema } from "mongoose";
 
-
 /****
  * Redis Settings
  */
@@ -161,7 +160,8 @@ export 	class ReadRepositoryBase<T extends mongoose.Document>
         condition:Object, 
         fields:Object, 
         options:any,   
-        model:any
+        model:any,
+        cName:string
     ) {
 
         /**
@@ -174,7 +174,7 @@ export 	class ReadRepositoryBase<T extends mongoose.Document>
          * Retrieve first property of <condition> object
          * @key:string|number
          */
-        let key:string|number = constructSecundaryKey(condition);
+        let key:string|number = constructSecundaryKey(condition, cName);
         let timeslotKey:string = constructTimeslotKey(hashKey, key);         
       
         /****
@@ -198,7 +198,7 @@ export 	class ReadRepositoryBase<T extends mongoose.Document>
         console.log("(2) Key: ", key)
         console.log("(3) TS Key: ", timeslotKey)
         console.log("(4) Expire Value ", expireValue  ) 
-        console.log("(5) Cache Value, ", cacheValue)      
+        // console.log("(5) Cache Value, ", cacheValue)      
 
         return {
             isReadByIdFunction,
@@ -285,13 +285,12 @@ export 	class ReadRepositoryBase<T extends mongoose.Document>
          */
         let isProtectedCollection:boolean;
         let cName:string = this._model.collection.collectionName;    
-        isProtectedCollection = EXCLUDE_FROM_CACHING_COLLECTIONS.includes( cName )       
+        isProtectedCollection = EXCLUDE_FROM_CACHING_COLLECTIONS.includes( cName );       
 
         /***
          * NO CACHING        
          */  
-        if(!USE_LOCAL_REDIS_SERVER || isProtectedCollection ) {
-            console.log("*** Execute Database Query Only ") 
+        if(!USE_LOCAL_REDIS_SERVER || isProtectedCollection ) {            
             return this.queryDontCache(condition, fields, options, exec, callback);           
 
         /***
@@ -325,7 +324,7 @@ export 	class ReadRepositoryBase<T extends mongoose.Document>
                 // Redis cache value for twin key with expiration value 
                 expireValue 
 
-            }:any = await this.getCacheValue( condition, fields, options, this._model );          
+            }:any = await this.getCacheValue( condition, fields, options, this._model, cName );          
      
 
             /***
@@ -340,8 +339,7 @@ export 	class ReadRepositoryBase<T extends mongoose.Document>
                 // return array of Mongoose Documents
                 const result = Array.isArray(doc)
                     ? doc.map(d => new this._model(d))
-                    : new this._model(doc);
-                  console.log(result)
+                    : new this._model(doc);                
                 return callback(null, result);
             }       
         
