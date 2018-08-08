@@ -10,6 +10,13 @@ import {
 
 import { ITypeDefinition } from "../interfaces";
 import { IUserAddress} from "../../interfaces";
+import { 
+	userDefinition, 
+	smallClientDefinition, 
+	smallCustomerDefinition
+} from "../type.definitions";
+
+import { PersonReadResolvers } from "../resolvers";
 
 /****
  *
@@ -27,7 +34,11 @@ const defaultAddressFields = {
 	city:           { type: GraphQLString},
 	county:         { type: GraphQLString},
 	country:        { type: GraphQLString},
-	countryCode:    { type: GraphQLString},   
+	countryCode:    { type: GraphQLString}, 
+	person: { 
+		type: userDefinition.type,
+		resolve: (parent:any, args:any) => PersonReadResolvers.findPerson(parent, args)
+	}	
 };
 
 export const addressDefinition:ITypeDefinition = {

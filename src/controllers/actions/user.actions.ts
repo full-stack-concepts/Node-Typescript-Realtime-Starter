@@ -1,3 +1,8 @@
+/***
+ * Person <Generic> Action Types
+ */
+export const TEST_FOR_ACCOUNT_BY_ID:string = "testForAccountTypeById";
+
 /****
  * Person <SystemUser> Type
  */

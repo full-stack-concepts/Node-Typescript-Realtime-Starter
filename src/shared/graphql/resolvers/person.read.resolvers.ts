@@ -25,6 +25,18 @@ import {
 	addressModel, AddressModel
 } from "../../models";
 
+import { proxyService} from "../../../services";
+
+import {
+	TEST_FOR_ACCOUNT_BY_ID
+} from "../../../controllers/actions";
+
+
+var uaController:any;
+proxyService.uaController$.subscribe( (state:boolean) => {        	       	        
+	if(proxyService._uaController) uaController = proxyService._uaController;           
+});
+
 import { IUser, IClient, ICustomer, ISystemUser, IUserAddress} from "../../interfaces";
 
 const getModel = (subtype:string) => {
@@ -58,6 +70,18 @@ const buildAddressQuery = (subtype:string, id:string):Object => {
     if(subtype==='customer') query = { "customerID": id};
 
     return query;
+}
+
+const getSubtype = (role:number):string => {
+	let subtype:string;
+	switch(role) {
+		case 1: subtype = 'systemuser'; break;
+		case 5: subtype = 'user'; break;
+		case 10: subtype = 'client';  break;
+		case 20: subtype = 'customer';  break;
+		default: subtype = 'user';  break;
+	}
+	return subtype;
 }
 
 export const PersonReadResolvers =  {
@@ -113,8 +137,24 @@ export const PersonReadResolvers =  {
    		const person:IUser|IClient|ICustomer|ISystemUser = await getModel(subtype).findById(args.id);
    		const id:string =  person._id.toString();
 		const query:Object = buildAddressQuery(subtype, id);
-		const address:any = await addressModel.find(query);
+		const address:any = await addressModel.find(query);		
 		return formatOutput(subtype, person, address[0]);
+    },
+
+    /***
+     *
+     */
+    findPerson: async (root:any, args:any) => {  
+    	console.log("*** Incoming User request for Person ", root, args)    	
+    	let personID:string = root.userID || root.clientID || root.customerID;
+    	let role:number;
+    	console.log(personID)
+    	const person:IUser|IClient|ICustomer|ISystemUser = await uaController.testForAccountTypeById(personID);
+    	let subtype:string = getSubtype(person.core.role);
+    	const id:any =  person._id.toString();
+		const query:Object = buildAddressQuery(subtype, id);
+		const address:any = await addressModel.find(query);
+		return formatOutput(subtype, person, address[0]);    	
     },
 
     /***

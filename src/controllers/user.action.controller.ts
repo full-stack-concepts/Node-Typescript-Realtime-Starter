@@ -4,7 +4,8 @@ import {
 	facebookUserService,
 	googleUserService,
 	clientService,
-	customerService	
+	customerService,
+	userOperationsService
 } from "../services";
 
 export class UAController  {	
@@ -22,7 +23,8 @@ export class UAController  {
 			return new Proxy( controller, { 
 				get: await function(target:any, property:any) {
 					console.log("==> REQUEST ", property)					
-					 return userService[property] || 
+					 return userOperationsService[property] ||
+					 		userService[property] || 
 					 		facebookUserService[property] || 
 					 		googleUserService[property] ||
 					 		clientService[property] ||

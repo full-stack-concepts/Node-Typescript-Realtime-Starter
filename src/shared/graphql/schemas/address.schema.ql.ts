@@ -51,6 +51,12 @@ const query = {
         resolve: () => AddressReadResolvers.count()
     },
 
+      getAddress: {
+        type: addressDefinition.type,
+        args: { id: { type: GraphQLID } },
+        resolve: (root:any, args:any) => AddressReadResolvers.findById(root, args)
+    },
+
 }
 
 /***

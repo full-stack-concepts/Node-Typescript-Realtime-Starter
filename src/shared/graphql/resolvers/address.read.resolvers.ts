@@ -48,6 +48,15 @@ export const AddressReadResolvers =  {
 		const count:number = await addressReadModel.count();		
 		return { count };
 	},
+
+	/***
+	 * Query Address collection to find address by Mongoose ID
+	 */
+    findById: async (root:any, args:any) => {            	
+   		const address:IUserAddress = await addressReadModel.findById(args.id);
+   		return address;
+    },
+
 	
 	
 }

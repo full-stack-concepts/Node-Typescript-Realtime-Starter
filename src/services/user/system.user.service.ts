@@ -334,7 +334,7 @@ export class SystemUserService extends UserOperations {
 				hasFirstName:boolean, 
 				hasLastName:boolean
 			) => { 							
-				return this.findUser( PERSON_SUBTYPE_SYSTEM_USER, this.userEmail); 
+				return this.findUserByEmail( PERSON_SUBTYPE_SYSTEM_USER, this.userEmail); 
 			})		
 		})
 
@@ -376,7 +376,7 @@ export class SystemUserService extends UserOperations {
 		.then( () => this.testPassword(login.password))
 
 		// process thick: test for account
-		.then( () => this.findUser( PERSON_SUBTYPE_SYSTEM_USER, login.email) )
+		.then( () => this.findUserByEmail( PERSON_SUBTYPE_SYSTEM_USER, login.email) )
 
 		// process thick: validate password
 		.then( (user:ISystemUser) => this.validateUserPassword(user, login.password) )

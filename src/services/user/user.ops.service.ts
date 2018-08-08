@@ -7,6 +7,7 @@ import fileType from "file-type";
 const uuidv1 = require("uuid/v1");
 import validator from "validator";
 import moment from "moment-timezone";
+import mongoose from "mongoose";
 
 import { PersonProfile} from "./user.profile.service";
 
@@ -182,18 +183,16 @@ export class UserOperations extends PersonProfile {
 		proxyService.userDBLive$.subscribe( (state:boolean) => {		
 			if(proxyService.userDB) this.db = proxyService.userDB;						
 		});		
-	}
-
-	private _userEmailQuery(email:string) {
-		return { 'core.email': email  };
 	}	
 
 	/****
+	 * Find <Person> in either collection: systemusers, users, clients, customers
 	 * @email:string
+	 * @id: Mongoose ID String
 	 */
-	protected testForAccountType( email:string) {	
+	public testForAccountType( email:string, id?:string) {	
+
 		
-		let query:any = this._userEmailQuery(email);
 		let hostType:number = this.hostType;
 
 		// only support localDB for now
@@ -201,14 +200,28 @@ export class UserOperations extends PersonProfile {
 
 		// process thick: query all <Person> Subtype collections 		
 		return Promise.map( PERSON_SUBTYPE_TO_MODELS, ( personType:string) => {	
-			return this.findUser( personType, email) 
+
+			/***
+			 * Search By Mongoose ID of Person
+			 */
+			if(id) {			
+				return this.findUserById(personType, id) 
 				.then( (res:any) => { return { [personType]: res}; })
-				.catch( (err:Error) => Promise.reject(1100));				
+				.catch( (err:Error) => Promise.reject(1100));	
+
+			/***
+			 * Search By Person's email address
+			 */
+			} else {
+				return this.findUserByEmail( personType, email) 
+				.then( (res:any) => { return { [personType]: res}; })
+				.catch( (err:Error) => Promise.reject(1100));			
+			}			
 		})		
 	
 		// process thick: evaluate query results 
 		.then( (results:any) => {							
-		
+			
 			return Promise.map( results, ( result:any) => {
 				let subType:string = Object.keys(result)[0];	
 				if(result[subType]) {					
@@ -219,17 +232,23 @@ export class UserOperations extends PersonProfile {
 					return Promise.resolve();
 				}
 			})			
-			.then( (items:any) => {
 
-				let person:ISystemUser|IUser|IClient|ICustomer;
-				for(let i:number=0; i<items.length; i++) {
-					let item:ISystemUser|IUser|IClient|ICustomer = items[i];		
-				
-					if(item && item.core && item.core.email && item.core.email === email) {									
-						person = item;
-					} 
-				};					
-				return Promise.resolve( person );
+			/***
+			 * Test if item matches provided email or Mongoose ID
+			 */
+			.then( (persons:any) => {			
+
+				return new Promise( (resolve, reject) => {
+					persons.map( (person:ISystemUser|IUser|IClient|ICustomer) => {					
+						if(person) {
+							if(email && person && person.core && person.core.email && person.core.email === email) { 
+								resolve(person);
+							} else if(id && person && person._id.toString() === id.toString() ) { 
+								resolve(person);
+							}
+						}	
+					});				
+				});			
 			});			
 		})
 		
@@ -756,33 +775,15 @@ export class UserOperations extends PersonProfile {
 	}
 
 	/***
-	 * Find User for this user SubType model
+	 * Find User for this user SubType model by email
 	 */
-	protected findUser( userType:string, email:string) {
+	protected findUserByEmail( userType:string, email:string) {
 
-		/****
-		 * Degine HostType
-		 */
+		// Define HostType, model, collection and query
 		const hostType:number = this.hostType;
-
-		/****
-		 * Find Model Setting for this User Type
-		 */	
-		const setting:IModelSetting = this._getReadModel(userType);	
-
-		/****
-		 * Define user subtype model
-		 */
-		const model:any = setting.model;	
-
-		/****
-		 * Define Collection
-		 */
-		const collection:string = setting.collection;	
-
-		/***
-		 * Define query
-		 */
+		const setting:IModelSetting = this._getReadModel(userType);
+		const model:any = setting.model;		
+		const collection:string = setting.collection;		
 		const query = { 'core.email': email };		
 
 		/***
@@ -801,6 +802,34 @@ export class UserOperations extends PersonProfile {
 			return model.remoteFindOneOnly(query, collection)	
 			.then(  (user:IUser) => { return Promise.resolve(user); })
 			.catch( (err:Error)    => { return Promise.reject(err); });
+		}
+	}
+
+	/***
+	 * Find User for this user SubType model by id
+	 */
+	protected findUserById( userType:string, id:string) {
+
+		// Define HostType, model, collection and query
+		const hostType:number = this.hostType;
+		const setting:IModelSetting = this._getReadModel(userType);
+		const model:any = setting.model;		
+		const collection:string = setting.collection;					
+
+		/***
+		 * Local MongoDB instance
+		 */		
+		if(hostType === 1) {							
+			return model.findById(id.toString())
+			.then( (u:any) => { return Promise.resolve(u); })
+			.catch( (err:Error) => Promise.reject(1160) ); 		
+		}	
+
+		/***
+		 * MLAB MongoDB instance
+		 */
+		if(hostType === 2) {			
+			
 		}
 	}
 
@@ -1144,9 +1173,24 @@ export class UserOperations extends PersonProfile {
 		else if(this.hostType===2) {
 			
 		}
-	}	
-	
+	}		
 }
+
+/****
+ * Public Interface for User Actions Controller
+ */
+class ActionService {	
+
+	public testForAccountTypeById( id:string) {
+		console.log("*** Get user by id ", id)
+		let instance:any = new UserOperations();
+		return instance.testForAccountType(null , id)
+			.then( (user:IUser) => Promise.resolve(user) )
+			.catch( (err:Error) => Promise.reject(err) );
+	}	
+}
+
+export const userOperationsService:any = new ActionService();
 
 
 

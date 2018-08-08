@@ -94,16 +94,6 @@ export class UserService extends UserOperations {
 	constructor() {
 		super();		
 	}	
-	
-	/***
-	 * Find third party authenticated user by email
-	 */
-	private findUserByEmail() {		
-		let query = { 'core.email': this.gmail };		
-		return userModel.remoteFindOneOnly(query, 'users')	
-		.then(  (user:IUser) => { return Promise.resolve(user); })
-		.catch( (err:Error)    => { return Promise.reject(err); })	
-	}		
 
 	private getDefaultThumbnail():IRawThumbnail {
 		let rawThumbnail:IRawThumbnail = deepCloneObject(TI_RAW_THUMBNAIL);
