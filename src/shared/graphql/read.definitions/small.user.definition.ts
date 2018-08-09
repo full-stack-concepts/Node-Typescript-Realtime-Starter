@@ -1,23 +1,24 @@
 /***
  * Import Default Graphql Types
  */
-import { GraphQLObjectType, GraphQLID, GraphQLString, GraphQLInt } from 'graphql';
+import {
+	GraphQLObjectType,
+    GraphQLID,         
+    GraphQLString,
+    GraphQLInt   
+} from 'graphql';
 
-/***
- * Person sub type definitions
- */
-import { DisplayNamesType, PersonaliaType } from "../type.definitions";
+import { 
+	DisplayNamesType, PersonaliaType
+} from "../read.definitions";
 
-/***
- * Type interfaces
- */
 import { ITypeDefinition } from "../interfaces";
 
 
 /****
  *
  */
-const smallClientFieldObject = {
+const smallUserFieldObject = {
 	id:             { type: GraphQLID },
     displayName:    { type: GraphQLString, description: 'Display Name' },
     role:           { type: GraphQLInt, description: 'Assigned Role' },
@@ -30,7 +31,7 @@ const smallClientFieldObject = {
 
 
 
-export const smallClientDefinition:ITypeDefinition = {
+export const smallUserDefinition:ITypeDefinition = {
 
 	filter: {},
 	
@@ -47,8 +48,8 @@ export const smallClientDefinition:ITypeDefinition = {
 	},
 	
 	type:  new GraphQLObjectType({
-   		name: 'SmallClientType',
-    	description: 'Return an array of clients with core identifiers such as id, email and url ',
-    	fields: () => (smallClientFieldObject)
+   		name: 'SmallUserType',
+    	description: 'Return an array of users with core identifiers such as id, email and url ',
+    	fields: () => (smallUserFieldObject)
 	})
 };

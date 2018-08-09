@@ -10,15 +10,14 @@ import {
 
 import { 
 	DisplayNamesType, PersonaliaType
-} from "../type.definitions";
+} from "../read.definitions";
 
 import { ITypeDefinition } from "../interfaces";
-
 
 /****
  *
  */
-const smallUserFieldObject = {
+const smallCustomerFieldObject = {
 	id:             { type: GraphQLID },
     displayName:    { type: GraphQLString, description: 'Display Name' },
     role:           { type: GraphQLInt, description: 'Assigned Role' },
@@ -31,7 +30,7 @@ const smallUserFieldObject = {
 
 
 
-export const smallUserDefinition:ITypeDefinition = {
+export const smallCustomerDefinition:ITypeDefinition = {
 
 	filter: {},
 	
@@ -48,8 +47,8 @@ export const smallUserDefinition:ITypeDefinition = {
 	},
 	
 	type:  new GraphQLObjectType({
-   		name: 'SmallUserType',
-    	description: 'Return an array of users with core identifiers such as id, email and url ',
-    	fields: () => (smallUserFieldObject)
+   		name: 'SmallCustomerType',
+    	description: 'Return an array of customers with core identifiers such as id, email and url ',
+    	fields: () => (smallCustomerFieldObject)
 	})
 };

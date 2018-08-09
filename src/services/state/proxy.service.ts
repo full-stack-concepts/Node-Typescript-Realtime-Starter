@@ -78,8 +78,19 @@ class ProxyService {
     public _daController : Function;
     public daController$ : Subject<boolean> = new Subject();
 
-
     public systemUser$ : Subject<boolean> = new Subject();
+
+    /***
+     * Form Validation Objects
+     */
+    private _validationObjects:any[];
+
+    public setValidationObjects(objects:any[]):Promise<any> {       
+        this._validationObjects = objects;
+        return Promise.resolve();
+    }
+
+    public get validationObjects() { return this._validationObjects; }
 
 	/***
 	 * Local Redis CLient
@@ -98,7 +109,6 @@ class ProxyService {
 	 * Data Generator
 	 */
     public startDataOperations$ : Subject<boolean> = new Subject();
-
 
     public startDataOperations() {
         this.startDataOperations$.next(true);

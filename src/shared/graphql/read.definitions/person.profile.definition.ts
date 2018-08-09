@@ -14,7 +14,7 @@ import {
 	SocialType,
 	CommunicationType,
 	ImagesType
-} from "../type.definitions";
+} from "../read.definitions";
 
 import { ITypeDefinition } from "../interfaces";
 

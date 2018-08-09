@@ -1,24 +1,26 @@
+
 /***
  * Import Default Graphql Types
  */
-import { GraphQLObjectType, GraphQLID, GraphQLString, GraphQLInt} from 'graphql';
+import {
+	GraphQLObjectType,
+    GraphQLID,         
+    GraphQLString,
+    GraphQLInt   
+} from 'graphql';
 
-/***
- * Person sub type definitions
- */
-import { DisplayNamesType, PersonaliaType, AddressType } from "../type.definitions";
+import {
+	PersonaliaType,
+	AddressType
+} from "../read.definitions";
 
-/***
- * Type interfaces
- */
 import { ITypeDefinition } from "../interfaces";
 import { IUserAddress} from "../../interfaces";
-
 
 /****
  *
  */
-const defaultClientFields = {
+const defaultUserFields = {
     id:             		{ type: GraphQLID },
     displayName:    		{ type: GraphQLString, description: 'Display Name' },
     role:           		{ type: GraphQLInt, description: 'Assigned Role' },
@@ -27,32 +29,32 @@ const defaultClientFields = {
     identifier:     		{ type: GraphQLString, description: 'Infrastructure Identifier' },     
     personalia:     		{ type: PersonaliaType},
     coreSectionID:      	{ type: GraphQLID },
-    passwordSectionID:		{ type: GraphQLID },   
+    passwordSectionID:		{ type: GraphQLID },
+    loginsSectionID:		{ type: GraphQLID },
     accountsSectionID:		{ type: GraphQLID },
     securitySectionID:		{ type: GraphQLID },
     configurationSectionID:	{ type: GraphQLID },
     profileSectionID:   	{ type: GraphQLID },
    	devicesSectionID:		{ type: GraphQLID },
- 	address: 				{ type: AddressType}
+   	address: 				{ type: AddressType}
 };
 
-
-export const clientDefinition:ITypeDefinition = {
+export const userDefinition:ITypeDefinition = {
 
 	filter: {},
 	
 	format: (obj:any, address:IUserAddress) => {
-		
+
 		return {
 	        id: obj._id,                                      
 	        role: obj.core.role,
 	        email: obj.core.email,
 	        url: obj.core.url,
-	        identifier: obj.core.identifier,
-	        personalia: obj.profile.personalia,
+	        identifier: obj.core.identifier,	      
 	        displayName: obj.profile.displayNames.fullName,
 	        coreSectionID: obj.core.id,
-	        passwordSectionID: obj.password.id,	       
+	        personalia: obj.profile.personalia,
+	        passwordSectionID: obj.password.id,	      
     		accountsSectionID:	obj.accounts.id,
     		securitySectionID:	obj.security.id,
     		configurationSectionID:	obj.configuration.id,
@@ -63,8 +65,10 @@ export const clientDefinition:ITypeDefinition = {
 	},
 	
 	type:  new GraphQLObjectType({
-   		name: 'clientType',
-    	description: 'Returns array of clients with core identifiers such as email, url and role and section identifiers.',
-    	fields: () => (defaultClientFields)
+   		name: 'UserType',
+    	description: 'User Read Query',
+    	fields: () => (defaultUserFields)
 	})
 };
+
+//    // loginsSectionID:  obj.logins.id,

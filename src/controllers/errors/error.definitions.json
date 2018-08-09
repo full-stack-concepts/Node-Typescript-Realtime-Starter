@@ -26,7 +26,7 @@
 			"number": 9000, 
 			"msg": "Uncaught Exception Error: ",
 			"stack": null
-		}
+		}	
 
 
 	],
@@ -292,7 +292,52 @@
 			"provider": "User Operations",
 			"number": 11207, 
 			"msg": "Data Error: Password change could not be added to security history "
+		},
+
+		{
+			"action": "user_address_change", 
+			"provider": "User Operations",
+			"number": 11300, 
+			"msg": "Data Error: Invalid Form Data"
+		},
+
+		{
+			"action": "user_address_change", 
+			"provider": "User Operations",
+			"number": 11301, 
+			"msg": "Data Error: Invalid Person Database Identifier"
+		},
+
+		{
+			"action": "user_address_change", 
+			"provider": "User Operations",
+			"number": 11302, 
+			"msg": "Data Error: Invalid Person Email Identifier"
+		},
+
+
+		{
+			"action": "user_address_change", 
+			"provider": "User Operations",
+			"number": 11303, 
+			"msg": "Data Error: Could not execute mutation on non existing Person."
+		},
+
+		{
+			"action": "user_address_change", 
+			"provider": "User Operations",
+			"number": 11304, 
+			"msg": "Data Error: Could not identify Owner of address."
+		},
+
+
+		{
+			"action": "user_address_change", 
+			"provider": "User Operations",
+			"number": 11305, 
+			"msg": "Data Error: Could not find address."
 		}
+		
 
 
 	],

@@ -34,7 +34,7 @@ import {
     securityDefinition,
     configurationDefinition,
     accountsDefinition
-} from "../type.definitions";
+} from "../read.definitions";
 
 
 import {

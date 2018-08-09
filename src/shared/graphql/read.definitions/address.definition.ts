@@ -14,7 +14,7 @@ import {
 	userDefinition, 
 	smallClientDefinition, 
 	smallCustomerDefinition
-} from "../type.definitions";
+} from "../read.definitions";
 
 import { PersonReadResolvers } from "../resolvers";
 

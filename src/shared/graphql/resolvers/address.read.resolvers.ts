@@ -1,6 +1,6 @@
 import {
 	addressDefinition
-} from "../type.definitions";
+} from "../read.definitions";
 
 import { 	
 	addressReadModel, AddressReadModel

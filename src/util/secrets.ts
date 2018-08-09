@@ -590,6 +590,16 @@ export const PERSON_SUBTYPES:string[] = [
 	PERSON_SUBTYPE_CUSTOMER
 ];
 
+export const PERSON_SUBTYPES_TO_ROLE:any = [
+	{type: PERSON_SUBTYPE_SYSTEM_USER, role: 1},
+	{type: PERSON_SUBTYPE_ADMIN, role: 2},
+	{type: PERSON_SUBTYPE_POWERUSER, role: 3},
+	{type: PERSON_SUBTYPE_AUTHOR, role: 4},
+	{type: PERSON_SUBTYPE_USER, role: 5},
+	{type: PERSON_SUBTYPE_CLIENT, role: 10},
+	{type: PERSON_SUBTYPE_CUSTOMER, role: 20}
+];
+
 export const PERSON_SUBTYPE_TO_MODELS:string[] = [
 	PERSON_SUBTYPE_SYSTEM_USER,
 	PERSON_SUBTYPE_USER,
@@ -865,6 +875,13 @@ if(LOG_SYSTEM_EVENTS && !LOG_LOCALLY) {
 		process.exit(1);
 	}
 }
+
+/***
+ * GEOCODER DEFINITIONS
+ */
+export const GEOCODER_PROVIDER = process.env["GEOCODER_PROVIDER"];
+export const GEOCODER_HTTP_ADAPTER = process.env["GEOCODER_HTTP_ADAPTER"] || 'http';
+export const GEOCODER_API_KEY = process.env["GEOCODER_API_KEY"] || '';
 
 /***
  * Checks before bootstrapping application

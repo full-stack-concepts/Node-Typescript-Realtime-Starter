@@ -1185,7 +1185,15 @@ class ActionService {
 		console.log("*** Get user by id ", id)
 		let instance:any = new UserOperations();
 		return instance.testForAccountType(null , id)
-			.then( (user:IUser) => Promise.resolve(user) )
+			.then( (user:any) => Promise.resolve(user) )
+			.catch( (err:Error) => Promise.reject(err) );
+	}	
+
+	public testForAccountTypeByEmail( email:string) {
+		console.log("*** Get user by Email ", email)
+		let instance:any = new UserOperations();
+		return instance.testForAccountType(email)
+			.then( (user:any) => Promise.resolve(user) )
 			.catch( (err:Error) => Promise.reject(err) );
 	}	
 }

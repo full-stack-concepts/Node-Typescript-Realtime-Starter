@@ -4,6 +4,7 @@
 export { 
 
 	TEST_FOR_ACCOUNT_BY_ID,
+	TEST_FOR_ACCOUNT_BY_EMAIL,
 
 	LOGIN_SYSTEM_USER,
 	REGISTER_NEW_USER,
@@ -26,6 +27,13 @@ export {
 	CHANGE_PASSWORD_CUSTOMER,
 
 } from "./user.actions";
+
+/****
+ * Pre-defined Address Actions
+ */
+export {
+	VERIFY_ADDRESS
+} from "./address.actions";
 
 
 /*****

@@ -62,7 +62,8 @@ export {
 } from "./infrastructure.util";
 
 export {
-	FormValidation
+	FormValidation,
+	validateFormObject
 } from "./form.validation.util";
 
 export {

@@ -8,28 +8,95 @@
  */
 
 import dotenv from 'dotenv';
+import Promise from "bluebird";
 import fs from 'fs-extra';
-import {promisify} from "util";
 import path from "path";
+import jsonFile from  "jsonfile";
 const rootPath  = require("app-root-path");
 
-promisify(fs.readdir).bind(fs);
-promisify(fs.readFile).bind(fs);
+Promise.promisifyAll(jsonFile.readFile);
 
 export class EnvironmentController {
 
+	/***
+	 * Application Root Path
+	 */
 	private rootPath:string = rootPath.path.toString();
 
-	private path:string = './env';
+	/***
+	 * Path to development and productoinenvironment from app root
+	 */
+	private pathToDevelopmentSettingsDirectory:string = './env';
+	private prodToProudctionSettingsDirectory:string = './prod';
 
+	/***
+	 * Path to for validation objects directory frmo app root
+	 */
+	private pathToValidationObjectsDirectory:string = './config/validation';
+
+	/***
+	 * File encoding
+	 */
 	private encoding:string = 'utf8';
 
 	private parse:Function = dotenv.parse.bind(dotenv);
 
 	constructor(path?:string, encoding?:string) {
-		if(path) this.path = path;
+		if(path) this.pathToDevelopmentSettingsDirectory = path;
 		if(encoding) this.encoding = encoding;
 	}
+
+	/****
+	 * @path: optional string
+	 */
+	public loadValidationFormObjects(
+		pathToEnvDirectory?:string
+	) {
+
+		let err:Error;
+		let files:string[];
+		let validationObjects:any = [];
+
+		if(pathToEnvDirectory) {
+			this.pathToValidationObjectsDirectory = path.join(this.rootPath, pathToEnvDirectory);
+		} else{
+			this.pathToValidationObjectsDirectory = path.join(this.rootPath, this.pathToValidationObjectsDirectory);
+		}
+		
+		/****
+		 * Filter .json files
+		 */	
+		let dirContent:string[] = fs.readdirSync(this.pathToValidationObjectsDirectory);	
+		files = dirContent.filter( (file:string) => file.match(/.*\.json/));	  		
+
+		/****
+		 * Filter example files
+		 */
+		files = files.filter( (file:string) => !file.match(/.*example/ig) );			
+
+		/***
+		 * Parse file and add them to validationObjects Array
+		 */
+		return Promise.map( files, (file:string) => {
+			const pathToFile:string = path.join(this.pathToValidationObjectsDirectory, file);	
+			let rawdata:Buffer = fs.readFileSync(pathToFile);  
+			let data:any = JSON.parse(rawdata.toString('utf8'));
+			validationObjects.push(data);				
+		})			
+		.then( (result:any) => Promise.resolve(validationObjects) )
+		.catch( (err:Error) => { 
+
+			/****
+			 * Critical Error
+			 */
+			if(err) {				
+				console.error("Critical Error: could not load form validation files", err.message)
+				process.exit(1);
+			}
+
+		});		
+	}
+
 
 	/****
 	 * @path: optional string
@@ -42,7 +109,7 @@ export class EnvironmentController {
 		let files:string[];
 
 		if(pathToEnvDirectory) {
-			this.path = path.join(this.rootPath, pathToEnvDirectory);
+			this.pathToDevelopmentSettingsDirectory = path.join(this.rootPath, pathToEnvDirectory);
 		}
 
 		try {	
@@ -50,7 +117,7 @@ export class EnvironmentController {
 			/****
 			 * Filter .env. files
 			 */
-			let dirContent:string[] = fs.readdirSync(this.path)			
+			let dirContent:string[] = fs.readdirSync(this.pathToDevelopmentSettingsDirectory)			
 			files = dirContent.filter( (file:string) => {				
 				return file.match(/.*\.env\./ig);
 			});	    
@@ -95,7 +162,7 @@ export class EnvironmentController {
 	 * Load Environmental files into memory
 	 * @files: string[]
 	 */
-
+	/*
 	private async reloadEnvironment(files:string[]):Promise<boolean> {
 
 		let err:Error;		
@@ -107,7 +174,7 @@ export class EnvironmentController {
 				let secrets:any = [];
 
 				// construct absolute path to environmental file
-				const pathToFile:string = path.join(this.rootPath, this.path, file );
+				const pathToFile:string = path.join(this.rootPath, this.pathToDevelopmentSettingsDirectory, file );
 
 				// get file data
 				const data:any = await fs.readFile( pathToFile, this.encoding);
@@ -138,7 +205,8 @@ export class EnvironmentController {
 		} else {
 			return Promise.resolve(true);
 		}
-	}	
+	}
+	*/	
 
 }
 

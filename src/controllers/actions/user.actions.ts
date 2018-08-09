@@ -2,6 +2,7 @@
  * Person <Generic> Action Types
  */
 export const TEST_FOR_ACCOUNT_BY_ID:string = "testForAccountTypeById";
+export const TEST_FOR_ACCOUNT_BY_EMAIL:string = "testForAccountTypeByEmail";
 
 /****
  * Person <SystemUser> Type

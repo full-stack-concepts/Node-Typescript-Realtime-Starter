@@ -74,6 +74,15 @@ export class FormValidation {
 		return (!str || str && typeof str === 'string');
    	} 
 
+   	public static isInteger(n:number):boolean {
+		if(!n) n=0;
+		return Number.isInteger(n);
+	}
+
+	public static isFloat(n:any):boolean {
+		return !n &&  validator.isFloat(n.toString());
+	}
+
    	public static required(value:any):boolean {   			
    		return (value !==null);
    	}
@@ -88,13 +97,11 @@ export class FormValidation {
    		return (value.length <= l);
    	}
 
-   	public static minValue(n:number, min:number):boolean {
-   		if(!n || isNaN(n)) return false;
+   	public static minValue(n:number, min:number):boolean {   		
    		return (n>=min);
    	}
 
-   	public static maxValue(n:number, max:number):boolean {
-   		if(!n || isNaN(n)) return false;   		
+   	public static maxValue(n:number, max:number):boolean {   		   		
    		return (n<=max);
    	} 
 
@@ -117,12 +124,7 @@ export class FormValidation {
 	public static isURL(url:string):boolean {	
 		if(!url || typeof url != 'string') return false;
 		return urlRegex().test( url.toString() )
-	}
-
-	public static isInteger(n:number):boolean {
-		if(!n || isNaN(n)) return false;
-		return Number.isInteger(n);
-	}
+	}	
 
 	public static firstName(str:string) {
 		return (str && v.isLength( str, { min:1, max:LOCAL_AUTH_CONFIG.validation.maxLengthFirstName }));
@@ -135,9 +137,136 @@ export class FormValidation {
 	public static lastName(str:string) {
 		return (str && v.isLength( str, { min:1, max:LOCAL_AUTH_CONFIG.validation.maxLengthLastName }));
 	}
-
-
 }
+
+const getKeys = (obj:Object) => {
+	return Object.keys(obj)
+}
+
+const addTypeError = (e:any, testField:any, type:any) => {
+	e.push({ field: testField, message: 'Wrong Datatype', requiredType: type });
+	return e;
+}
+
+export const validateFormObject = (form:any, validationObject:any) => {
+
+	/*
+	console.log("*****************************************************")
+	console.log("Form: ", form)
+	console.log("Validation ", validationObject)
+	*/
+	
+	let formFields:string[] = getKeys(form);
+	let testFields:string[] = getKeys(validationObject.fields);
+	let e:any[] = [];	
+	
+	// loop form fields and validate
+	testFields.map( (testField:string) => {
+
+		let rules = validationObject.fields[testField];		
+
+		/***
+		 * Loop through rules
+		 */
+		Object.entries(rules).forEach( (entry:any) => {
+
+			let rule = entry[0]; 
+			let value = form[testField];		
+
+			/***
+		 	 * Test if form field is required
+		     */
+			if(rule === 'required' && rules[rule]) {			
+				if(	!formFields.includes(testField) || !FormValidation.required(formFields[testField]) ) {					
+					e.push({ field: testField, message: 'Field is required', type: rule });
+				}
+			}
+
+			/***
+			 * Test Datatype
+			 */
+			if(rule === 'type' && rules[rule] && formFields.includes(testField)) {
+
+				let type:string = rules[rule];				
+				
+				switch(type) {
+
+					// type: string
+					case 'string': if(!FormValidation.isString(value)) e = addTypeError(e, testField, type);					
+						break;
+
+					// type: integer
+					case 'int': if(!FormValidation.isInteger(value)) e = addTypeError(e, testField, type);
+						break;
+
+					// type: boolean
+					case 'boolean': if(!FormValidation.isBoolean(value)) e = addTypeError(e, testField, type);
+						break;
+
+					// type: float
+					case 'float': if(!FormValidation.isFloat(value)) e = addTypeError(e, testField, type);	
+						break;
+
+					// type: email
+					case 'email': if(!FormValidation.isEmail(value)) e = addTypeError(e, testField, type);
+						break;
+
+					// type: url
+					case 'url': if(!FormValidation.isURL(value)) e = addTypeError(e, testField, type);						
+						break;
+				};
+			}
+
+
+			/***
+			 * Test minlength
+			 */
+			let requirement = rules[rule];		
+			if(rule === 'minlength' && requirement && formFields.includes(testField)) {	
+				if(	!FormValidation.minLength( value, requirement) ) {					
+					e.push({ field: testField, message: `Minimum length of ${requirement} is required`, type: rule });
+				}
+
+			}
+
+			/***
+			 * Test maxlength
+			 */
+			if(rule === 'maxlength' && requirement && formFields.includes(testField)) {	
+				if(	!FormValidation.maxLength( value, requirement) ) {					
+					e.push({ field: testField, message: `Value exceeds maximum length of ${requirement} `, type: rule });
+				}
+			}
+
+			/***
+			 * Test minvalue
+			 */
+			if(rule === 'minvalue' && requirement && formFields.includes(testField)) {				
+				if(	!FormValidation.minValue(value, requirement) ) {					
+					e.push({ field: testField, message: `Minimum value of ${requirement} is required`, type: rule });
+				}
+			}
+
+			/***
+			 * Test maxvalue
+			 */
+			if(rule === 'maxvalue' && requirement && formFields.includes(testField)) {					
+				if(	!FormValidation.maxValue(value, requirement) ) {					
+					e.push({ field: testField, message: `Maximum value is ${requirement}`, type: rule });
+				}
+			}			
+		});
+
+	});
+
+	/***
+	 * Return error array
+	 */
+	console.log(e)
+	return e;
+}
+
+
 
 
 

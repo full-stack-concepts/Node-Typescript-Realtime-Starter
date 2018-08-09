@@ -19,7 +19,11 @@ import {
 
 import {
     addressDefinition
-} from "../type.definitions";
+} from "../read.definitions";
+
+import {    
+    MutationResponseType
+} from "../mutation.definitions";
 
 
 import {
@@ -51,7 +55,7 @@ const query = {
         resolve: () => AddressReadResolvers.count()
     },
 
-      getAddress: {
+    getAddress: {
         type: addressDefinition.type,
         args: { id: { type: GraphQLID } },
         resolve: (root:any, args:any) => AddressReadResolvers.findById(root, args)
@@ -60,9 +64,26 @@ const query = {
 }
 
 /***
- *
+ * 
  */
 const mutation = {
+
+     ChangeAddress: {
+        type: MutationResponseType,
+        args: {
+            userID:  { type: GraphQLID }, 
+            userEmail: { type:  GraphQLString},
+            addressID: { type: GraphQLString, description: "Address Identifier: Mongoose ObjectId string"},     
+            street: { type: new GraphQLNonNull(GraphQLString) },
+            houseNumber:  { type: new GraphQLNonNull(GraphQLInt) },
+            suffix:  { type: GraphQLString },
+            areacode:  { type: new GraphQLNonNull(GraphQLString) },
+            city:  { type: new GraphQLNonNull(GraphQLString) },
+            country:  { type: GraphQLString },
+            countryID: { type: GraphQLString }
+        },
+        resolve: (root:any, args:any, context:any) => AddressMutationResolvers.changeAddress(root, args, context)
+    }
 
 }
 
@@ -73,8 +94,6 @@ export const AddressSchema = {
         addressDefinition.type      
     ]
 };
-
-
 
 
 

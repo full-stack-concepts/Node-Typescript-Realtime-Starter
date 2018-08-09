@@ -1,0 +1,17 @@
+{
+    "type": "new-adddress-form",
+    "fields": {
+        "userID": { "required":false, "type": "string" },
+        "userEmail": { "required": false, "type": "string"},
+        "addressID": { "required": false, "type": "string"},
+        "street":  { "required": true, "type": "string", "minlength": 2, "maxlength": 100 },
+        "houseNumber":  { "required": true, "type": "int", "minvalue": 1, "maxvalue": 20000 },
+        "suffix":  { "required": false, "type": "string", "minlength": 1, "maxlength": 100 },
+        "areacode": { "required": true, "type": "string", "minlength": 4, "maxlength": 10 },
+        "city": { "required": true, "type": "string", "minlength": 2, "maxlength": 100 },
+        "country":  { "required": false, "type": "string", "minlength": 0, "maxlength": 100 },
+        "countryID": { "required": false, "type": "string", "minlength": 2, "maxlength": 2 }
+    }
+}
+
+

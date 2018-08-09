@@ -5,7 +5,8 @@ import {
 	googleUserService,
 	clientService,
 	customerService,
-	userOperationsService
+	userOperationsService,
+	addressService
 } from "../services";
 
 export class UAController  {	
@@ -29,7 +30,8 @@ export class UAController  {
 					 		googleUserService[property] ||
 					 		clientService[property] ||
 					 		customerService[property] ||
-					 		systemUserService[property] 
+					 		systemUserService[property]  ||
+					 		addressService[property]
 					 }
 			});		
 

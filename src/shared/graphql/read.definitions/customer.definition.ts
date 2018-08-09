@@ -12,7 +12,7 @@ import {
 import {
 	PersonaliaType,
 	AddressType
-} from "../type.definitions";
+} from "../read.definitions";
 
 import { ITypeDefinition } from "../interfaces";
 import { IUserAddress} from "../../interfaces";
@@ -20,7 +20,7 @@ import { IUserAddress} from "../../interfaces";
 /****
  *
  */
-const defaultUserFields = {
+const defaultCustomerFields = {
     id:             		{ type: GraphQLID },
     displayName:    		{ type: GraphQLString, description: 'Display Name' },
     role:           		{ type: GraphQLInt, description: 'Assigned Role' },
@@ -29,32 +29,31 @@ const defaultUserFields = {
     identifier:     		{ type: GraphQLString, description: 'Infrastructure Identifier' },     
     personalia:     		{ type: PersonaliaType},
     coreSectionID:      	{ type: GraphQLID },
-    passwordSectionID:		{ type: GraphQLID },
-    loginsSectionID:		{ type: GraphQLID },
+    passwordSectionID:		{ type: GraphQLID },   
     accountsSectionID:		{ type: GraphQLID },
     securitySectionID:		{ type: GraphQLID },
     configurationSectionID:	{ type: GraphQLID },
     profileSectionID:   	{ type: GraphQLID },
    	devicesSectionID:		{ type: GraphQLID },
-   	address: 				{ type: AddressType}
+	address: 				{ type: AddressType}
 };
 
-export const userDefinition:ITypeDefinition = {
+
+export const customerDefinition:ITypeDefinition = {
 
 	filter: {},
 	
 	format: (obj:any, address:IUserAddress) => {
-
 		return {
 	        id: obj._id,                                      
 	        role: obj.core.role,
 	        email: obj.core.email,
 	        url: obj.core.url,
-	        identifier: obj.core.identifier,	      
+	        identifier: obj.core.identifier,
+	        personalia: obj.profile.personalia,
 	        displayName: obj.profile.displayNames.fullName,
 	        coreSectionID: obj.core.id,
-	        personalia: obj.profile.personalia,
-	        passwordSectionID: obj.password.id,	      
+	        passwordSectionID: obj.password.id,	       
     		accountsSectionID:	obj.accounts.id,
     		securitySectionID:	obj.security.id,
     		configurationSectionID:	obj.configuration.id,
@@ -65,10 +64,8 @@ export const userDefinition:ITypeDefinition = {
 	},
 	
 	type:  new GraphQLObjectType({
-   		name: 'UserType',
-    	description: 'User Read Query',
-    	fields: () => (defaultUserFields)
+   		name: 'CustomerType',
+    	description: 'Customer Read Query',
+    	fields: () => (defaultCustomerFields)
 	})
 };
-
-//    // loginsSectionID:  obj.logins.id,

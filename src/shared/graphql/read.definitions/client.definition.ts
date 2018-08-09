@@ -1,26 +1,24 @@
-
 /***
  * Import Default Graphql Types
  */
-import {
-	GraphQLObjectType,
-    GraphQLID,         
-    GraphQLString,
-    GraphQLInt   
-} from 'graphql';
+import { GraphQLObjectType, GraphQLID, GraphQLString, GraphQLInt} from 'graphql';
 
-import {
-	PersonaliaType,
-	AddressType
-} from "../type.definitions";
+/***
+ * Person sub type definitions
+ */
+import { DisplayNamesType, PersonaliaType, AddressType } from "../read.definitions";
 
+/***
+ * Type interfaces
+ */
 import { ITypeDefinition } from "../interfaces";
 import { IUserAddress} from "../../interfaces";
+
 
 /****
  *
  */
-const defaultCustomerFields = {
+const defaultClientFields = {
     id:             		{ type: GraphQLID },
     displayName:    		{ type: GraphQLString, description: 'Display Name' },
     role:           		{ type: GraphQLInt, description: 'Assigned Role' },
@@ -35,15 +33,16 @@ const defaultCustomerFields = {
     configurationSectionID:	{ type: GraphQLID },
     profileSectionID:   	{ type: GraphQLID },
    	devicesSectionID:		{ type: GraphQLID },
-	address: 				{ type: AddressType}
+ 	address: 				{ type: AddressType}
 };
 
 
-export const customerDefinition:ITypeDefinition = {
+export const clientDefinition:ITypeDefinition = {
 
 	filter: {},
 	
 	format: (obj:any, address:IUserAddress) => {
+		
 		return {
 	        id: obj._id,                                      
 	        role: obj.core.role,
@@ -64,8 +63,8 @@ export const customerDefinition:ITypeDefinition = {
 	},
 	
 	type:  new GraphQLObjectType({
-   		name: 'CustomerType',
-    	description: 'Customer Read Query',
-    	fields: () => (defaultCustomerFields)
+   		name: 'clientType',
+    	description: 'Returns array of clients with core identifiers such as email, url and role and section identifiers.',
+    	fields: () => (defaultClientFields)
 	})
 };

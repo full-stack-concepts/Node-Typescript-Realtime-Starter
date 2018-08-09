@@ -16,6 +16,7 @@ import {
  * Import Dependencies
  */
 import { 
+	environmentController,
 	loggerController,
 	errorController,
 	RedisController, 
@@ -190,6 +191,11 @@ export class BootstrapController {
 		try {
 
 			/***
+			 * Await loading validation objects
+			 */
+			const validationObjects = await environmentController.loadValidationFormObjects();
+
+			/***
 			 * Await built of Log Controller
 			 */
 			await loggerController.build();
@@ -221,6 +227,11 @@ export class BootstrapController {
 			 */
 			this.daController = await DAController.build();
 			this.logBootstrapEvent(1002);
+
+			/****
+			 * Propagate Validation Objects
+			 */
+			await proxyService.setValidationObjects(validationObjects)
 
 			/****
 			 * Propagate instance of Redis CLient

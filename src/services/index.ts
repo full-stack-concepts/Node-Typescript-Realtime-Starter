@@ -44,3 +44,8 @@ export { clientDetectionService } from "./http/client.analyzer.service";
  * Mail Services
  */
 export { mailService } from "./mail/mail.service";
+
+/***
+ * Address Service(s)
+ */
+export {addressService} from "./address/address.service";

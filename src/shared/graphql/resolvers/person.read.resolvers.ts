@@ -15,7 +15,7 @@ import {
 	configurationDefinition,
 	accountsDefinition,
 	coreDefinition
-} from "../type.definitions";
+} from "../read.definitions";
 
 import { 
 	userReadModel, UserReadModel, 
@@ -188,9 +188,7 @@ export const PersonReadResolvers =  {
 	 * Query Person subtype collection to find user <password configuration> by its Mongoose ID section
 	 */
     password: async (root:any, args:any, subtype:string) => {   	
-   		const persons:IUser[]|IClient[]|ICustomer[]|ISystemUser[] = await getModel(subtype).find({"password._id": args.id}, passwordDefinition.filter)
-   		console.log("--------------------------------------")
-   		console.log(persons[0])
+   		const persons:IUser[]|IClient[]|ICustomer[]|ISystemUser[] = await getModel(subtype).find({"password._id": args.id}, passwordDefinition.filter)   	
    		return passwordDefinition.format(persons[0]);
     },
 

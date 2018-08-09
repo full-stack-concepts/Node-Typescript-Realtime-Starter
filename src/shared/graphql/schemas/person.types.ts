@@ -35,7 +35,7 @@ import {
 	CommunicationType,
 	ImagesType,
 	LocationType
-} from "../type.definitions";
+} from "../read.definitions";
 
 interface ITypeDefinition {
 	filter: Object,
