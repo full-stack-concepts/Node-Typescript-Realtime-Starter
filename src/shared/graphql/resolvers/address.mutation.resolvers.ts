@@ -26,25 +26,17 @@ export const changeAddress = async (root:any, args:any, context:any):Promise<any
 
 	console.log("*** Request to change address ")
 	console.log(root, args)
-	let err;
+	let err;	
 
-	try {
-		const result:any = await uaController[VERIFY_ADDRESS](args);
-
-
-	}
-
+	try { await uaController[VERIFY_ADDRESS](args); }
 	catch(e) {err = e;}
 	finally {
-		if(err) {
-			console.log(err)
-			const {errorID, data} = err;		
-			console.log(errorID, data)
+		if(err) {			
+			const {errorID, data} = err;				
 			return { error: true, status: false, errorID: errorID, formData:data };
+		} else {
+			 return Object.assign({}, args, { error: false, status: true});
 		}
-
-	
-
 	}
 
 

@@ -63,7 +63,8 @@ export {
 
 export {
 	FormValidation,
-	validateFormObject
+	validateFormObject,
+	sanitizeFormObject
 } from "./form.validation.util";
 
 export {

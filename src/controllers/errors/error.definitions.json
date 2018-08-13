@@ -298,7 +298,7 @@
 			"action": "user_address_change", 
 			"provider": "User Operations",
 			"number": 11300, 
-			"msg": "Data Error: Invalid Form Data"
+			"msg": "Data Error: Invalid Form Data or operations error."
 		},
 
 		{
@@ -320,7 +320,7 @@
 			"action": "user_address_change", 
 			"provider": "User Operations",
 			"number": 11303, 
-			"msg": "Data Error: Could not execute mutation on non existing Person."
+			"msg": "Data Error: Could not execute address mutation on non existing Person or faulty address object."
 		},
 
 		{
@@ -336,10 +336,22 @@
 			"provider": "User Operations",
 			"number": 11305, 
 			"msg": "Data Error: Could not find address."
+		},
+
+		{
+			"action": "user_address_change", 
+			"provider": "User Operations",
+			"number": 11310, 
+			"msg": "Data Error: Invalid Data response from Geocoder Provider."
+		},
+
+		{
+			"action": "user_address_change", 
+			"provider": "User Operations",
+			"number": 11311, 
+			"msg": "Geocoder Provider Error: Provided address has low confidence leveol. Aborting Address update."
 		}
 		
-
-
 	],
 
 	"systemuser": [

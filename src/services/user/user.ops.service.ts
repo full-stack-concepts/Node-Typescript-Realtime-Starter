@@ -238,16 +238,12 @@ export class UserOperations extends PersonProfile {
 			 */
 			.then( (persons:any) => {			
 
+				let result:any;
 				return new Promise( (resolve, reject) => {
 					persons.map( (person:ISystemUser|IUser|IClient|ICustomer) => {					
-						if(person) {
-							if(email && person && person.core && person.core.email && person.core.email === email) { 
-								resolve(person);
-							} else if(id && person && person._id.toString() === id.toString() ) { 
-								resolve(person);
-							}
-						}	
+						if(person) result = person;					
 					});				
+					(result)?resolve(result):reject(1100);
 				});			
 			});			
 		})
@@ -1104,7 +1100,7 @@ export class UserOperations extends PersonProfile {
 	}	
 
 
-	protected updateUser (query:any, update:any, subType?:string) {
+	public updateUser (query:any, update:any, subType?:string) {
 
 		/*
 		let ts:number = Math.round(+new Date());
@@ -1194,6 +1190,14 @@ class ActionService {
 		let instance:any = new UserOperations();
 		return instance.testForAccountType(email)
 			.then( (user:any) => Promise.resolve(user) )
+			.catch( (err:Error) => Promise.reject(err) );
+	}	
+
+	public updateUser(query:any, update:any, subType?:string ) {
+		console.log("*** Update User ")
+		let instance:any = new UserOperations();
+		return instance.updateUser(query, update, subType)
+			.then( () => Promise.resolve() )
 			.catch( (err:Error) => Promise.reject(err) );
 	}	
 }

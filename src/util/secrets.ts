@@ -874,14 +874,17 @@ if(LOG_SYSTEM_EVENTS && !LOG_LOCALLY) {
 		console.error("Logger Settings: a critical error occured ");
 		process.exit(1);
 	}
-}
+} 
 
 /***
  * GEOCODER DEFINITIONS
  */
+export const USE_GEOCODER_PROVIDER = process.env["USE_GEOCODER_PROVIDER"] == 'true';
 export const GEOCODER_PROVIDER = process.env["GEOCODER_PROVIDER"];
 export const GEOCODER_HTTP_ADAPTER = process.env["GEOCODER_HTTP_ADAPTER"] || 'http';
 export const GEOCODER_API_KEY = process.env["GEOCODER_API_KEY"] || '';
+export const GEOCODER_CONFIDENCE_LEVEL = parseFloat(process.env["GEOCODER_CONFIDENCE_LEVE"]) || 0.9;
+
 
 /***
  * Checks before bootstrapping application

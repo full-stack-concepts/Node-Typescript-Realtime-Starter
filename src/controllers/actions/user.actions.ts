@@ -16,6 +16,7 @@ export const REGISTER_NEW_USER:string = "registerUser";
 export const LOGIN_USER:string = "loginUser";
 export const FIND_USER:string = "findSingleUser";
 export const DELETE_USER:string = "deleteSingleUser";
+export const UPDATE_USER:string = "updateUser";
 export const CHANGE_PASSWORD_USER:string = "changePasswordUser";
 
 /****

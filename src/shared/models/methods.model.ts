@@ -73,7 +73,7 @@ export class ModelMethods {
 	public find (query:Object, fields:Object={}, options:Object={} ):Promise<any> {
 		const repo = this.repo;		
 		return new Promise ( (resolve, reject) => {
-			repo.find ( query, fields, options, (err:Error, result:any) => {			
+			repo.find ( query, fields, options, (err:Error, result:any) => {				
 				if(err) {  reject(err); } 
 				else if(!result) { resolve(); } 
 				else { resolve(result); }

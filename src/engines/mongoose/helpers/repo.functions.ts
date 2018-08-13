@@ -30,10 +30,10 @@ export const constructSecundaryKey = (query:Object, cName:string):string => {
     let keys:string[] = Object.keys(query);
   
     key = keys[0];        
-    value = query[key];
+    value = query[key].toString();
 
     console.log("***********************************************************************")
-    console.log(key, value)
+    console.log(" Cache key value pair ", key, value)
 
     if(key) {
         key = key.replace('.', '');

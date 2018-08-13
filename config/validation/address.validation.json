@@ -2,7 +2,7 @@
     "type": "new-adddress-form",
     "fields": {
         "userID": { "required":false, "type": "string" },
-        "userEmail": { "required": false, "type": "string"},
+        "userEmail": { "required": false, "type": "email"},
         "addressID": { "required": false, "type": "string"},
         "street":  { "required": true, "type": "string", "minlength": 2, "maxlength": 100 },
         "houseNumber":  { "required": true, "type": "int", "minvalue": 1, "maxvalue": 20000 },

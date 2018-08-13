@@ -1,8 +1,11 @@
 // TODO Rewrite this class with JS Proxy
+"use strict";
 
 import urlRegex from "url-regex";
 import validator from "validator";
+const htmlTags = require("html-tags")
 const v = validator;
+
 
 import {
 	PASSWORD_MIN_LENGTH,
@@ -83,6 +86,20 @@ export class FormValidation {
 		return !n &&  validator.isFloat(n.toString());
 	}
 
+	public static isHTML(str:string):boolean {
+		let regex:RegExp = new RegExp(htmlTags.map( (x:any) => `<${x}\\b[^>]*>`).join('|'), 'i');	
+		console.log(regex.test(str))
+		return regex.test(str);
+	}
+
+	public static isObject(obj:any):boolean {
+		return Object.prototype.toString.call(obj) === '[object Object]';
+	}
+
+	public static isJSON(obj:Object):boolean {		
+		return v.isJSON(obj.toString());
+	}
+
    	public static required(value:any):boolean {   			
    		return (value !==null);
    	}
@@ -148,6 +165,91 @@ const addTypeError = (e:any, testField:any, type:any) => {
 	return e;
 }
 
+interface ValidationRule {
+	required?: boolean,
+	type?:string,
+	minlength?:number,
+	maxlength?:number,
+	minvalue?:number,
+	maxvalue?:number	
+}
+
+/***
+ * Sanitizer
+ * (1) Defence against Mongoose Query Selector Injection Attacks
+ * (2) Type Casting
+ * 
+ * @form: JSON object provided by Graphql
+ * @validationObject: JSON Validation object 
+ */
+export const sanitizeFormObject = (form:any, validationObject:any) => {
+
+	let formFields:string[] = getKeys(form);
+	let testFields:string[] = getKeys(validationObject.fields);
+
+	testFields.map( (testField:string) => {
+
+		let rules = validationObject.fields[testField];		
+
+		Object.entries(
+			validationObject.fields[testField])
+		.forEach( (entry:any) => {
+
+			let rule = entry[0]; 
+			let value = form[testField];
+
+			if( rule === 'type' && 
+
+				formFields.includes(testField)) {
+
+				let type:string = rules[rule];		
+
+				switch(type) {
+
+					/***
+					 * (1) Prevent exploit of Mongoose query selector
+					 * (2) Cast as string
+					 */
+					case 'string': 		
+					case 'url':
+					case 'email':				
+						form[testField] = form[testField].replace('/$','/')
+						form[testField] = form[testField].toString().trim();
+						break;
+
+					/***
+					 * Number Type Conversion
+					 */
+					case 'int': 
+					case 'float':
+						form[testField] = Number(form[testField]);
+						break;
+
+					/***
+					 * Boolean Type Conversion
+					 */
+					case 'boolean':
+						form[testField] = Boolean(form[testField]);
+						break;
+
+					/***
+					 * Unescape HTML
+					 */
+					case 'html':
+						form[testField] = v.unescape(form[testField])
+						break;
+
+				}
+			}
+		});
+
+	});
+
+	return form;
+
+
+}
+
 export const validateFormObject = (form:any, validationObject:any) => {
 
 	/*
@@ -159,6 +261,22 @@ export const validateFormObject = (form:any, validationObject:any) => {
 	let formFields:string[] = getKeys(form);
 	let testFields:string[] = getKeys(validationObject.fields);
 	let e:any[] = [];	
+
+	/***
+	 * Return to caller when 
+	 * (1) Form data is not an object or valid JSON
+	 * (2) Validation objectis !object or valid JSOn 
+	 */
+	console.log("*** Test form ", FormValidation.isObject(form), FormValidation.isJSON(form))
+	if( !FormValidation.isObject(form)) {
+		e.push({ message: 'Invalid Data Object' });
+		return e;
+	}
+
+	if( !FormValidation.isObject(validationObject)) {
+		e.push({ message: 'Corrupted Validation Rules Object for this graphql mutation' });
+		return e;
+	}
 	
 	// loop form fields and validate
 	testFields.map( (testField:string) => {
@@ -191,8 +309,11 @@ export const validateFormObject = (form:any, validationObject:any) => {
 				
 				switch(type) {
 
-					// type: string
-					case 'string': if(!FormValidation.isString(value)) e = addTypeError(e, testField, type);					
+					// type: string -> test for HTML
+					case 'string': 
+
+						if(!FormValidation.isString(value)) e = addTypeError(e, testField, type);						
+						if(FormValidation.isHTML(value)) e.push({ field: testField, message: 'HTML is not allowed', type: rule });
 						break;
 
 					// type: integer

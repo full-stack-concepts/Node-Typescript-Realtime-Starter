@@ -79,8 +79,9 @@ const mutation = {
             suffix:  { type: GraphQLString },
             areacode:  { type: new GraphQLNonNull(GraphQLString) },
             city:  { type: new GraphQLNonNull(GraphQLString) },
+            county:  { type: GraphQLString },
             country:  { type: GraphQLString },
-            countryID: { type: GraphQLString }
+            countryCode: { type: GraphQLString }
         },
         resolve: (root:any, args:any, context:any) => AddressMutationResolvers.changeAddress(root, args, context)
     }
