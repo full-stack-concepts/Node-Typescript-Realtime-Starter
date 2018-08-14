@@ -50,6 +50,7 @@ export {
 	IUserAddress,
 	IUserCommunication,
 	IUserSocial,
+	IUserImages,
 	IUserImage,
 	IUserAccessControl,
 	IUserShortList,

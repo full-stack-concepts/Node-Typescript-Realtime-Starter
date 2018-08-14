@@ -16,7 +16,7 @@ import {
 import { ITypeDefinition } from "../interfaces";
 
 import {
-    IUserPersonalia, IUserDisplayNames, IUserSocial, IUserCommunication
+    IUserPersonalia, IUserDisplayNames, IUserSocial, IUserCommunication, IUserImages
 } from "../../interfaces";
 
 /***
@@ -137,12 +137,42 @@ export const profileCommunicationDefinition:ITypeDefinition = {
 
 	type: new GraphQLObjectType({
 	    name: "ProfileCommunicationType",
-	    description: "Get Communication Identifiersby Profile Id",
+	    description: "Get Communication Identifiers by Profile Id",
 	    fields: {
 	    	"phone": { type: GraphQLString},  
     		"mobile": { type: GraphQLString},  
     		"website":  { type: GraphQLString},    
-    		"email": { type: GraphQLString},    	    
+    		"email": { type: GraphQLString}  	    
+	    }
+	})
+}
+
+/***
+ *
+ */
+export const profileImagesDefinition:ITypeDefinition = {
+
+	filter: {				
+    	"profile.images.img":1,
+   		"profile.images.avatar":1,
+    	"profile.images.thumbnail":1    	
+	},
+
+	format: (obj:any):IUserImages => {
+		return <IUserImages>{
+	    	"img": obj.img,
+    		"avatar": obj.avatar,  
+    		"thumbnail": obj.thumbnail    	       
+	    };
+	},
+
+	type: new GraphQLObjectType({
+	    name: "ProfileImagesType",
+	    description: "Get Images Identifiers by Profile Id",
+	    fields: {
+	    	"img":{ type: GraphQLString},  
+    		"avatar":{ type: GraphQLString},  
+    		"thumbnail":{ type: GraphQLString}  
 	    }
 	})
 }

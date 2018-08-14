@@ -53,6 +53,12 @@ export interface IUserSocial {
 	stackoverflow?:string
 }
 
+export interface IUserImages {
+	img?: string,
+	thumbnail?:string,
+	avater?:string
+}
+
 export interface IUserImage {
 	img?: string
 }

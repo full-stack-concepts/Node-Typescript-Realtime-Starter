@@ -17,7 +17,8 @@ import {
     profilePersonaliaDefinition,
     profileDisplayNamesDefinition,
     profileSocialDefinition,
-    profileCommunicationDefinition
+    profileCommunicationDefinition,
+    profileImagesDefinition
 } from "../read.definitions";
 
 import {    
@@ -54,8 +55,14 @@ const query = {
 
     getCommunicationSettings: {
         type: profileCommunicationDefinition.type,
-        args: { profileID: { type: GraphQLID, description: 'retrieve Cpmmunication subdocument by its parent Profile Mongoose ID' } },
+        args: { profileID: { type: GraphQLID, description: 'retrieve Communication subdocument by its parent Profile Mongoose ID' } },
         resolve: (root:any, args:any) => ProfileReadResolvers.getCommunicationSettings(root, args)     
+    },
+
+    getImageSettings: {
+        type: profileImagesDefinition.type,
+        args: { profileID: { type: GraphQLID, description: 'retrieve Images subdocument by its parent Profile Mongoose ID' } },
+        resolve: (root:any, args:any) => ProfileReadResolvers.getImagesSettings(root, args)     
     }
 
 }

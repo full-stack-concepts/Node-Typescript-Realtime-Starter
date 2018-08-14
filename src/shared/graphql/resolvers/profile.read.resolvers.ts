@@ -2,11 +2,12 @@ import {
 	profilePersonaliaDefinition,
 	profileDisplayNamesDefinition,
 	profileSocialDefinition,
-	profileCommunicationDefinition
+	profileCommunicationDefinition,
+	profileImagesDefinition
 } from "../read.definitions";
 
 import {
-	ISystemUser, IUser, IClient, ICustomer, IUserPersonalia, IUserDisplayNames, IUserSocial
+	ISystemUser, IUser, IClient, ICustomer, IUserPersonalia, IUserDisplayNames, IUserSocial, IUserImages
 } from "../../interfaces";
 
 import {
@@ -93,6 +94,15 @@ export const ProfileReadResolvers =  {
     	
     	let result = await matchProfileSectionToSubDocumentId('communication', args.profileID.toString(), profileCommunicationDefinition.filter );     
     	return profileCommunicationDefinition.format(result) || {};   	
+    },
+
+    /***
+	 * Query Person collections to find Images Object
+	 */
+    getImagesSettings: async (root:any, args:any):Promise<IUserImages> => {        	
+    	
+    	let result = await matchProfileSectionToSubDocumentId('images', args.profileID.toString(), profileImagesDefinition.filter );     
+    	return profileImagesDefinition.format(result) || {};   	
     },
 
 
