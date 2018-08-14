@@ -28,7 +28,7 @@ import { BigIntegerScalar} from "../scalars/bigint.scalar";
 import { DateScalar } from "../scalars/date.scalar";
 
 import {
-	PersonaliaType,
+	profilePersonaliaDefinition,
 	DisplayNamesType,
 	AddressType,
 	SocialType,

@@ -3,6 +3,7 @@
  */
 export const TEST_FOR_ACCOUNT_BY_ID:string = "testForAccountTypeById";
 export const TEST_FOR_ACCOUNT_BY_EMAIL:string = "testForAccountTypeByEmail";
+export const FIND_USER_SUB_DOCUMENT:string = "findUserSubDocument";
 
 /****
  * Person <SystemUser> Type

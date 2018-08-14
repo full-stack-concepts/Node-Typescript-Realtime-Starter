@@ -6,7 +6,7 @@ import { GraphQLObjectType, GraphQLID, GraphQLString, GraphQLInt } from 'graphql
 /***
  * Person sub type definitions
  */
-import { DisplayNamesType, PersonaliaType } from "../read.definitions";
+import { DisplayNamesType, profilePersonaliaDefinition } from "../read.definitions";
 
 /***
  * Type interfaces
@@ -25,7 +25,7 @@ const smallClientFieldObject = {
     url:            { type: GraphQLString, description: 'Public Identifier' },
     identifier:     { type: GraphQLString, description: 'Infrastructure Identifier' },   
     displayNames:	{ type: DisplayNamesType },
-    personalia:     { type: PersonaliaType}
+    personalia:     { type: profilePersonaliaDefinition.type}
 }
 
 

@@ -10,7 +10,7 @@ import {
 } from 'graphql';
 
 import {
-	PersonaliaType,
+	profilePersonaliaDefinition,
 	AddressType
 } from "../read.definitions";
 
@@ -27,7 +27,7 @@ const defaultCustomerFields = {
     email:          		{ type: GraphQLString, description: 'Email Address' },     
     url:            		{ type: GraphQLString, description: 'Public Identifier' },
     identifier:     		{ type: GraphQLString, description: 'Infrastructure Identifier' },     
-    personalia:     		{ type: PersonaliaType},
+    personalia:     		{ type: profilePersonaliaDefinition.type},
     coreSectionID:      	{ type: GraphQLID },
     passwordSectionID:		{ type: GraphQLID },   
     accountsSectionID:		{ type: GraphQLID },

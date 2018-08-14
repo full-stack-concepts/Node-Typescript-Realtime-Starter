@@ -2,6 +2,12 @@ export interface IUserJob  {
 	jobDescription:string
 }
 
+export interface IUserPersonalia {
+	givenName:string,
+	middleName?:string,
+	familyName:string
+}
+
 export interface IUserAddress {
 	userID?:any,
 	clientID?:any,

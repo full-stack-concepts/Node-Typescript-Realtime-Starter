@@ -9,7 +9,7 @@ import {
 } from 'graphql';
 
 import { 
-	DisplayNamesType, PersonaliaType
+	DisplayNamesType, profilePersonaliaDefinition
 } from "../read.definitions";
 
 import { ITypeDefinition } from "../interfaces";
@@ -25,7 +25,7 @@ const smallCustomerFieldObject = {
     url:            { type: GraphQLString, description: 'Public Identifier' },
     identifier:     { type: GraphQLString, description: 'Infrastructure Identifier' },   
     displayNames:	{ type: DisplayNamesType },
-    personalia:     { type: PersonaliaType}
+    personalia:     { type: profilePersonaliaDefinition.type}
 }
 
 

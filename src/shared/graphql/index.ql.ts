@@ -10,6 +10,7 @@ import { ClientSchema} from "./schemas/client.schema.ql";
 import { CustomerSchema} from "./schemas/customer.schema.ql";
 import { SystemUserSchema} from "./schemas/systemuser.schema.ql";
 import { AddressSchema} from "./schemas/address.schema.ql";
+import { ProfileSchema } from "./schemas/profile.schema.ql";
 
 export const graphqlSchema = new GraphQLSchema({
 
@@ -20,7 +21,8 @@ export const graphqlSchema = new GraphQLSchema({
             ClientSchema.query,
             CustomerSchema.query,
             SystemUserSchema.query,
-            AddressSchema.query
+            AddressSchema.query,
+            ProfileSchema.query
         )
     }),  
 
@@ -30,7 +32,8 @@ export const graphqlSchema = new GraphQLSchema({
             UserSchema.mutation,
             ClientSchema.mutation,
             CustomerSchema.mutation,
-            AddressSchema.mutation
+            AddressSchema.mutation,
+            ProfileSchema.mutation
         )
     }),
    

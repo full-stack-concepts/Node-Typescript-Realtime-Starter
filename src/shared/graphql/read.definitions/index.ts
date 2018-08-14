@@ -1,12 +1,25 @@
 export {
-	DisplayNamesType,
-	PersonaliaType,
+	DisplayNamesType,	
 	AddressType,
 	SocialType,
 	CommunicationType,
 	ImagesType,
 	LocationType
 } from "./person.definitions";
+
+/***
+ * Person  subtype definitions
+ */
+
+export { profilePersonaliaDefinition } from "./profile.sub.definitions";
+export { passwordDefinition} from "./person.password.definition";
+export { loginDefinition} from "./person.login.definition";
+export { devicesDefinition } from "./person.devices.definition";
+export { securityDefinition } from "./person.security.definition";
+export { configurationDefinition } from "./person.configuration.definition";
+export { accountsDefinition } from "./person.accounts.definition";
+export { coreDefinition } from "./person.core.definition";
+export { profileDefinition} from "./person.profile.definition";
 
 /***
  * Person type definitions
@@ -27,14 +40,3 @@ export { systemUserDefinition } from "./systemuser.definition";
  */
 export { addressDefinition } from "./address.definition";
 
-/***
- * Person  subtype definitions
- */
-export { profileDefinition} from "./person.profile.definition";
-export { passwordDefinition} from "./person.password.definition";
-export { loginDefinition} from "./person.login.definition";
-export { devicesDefinition } from "./person.devices.definition";
-export { securityDefinition } from "./person.security.definition";
-export { configurationDefinition } from "./person.configuration.definition";
-export { accountsDefinition } from "./person.accounts.definition";
-export { coreDefinition } from "./person.core.definition";

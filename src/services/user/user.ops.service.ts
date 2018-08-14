@@ -183,7 +183,46 @@ export class UserOperations extends PersonProfile {
 		proxyService.userDBLive$.subscribe( (state:boolean) => {		
 			if(proxyService.userDB) this.db = proxyService.userDB;						
 		});		
-	}	
+	}
+
+	/****
+	 *
+	 */
+	public findUserSubDocument($query:Object, $filter:Object={}) {
+
+		// Define HostType, model, collection and query
+		const hostType:number = this.hostType;
+
+		// process thick: query all <Person> Subtype collections 		
+		return Promise.map( PERSON_SUBTYPE_TO_MODELS, ( personType:string) => {	
+
+			let setting:IModelSetting = this._getReadModel(personType);
+			let model:any = setting.model;		
+			let collection:string = setting.collection;				
+			
+			if(hostType === 1) {
+				return model.find($query) 
+				.then( (res:any) => { return { [personType]: res[0]}; })
+				.catch( (err:Error) => Promise.reject(1100));		
+			}				
+		})		
+
+		// process thick: evaluate query results 
+		.then( (results:any) => {	
+
+			let doc:any;							
+			results.forEach( (result:any) => {
+				let personType:string = Object.keys(result)[0];			
+				if(result[personType]) doc = result[personType];	
+			});	
+
+			return new Promise( (resolve, reject) => {
+				(doc)?resolve(doc):reject(1100)
+			});
+
+		})
+		.catch( (err:Error) => Promise.reject(1100));		
+	}
 
 	/****
 	 * Find <Person> in either collection: systemusers, users, clients, customers
@@ -1200,6 +1239,15 @@ class ActionService {
 			.then( () => Promise.resolve() )
 			.catch( (err:Error) => Promise.reject(err) );
 	}	
+
+	public findUserSubDocument($query:Object, $filter:Object={}) {
+		console.log("*** Find User Sub Document ", $query)		
+		let instance:any = new UserOperations();
+		return instance.findUserSubDocument($query, $filter)
+			.then( (doc:any) => Promise.resolve(doc) )
+			.catch( (err:Error) => Promise.reject(err) );
+
+	}
 }
 
 export const userOperationsService:any = new ActionService();

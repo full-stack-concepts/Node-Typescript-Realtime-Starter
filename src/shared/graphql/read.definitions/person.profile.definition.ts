@@ -10,7 +10,7 @@ import {
 
 import { 
 	DisplayNamesType, 
-	PersonaliaType, 
+	profilePersonaliaDefinition,
 	SocialType,
 	CommunicationType,
 	ImagesType
@@ -51,7 +51,7 @@ export const profileDefinition:ITypeDefinition = {
 	    fields: {
 	        id:             { type: GraphQLID},
 	        description:    { type: GraphQLString},
-	        personalia:     { type: PersonaliaType },
+	        personalia:     { type: profilePersonaliaDefinition.type },
 	        displayNames:   { type: DisplayNamesType },	       
 	        social:         { type: SocialType},
 	        communication:  { type: CommunicationType },

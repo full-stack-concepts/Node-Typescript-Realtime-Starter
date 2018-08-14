@@ -15,16 +15,6 @@ import {
     GraphQLBoolean 
 } from 'graphql';
 
-export const PersonaliaType = new GraphQLObjectType({
-    name: "PersonaliaType",
-    description: "Personalia Names Model",
-    fields: {
-        givenName:   { type: GraphQLString },     
-        middleName:  { type: GraphQLString },     
-        familyName:  { type: GraphQLString }
-    }
-});
-
 
 export const DisplayNamesType = new GraphQLObjectType({
     name: "DisplayNamesType",
