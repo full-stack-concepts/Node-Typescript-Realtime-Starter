@@ -14,17 +14,17 @@ import {
 } from "./person.types";
 
 import {
-    profilePersonaliaDefinition
+    profilePersonaliaDefinition,
+    profileDisplayNamesDefinition
 } from "../read.definitions";
 
 import {    
     MutationResponseType
 } from "../mutation.definitions";
 
-
 import {
-    PersonaliaReadResolvers,
-    PersonaliaMutationResolvers
+    ProfileReadResolvers,
+    ProfileMutationResolvers
 } from "../resolvers";
 
 /***
@@ -32,11 +32,17 @@ import {
  */
 const query = {  
 
-    getPersonaliaByProfileId: {
+    getPersonalia: {
         type: profilePersonaliaDefinition.type,
-        args: { id: { type: GraphQLID, description: 'rerieve Personalia subdocument by its Mongoose ID' } },
-        resolve: (root:any, args:any) => PersonaliaReadResolvers.getPersonalia(root, args)     
-    } 
+        args: { profileID: { type: GraphQLID, description: 'rerieve Personalia subdocument by its parent Profile Mongoose ID' } },
+        resolve: (root:any, args:any) => ProfileReadResolvers.getPersonalia(root, args)     
+    },
+
+    getDisplayNames: {
+        type: profileDisplayNamesDefinition.type,
+        args: { profileID: { type: GraphQLID, description: 'rerieve Display names subdocument by its parent Profile Mongoose ID' } },
+        resolve: (root:any, args:any) => ProfileReadResolvers.getDisplayNames(root, args)     
+    },
 
 }
 

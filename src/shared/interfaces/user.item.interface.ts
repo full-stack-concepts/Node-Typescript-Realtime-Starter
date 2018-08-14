@@ -8,6 +8,11 @@ export interface IUserPersonalia {
 	familyName:string
 }
 
+export interface IUserDisplayNames {
+	fullName?:string,
+	sortName?:string
+}
+
 export interface IUserAddress {
 	userID?:any,
 	clientID?:any,

@@ -15,20 +15,20 @@ import {
 
 import { ITypeDefinition } from "../interfaces";
 
-
-
+/***
+ *
+ */
 export const profilePersonaliaDefinition:ITypeDefinition = {
 
-	filter: {		
+	filter: {				
     	"profile.personalia.givenName":1,
     	"profile.personalia.middelName":1,
     	"profile.personalia.familyName":1
 	},
 
 	format: (obj:any) => {
-		return {
-	        id: obj._id,
-	      	givenName: obj.givenName,
+		return {	       
+	        givenName: obj.givenName,
 	      	middleName: obj.middleName, 
 	      	familyName: obj.familyName
 	    };
@@ -37,11 +37,36 @@ export const profilePersonaliaDefinition:ITypeDefinition = {
 	type: new GraphQLObjectType({
 	    name: "ProfilePersonaliaType",
 	    description: "Get Person Personalia By Section ID (Mongoose ID)",
-	    fields: {
-	        id: { type: GraphQLID},
+	    fields: {	   
 	        givenName: { type: GraphQLString},   
 	        middleName:  { type: GraphQLString}, 
 	        familyName:  { type: GraphQLString}  
+	    }
+	})
+}
+
+/***
+ *
+ */
+export const profileDisplayNamesDefinition:ITypeDefinition = {
+
+	filter: {				
+    	"profile.displayNames.fullName":1,
+    	"profile.displayNames.sortName":1,  
+	},
+	format: (obj:any) => {
+		return {
+	        fullName: obj.fullName,
+	        sortName: obj.sortName	       
+	    };
+	},
+
+	type: new GraphQLObjectType({
+	    name: "ProfileDisplayNamesType",
+	    description: "Get Person Display Names by Profile Id",
+	    fields: {
+	    	fullName: { type: GraphQLString},   
+	        sortName: { type: GraphQLString}	    
 	    }
 	})
 }

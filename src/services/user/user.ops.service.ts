@@ -201,7 +201,7 @@ export class UserOperations extends PersonProfile {
 			let collection:string = setting.collection;				
 			
 			if(hostType === 1) {
-				return model.find($query) 
+				return model.find($query, $filter) 
 				.then( (res:any) => { return { [personType]: res[0]}; })
 				.catch( (err:Error) => Promise.reject(1100));		
 			}				

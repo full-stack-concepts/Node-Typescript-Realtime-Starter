@@ -45,6 +45,7 @@ export { IChangePassword} from "./user/user.changepassword.interface";
 
 export {
 	IUserPersonalia,
+	IUserDisplayNames,
 	IUserJob,
 	IUserAddress,
 	IUserCommunication,

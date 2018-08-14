@@ -31,6 +31,6 @@ export const changePersonalia = async (root:any, args:any, context:any) => {
 /***
  *
  */
-export const PersonaliaMutationResolvers =  {	
+export const ProfileMutationResolvers =  {	
 	changePersonalia
 }

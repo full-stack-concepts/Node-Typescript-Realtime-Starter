@@ -4,6 +4,6 @@ export { PersonMutationResolvers } from "./person.mutation.resolvers";
 export { AddressReadResolvers} from "./address.read.resolvers";
 export { AddressMutationResolvers} from "./address.mutation.resolvers";
 
-export { PersonaliaReadResolvers} from "./personalia.read.resolvers";
-export { PersonaliaMutationResolvers} from "./personalia.mutation.resolvers";
+export { ProfileReadResolvers} from "./profile.read.resolvers";
+export { ProfileMutationResolvers} from "./profile.mutation.resolvers";
 

@@ -10,8 +10,11 @@ export {
 /***
  * Person  subtype definitions
  */
-
-export { profilePersonaliaDefinition } from "./profile.sub.definitions";
+export { 
+	profilePersonaliaDefinition,
+	profileDisplayNamesDefinition
+ } from "./profile.sub.definitions";
+ 
 export { passwordDefinition} from "./person.password.definition";
 export { loginDefinition} from "./person.login.definition";
 export { devicesDefinition } from "./person.devices.definition";
