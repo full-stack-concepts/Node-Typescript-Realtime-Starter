@@ -168,7 +168,7 @@ export const addressLine3 = ():string => {
 }
 
 /****
- * Data generate functions: system
+ * Data generate functions: Location
  */
 export const latitude = ():number => {
 	return Number(faker.address.latitude());
@@ -177,6 +177,10 @@ export const latitude = ():number => {
 export const longitude = ():number => {
 	return Number(faker.address.longitude());
 } 
+
+export const placeID = ():string => {
+	return faker.random.word().replace(/\s+/g, '_').toLowerCase();
+}
 
 /****
  * Data generate functions: Imaging

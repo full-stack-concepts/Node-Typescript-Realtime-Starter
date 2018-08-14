@@ -21,7 +21,8 @@ export interface IUserAddress {
 	addressLine3?:string,
 	location?:{
 		longitude?:number,
-		latitude?:number
+		latitude?:number,
+		placeID?:string
 	},
 }
 

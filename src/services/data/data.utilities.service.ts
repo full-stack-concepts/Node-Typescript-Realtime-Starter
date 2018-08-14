@@ -25,14 +25,14 @@ import {
 
 	/* Address */
 	city, zipCode, cityPrefix, streetName, houseNumber, streetAddress, streetSuffix, streetPrefix, county, country, countryCode, 
-	state, stateAbbr, addressLine1, addressLine2, addressLine3, latitude, longitude,
+	state, stateAbbr, addressLine1, addressLine2, addressLine3, latitude, longitude, placeID,
 
 	/* Images */
 	image, avatar, imageURL, mimeType, randomImage,
 
 	/* System */
 	word, createIdentifier, generatePassword, protocol, url, domainName, domainSuffix, domainWord, ipType,
-	ipAddress, ip6Address, userAgent, color, macAddress, getRandomArbitrary, creditCardNumber, emailProvider, sliceMe
+	ipAddress, ip6Address, userAgent, color, macAddress, getRandomArbitrary, creditCardNumber, emailProvider, sliceMe,
 	
 } from "../../util/data.functions.util";
 
@@ -175,7 +175,8 @@ export class DataUtilitiesService  {
 			countryCode: countryCode().trim(),
 			location: {
 				latitude: latitude(),
-				longitude: longitude()
+				longitude: longitude(),
+				placeID: placeID()
 			}
 		};
 
@@ -195,7 +196,11 @@ export class DataUtilitiesService  {
 			_city:string = city().trim(),
 			_county:string = country().trim(),	
 			_country:string = country().trim(),
-			_countryCode:string = countryCode().trim();
+			_countryCode:string = countryCode().trim(),
+			_latitude:number = latitude(),
+			_longitude:number = longitude(),
+			_placeID:string = placeID();
+
 
 		/***
 		 * Address Details
@@ -214,8 +219,9 @@ export class DataUtilitiesService  {
 		 * Address Geo Location
 		 */
 		user.profile.location = {
-			latitude: latitude(),
-			longitude: longitude()
+			latitude: _latitude,
+			longitude: _longitude,
+			plcaeID: _placeID
 		}		
 			
 
