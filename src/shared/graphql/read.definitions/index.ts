@@ -13,7 +13,8 @@ export {
 export { 
 	profilePersonaliaDefinition,
 	profileDisplayNamesDefinition,
-	profileSocialDefinition
+	profileSocialDefinition,
+	profileCommunicationDefinition
  } from "./profile.sub.definitions";
  
 export { passwordDefinition} from "./person.password.definition";

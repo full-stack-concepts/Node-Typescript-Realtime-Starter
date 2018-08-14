@@ -15,6 +15,10 @@ import {
 
 import { ITypeDefinition } from "../interfaces";
 
+import {
+    IUserPersonalia, IUserDisplayNames, IUserSocial, IUserCommunication
+} from "../../interfaces";
+
 /***
  *
  */
@@ -26,8 +30,8 @@ export const profilePersonaliaDefinition:ITypeDefinition = {
     	"profile.personalia.familyName":1
 	},
 
-	format: (obj:any) => {
-		return {	       
+	format: (obj:any):IUserPersonalia => {
+		return <IUserPersonalia>{	       
 	        givenName: obj.givenName,
 	      	middleName: obj.middleName, 
 	      	familyName: obj.familyName
@@ -54,8 +58,8 @@ export const profileDisplayNamesDefinition:ITypeDefinition = {
     	"profile.displayNames.fullName":1,
     	"profile.displayNames.sortName":1,  
 	},
-	format: (obj:any) => {
-		return {
+	format: (obj:any):IUserDisplayNames => {
+		return <IUserDisplayNames>{
 	        fullName: obj.fullName,
 	        sortName: obj.sortName	       
 	    };
@@ -85,8 +89,8 @@ export const profileSocialDefinition:ITypeDefinition = {
     	"profile.social.stackoverflow":1,  
 	},
 
-	format: (obj:any) => {
-		return {
+	format: (obj:any):IUserSocial => {
+		return <IUserSocial>{
 	    	"googleplus": obj.googleplus,
     		"facebook": obj.facebook,  
     		"linkedin": obj.linkedin,  
@@ -106,6 +110,39 @@ export const profileSocialDefinition:ITypeDefinition = {
     		"twitter": { type: GraphQLString},   
     		"instagram":{ type: GraphQLString},   
     		"stackoverflow":{ type: GraphQLString}  	    
+	    }
+	})
+}
+
+/***
+ *
+ */
+export const profileCommunicationDefinition:ITypeDefinition = {
+
+	filter: {				
+    	"profile.communication.phone":1,
+   		"profile.communication.mobile":1,
+    	"profile.communication.website":1,
+    	"profile.communication.email":1    	
+	},
+
+	format: (obj:any):IUserCommunication => {
+		return <IUserCommunication>{
+	    	"phone": obj.phone,
+    		"mobile": obj.mobile,  
+    		"website": obj.website,  
+    		"email": obj.email    		       
+	    };
+	},
+
+	type: new GraphQLObjectType({
+	    name: "ProfileCommunicationType",
+	    description: "Get Communication Identifiersby Profile Id",
+	    fields: {
+	    	"phone": { type: GraphQLString},  
+    		"mobile": { type: GraphQLString},  
+    		"website":  { type: GraphQLString},    
+    		"email": { type: GraphQLString},    	    
 	    }
 	})
 }

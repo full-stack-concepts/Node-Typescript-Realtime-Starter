@@ -16,7 +16,8 @@ import {
 import {
     profilePersonaliaDefinition,
     profileDisplayNamesDefinition,
-    profileSocialDefinition
+    profileSocialDefinition,
+    profileCommunicationDefinition
 } from "../read.definitions";
 
 import {    
@@ -50,6 +51,12 @@ const query = {
         args: { profileID: { type: GraphQLID, description: 'retrieve Social Profiles subdocument by its parent Profile Mongoose ID' } },
         resolve: (root:any, args:any) => ProfileReadResolvers.getSocialProfiles(root, args)     
     },
+
+    getCommunicationSettings: {
+        type: profileCommunicationDefinition.type,
+        args: { profileID: { type: GraphQLID, description: 'retrieve Cpmmunication subdocument by its parent Profile Mongoose ID' } },
+        resolve: (root:any, args:any) => ProfileReadResolvers.getCommunicationSettings(root, args)     
+    }
 
 }
 

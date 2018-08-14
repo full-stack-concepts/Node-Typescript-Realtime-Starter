@@ -1,7 +1,8 @@
 import {	
 	profilePersonaliaDefinition,
 	profileDisplayNamesDefinition,
-	profileSocialDefinition
+	profileSocialDefinition,
+	profileCommunicationDefinition
 } from "../read.definitions";
 
 import {
@@ -83,6 +84,15 @@ export const ProfileReadResolvers =  {
     	
     	let result = await matchProfileSectionToSubDocumentId('social', args.profileID.toString(), profileSocialDefinition.filter );     
     	return profileSocialDefinition.format(result) || {};   	
+    },
+
+    /***
+	 * Query Person collections to find Communication Object
+	 */
+    getCommunicationSettings: async (root:any, args:any):Promise<IUserSocial> => {        	
+    	
+    	let result = await matchProfileSectionToSubDocumentId('communication', args.profileID.toString(), profileCommunicationDefinition.filter );     
+    	return profileCommunicationDefinition.format(result) || {};   	
     },
 
 
