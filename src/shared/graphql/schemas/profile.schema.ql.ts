@@ -15,7 +15,8 @@ import {
 
 import {
     profilePersonaliaDefinition,
-    profileDisplayNamesDefinition
+    profileDisplayNamesDefinition,
+    profileSocialDefinition
 } from "../read.definitions";
 
 import {    
@@ -24,7 +25,7 @@ import {
 
 import {
     ProfileReadResolvers,
-    ProfileMutationResolvers
+    ProfileMutationResolvers,    
 } from "../resolvers";
 
 /***
@@ -34,14 +35,20 @@ const query = {
 
     getPersonalia: {
         type: profilePersonaliaDefinition.type,
-        args: { profileID: { type: GraphQLID, description: 'rerieve Personalia subdocument by its parent Profile Mongoose ID' } },
+        args: { profileID: { type: GraphQLID, description: 'retrieve Personalia subdocument by its parent Profile Mongoose ID' } },
         resolve: (root:any, args:any) => ProfileReadResolvers.getPersonalia(root, args)     
     },
 
     getDisplayNames: {
         type: profileDisplayNamesDefinition.type,
-        args: { profileID: { type: GraphQLID, description: 'rerieve Display names subdocument by its parent Profile Mongoose ID' } },
+        args: { profileID: { type: GraphQLID, description: 'retrieve Display names subdocument by its parent Profile Mongoose ID' } },
         resolve: (root:any, args:any) => ProfileReadResolvers.getDisplayNames(root, args)     
+    },
+
+    getSocialProfiles: {
+        type: profileSocialDefinition.type,
+        args: { profileID: { type: GraphQLID, description: 'retrieve Social Profiles subdocument by its parent Profile Mongoose ID' } },
+        resolve: (root:any, args:any) => ProfileReadResolvers.getSocialProfiles(root, args)     
     },
 
 }

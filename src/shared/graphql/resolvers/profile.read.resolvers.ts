@@ -1,10 +1,11 @@
 import {	
 	profilePersonaliaDefinition,
-	profileDisplayNamesDefinition
+	profileDisplayNamesDefinition,
+	profileSocialDefinition
 } from "../read.definitions";
 
 import {
-	ISystemUser, IUser, IClient, ICustomer, IUserPersonalia, IUserDisplayNames
+	ISystemUser, IUser, IClient, ICustomer, IUserPersonalia, IUserDisplayNames, IUserSocial
 } from "../../interfaces";
 
 import {
@@ -69,13 +70,23 @@ export const ProfileReadResolvers =  {
     /***
 	 * Query Person collections to find Display Names Object
 	 */
-    getDisplayNames: async (root:any, args:any):Promise<IUserDisplayNames> => {    
-
-    	let err:Error, user:any;
+    getDisplayNames: async (root:any, args:any):Promise<IUserDisplayNames> => {        	
     	
     	let result = await matchProfileSectionToSubDocumentId('displayNames', args.profileID.toString(), profileDisplayNamesDefinition.filter );     
     	return profileDisplayNamesDefinition.format(result) || {};   	
+    },
 
-    }	
+    /***
+	 * Query Person collections to find Social Profiles Object
+	 */
+    getSocialProfiles: async (root:any, args:any):Promise<IUserSocial> => {        	
+    	
+    	let result = await matchProfileSectionToSubDocumentId('social', args.profileID.toString(), profileSocialDefinition.filter );     
+    	return profileSocialDefinition.format(result) || {};   	
+    },
+
+
+
+
 }
 

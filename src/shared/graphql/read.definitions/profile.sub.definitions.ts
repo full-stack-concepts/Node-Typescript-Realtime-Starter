@@ -71,3 +71,42 @@ export const profileDisplayNamesDefinition:ITypeDefinition = {
 	})
 }
 
+/***
+ *
+ */
+export const profileSocialDefinition:ITypeDefinition = {
+
+	filter: {				
+    	"profile.social.googleplus":1,
+    	"profile.social.facebook":1,  
+    	"profile.social.linkedin":1,  
+    	"profile.social.twitter":1,  
+    	"profile.social.instagram":1,  
+    	"profile.social.stackoverflow":1,  
+	},
+
+	format: (obj:any) => {
+		return {
+	    	"googleplus": obj.googleplus,
+    		"facebook": obj.facebook,  
+    		"linkedin": obj.linkedin,  
+    		"twitter": obj.twitter,  
+    		"instagram": obj.instagram,  
+    		"stackoverflow": obj.stackoverflow,         
+	    };
+	},
+
+	type: new GraphQLObjectType({
+	    name: "ProfileSocialType",
+	    description: "Get Social Subscriptions by Profile Id",
+	    fields: {
+	    	"googleplus": { type: GraphQLString},   
+    		"facebook":{ type: GraphQLString},   
+    		"linkedin":{ type: GraphQLString},   
+    		"twitter": { type: GraphQLString},   
+    		"instagram":{ type: GraphQLString},   
+    		"stackoverflow":{ type: GraphQLString}  	    
+	    }
+	})
+}
+

@@ -12,7 +12,8 @@ export {
  */
 export { 
 	profilePersonaliaDefinition,
-	profileDisplayNamesDefinition
+	profileDisplayNamesDefinition,
+	profileSocialDefinition
  } from "./profile.sub.definitions";
  
 export { passwordDefinition} from "./person.password.definition";
