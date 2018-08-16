@@ -64,8 +64,10 @@ export const ProfileReadResolvers =  {
 	 * Query Person collections to find Personalia Object
 	 */
     getPersonalia: async (root:any, args:any):Promise<IUserPersonalia> => {   
+
+    	let id:string = args.profileID || root.id;
     
-    	let result = await matchProfileSectionToSubDocumentId('personalia', args.profileID.toString(), profilePersonaliaDefinition.filter );     
+    	let result = await matchProfileSectionToSubDocumentId('personalia', id.toString(), profilePersonaliaDefinition.filter );     
     	return profilePersonaliaDefinition.format(result) || {};   	
     },	
 

@@ -2,7 +2,6 @@ import Promise from "bluebird";
 import mongoose from "mongoose";
 
 import { PERSON_SUBTYPE_CLIENT } from "../../util/secrets";
-import { proxyService } from "../../services";
 import { DefaultModel } from "./default.model";
 import { IClient } from "../interfaces";
 import { ReadWriteRepositoryBase } from "../../engines";
@@ -15,16 +14,20 @@ import { LoggerController } from "../../controllers";
  */
 export class ClientRepository extends ReadWriteRepositoryBase<IClient> {
 	
-	constructor(connection:mongoose.Model<mongoose.Document>, redisClient:any) {
+	constructor(connection:mongoose.Model<mongoose.Document> ) {
 		super( 
 			PERSON_SUBTYPE_CLIENT, 
-			connection, 
-			redisClient 
+			connection
 		);
 	}
 }
  
 export class ClientModel extends DefaultModel  {
+
+	/***
+	 * Database Connection Type for this model: users
+	 */
+	private dbType:number = 1;
 
 	private _clientModel: IClient;	
 
@@ -37,18 +40,24 @@ export class ClientModel extends DefaultModel  {
 
 		this._clientModel = clientModel;
 
-		proxyService.userDBLive$.subscribe( (state:boolean) => {				
+		this.launchRepository();		
+	}	
 
-			if(proxyService.userDB) this.userDBConn = proxyService.userDB;				
-			this.repo = new ClientRepository( this.userDBConn, this.redisClient );			
-		});		
+	/***
+	 *
+	 */
+	private async launchRepository() {
+
+		this.repoConstructor = ClientRepository;	
+
+		await this.createRepo(this.dbType);			
 	}	
 
 	/****
 	 * Define custom methods for local instance of MongoDB here	
 	 */
 	public createUser(client:IClient): Promise<any> {
-		const repo = new ClientRepository( this.userDBConn, this.redisClient );
+		const repo = this.repo;
 		return new Promise ( (resolve, reject) => {
 			repo.create(client, (err:Error, res:any) => {			
 				if(err) { reject(err);} else { resolve(res);}

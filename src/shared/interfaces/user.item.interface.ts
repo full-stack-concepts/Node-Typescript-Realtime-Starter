@@ -1,3 +1,12 @@
+export interface IUserSecurity {
+	latestLogon?: boolean,
+	latestModification?: Date,
+	accountType?:number,
+	isAccountVerified?: boolean,
+	isTemporaryPassword?: boolean,
+	isPasswordEncrypted?: boolean
+}
+
 export interface IUserJob  {
 	jobDescription:string
 }

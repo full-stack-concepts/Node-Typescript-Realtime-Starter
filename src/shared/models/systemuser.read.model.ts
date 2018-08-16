@@ -2,7 +2,6 @@ import Promise from "bluebird";
 import mongoose from "mongoose";
 
 import { PERSON_SUBTYPE_SYSTEM_USER } from "../../util/secrets";
-import { proxyService } from "../../services";
 import { DefaultModel} from "./default.model";
 import { ISystemUser } from "../interfaces";
 import { ReadRepositoryBase } from "../../engines";
@@ -15,11 +14,10 @@ import { LoggerController } from "../../controllers";
  */
 export class SystemUserReadRepository extends ReadRepositoryBase<ISystemUser> {
 	
-	constructor(connection:mongoose.Model<mongoose.Document>, redisClient:any) {
+	constructor(connection:mongoose.Model<mongoose.Document>) {
 		super( 
 			PERSON_SUBTYPE_SYSTEM_USER, 
-			connection, 
-			redisClient
+			connection		
 		);
 	}
 }
@@ -29,7 +27,12 @@ export class SystemUserReadRepository extends ReadRepositoryBase<ISystemUser> {
  */
 export class SystemUserReadModel extends DefaultModel  {
 
-	private _systemUserModel: ISystemUser;	
+	/***
+	 * Database Connection Type for this model: users
+	 */
+	private dbType:number = 1;
+
+	private _systemUserModel: ISystemUser;		
 
 	constructor(systemUserModel: ISystemUser) {
 
@@ -38,18 +41,23 @@ export class SystemUserReadModel extends DefaultModel  {
 		 */
 		super();
 
-		this._systemUserModel = systemUserModel;		
+		this._systemUserModel = systemUserModel;	
 
-		proxyService.userDBLive$.subscribe( (state:boolean) => {						
-			
-			if(proxyService.userDB) this.userDBConn = proxyService.userDB;				
-			this.repo = new SystemUserReadRepository( this.userDBConn, this.redisClient );
-						
-		});		
+		this.launchRepository();						
 	}				
 
+	/***
+	 *
+	 */
+	private async launchRepository() {
+
+		this.repoConstructor = SystemUserReadRepository;	
+
+		await this.createRepo(this.dbType);			
+	}
+
 	/****
-	 * Define custom methods for local onstance of MongoDB here	
+	 * Define custom methods for local instance of MongoDB here	
 	 */
 	
 }

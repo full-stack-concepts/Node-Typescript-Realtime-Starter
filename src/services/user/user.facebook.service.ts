@@ -16,7 +16,7 @@ import {
 } from "../../util";
 
 import { UserOperations } from "./user.ops.service";
-import { IUser, IClient, ICustomer} from "../../shared/interfaces";
+import { IUser, IClient, ICustomer, IPersonSecurity} from "../../shared/interfaces";
 import { TUSER } from "../../shared/types";
 
 export class FaceBookUserService extends UserOperations {	
@@ -59,8 +59,13 @@ export class FaceBookUserService extends UserOperations {
 			newUser.core.identifier = uuidv1();
 
 			// configure security and account Type
-			newUser.security.accountType = 5;			
-			newUser.security.isAccountVerified = true;
+			let security:IPersonSecurity = {
+				accountType:5,
+				isAccountVerified:true,
+				isPasswordEncrypted:false
+			}
+			newUser.security = security;
+			
 			newUser.core.role = 5;
 
 			// update user configuration

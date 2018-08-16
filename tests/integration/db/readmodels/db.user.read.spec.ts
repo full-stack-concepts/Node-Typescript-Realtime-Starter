@@ -87,7 +87,7 @@ describe("Database User Read Model Methods", () => {
 		configActions.forEach( (config:any) => {			
 
 			// (4) reate respository
-			let testRepo:any = new ReadRepository(config.type, connection, redisClient);	
+			let testRepo:any = new ReadRepository(config.type, connection);	
 			
 			// import repository into our test model
 			config.repo = testRepo;

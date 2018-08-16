@@ -120,7 +120,9 @@ export const PersonReadResolvers =  {
 	/***
 	 * Query Person subtype collection to find user by mail address
 	 */
-	findByMail: async (root:any, args:any, subtype:string) =>  {  		
+	findByMail: async (root:any, args:any, subtype:string) =>  {  	
+
+		console.log("*** FInd person by mail")	
 
         const persons:IUser[]|IClient[]|ICustomer[]|ISystemUser[] = await getModel(subtype).find({"core.email": args.email});
   		const id:string =  persons[0]._id.toString();
@@ -145,10 +147,10 @@ export const PersonReadResolvers =  {
      *
      */
     findPerson: async (root:any, args:any) => {  
-    	console.log("*** Incoming User request for Person ", root, args)    	
+    	
     	let personID:string = root.userID || root.clientID || root.customerID;
     	let role:number;
-    	console.log(personID)
+    	
     	const person:IUser|IClient|ICustomer|ISystemUser = await uaController.testForAccountTypeById(personID);
     	let subtype:string = getSubtype(person.core.role);
     	const id:any =  person._id.toString();

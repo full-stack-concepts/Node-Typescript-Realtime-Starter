@@ -9,6 +9,14 @@ import {
     GraphQLInt
 } from 'graphql';
 
+import {
+    profilePersonaliaDefinition
+} from "../read.definitions";
+
+import {
+    ProfileReadResolvers,    
+} from "../resolvers";
+
 import { ITypeDefinition } from "../interfaces";
 
 
@@ -46,7 +54,18 @@ export const coreDefinition:ITypeDefinition = {
         	url:            { type: GraphQLString},
 	        email:          { type: GraphQLString},
 	        role:           { type: GraphQLInt},
-	        identifier:     { type: GraphQLString}
+	        identifier:     { type: GraphQLString},
+            personalia: {
+                type: profilePersonaliaDefinition.type,
+                resolve: (parent:any, args:any) => ProfileReadResolvers.getPersonalia(parent, args)
+            }
     	}
     })
 }
+
+/*
+person: { 
+        type: userDefinition.type,
+        resolve: (parent:any, args:any) => PersonReadResolvers.findPerson(parent, args)
+    }   
+    */

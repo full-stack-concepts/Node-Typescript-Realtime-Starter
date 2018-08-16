@@ -2,7 +2,6 @@ import Promise from "bluebird";
 import mongoose from "mongoose";
 
 import { PERSON_SUBTYPE_USER } from "../../util/secrets";
-import { proxyService } from "../../services";
 import { DefaultModel} from "./default.model";
 import { TUSER } from "../types";
 import { IUser } from "../interfaces";
@@ -15,16 +14,20 @@ import { LoggerController } from "../../controllers";
  */
 export class UserReadRepository extends ReadRepositoryBase<IUser> {
 	
-	constructor(connection:mongoose.Model<mongoose.Document>, redisClient:any) {
+	constructor(connection:mongoose.Model<mongoose.Document> ) {
 		super( 
 			PERSON_SUBTYPE_USER, 
-			connection, 
-			redisClient
+			connection
 		);
 	}
 }
 
 export class UserReadModel extends DefaultModel  {
+
+	/***
+	 * Database Connection Type for this model: users
+	 */
+	private dbType:number = 1;
 
 	private _userModel: IUser;	
 
@@ -37,12 +40,18 @@ export class UserReadModel extends DefaultModel  {
 
 		this._userModel = userModel;
 
-		proxyService.userDBLive$.subscribe( (state:boolean) => {						
-			
-			if(proxyService.userDB) this.userDBConn = proxyService.userDB;				
-			this.repo = new UserReadRepository( this.userDBConn, this.redisClient );		
-		});		
+		this.launchRepository();				
 	}	
+
+	/***
+	 *
+	 */
+	private async launchRepository() {
+
+		this.repoConstructor = UserReadRepository;	
+
+		await this.createRepo(this.dbType);			
+	}
 
 	/****
 	 * Define custom methods for UserRead Model here

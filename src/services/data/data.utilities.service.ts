@@ -5,7 +5,7 @@ import "rxjs/add/operator/take";
 import "rxjs/add/operator/map";
 
 import { deepCloneObject} from "../../util";
-import { IUser, IClient, ICustomer, IUserAddress} from "../../shared/interfaces"; 
+import { IUser, IClient, ICustomer, IUserAddress, IUserDevice, IUserSecurity} from "../../shared/interfaces"; 
 import { TUSER, TCLIENT, TCUSTOMER } from "../../shared/types";
 import { constructUserCredentials } from "../../util";
 
@@ -76,9 +76,13 @@ export class DataUtilitiesService  {
 		 * @securtity.isAccoutnVerified: default value:false
 		 * @core.role: mirror for @security.acountType
 		 */
-		 user.security.accountType = 5; // default user
-		 user.security.isAccountVerified = false;
-		 user.security.isPasswordEncrypted = false;
+
+		 let security = <IUserSecurity> {
+		 	accountType:5, // default user
+		 	isAccountVerified:false,
+		 	isPasswordEncrypted:false
+		 }
+		 user.security = security;		
 		 user.core.role = 5;
 
 		 /***
@@ -163,7 +167,7 @@ export class DataUtilitiesService  {
 
 	public fakeSingleAddress():IUserAddress {
 
-		return {
+		return <IUserAddress>{
 			street: streetName().trim(),
 			houseNumber: houseNumber().toString().trim(),
 			suffix:streetSuffix().trim(),
@@ -179,65 +183,7 @@ export class DataUtilitiesService  {
 				placeID: placeID()
 			}
 		};
-
-	}
-
-	/***
-	 * Data Factory: user address & location
-	 */
-	public fakeUserAddressAndLocation (user:any) {
-
-		
-		let _street:string = streetName().trim(),
-			_houseNumber:string = houseNumber().toString().trim(),
-			_suffix:string = streetSuffix().trim(),
-			_addition:string = '',
-			_areaCode = zipCode().trim(),
-			_city:string = city().trim(),
-			_county:string = country().trim(),	
-			_country:string = country().trim(),
-			_countryCode:string = countryCode().trim(),
-			_latitude:number = latitude(),
-			_longitude:number = longitude(),
-			_placeID:string = placeID();
-
-
-		/***
-		 * Address Details
-		 */
-		user.profile.address.street = _street;
-		user.profile.address.houseNumber = _houseNumber;
-		user.profile.address.suffix = _suffix;
-		user.profile.address.addition = _addition;
-		user.profile.address.areacode = _areaCode;
-		user.profile.address.city = _city;
-		user.profile.address.county = _county;	
-		user.profile.address.country = _country;
-		user.profile.address.countryCode = _countryCode;
-
-		/***
-		 * Address Geo Location
-		 */
-		user.profile.location = {
-			latitude: _latitude,
-			longitude: _longitude,
-			plcaeID: _placeID
-		}		
-			
-
-		// type assertionL and finally confirm that address has been configured
-		if(isOfUserType(user)) {
-			user.configuration.isAddressSet =true;
-		}
-		if(isOfClientType(user)) {
-			user.configuration.isAddressSet =true;
-		}
-		if(isOfCustomerType(user)) {
-			user.configuration.isAddressSet = true;
-		}
-
-		return user;
-	}
+	}	
 
 	/*****************************************************************************************
 	 * Data Factory: device
@@ -264,7 +210,7 @@ export class DataUtilitiesService  {
 		/***
 		 * Device details
 		 */
-		 user.devices = [{
+		 user.devices = [ <IUserDevice>{
 		 	location: _location,
 		 	ipType: _ipType,
 		 	ipAddress: _ipAddress,

@@ -2,7 +2,6 @@ import Promise from "bluebird";
 import mongoose from "mongoose";
 
 import { PERSON_SUBTYPE_SYSTEM_USER } from "../../util/secrets";
-import { proxyService } from "../../services";
 import { DefaultModel} from "./default.model";
 import { ISystemUser } from "../interfaces";
 import { ReadWriteRepositoryBase } from "../../engines";
@@ -15,11 +14,10 @@ import { LoggerController } from "../../controllers";
  */
 export class SystemUserRepository extends ReadWriteRepositoryBase<ISystemUser> {
 	
-	constructor(connection:mongoose.Model<mongoose.Document>, redisClient:any) {
+	constructor(connection:mongoose.Model<mongoose.Document>) {
 		super( 
 			PERSON_SUBTYPE_SYSTEM_USER, 
-			connection, 
-			redisClient
+			connection
 		);
 	}
 }
@@ -29,7 +27,12 @@ export class SystemUserRepository extends ReadWriteRepositoryBase<ISystemUser> {
  */
 export class SystemUserModel extends DefaultModel  {
 
-	private _systemUserModel: ISystemUser;
+	/***
+	 * Database Connection Type for this model: users
+	 */
+	private dbType:number = 1;
+
+	private _systemUserModel: ISystemUser;	
 
 	constructor(systemUserModel: ISystemUser) {
 
@@ -38,20 +41,26 @@ export class SystemUserModel extends DefaultModel  {
 		 */
 		super();
 
-		this._systemUserModel = systemUserModel;		
+		this._systemUserModel = systemUserModel;
 
-		proxyService.userDBLive$.subscribe( (state:boolean) => {						
-			
-			if(proxyService.userDB) this.userDBConn = proxyService.userDB;				
-			this.repo = new SystemUserRepository( this.userDBConn, this.redisClient );			
-		});		
+		this.launchRepository();				
 	}			
+
+	/***
+	 *
+	 */
+	private async launchRepository() {
+
+		this.repoConstructor = SystemUserRepository;	
+		
+		await this.createRepo(this.dbType);			
+	}
 
 	/****
 	 * Define custom methods for local onstance of MongoDB here	
 	 */
 	public createUser(user:ISystemUser): Promise<any> {			
-		const repo = new SystemUserRepository( this.userDBConn, this.redisClient );		
+		const repo = this.repo;		
 		return new Promise ( (resolve, reject) => {
 			repo.create(user, (err:Error, res:any) => {			
 				if(err) { reject(err);} else { resolve(res);}

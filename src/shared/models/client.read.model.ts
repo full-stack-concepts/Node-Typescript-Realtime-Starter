@@ -2,7 +2,6 @@ import Promise from "bluebird";
 import mongoose from "mongoose";
 
 import { PERSON_SUBTYPE_CLIENT } from "../../util/secrets";
-import { proxyService } from "../../services";
 import { DefaultModel } from "./default.model";
 import { IClient } from "../interfaces";
 import { ReadRepositoryBase } from "../../engines";
@@ -15,16 +14,20 @@ import { LoggerController } from "../../controllers";
  */
 export class ClientReadRepository extends ReadRepositoryBase<IClient> {
 	
-	constructor(connection:mongoose.Model<mongoose.Document>, redisClient:any) {
+	constructor(connection:mongoose.Model<mongoose.Document> ) {
 		super( 
 			PERSON_SUBTYPE_CLIENT, 
-			connection, 
-			redisClient
+			connection			
 		);
 	}
 }
 
 export class ClientReadModel extends DefaultModel  {
+
+	/***
+	 * Database Connection Type for this model: users
+	 */
+	private dbType:number = 1;
 
 	private _clientModel: IClient;	
 
@@ -37,11 +40,17 @@ export class ClientReadModel extends DefaultModel  {
 
 		this._clientModel = clientModel;
 
-		proxyService.userDBLive$.subscribe( (state:boolean) => {	
+		this.launchRepository();		
+	}	
 
-			if(proxyService.userDB) this.userDBConn = proxyService.userDB;				
-			this.repo = new ClientReadRepository( this.userDBConn, this.redisClient );			
-		});		
+	/***
+	 *
+	 */
+	private async launchRepository() {
+
+		this.repoConstructor = ClientReadRepository;	
+
+		await this.createRepo(this.dbType);			
 	}	
 	
 }

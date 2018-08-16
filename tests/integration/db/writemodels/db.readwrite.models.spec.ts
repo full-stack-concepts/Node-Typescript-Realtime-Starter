@@ -98,7 +98,7 @@ const readWriteModels:string[] = [
 		configActions.forEach( (config:any) => {			
 
 			// (4) reate respository
-			let testRepo:any = new ReadWriteRepository(config.type, connection, redisClient);	
+			let testRepo:any = new ReadWriteRepository(config.type, connection);	
 			
 			// import repository into our test model
 			config.repo = testRepo;

@@ -1216,37 +1216,32 @@ export class UserOperations extends PersonProfile {
  */
 class ActionService {	
 
-	public testForAccountTypeById( id:string) {
-		console.log("*** Get user by id ", id)
+	public testForAccountTypeById( id:string) {		
 		let instance:any = new UserOperations();
 		return instance.testForAccountType(null , id)
 			.then( (user:any) => Promise.resolve(user) )
 			.catch( (err:Error) => Promise.reject(err) );
 	}	
 
-	public testForAccountTypeByEmail( email:string) {
-		console.log("*** Get user by Email ", email)
+	public testForAccountTypeByEmail( email:string) {		
 		let instance:any = new UserOperations();
 		return instance.testForAccountType(email)
 			.then( (user:any) => Promise.resolve(user) )
 			.catch( (err:Error) => Promise.reject(err) );
 	}	
 
-	public updateUser(query:any, update:any, subType?:string ) {
-		console.log("*** Update User ")
+	public updateUser(query:any, update:any, subType?:string ) {		
 		let instance:any = new UserOperations();
 		return instance.updateUser(query, update, subType)
 			.then( () => Promise.resolve() )
 			.catch( (err:Error) => Promise.reject(err) );
 	}	
 
-	public findUserSubDocument($query:Object, $filter:Object={}) {
-		console.log("*** Find User Sub Document ", $query)		
+	public findUserSubDocument($query:Object, $filter:Object={}) {	
 		let instance:any = new UserOperations();
 		return instance.findUserSubDocument($query, $filter)
 			.then( (doc:any) => Promise.resolve(doc) )
 			.catch( (err:Error) => Promise.reject(err) );
-
 	}
 }
 

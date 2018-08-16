@@ -194,7 +194,7 @@ describe("Local Redis Server", () => {
             // (2) connect to Users Database
             connection = dbTestEnvironment.initUserDatabase();  
 
-            let testRepo:any = await new ReadRepository('user', connection, redisClient);            
+            let testRepo:any = await new ReadRepository('user', connection);            
 
             // clone testmodel to we can create a repo per readModel
             let model:any = await testRepo.getModel();          

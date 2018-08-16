@@ -10,24 +10,12 @@ const headers:any= { 'Content-Type': 'application/json' };
  * Seperated from default model so test environment can access Mongoose methods
  * without loading proxy service that triggers entire application on BOOTSTRAPPING 
  */
-export class ModelMethods {
-
-	/****
-	 * Native Connections
-	 * inejected into Repository classes
-	 */
-	protected userDBConn:any;
-	protected productDBConn:any;
+export class ModelMethods {	
 
 	/****
 	 * Repository
 	 */
 	repo:any;
-
-	/***
-	 * Redis Client
-	 */
-	protected redisClient:any;
 
 	/******************************************************************************************
 	 *
@@ -39,7 +27,7 @@ export class ModelMethods {
 	public findAll ( query:Object={}, fields:Object={}, options:Object={}):Promise<any> {
 		const repo = this.repo;
 		return new Promise ( (resolve, reject) => {
-			repo.find ( {}, fields, options, (err:Error, res:any) => {					
+			repo.find ( query, fields, options, (err:Error, res:any) => {					
 				if(err) { reject(err);} 
 				else if(!res) {  resolve(); } 
 				else {  resolve(res); }
@@ -61,8 +49,7 @@ export class ModelMethods {
 	public count ( query:Object={}, options:Object={} ):Promise<any> {
 		const repo = this.repo;
 		return new Promise ( (resolve, reject) => {
-			repo.count( query, options, (err:Error, result:any) => {			
-				console.log(err, result)
+			repo.count( query, options, (err:Error, result:any) => {							
 				if(err) { reject(err);} 			
 				else {  resolve(result); }
 			});		
@@ -120,8 +107,7 @@ export class ModelMethods {
 	public insert(users:any): Promise<any> {
 		const repo = this.repo;
 		return new Promise ( (resolve, reject) => {
-			repo.insertMany( users, (err:Error, res:any) => {	
-				console.log("*** Insert result ", res.length)		
+			repo.insertMany( users, (err:Error, res:any) => {				
 				if(err) {reject(err); } else { resolve(res); }
 			});
 		});
@@ -215,8 +201,7 @@ export class ModelMethods {
 	public remoteFindOneOnly(query:Object, collection:string) {
 		return new Promise( (resolve, reject) => {
 			query = stringify( query);
-			let rURL = RemoteQueryBuilder.findOneRemoteURL(collection, query);
-			console.log(rURL);
+			let rURL = RemoteQueryBuilder.findOneRemoteURL(collection, query);			
 			fetch(rURL)
 			.then( (res:any) =>res.json())
 			.then( (response:any) => resolve(response) )			

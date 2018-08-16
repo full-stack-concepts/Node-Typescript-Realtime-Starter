@@ -2,7 +2,6 @@ import Promise from "bluebird";
 import mongoose from "mongoose";
 
 import { ADDRESS_TYPE } from "../../util/secrets";
-import { proxyService } from "../../services";
 import { DefaultModel} from "./default.model";
 import { TADDRESS } from "../types";
 import { IUserAddress } from "../interfaces";
@@ -15,16 +14,20 @@ import { LoggerController } from "../../controllers";
  */
 export class AddressReadRepository extends ReadRepositoryBase<IUserAddress> {
 	
-	constructor(connection:mongoose.Model<mongoose.Document>, redisClient:any) {
+	constructor(connection:mongoose.Model<mongoose.Document>) {
 		super( 
 			ADDRESS_TYPE, 
-			connection, 
-			redisClient
+			connection
 		);
 	}
 }
 
 export class AddressReadModel extends DefaultModel  {
+
+	/***
+	 * Database Connection Type for this model: users
+	 */
+	private dbType:number = 1;
 
 	private _addressModel: IUserAddress;	
 
@@ -37,11 +40,17 @@ export class AddressReadModel extends DefaultModel  {
 
 		this._addressModel = addressModel;
 
-		proxyService.userDBLive$.subscribe( (state:boolean) => {						
-			
-			if(proxyService.userDB) this.userDBConn = proxyService.userDB;				
-			this.repo = new AddressReadRepository( this.userDBConn, this.redisClient );		
-		});		
+		this.launchRepository();		
+	}	
+
+	/***
+	 *
+	 */
+	private async launchRepository() {
+
+		this.repoConstructor = AddressReadRepository;	
+
+		await this.createRepo(this.dbType);			
 	}	
 
 	/****

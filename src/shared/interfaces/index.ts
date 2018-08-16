@@ -44,6 +44,7 @@ export { IUserDefinitions} from "./user/user.definitions.interface";
 export { IChangePassword} from "./user/user.changepassword.interface";
 
 export {
+	IUserSecurity,
 	IUserPersonalia,
 	IUserDisplayNames,	
 	IUserJob,

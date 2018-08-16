@@ -7,13 +7,11 @@ import {
  * Redis hash key: `@dataabseName-collectionName`
  * @model: Mongoose Model
  */
-export const constructPrimaryKey = (model:any) => {        
-    let dbName:string = model.db.name;
-    let collectionName:string = model.collection.collectionName;    
+export const constructPrimaryKey = (model:any, cName:string) => {        
+    let dbName:string = model.db.name;  
     return {
-        dbName,
-        collectionName,
-        hashKey: `${dbName}-${collectionName}`
+        dbName,        
+        hashKey: `${dbName}-${cName}`
     };
 }
 
@@ -28,15 +26,12 @@ export const constructSecundaryKey = (query:Object, cName:string):string => {
     let value:string;
     let redisKey:string;
     let keys:string[] = Object.keys(query);
-  
+   
     key = keys[0];        
-    value = query[key].toString();
-
-    console.log("***********************************************************************")
-    console.log(" Cache key value pair ", key, value)
 
     if(key) {
         key = key.replace('.', '');
+        value = query[key].toString();
         value = value.replace(/[^\w\s]/gi, '');
         redisKey = `${key}${value}`;
     } else {

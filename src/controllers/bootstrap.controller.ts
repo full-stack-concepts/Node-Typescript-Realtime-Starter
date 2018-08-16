@@ -86,23 +86,38 @@ export class BootstrapController {
 	}
 
 	/***
-	 * Launch Data Generator when
+	 * I Launch Data Generator when
 	 * (1) User Database is live
 	 * (2) Product Dataabse is live
 	 * (3) User Action Controller is loaded
 	 * (4) Data Action Controller is loaded
 	 * (5) Application is not running is test mode
+	 *
+	 * II Create SystemUser when all databases are live.
 	 */
-	private dataGenerator() {
+	private async dataGenerator() {
 		const source$:Observable<number> = Observable.interval(75);
 		const sub$:Subscription = source$.subscribe(	
 			(x:number)=> { 			
 
 				if(this.testMode || (this.userDBLive && this.productDBLive && this.uaController && this.daController) ) sub$.unsubscribe();
 				if(this.userDBLive && this.productDBLive  && this.uaController && this.daController) {
+
+					/***
+					 * Log Databases Live Event
+					 */
 					this.logBootstrapEvent(1008);
 					this.logBootstrapEvent(1009);					
-					dataBreeder.generateData()
+
+					/***
+					 * Populate Databases if required
+					 */
+					dataBreeder.generateData();
+
+					/***
+					 * Create System User
+					 */ 
+					createSystemUser();		
 				}			
 			}
 		);
@@ -292,12 +307,7 @@ export class BootstrapController {
 			/***
 			 * Connect to Product DB
 			 */ 
-			await connectToProductDatabase();		
-
-			/***
-			 *
-			 */ 
-			await createSystemUser();		
+			await connectToProductDatabase();					
 
 			/***
 			 * Send email to application owner 
