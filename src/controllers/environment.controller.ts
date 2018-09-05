@@ -67,7 +67,7 @@ export class EnvironmentController {
 		 * Filter .json files
 		 */	
 		let dirContent:string[] = fs.readdirSync(this.pathToValidationObjectsDirectory);	
-		files = dirContent.filter( (file:string) => file.match(/.*\.json/));	  		
+		files = dirContent.filter( (file:string) => file.match(/.*\.json/));	
 
 		/****
 		 * Filter example files
@@ -80,7 +80,7 @@ export class EnvironmentController {
 		return Promise.map( files, (file:string) => {
 			const pathToFile:string = path.join(this.pathToValidationObjectsDirectory, file);	
 			let rawdata:Buffer = fs.readFileSync(pathToFile);  
-			let data:any = JSON.parse(rawdata.toString('utf8'));
+			let data:any = JSON.parse(rawdata.toString('utf8'));		
 			validationObjects.push(data);				
 		})			
 		.then( (result:any) => Promise.resolve(validationObjects) )
@@ -130,7 +130,8 @@ export class EnvironmentController {
 			/***
 			 * Parse file
 			 */
-			files.forEach( (file:string) => {				
+			files.forEach( (file:string) => {	
+				console.log(file);
 				const pathToFile:string = path.join(this.rootPath, "env", file);			
 				if (fs.existsSync(pathToFile)) {   				
     				dotenv.config({ path: pathToFile });

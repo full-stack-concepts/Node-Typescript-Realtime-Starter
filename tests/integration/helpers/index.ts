@@ -1,5 +1,5 @@
 export { UserTypeMethods } from "./usertype.methods";
-export { dbTestEnvironment, DataBaseConnections } from "./db.connection.methods";
+export { initUserDatabase, initProductDatabase } from "./db.methods";
 export { RedisController } from "./redis.methods";
 export { ReadRepository, ReadWriteRepository } from "./repository.methods";
 

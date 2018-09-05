@@ -233,7 +233,23 @@ class RedisEngine  {
      *      Only cache subdocument queries associated with these collections
      * (3)  All datastore queries are cached by default
      */
-    public async cache (model:any, condition:any, fields:any, options:any, exec?:Function, callback?:any) {   
+    public async cache (
+
+        model:any, 
+
+        condition:any, 
+
+        fields:any, 
+
+        options:any, 
+
+        exec?:Function, 
+
+        callback?:any,
+
+        disableCaching?:boolean
+
+    ) {   
 
         this.model = model; 
   
@@ -248,7 +264,7 @@ class RedisEngine  {
         /***
          * NO CACHING        
          */  
-        if(!USE_LOCAL_REDIS_SERVER || isProtectedCollection ) {                  
+        if(!USE_LOCAL_REDIS_SERVER || isProtectedCollection || disableCaching ) {                  
             return this.queryDontCache(condition, fields, options, exec, callback);           
 
         /***

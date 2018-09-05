@@ -5,20 +5,14 @@ import {
 	SYSTEM_DB_PRODUCTS_ADMIN_USER,
 	DB_SYSTEM_USERS,
 	DB_MAX_POOL_SIZE
-} from "../../util/secrets";
+} from "../../../util/secrets";
 
-import { proxyService } from "../../services";
+import { proxyService } from "../../../services";
 
-interface IConnectAccount {
-	user: string, 
-	password: string,
-	host:string,
-	db: string, 
-	port: number,
-	type: number
-}
+import { INOSQLAccount} from "../interfaces";
 
-export class DBProductService {
+
+export class NOSQL_ProductService {
 
 	/***
 	 * Proxy Service
@@ -33,7 +27,7 @@ export class DBProductService {
 	/***
 	 *
 	 */
-	private account:IConnectAccount;		
+	private account:INOSQLAccount;		
 
 	constructor() {
 
@@ -53,7 +47,7 @@ export class DBProductService {
 	 * Connection string
 	 */
 	private constructConnectionString():string {	
-		const a:IConnectAccount = this.account;
+		const a:INOSQLAccount = this.account;
 		return `mongodb://${a.user}:${a.password}@${a.host}:${a.port}/${a.db}?maxPoolSize=${DB_MAX_POOL_SIZE}`;	
 	}	
 
@@ -71,8 +65,8 @@ export class DBProductService {
 		/****
 		 * Format Connection Object
 		 */
-		const account:IConnectAccount = DB_SYSTEM_USERS.find( 
-			(systemUser:IConnectAccount) => systemUser.user === SYSTEM_DB_PRODUCTS_ADMIN_USER
+		const account:INOSQLAccount = DB_SYSTEM_USERS.find( 
+			(systemUser:INOSQLAccount) => systemUser.user === SYSTEM_DB_PRODUCTS_ADMIN_USER
 		);	
 		this.account = account;	 
 
@@ -122,7 +116,7 @@ export class DBProductService {
  * Export for Bootstrap Controller
  */
 export const connectToProductDatabase = () => {
-	const instance:any = new DBProductService();
+	const instance:any = new NOSQL_ProductService();
 	return instance.connect()
 	.then( () => Promise.resolve() )
 	.catch( (err:Error) => Promise.reject(err) );	

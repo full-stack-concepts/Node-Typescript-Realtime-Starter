@@ -27,7 +27,7 @@ import {
 	mailController, MAController	
 } from "../controllers";
 
-import { proxyService, connectToUserDatabase, connectToProductDatabase, dataBreeder } from "../services";
+import { proxyService, connectToUserDatabase, connectToProductDatabase, dataBreeder, connectToSQLUserDatabase, connectToSQLProductDatabase } from "../services";
 import { configureDatabases } from "../services/db/db.admin.service";
 import { createSystemUser } from "../services/user/system.user.service";
 
@@ -158,12 +158,10 @@ export class BootstrapController {
 	 *		(d) CustomerModel		-  readWrite native connection
 	 * 		(e) addressModel        -  readwrite native connection
 	 */
-	private async configureDatabases():Promise<void> {		
+	private async configureNoSQLDatabases():Promise<void> {		
 		
 		let err:Error;
-		try {
-			const $dbConfig = await configureDatabases();
-		}
+		try { const $dbConfig = await configureDatabases(); }
 		catch(e) { err=e;}
 		finally {
 			if(err) { 
@@ -278,7 +276,7 @@ export class BootstrapController {
 			 * (3) Test if predefined collections exist (#TODO)
 			 * (4) Perform test operations (#TODO)
 			 */		
-			await this.configureDatabases();
+			await this.configureNoSQLDatabases();
 			this.logBootstrapEvent(1006);
 
 			/***
@@ -300,14 +298,24 @@ export class BootstrapController {
 			this.logBootstrapEvent(1019)
 
 			/***
-			 * Connect To User DB
+			 * Connect To NoSQL User DB
 			 */
 			await connectToUserDatabase();
 
 			/***
-			 * Connect to Product DB
+			 * Connect to NoSQL Product DB
 			 */ 
 			await connectToProductDatabase();					
+
+			/***
+			 * Connect To SQL User DB
+			 */
+			await connectToSQLUserDatabase();
+
+			/***
+			 * Connect to SQL Product DB
+			 */ 
+			await connectToSQLProductDatabase();				
 
 			/***
 			 * Send email to application owner 

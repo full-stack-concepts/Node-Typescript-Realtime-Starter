@@ -37,7 +37,7 @@ import {
 
 	DB_SYSTEM_USERS,
 	SYSTEM_DB_USERS_ADMIN_USER
-} from "../../../../src/util/secrets";
+} from "../../../src/util/secrets";
 
 import { 
     systemUserSchema, 
@@ -45,14 +45,7 @@ import {
     clientSchema,
     customerSchema,
     addressSchema
-} from "../../../../src/shared/schemas";
-
-
-// Helpers
-import { initUserDatabase, closeConnection } from "../../helpers/db.methods";
-import { deepCloneInstance} from "../../helpers/functions.helper";
-import { RedisController} from "../../helpers/redis.methods";
-import { IUser, IClient, ICustomer} from "../../../../src/shared/interfaces";
+} from "../../../src/shared/schemas"
 
 /****
  * Test variables
@@ -71,10 +64,7 @@ var configActions:any = [];
 describe("Database User Read Model Methods", () => {
 
 	let err:Error;
-	let users:IUser[] | IClient[] | ICustomer[];
-	let user: IUser | IClient | ICustomer;
 	let connection:any;
-
 	let model:any;
 
 	before( async () => {		
@@ -86,27 +76,19 @@ describe("Database User Read Model Methods", () => {
 		 	(systemUser:IConnectAccount) => systemUser.user === SYSTEM_DB_USERS_ADMIN_USER
 		 );		
 
+		 console.log(a)
+
 		/****
 		 * Connection String
 		 */
 		const mongoURI:string =  `mongodb://${a.user}:${a.password}@${a.host}:${a.port}/${a.db}?maxPoolSize=${DB_MAX_POOL_SIZE}`;	
 
-		console.log(mongoURI)
+		console.log(mongoURI);
 
 		/***
 		 *
 		 */	
-		connection =  mongoose.createConnection( mongoURI );	
-
-		/***
-		 *
-		 */	
-		// connection = await initUserDatabase(userDBAccount, DB_MAX_POOL_SIZE );		
-
-		/***
-		 * Await redis client
-		 */	
-		redisClient = await RedisController.build();	
+		connection =  mongoose.createConnection( mongoURI );				
 			
 	});
 
@@ -157,26 +139,12 @@ describe("Database User Read Model Methods", () => {
 
   		model = connection.model( 'Address', userSchema, 'addresses', true);
   		expect(model).to.be.an("function").and.to.exist;	  		
-	});
-
-
-
-
-
-
-
-	
-
-	
+	});	
 
 	/***
 	 * Close DB Connection
 	 */
 	after( async () => {
-
-		// close db connection
-		closeConnection();
-	
+		mongoose.connection.close();	
 	});
-
 });

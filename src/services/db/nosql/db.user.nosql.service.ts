@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-import { deepCloneObject} from "../../util";
+import { deepCloneObject} from "../../../util";
 
 import {
 	USE_LOCAL_MONGODB_SERVER,	
@@ -11,31 +11,20 @@ import {
 	DB_SYSTEM_USERS,
 	SYSTEM_DB_USERS_ADMIN_USER
 	
-} from "../../util/secrets";
+} from "../../../util/secrets";
 
-import { 
-	IConnection 
-} from "../../shared/interfaces";
+import { IConnection  } from "../../../shared/interfaces";
+import { INOSQLAccount} from "../interfaces";
 
-import {
-	proxyService
-} from "../../services";
+import { proxyService } from "../../../services";
 
-interface IConnectAccount {
-	user: string, 
-	password: string,
-	host:string,
-	db: string, 
-	port: number,
-	type: number
-}
 
 /******************
  * Before connecting create a DB Admin with your mongo interface
  * db.createUser({user: DB_CONFIG_USER, pwd: DB_CONFIG_PASSWORD, roles: [{role: "dbOwner", db: DB_CONFIG_DATABASE}]});
  *
  */
-export class DBUserService {
+export class NoSQL_UserService {
 
  	/***
 	 * Instance of Mongoose Nativce Connection
@@ -50,7 +39,7 @@ export class DBUserService {
     /***
 	 *
 	 */
-	private account:IConnectAccount;	
+	private account:INOSQLAccount;	
 
 	constructor() {		
 
@@ -77,7 +66,7 @@ export class DBUserService {
 	}
 
 	private constructConnectionString():string {
-		const a:IConnectAccount = this.account;
+		const a:INOSQLAccount = this.account;
 		return `mongodb://${a.user}:${a.password}@${a.host}:${a.port}/${a.db}?maxPoolSize=${DB_MAX_POOL_SIZE}`;	
 	}	
 
@@ -95,8 +84,8 @@ export class DBUserService {
 		/****
 		 * Format Connection Object
 		 */
-		 const account:IConnectAccount = DB_SYSTEM_USERS.find( 
-		 	(systemUser:IConnectAccount) => systemUser.user === SYSTEM_DB_USERS_ADMIN_USER
+		 const account:INOSQLAccount = DB_SYSTEM_USERS.find( 
+		 	(systemUser:INOSQLAccount) => systemUser.user === SYSTEM_DB_USERS_ADMIN_USER
 		 );	
 		 this.account = account;	 
 
@@ -146,7 +135,7 @@ export class DBUserService {
  * Export for Bootstrap Controller
  */
 export const connectToUserDatabase = () => {
-	const instance:any = new DBUserService();
+	const instance:any = new NoSQL_UserService();
 	return instance.connect()
 	.then( () => Promise.resolve() )
 	.catch( (err:Error) => Promise.reject(err) );	

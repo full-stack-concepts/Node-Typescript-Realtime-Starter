@@ -78,21 +78,8 @@ describe("Sub Schema", () => {
 
 		});
 
-	})
-
-
-
-
+	});
 
 
 });
 
-
-/*
-latestLogOn?: Date,
-	latestModification?: Date,
-	accountType: number,
-	isAccountVerified: boolean,
-	isTemporaryPassword?:boolean,
-	isPasswordEncrypted:boolean
-	*/

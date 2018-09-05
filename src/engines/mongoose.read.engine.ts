@@ -4,14 +4,13 @@ import { Schema } from "mongoose";
 
 import { cache } from "./cache.engine";
 
+import { RepositoryBase } from "./mongoose.base.engine";
+
 /****
  * Redis Settings
  */
-import {
-  
-    /****
-     * Person Model Identifiers
-     */
+import {  
+    
     PERSON_SUBTYPE_SYSTEM_USER,
     PERSON_SUBTYPE_USER,
     PERSON_SUBTYPE_CLIENT,
@@ -36,7 +35,8 @@ import {
 
 import { IMongooseModels, IRead } from "./mongoose/interfaces";
 
-export 	class ReadRepositoryBase<T extends mongoose.Document>  
+
+export  class ReadRepositoryBase<T extends mongoose.Document>  
 		implements 
 			IMongooseModels<T>, 
 			IRead<T> {
@@ -47,17 +47,24 @@ export 	class ReadRepositoryBase<T extends mongoose.Document>
 
     private schemaIdentifier:string;
 
+    private disableCaching:boolean=false;
+
     constructor(     
 
         // Schema Identifier    
         schemaIdentifier:string,
          
         // Native Model Connection    
-        connection:mongoose.Model<mongoose.Document>
+        connection:mongoose.Model<mongoose.Document>,
+
+        // Cache Query <optional setting for test environment
+        disableCaching:boolean=false
        
-    ) {       
+    ) {            
 
         this.schemaIdentifier = schemaIdentifier.toLowerCase();   
+
+        this.disableCaching = disableCaching;
 
         switch(this.schemaIdentifier) {
             case PERSON_SUBTYPE_SYSTEM_USER:    this.createSystemUserModel(connection);   break;
@@ -95,19 +102,19 @@ export 	class ReadRepositoryBase<T extends mongoose.Document>
      * Mongoose operations
      */
     retrieve(callback: (error: any, result: T) => void) {
-        cache(this._model, {}, {}, {}, this._model.find, callback);      
+        cache(this._model, {}, {}, {}, this._model.find, callback, this.disableCaching);      
     }
 
     findById(_id: string, fields:Object, callback: (error: any, result: T) => void) {
-        cache(this._model, _id, null, null, this._model.findById, callback);    
+        cache(this._model, _id, null, null, this._model.findById, callback, this.disableCaching);    
     }  
 
     findOne(query:Object, callback?: (err: any, res: T) => void): any {      
-        cache(this._model, query, {}, {}, this._model.findOne, callback);       
+        cache(this._model, query, {}, {}, this._model.findOne, callback, this.disableCaching);       
     }   
 
     find(query: Object, fields:Object={}, options:Object={}, callback: (err: any, res: T[]) => void): any {
-        cache(this._model, query, fields, options, this._model.find, callback);        
+        cache(this._model, query, fields, options, this._model.find, callback, this.disableCaching);        
     } 
 
     count(query: Object, options:Object={}, callback: (err: any, res: T[]) => void): any {      

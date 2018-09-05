@@ -7,8 +7,10 @@ import { ServiceContainer } from "../shared/lib";
  * Import Database Services
  */
 import { DBAdminService } from "./db/db.admin.service";
-import { DBUserService } from "./db/db.user.service";
-import { DBProductService } from "./db/db.product.service";
+import { NoSQL_UserService } from "./db/nosql/db.user.nosql.service";
+import { NOSQL_ProductService } from "./db/nosql/db.product.nosql.service";
+import { SQL_UserService } from "./db/sql/db.user.sql.service";
+import { SQL_ProductService } from "./db/sql/db.product.sql.service";
 import { SystemUserService } from "./user/system.user.service";
 
 class ServiceManager {
@@ -16,18 +18,27 @@ class ServiceManager {
 	public services:any = ServiceContainer;
 
 	constructor() {	
-		this.registerServices();
+
+		/***
+		 * Register NoSQL Services
+		 */
+		this.registerNoSQLServices();
+
+		/***
+		 * Register SQL Services
+		 */
+		this.registerSQLServices();
 	}	
 
-	/*****
-	 * Register Singleton Services
+	/***
+	 * Register NoSQL Singleton Services
 	 */
-	private registerServices() {	
+	private registerNoSQLServices():void {	
 
 		/***************************
 		 * Configure Local Database		
 		 */	
-		this.services.registerClass('db', [], DBUserService);
+		this.services.registerClass('db', [], NoSQL_UserService);
 
 		/***************************
 		 * Configure Local Database		
@@ -35,15 +46,32 @@ class ServiceManager {
 		this.services.registerClass('adminDB', [], DBAdminService  );
 
 		/***************************
-		 * Configure Product Database		
+		 * Register Product Database Service		
 		 */	
-		this.services.registerClass('productDB', [], DBProductService  );
+		this.services.registerClass('productDB', [], NOSQL_ProductService  );
 
 		/***************************
 		 * Register System user Service
 		 */
 		this.services.registerClass('systemUser', [], SystemUserService);
 			
+	}
+
+	/***
+	 * Register SQL Singleton Services
+	 */
+	private registerSQLServices():void {
+
+		/***************************
+		 * Register Users Database Service
+		 */	
+		this.services.registerClass('userDB_SQL', [], SQL_UserService);
+
+		/***************************
+		 * Register Product Database Service		
+		 */	
+		this.services.registerClass('productDB_SQL', [], SQL_ProductService  );
+		
 	}
 
 	public inject(service:string):Function {

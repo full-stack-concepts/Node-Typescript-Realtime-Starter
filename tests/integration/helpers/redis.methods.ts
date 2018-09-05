@@ -21,7 +21,7 @@ import {
 
 export class RedisController {
 
-	static build() {
+	static async build() {
 
 		if(!USE_LOCAL_REDIS_SERVER)
 			return null;
@@ -42,6 +42,6 @@ export class RedisController {
 		/****
 		 * return Redis CLient to caller
 		 */	
-		return redisClient;		
+		return Promise.resolve(redisClient);		
 	}
 }

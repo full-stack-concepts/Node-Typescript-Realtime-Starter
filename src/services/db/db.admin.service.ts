@@ -144,9 +144,11 @@ export class DBAdminService implements IndexSignature {
 		 * Subscriber: proxyService flags to test MongoClient
 		 * get instance through get call to proxy service
 		 */		
-		this.proxyService.mongoClient$.subscribe( (state:boolean) => {	
-			if(state) this.adminDB = this.configureMongoDBClient();
-		});	
+		this.proxyService
+			.mongoClient$
+			.subscribe( (state:boolean) => {	
+				if(state) this.adminDB = this.configureMongoDBClient();
+			});	
 
 		/****
 		 * Subscriber: Mongoose Native Connection

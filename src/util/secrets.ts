@@ -7,7 +7,6 @@ import {
 } from "../controllers/environment.controller";
 
 import dotenv from "dotenv";
-import fs from "fs";
 import moment from "moment-timezone";
 import randomString from "random-string";
 
@@ -149,7 +148,60 @@ if(SET_SYSTEM_ADMIN_ACCOUNT) {
 
 
 /***
- * LOCAL MONGODB SERVER
+ * MYSQL CONFIGURATION
+ */
+export const USE_LOCAL_SQL_SERVER = process.env["USE_LOCAL_SQL_SERVER"] == 'true';
+export const DB_SQL_HOST = process.env["DB_SQL_HOST"];
+export const DB_SQL_PORT = process.env["DB_SQL_PORT"];
+export const DB_SQL_USER = process.env["DB_SQL_USER"];
+export const DB_SQL_PASSWORD = process.env["DB_SQL_PASSWORD"];
+export const DB_SQL_MAX_POOL_SIZE = process.env["DB_SQL_MAX_POOL_SIZE"];
+
+export const DB_USER_DATABASE_SQL_NAME = process.env["DB_USERS_DATABASE_SQL_NAME"];
+export const DB_PRODUCT_DATABASE_SQL_NAME = process.env["DB_PRODUCT_DATABASE_SQL_NAME"];
+
+export const SQL_CONNECTION_SETTINGS:any = {
+	USE_LOCAL_SQL_SERVER,
+	DB_SQL_HOST,
+	DB_SQL_PORT,
+	DB_SQL_USER,
+	DB_SQL_PASSWORD,
+	DB_SQL_MAX_POOL_SIZE,
+	DB_USER_DATABASE_SQL_NAME,
+	DB_PRODUCT_DATABASE_SQL_NAME
+};
+
+
+if( typeof USE_LOCAL_SQL_SERVER === 'boolean' ) {	
+
+	console.log("**** Test SQL host ", DB_SQL_HOST)
+
+
+	if(!DB_SQL_HOST || (DB_SQL_HOST && typeof DB_SQL_HOST!='string')) {
+		console.error("Local Database: Please specify DB SQL <host> name in your environemntal file (.env or .prod)! ");
+		process.exit(1);
+	}
+
+	const port:number = parseInt(DB_SQL_PORT);
+	if(!Number.isInteger(port) || Number.isInteger(port) && port<=0) {
+		console.error("Local Database: Please specify DB SQL <port> in your environemntal file (.env or .prod)! ");
+		process.exit(1);
+	}
+
+	if(!DB_SQL_USER || (DB_SQL_USER && typeof DB_SQL_USER!='string')) {
+		console.error("Local Database: Please specify DB SQL <user> in your environemntal file (.env or .prod)! ");
+		process.exit(1);
+	}
+
+	if(!DB_SQL_PASSWORD || (DB_SQL_PASSWORD && typeof DB_SQL_PASSWORD!='string')) {
+		console.error("Local Database: Please specify DB SQL <password> in your environemntal file (.env or .prod)! ");
+		process.exit(1);
+	}
+}
+
+
+/***
+ * MONGODB CONFIGURATION
  */
 export const USE_LOCAL_MONGODB_SERVER = process.env["USE_LOCAL_MONGODB_SERVER"] == 'true';
 export const DB_CONFIG_HOST = process.env["DB_CONFIG_HOST"];
@@ -164,34 +216,34 @@ if( typeof USE_LOCAL_MONGODB_SERVER === 'boolean' ) {
 	
 
 	if(!DB_CONFIG_HOST || (DB_CONFIG_HOST && typeof DB_CONFIG_HOST!='string')) {
-		console.error("Local Database: Please specify DB <host> name in your environemntal file (.env or .prod)! ");
+		console.error("Local Database: Please specify DB NoSQL <host> name in your environemntal file (.env or .prod)! ");
 		process.exit(1);
 	}
 
 	const port:number = parseInt(DB_CONFIG_PORT);
 	if(!Number.isInteger(port) || Number.isInteger(port) && port<=0) {
-		console.error("Local Database: Please specify DB <port> in your environemntal file (.env or .prod)! ");
+		console.error("Local Database: Please specify DB NoSQL <port> in your environemntal file (.env or .prod)! ");
 		process.exit(1);
 	}
 
 	if(!DB_CONFIG_USER || (DB_CONFIG_USER && typeof DB_CONFIG_USER!='string')) {
-		console.error("Local Database: Please specify DB <user> in your environemntal file (.env or .prod)! ");
+		console.error("Local Database: Please specify DB NoSQL <user> in your environemntal file (.env or .prod)! ");
 		process.exit(1);
 	}
 
 	if(!DB_CONFIG_PASSWORD || (DB_CONFIG_PASSWORD && typeof DB_CONFIG_PASSWORD!='string')) {
-		console.error("Local Database: Please specify DB <password> in your environemntal file (.env or .prod)! ");
+		console.error("Local Database: Please specify DB NoSQL <password> in your environemntal file (.env or .prod)! ");
 		process.exit(1);
 	}
 
 	if(!DB_CONFIG_PASSWORD || (DB_CONFIG_DATABASE && typeof DB_CONFIG_DATABASE!='string')) {
-		console.error("Local Database: Please specify DB <name> in your environemntal file (.env or .prod)! ");
+		console.error("Local Database: Please specify DB NoSQL <name> in your environemntal file (.env or .prod)! ");
 		process.exit(1);
 	}
 
 	const poolSize:number = parseInt(DB_MAX_POOL_SIZE);
 	if(!Number.isInteger(poolSize) || Number.isInteger(poolSize) && poolSize<=0) {
-		console.error("Local Database: Please specify <PoolSize> in your environemntal file (.env or .prod)! ");
+		console.error("Local Database: Please specify NoSQL <PoolSize> in your environemntal file (.env or .prod)! ");
 		process.exit(1);
 	}
 }

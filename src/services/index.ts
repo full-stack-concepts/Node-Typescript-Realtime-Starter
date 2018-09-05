@@ -32,8 +32,11 @@ export { UserTypes } from "./data/data.usertypes.service";
 export { DBAdminService, configureDatabases } from "./db/db.admin.service";
 export { dbModelService} from "./db/db.model.service";
 
-export { connectToProductDatabase, DBProductService } from "./db/db.product.service";
-export { connectToUserDatabase, DBUserService } from "./db/db.user.service";
+export { connectToProductDatabase, NOSQL_ProductService } from "./db/nosql/db.product.nosql.service";
+export { connectToUserDatabase, NoSQL_UserService } from "./db/nosql/db.user.nosql.service";
+
+export { connectToSQLUserDatabase, SQL_UserService } from "./db/sql/db.user.sql.service";
+export { connectToSQLProductDatabase, SQL_ProductService } from "./db/sql/db.product.sql.service";
 
 /***
  * CLient/HTTP Services

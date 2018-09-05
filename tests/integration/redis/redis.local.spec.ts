@@ -197,14 +197,12 @@ describe("Local Redis Server", () => {
             let testRepo:any = await new ReadRepository('user', connection);            
 
             // clone testmodel to we can create a repo per readModel
-            let model:any = await testRepo.getModel();          
+            let model:any = await testRepo.getModel();    
+
+            let collectionName:string = model.collection.collectionName;          
             
             // construct hash key
-            const {
-            	dbName, 
-            	collectionName, 
-            	hashKey
-            }:any = constructPrimaryKey(model); 
+            const {dbName, hashKey}:any = constructPrimaryKey(this.model, collectionName); 
 
             _dbName = dbName;
             _collectionName = collectionName;
