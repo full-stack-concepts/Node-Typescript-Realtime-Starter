@@ -142,6 +142,10 @@ export {
 	timestampToString
 } from "./date.util";
 
+export {
+	D
+} from "./decimal.util";
+
 
 
 
